@@ -242,7 +242,7 @@ div#price_table_notes {
         height: 5rem;
     }
 }
-.login-content {
+.login-content, .signup-content {
     #content {
         width: 20rem;
     }
@@ -253,25 +253,8 @@ div#price_table_notes {
         width: 7rem;
     }
     input,
-    button {
-        width: 100%;
-    }
-    .errorfield {
-        margin-top: -1rem;
-    }
-    .bigerror {
-        margin-top: 1rem;
-    }
-}
-.signup-content {
-    #content {
-        width: 30rem;
-    }
-    .form-logo {
-        width: 7rem;
-    }
-    input,
-    button {
+    button,
+    select {
         width: 100%;
     }
     .errorfield {
