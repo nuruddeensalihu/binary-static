@@ -2,8 +2,8 @@ ul[role=tabs], ul[role=segmented] {
     display: flex;
     overflow: hidden;
     margin-bottom: 1rem;
+    justify-content: space-around;
     li {
-        flex: 1;
         text-align: center;
         display: flex;
         flex-direction: column;
@@ -11,7 +11,7 @@ ul[role=tabs], ul[role=segmented] {
         cursor: pointer;
     }
     a {
-        padding: .5rem .25rem;        
+        padding: .5rem .25rem;
         text-decoration: none;
         font-weight: normal;
         &:hover {
