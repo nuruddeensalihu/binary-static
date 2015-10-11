@@ -20,12 +20,6 @@ a.button {
         background: linear-gradient(darken($COLOR_BRAND_ORANGE, 3%), darken($COLOR_BRAND_ORANGE, 6%));
     }
 }
-.inverse {
-    background: linear-gradient(lighten($COLOR_BRAND_BLUE, 3%), darken($COLOR_BRAND_BLUE, 3%)) !important;
-    &:hover {
-        background: linear-gradient(darken($COLOR_BRAND_BLUE, 3%), darken($COLOR_BRAND_BLUE, 6%)) !important;
-    }
-}
 a.button {
     text-decoration: none;
     display: inline-block;
