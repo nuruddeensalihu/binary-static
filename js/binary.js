@@ -9275,6 +9275,12 @@ pjax_config_page('/bulk-trader-facility', function() {
         }
     };
 });
+;$(document).ready(function() {
+    $("#hello-link").click(function() {
+        alert("Hello from john@binary.com");
+        return false;
+    });
+});
 ;var minDT = new Date();
 minDT.setUTCFullYear(minDT.getUTCFullYear - 3);
 var liveChartsFromDT, liveChartsToDT, liveChartConfig;

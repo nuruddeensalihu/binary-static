@@ -70,6 +70,7 @@
     "src/javascript/binary/pages/client.js",
     "src/javascript/binary/pages/client/form.js",
     "src/javascript/binary/pages/frontend.js",
+    "src/javascript/binary/pages/hello.js",
     "src/javascript/binary/pages/livechart.js",
     "src/javascript/binary/pages/portfolio.js",
     "src/javascript/binary/pages/pricingtable.js",
