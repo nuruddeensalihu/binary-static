@@ -12103,6 +12103,8 @@ var Price = (function () {
             description = container.getElementsByClassName('contract_description')[0],
             comment = container.getElementsByClassName('price_comment')[0],
             error = container.getElementsByClassName('contract_error')[0],
+            amount_wrapper = container.getElementsByClassName('amount_wrapper')[0],
+            price_wrapper = container.getElementsByClassName('price_wrapper')[0],
             currency = document.getElementById('currency');
 
         var display = type ? (contractType ? contractType[type] : '') : '';
@@ -12129,7 +12131,7 @@ var Price = (function () {
 
         if (proposal['longcode']) {
             proposal['longcode'] = proposal['longcode'].replace(/[\d\,]+\.\d\d/,function(x){return '<b>'+x+'</b>';});
-            description.innerHTML = proposal['longcode'];
+            description.innerHTML = '<div>'+proposal['longcode']+'</div>';
         }
 
         if (document.getElementById('websocket_form')) {
@@ -12151,12 +12153,16 @@ var Price = (function () {
         if (details['error']){
             purchase.hide();
             comment.hide();
+            amount_wrapper.hide();
+            price_wrapper.classList.add('small');
             error.show();
             error.textContent = details['error'].message;
         }
         else{
             purchase.show();
             comment.show();
+            amount_wrapper.show();
+            price_wrapper.classList.remove('small');
             error.hide();
             if (is_spread) {
                 displayCommentSpreads(comment, currency.value, proposal['spread']);
@@ -12524,18 +12530,11 @@ var Purchase = (function () {
             profit_value = Math.round((payout_value - cost_value)*100)/100;
 
             if(sessionStorage.getItem('formname')==='spreads'){
-                payout.hide();
-                cost.hide();
-                profit.hide();
-
-                // payout.innerHTML = Content.localize().textStopLoss + ' <p>' + payout_value + '</p>';
-                // cost.innerHTML = Content.localize().textAmountPerPoint + ' <p>' + cost_value + '</p>';
-                // profit.innerHTML = Content.localize().textStopProfit + ' <p>' + profit_value + '</p>';
+                payout.innerHTML = Content.localize().textStopLoss + ' <p>' + receipt.stop_loss_level + '</p>';
+                cost.innerHTML = Content.localize().textAmountPerPoint + ' <p>' + receipt.amount_per_point + '</p>';
+                profit.innerHTML = Content.localize().textStopProfit + ' <p>' + receipt.stop_profit_level + '</p>';
             }
             else {
-                payout.show();
-                cost.show();
-                profit.show();
                 payout.innerHTML = Content.localize().textContractConfirmationPayout + ' <p>' + payout_value + '</p>';
                 cost.innerHTML = Content.localize().textContractConfirmationCost + ' <p>' + cost_value + '</p>';
                 profit.innerHTML = Content.localize().textContractConfirmationProfit + ' <p>' + profit_value + '</p>';
