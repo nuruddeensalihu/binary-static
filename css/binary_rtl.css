@@ -4705,10 +4705,11 @@ table .loss, table .lower {
 }
 #trading_socket_container #contract_prices_container #contract_purchase_profit_list,
 #trading_socket_container #contract_prices_container #contract_purchase_spots .row {
+  padding: 3px 0;
   flex-direction: row !important;
 }
 #trading_socket_container #contract_prices_container #contract_purchase_spots {
-  max-height: 180px;
+  height: 110px;
   overflow: hidden;
 }
 #trading_socket_container #contract_prices_container #contract_purchase_spots.won {
@@ -4905,9 +4906,6 @@ table .loss, table .lower {
   #trading_socket_container #contract_market_form_container {
     height: auto;
   }
-  #trading_socket_container #contract_purchase_spots {
-    max-height: 205px;
-  }
   #trading_socket_container #expiry_time {
     width: 175px;
   }
@@ -4932,6 +4930,9 @@ table .loss, table .lower {
   #trading_socket_container #contract_symbol_container #contract_markets_container {
     margin-right: 0;
     text-align: inherit;
+  }
+  #trading_socket_container #contract_prices_container #contract_purchase_spots {
+    height: auto;
   }
   #trading_socket_container #contract_prices_container #price_container_top {
     margin-right: 0 !important;
