@@ -1,7 +1,6 @@
 <div id="hello-page">
-    <h1>[% l("Hello World") %]</h1>
-    <p>[% l("Click") %] 
-        <a href="#" id="hello-link">[% l("here") %]</a>
-        [% l("to see what happens") %].
+    <h1>Hello WOrld</h1>
+    <p> This is a test 
+
     </p>
 </div>
