@@ -5296,7 +5296,7 @@ table .loss, table .lower {
 /* Language based rules */
 /* Specific rules for languages */
 /*Japan Language */
-body .newTopMenuBetaInterface {
+body #newTopMenuBetaInterface {
   display: none;
 }
 
