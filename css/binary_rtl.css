@@ -5193,6 +5193,10 @@ table .loss, table .lower {
 /* Language based rules */
 /* Specific rules for languages */
 /*Japan Language */
+body .newTopMenuBetaInterface {
+  display: none;
+}
+
 body.JA .ja-hide {
   display: none !important;
 }
@@ -5263,6 +5267,9 @@ body.FR h1, body.FR h2, body.FR h3, body.FR h4, body.FR h5, body.FR h6 {
 }
 body.FR .fr-hide {
   display: none !important;
+}
+body.FR .fr-show {
+  display: inline !important;
 }
 
 /*Arabic Language */
