@@ -788,7 +788,7 @@ Menu.prototype = {
                 this.show_main_menu();
             }
         } else {
-            var is_mojo_page = /^\/$|\/login|\/home|\/smart-indices|\/ad|\/open-source-projects|\/white-labels|\/bulk-trader-facility|\/partners|\/payment-agent|\/about-us$/.test(window.location.pathname);
+            var is_mojo_page = /^\/$|\/login|\/home|\/smart-indices|\/ad|\/open-source-projects|\/white-labels|\/bulk-trader-facility|\/partners|\/payment-agent|\/about-us|\/group-information|\/group-history|\/careers|\/contact|\/terms-and-conditions|\/terms-and-conditions-jp|\/responsible-trading|\/us_patents|\/signup$/.test(window.location.pathname);
             if(!is_mojo_page) {
                 trading.addClass('active');
                 this.show_main_menu();
@@ -1338,7 +1338,6 @@ Page.prototype = {
     on_change_loginid: function() {
         var that = this;
         $('#client_loginid').on('change', function() {
-            LocalStore.set('active_loginid', $(this).val());
             $('#loginid-switch-form').submit();
         });
     },
@@ -1932,16 +1931,35 @@ onLoad.queue(function () {
     attach_tabs('.has-tabs');
 });
 
-// this event is fired when there is change in localStorage
-// that looks for active_loginid key change, this was needed for
-// scenario where client has multiple tab/window open and switch
-// account on one tab then we need to load all the open tab/window
-$(window).on('storage', function (jq_event) {
-    if (jq_event.originalEvent.key !== 'active_loginid') return;
-    // wait for 2 seconds as cookie is being set else it will show login screen
-    window.setTimeout(function () {
-        location.href = page.url.url_for('user/my_account?loginid=' + LocalStore.get('active_loginid'));
-    }, 2000);
+// LocalStorage can be used as a means of communication among
+// different windows. The problem that is solved here is what
+// happens if the user logs out or switches loginid in one
+// window while keeping another window or tab open. This can
+// lead to unintended trades. The solution is to load the
+// account page in all windows after switching loginid or
+// the home page after logout.
+
+// onLoad.queue does not work on the home page.
+// jQuery's ready function works always.
+$(document).ready(function () {
+    // $.cookie is not always available.
+    // So, fall back to a more basic solution.
+    var match = document.cookie.match(/\bloginid=(\w+)/);
+    match = match ? match[1] : '';
+
+    $(window).on('storage', function (jq_event) {
+        if (jq_event.originalEvent.key !== 'active_loginid') return;
+        if (jq_event.originalEvent.newValue === match) return;
+        if (jq_event.originalEvent.newValue === '') {
+            // logged out
+            location.href = page.url.url_for('home');
+        } else {
+            // loginid switch
+            location.href = page.url.url_for('user/my_account?loginid=' + jq_event.originalEvent.newValue);
+        }
+    });
+
+    LocalStore.set('active_loginid', match);
 });
 ;DatePicker = function(component_id, select_type) {
     this.component_id = component_id;
@@ -7431,7 +7449,7 @@ BetForm.Time.EndTime.prototype = {
         },
         register: function () {
             var that = this;
-            $('#profit-table, #portfolio-table, #bet_container, #statement-table, #trading_socket_container').on('click', '.open_contract_details', function (e) {
+            $('#profit-table, #portfolio-table, #bet_container, #statement-table').on('click', '.open_contract_details', function (e) {
                 var $this = $(this);
                 e.preventDefault();
                 _previous_button_clicked = this;
@@ -8795,6 +8813,7 @@ ClientForm.prototype = {
                 var names = ['MAXCASHBAL', 'MAXOPENPOS',
                              'DAILYTURNOVERLIMIT', 'DAILYLOSSLIMIT',
                              '7DAYTURNOVERLIMIT', '7DAYLOSSLIMIT',
+                             '30DAYTURNOVERLIMIT', '30DAYLOSSLIMIT',
                              'SESSIONDURATION', 'EXCLUDEUNTIL'];
                 for (i=0; i<names.length; i++) {
                     el = document.getElementById(names[i]);
@@ -11376,7 +11395,11 @@ var Durations = (function(){
         // jquery for datepicker
         var amountElement = $('#duration_amount');
         if (unit.value === 'd') {
+            var tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+
             amountElement.datepicker({
+                minDate: tomorrow,
                 onSelect: function() {
                     var date = $(this).datepicker('getDate');
                     var today = new Date();
@@ -11886,7 +11909,7 @@ var TradingEvents = (function () {
         var view_button = document.getElementById('contract_purchase_button');
         if(view_button){
             view_button.addEventListener('click', debounce( function (e) {
-                BetSell.sell_at_market($(e.traget)[0]);
+                BetSell.sell_at_market(e.target);
             }));
         }
 
@@ -12508,7 +12531,7 @@ var Purchase = (function () {
 
             heading.textContent = Content.localize().textContractConfirmationHeading;
             descr.textContent = receipt['longcode'];
-            reference.textContent = Content.localize().textContractConfirmationReference + ' ' + receipt['fmb_id'];
+            reference.textContent = Content.localize().textContractConfirmationReference + ' ' + receipt['contract_id'];
 
             var payout_value, cost_value, profit_value;
 
@@ -12568,13 +12591,12 @@ var Purchase = (function () {
                     spread_bet = 0;
                 }
                 var button_attrs = {
-                    contract_id: receipt['fmb_id'],
+                    contract_id: receipt['contract_id'],
                     currency: document.getElementById('currency').value,
                     purchase_price: cost_value,
                     purchase_time: (purchase_date.getUTCFullYear()+'-'+(purchase_date.getUTCMonth()+1)+'-'+purchase_date.getUTCDate()+' '+purchase_date.getUTCHours()+':'+purchase_date.getUTCMinutes()+':'+purchase_date.getUTCSeconds()),
                     shortcode:receipt['shortcode'],
                     spread_bet:spread_bet,
-                    broker_code:receipt.broker_code,
                     language:page.language(),
                     url:url
                 };
@@ -13060,36 +13082,92 @@ WSTickDisplay.updateChart = function(data){
     "use strict";
 
     var reality_check_url = page.url.url_for('user/reality_check');
+    var reality_freq_url  = page.url.url_for('user/reality_check_frequency');
+    var logout_url        = page.url.url_for('logout');
 
-    function RealityCheck(cookieName, persistentStore, logoutLocation) {
-        var val;
+    RealityCheck.prototype.setInterval = function (intv) {
+        this.interval = intv * 60 * 1000; // convert minutes to millisec
+        this.storage.set('reality_check.interval', this.interval);
+    };
+
+    RealityCheck.prototype.getInterval = function () {
+        return this.getIntervalMs() / (60 * 1000); // convert to minutes
         
-        this.cookieName = cookieName;
+    };
+
+    RealityCheck.prototype.getIntervalMs = function () {
+        if (this.interval > 0) return this.interval;
+
+        this.interval = parseFloat(this.storage.get('reality_check.interval'));
+
+        // use default if garbage
+        if (isNaN(this.interval) || this.interval<=0)
+            this.interval = this.default_interval;
+
+        return this.interval;
+    };
+
+    function RealityCheck(cookieName, persistentStore) {
+        var val, that = this;
+
+        val = ($.cookie(cookieName)||'').split(',');
+        val[0] = parseFloat(val[0]);
+        if (isNaN(val[0]) || val[0]<=0) return;  // no or invalid cookie
+        this.default_interval = val[0] * 60 * 1000;
+
         this.storage = persistentStore;
 
-        val = ($.cookie(this.cookieName)||'').split(',');
-        val[0] = parseInt(val[0]);
-        if (isNaN(val[0]) || val[0]<=0) return;  // no or invalid cookie
+        // A storage event handler is used to notify about interval changes.
+        // That way all windows see the same interval.
+        $(window).on('storage', function (jq_event) {
+            if (jq_event.originalEvent.key === 'reality_check.interval') {
+                that.interval = parseFloat(jq_event.originalEvent.newValue);
+
+                // garbage here can only happen if the user tries to tamper
+                if (isNaN(that.interval) || that.interval<=0)
+                    that.interval = that.default_interval;
+
+                // console.log('interval storage handler new value = '+that.interval);
+
+                that.setAlarm();
+            }
+
+            if (jq_event.originalEvent.key === 'reality_check.basetime') {
+                var val = parseInt(jq_event.originalEvent.newValue);
+
+                // garbage here can only happen if the user tries to tamper
+                if (isNaN(val) || val<=0) return;
+                that.basetime = val;
+
+                // console.log('basetime storage handler new value = '+that.basetime);
+
+                that.setAlarm();
+            }
+        });
+
+        // The cookie is formatted as DEFAULT_INTERVAL , SERVER_TIME_WHEN_IT_WAS_ISSUED
+        // We save the server time in local storage. If the stored time differs from
+        // the cookie time we are in a new session. Hence, we have to reset all stored
+        // data and to ask the user to check the reality-check frequency.
 
         if (val[1] && val[1] != persistentStore.get('reality_check.srvtime')) {
             persistentStore.set('reality_check.srvtime', val[1]);
-            persistentStore.set('reality_check.basetime', (new Date()).getTime());
+            persistentStore.set('reality_check.basetime', this.basetime = new Date().getTime());
             persistentStore.set('reality_check.ack', 1);
+            this.askForFrequency();
+        } else if (persistentStore.get('reality_check.askingForInterval')) {
+            this.basetime = parseInt(persistentStore.get('reality_check.basetime'));
+            this.askForFrequency();
+        } else {
+            this.basetime = parseInt(persistentStore.get('reality_check.basetime'));
+            this.setAlarm();
         }
-
-        this.logoutLocation = logoutLocation;
-        if (!this.logoutLocation) return; // not logged in?
-
-        this.interval = parseInt(val) * 60 * 1000; // convert minutes to millisec
-
-        this.basetime = persistentStore.get('reality_check.basetime');
-
-        return this.setAlarm();
     }
 
     RealityCheck.prototype.setAlarm = function () {
         var that = this;
-        var alrm = this.interval - ((new Date()).getTime() - this.basetime) % this.interval;
+        var intv = this.getIntervalMs();
+        var alrm = intv - (new Date().getTime() - this.basetime) % intv;
 
         // console.log('interval = '+this.interval+', next alarm in '+alrm+' ms');
         // console.log('alrm at '+(new Date((new Date()).getTime()+alrm)).toUTCString());
@@ -13102,14 +13180,14 @@ WSTickDisplay.updateChart = function(data){
         }, alrm);
     };
 
-    RealityCheck.prototype.fire = function () {
+    RealityCheck.prototype._fire = function (url, next) {
         var that = this;
 
         $.ajax({
-            url: reality_check_url,
+            url: url,
             dataType: 'text',
             success: function (data) {
-                that.display(data);
+                next.call(that, data);
             },
             error: function (xhr) {
                 if (xhr.status === 404) return; // no MF loginid
@@ -13118,6 +13196,10 @@ WSTickDisplay.updateChart = function(data){
                 }, 5000);
             },
         });
+    };
+
+    RealityCheck.prototype.fire = function () {
+        this._fire(reality_check_url, this.display);
     };
 
     RealityCheck.prototype.display = function (data) {
@@ -13129,6 +13211,7 @@ WSTickDisplay.updateChart = function(data){
         outer = $("<div id='reality-check' class='lightbox'></div>").appendTo('body');
         middle = $('<div />').appendTo(outer);
         $('<div>' + data + '</div>').appendTo(middle);
+        $('#reality-check [interval=1]').val(this.getInterval());
 
         storage_handler = function (jq_event) {
             var ack;
@@ -13136,6 +13219,8 @@ WSTickDisplay.updateChart = function(data){
             if (jq_event.originalEvent.key !== 'reality_check.ack') return;
             ack = parseInt(jq_event.originalEvent.newValue || 1);
             if (ack > that.lastAck) {
+                // console.log('Display storage handler');
+
                 $(window).off('storage', storage_handler);
                 that.setAlarm();
                 $('#reality-check').remove();
@@ -13148,6 +13233,12 @@ WSTickDisplay.updateChart = function(data){
 
         this.lastAck = parseInt(this.storage.get('reality_check.ack') || 1);
         $('#reality-check [bcont=1]').on('click', function () {
+            var intv = parseFloat($('#reality-check [interval=1]').val());
+            if (isNaN(intv) || intv <= 0) {
+                $('#reality-check p.msg').show('fast');
+                return;
+            }
+            that.setInterval(intv);
             that.storage.set('reality_check.ack', that.lastAck+1);
             $(window).off('storage', storage_handler);
             that.setAlarm();
@@ -13155,18 +13246,77 @@ WSTickDisplay.updateChart = function(data){
         });
 
         $('#reality-check .blogout').on('click', function () {
-            window.location.href = that.logoutLocation;
+            window.location.href = logout_url;
         });
+    };
+
+    // On session start we need to ask for the reality-check interval.
+    // This is an ajax call because it depends on the user's language.
+
+    RealityCheck.prototype.askForFrequency = function () {
+        this._fire(reality_freq_url, this.displayFrequencyChoice);
+    };
+
+    RealityCheck.prototype.displayFrequencyChoice = function (data) {
+        var that = this, outer, middle, storage_handler, click_handler; 
+
+        outer = $('#reality-check');
+        if (outer) outer.remove();
+
+        outer = $("<div id='reality-check' class='lightbox'></div>").appendTo('body');
+        middle = $('<div />').appendTo(outer);
+        $('<div>' + data + '</div>').appendTo(middle);
+        $('#reality-check [interval=1]').val(this.getInterval());
+
+        this.storage.set('reality_check.askingForInterval', 1);
+        storage_handler = function (jq_event) {
+            var ack;
+
+            if (jq_event.originalEvent.key !== 'reality_check.ack') return;
+
+            ack = parseInt(jq_event.originalEvent.newValue || 1);
+            if (ack > that.lastAck) {
+                // console.log('FreqSet storage handler');
+
+                $(window).off('storage', storage_handler);
+                $('#reality-check').remove();
+                that.setAlarm();
+            }
+        };
+
+        // in case the client works with multiple windows, check if he has acknowleged
+        // it in another window.
+        $(window).on('storage', storage_handler);
+
+        this.lastAck = parseInt(this.storage.get('reality_check.ack') || 1);
+        click_handler = function () {
+            var intv = parseFloat($('#reality-check [interval=1]').val());
+            if (isNaN(intv) || intv <= 0) {
+                $('#reality-check p.msg').show('fast');
+                return;
+            }
+
+            // console.log('set interval handler: intv = '+intv);
+            that.storage.remove('reality_check.askingForInterval');
+
+            that.setInterval(intv);
+            that.storage.set('reality_check.ack', that.lastAck+1);
+            $(window).off('storage', storage_handler);
+            $('#reality-check').remove();
+            that.setAlarm();
+        };
+        $('#reality-check [bcont=1]').on('click', click_handler);
+        $('#reality-check [interval=1]').on('change', click_handler);
     };
 
     return RealityCheck;
 }(jQuery));
 
-onLoad.queue(function () {
-    var logoutBtn = $('#btn_logout')[0];
-    if (!logoutBtn) return;
+$(document).ready(function () {
+    // console.log('About to create reality-check object');
+
     if (window.reality_check_object) return;
-    window.reality_check_object = new RealityCheck('reality_check', LocalStore, logoutBtn.getAttribute('href'));
+    window.reality_check_object = new RealityCheck('reality_check', LocalStore);
 });
 ;//////////////////////////////////////////////////////////////////
 // Purpose: Write loading image to a container for ajax request
