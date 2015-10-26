@@ -5326,7 +5326,7 @@ body.JA #asset-forex div.table-header:nth-of-type(n + 3), body.JA #asset-forex d
 body.JA #tradingtimes-forex div.table-header:nth-of-type(n + 3), body.JA #tradingtimes-forex div.table-body:nth-of-type(n + 15) {
   display: none !important;
 }
-body.JA #topMenuHighCharts, body.JA #risefall_table_lnk, body.JA #pricing_table_lnk, body.JA #topMenuBetaInterface {
+body.JA #topMenuHighCharts, body.JA #risefall_table_lnk, body.JA #pricing_table_lnk, body.JA #topMenuBetaInterface, body.JA #newTopMenuBetaInterface {
   display: none !important;
 }
 body.JA #footer-regulatory .grd-grid-9, body.JA #footer-regulatory .grd-grid-phablet-7 {
