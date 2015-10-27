@@ -2477,6 +2477,7 @@ a.spread_250, a.spread_260, a.spread_buy, a.spread_sell {
 }
 #bet_bottom_content input {
   border: 1px solid #dedede;
+  border-radius: 4px;
 }
 #bet_bottom_content select {
   border: 1px solid #dedede;
@@ -5115,6 +5116,13 @@ table .loss, table .lower {
 #trading_socket_container #contract_form_name_nav > li .tm-ul-2 {
   top: 29px;
   margin-top: 0;
+}
+
+#analysis_daily_prices_form {
+  text-align: center;
+}
+#analysis_daily_prices_form input {
+  margin: 0 10px;
 }
 
 /*
