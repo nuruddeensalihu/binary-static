@@ -5193,10 +5193,6 @@ table .loss, table .lower {
 /* Language based rules */
 /* Specific rules for languages */
 /*Japan Language */
-body #newTopMenuBetaInterface {
-  display: none;
-}
-
 body.JA .ja-hide {
   display: none !important;
 }
