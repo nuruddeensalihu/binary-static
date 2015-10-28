@@ -12,7 +12,10 @@
       .grd-row-padding
         %p.no-para-margin!= l("You'll find answers to most of your questions on the <a href='[_1]' target='_blank'>FAQ</a> page.", $faq_url)
       .grd-row-padding  
-        %p.body-hide.ru-show.id-show.en-show.no-para-margin= l('Our Customer service opening hours are: Monday') %br/=l('– Friday: 24 Hours')
+        %p.body-hide.ru-show.id-show.en-show.no-para-margin
+          %span= l('Our Customer service opening hours are:') 
+          %br
+          %span= l('Monday – Friday: 24 Hours')
         %p!= l("Email: <span id='cs_contact_eaddress'></span>")
       .grd-grid-12.grd-parent.grd-row-padding
         %label.grd-grid-4.grd-grid-mobile-12.grd-no-gutter= l('Telephone:')
