@@ -1616,15 +1616,7 @@ msgstr "Binary (C.R.) S.A., terdaftar di Costa Rica."
 
 #: /home/git/translations/binary-static/src/templates/haml/static/contact.html.haml:1
 msgid "Binary (Europe) Ltd, Mompalao Building, Suite 2, Tower Road, Msida MSD1825"
-msgstr "Binary (Europe) Ltd, Mompalao Building, Suite 2, Tower Road, Msida MSD1825"
-
-#: /home/git/translations/binary-static/src/templates/haml/static/contact.html.haml:1
-msgid "Our Customer service opening hours are: Monday – Friday: 24 Hours"
-msgstr "Jam buka kami dari 12:00am GMT - 03:00pm GMT 11:00pm - 10:00pm Jakarta time"
-
-#: /home/git/translations/binary-static/src/templates/haml/static/contact.html.haml:1
-msgid "All calls are recoded for training and monitoring purposes"
-msgstr "Semua panggilan dicatat untuk tujuan pelatihan dan pemantauan."
+msgstr "RMG Technology (M) Sdn Bhd, C-2-01 SME Technopreneur Center 2, 63000 Cyberjaya"
 
 #. (('https://secure.gamblingcommission.gov.uk/gccustomweb/PublicRegister/PRSearch.aspx?ExternalAccountId=39495')
 #: /home/git/translations/binary-static/src/templates/haml/about/group-information.html.haml:1
