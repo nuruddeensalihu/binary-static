@@ -5289,6 +5289,28 @@ table .loss, table .lower {
 
 /* Language based rules */
 /* Specific rules for languages */
+body #customer_service-hours {
+  display: none !important;
+}
+body #conversation_recording_notice {
+  display: none !important;
+}
+
+/*English Language*/
+body.EN #customer_service-hours {
+  display: inline !important;
+}
+body.EN #conversation_recording_notice {
+  display: inline !important;
+}
+
+body.RU #conversation_recording_notice {
+  display: inline !important;
+}
+body.RU #customer_service-hours {
+  display: inline !important;
+}
+
 /*Japan Language */
 body.JA .ja-hide {
   display: none !important;
@@ -5383,6 +5405,12 @@ body.ID .id-hide {
 }
 body.ID .extra-space {
   margin-top: 127px;
+}
+body.ID #customer_service-hours {
+  display: inline !important;
+}
+body.ID #conversation_recording_notice {
+  display: inline !important;
 }
 @media screen and (max-width: 480px) {
   body.ID .empty-space {
