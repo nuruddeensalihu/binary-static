@@ -64,5 +64,12 @@
     "src/javascript/binary/pages/trade/tick_trade.js",
     "src/javascript/binary/pages/trade/user.js",
     "src/javascript/binary/reality-check.js",
+    "src/javascript/binary/static/common/common.data.js",
+    "src/javascript/binary/static/common/dom.table.js",
+    "src/javascript/binary/static/common/string_util.js",
+    "src/javascript/binary/static/statement.js",
+    "src/javascript/binary/static/statement/statement.data.js",
+    "src/javascript/binary/static/statement/statement.init.js",
+    "src/javascript/binary/static/statement/statement.ui.js",
     "src/javascript/binary/utility.js"
 ]
