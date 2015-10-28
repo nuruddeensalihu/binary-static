@@ -5466,11 +5466,12 @@ table .loss, table .lower {
 
 /* Language based rules */
 /* Specific rules for languages */
-body .body-hide {
+body .contact-timings {
   display: none;
 }
 
-body.EN en-show {
+/*English Language*/
+body.EN .contact-timings {
   display: inline !important;
 }
 
@@ -5556,6 +5557,9 @@ body.AR .ar-hide {
 body.ID .regulatory-logo {
   display: none !important;
 }
+body.ID .contact-timings {
+  display: inline !important;
+}
 body.ID #regulatory-text {
   margin-top: 10px;
   margin-bottom: 10px;
@@ -5565,9 +5569,6 @@ body.ID #footer #social-networks {
 }
 body.ID .id-hide {
   display: none !important;
-}
-body.ID .id-show {
-  display: inline !important;
 }
 body.ID .extra-space {
   margin-top: 127px;
@@ -5593,8 +5594,7 @@ body.IT h1, body.IT h2, body.IT h3, body.IT h4, body.IT h5, body.IT h6 {
   text-transform: initial !important;
 }
 
-/*Russian Language*/
-body.RU ru-show {
+body.RU .contact-timings {
   display: inline !important;
 }
 
