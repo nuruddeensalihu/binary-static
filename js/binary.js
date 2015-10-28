@@ -906,7 +906,7 @@ Menu.prototype = {
         }
         var start_trading = $('#topMenuStartBetting a:first');
         var trade_url = start_trading.attr("href");
-        if(stored_market && !/\/trading/.test(trade_url)) {
+        if(stored_market) {
             if(/market=/.test(trade_url)) {
                 trade_url = trade_url.replace(/market=\w+/, 'market=' + stored_market);
             } else {
@@ -9470,6 +9470,13 @@ $(function() {
     }
 
 });
+;$(function() {
+    $( "#accordion" ).accordion({
+      heightStyle: "content",
+      collapsible: true,
+      active: false
+    });
+});
 ;function currencyConvertorCalculator()
 {
     var currencyto = document.getElementById('currencyto');
@@ -10992,9 +10999,29 @@ function countDecimalPlaces(num) {
         }
     };
 
+    function localizeTextContentById(id){
+        var element = document.getElementById(id);
+        var textContent = element.textContent;
+        element.textContent = text.localize(textContent);
+    }
+
+    var statementTranslation = function(){
+        var titleElement = document.getElementById("statement-title").firstElementChild;
+        var title = titleElement.textContent;
+        titleElement.textContent = text.localize(title);
+
+        localizeTextContentById("err");
+        localizeTextContentById("newer-date");
+        localizeTextContentById("older-date");
+        localizeTextContentById("date-label");
+        localizeTextContentById("submit-date");
+        localizeTextContentById("end-of-table");
+    };
+
     return {
         localize: function () { return localize; },
-        populate: populate
+        populate: populate,
+        statementTranslation: statementTranslation
     };
 
 })();
@@ -11510,8 +11537,20 @@ var TradingEvents = (function () {
          * attach event to market list, so when client change market we need to update undelryings
          * and request for new Contract details to populate the form and request price accordingly
          */
+        var getEventValue = function(e){
+            var value;
+            if(typeof e === 'object' && e.target){
+                value = e.target.value;
+            }
+            else{
+                value = e;
+            }
+            return value;
+        };
+
         var marketNavElement = document.getElementById('contract_markets');
-        var onMarketChange = function(market){
+        var onMarketChange = function(e){
+            var market = getEventValue(e);
             showPriceOverlay();
             sessionStorage.setItem('market', market);
 
@@ -11523,10 +11562,7 @@ var TradingEvents = (function () {
         };
 
         if (marketNavElement) {
-            marketNavElement.addEventListener('change', function(e) {
-                var clickedMarket = e.target;
-                onMarketChange(clickedMarket.value);
-            });
+            marketNavElement.addEventListener('change', onMarketChange);
         }
 
         /*
@@ -11564,110 +11600,128 @@ var TradingEvents = (function () {
         /*
          * attach event to underlying change, event need to request new contract details and price
          */
+        var onUnderlyingChange = function(e){
+            var value = getEventValue(e);
+            showPriceOverlay();
+            var underlying = value;
+            sessionStorage.setItem('underlying', underlying);
+            requestTradeAnalysis();
+
+            Contract.getContracts(underlying);
+
+            // forget the old tick id i.e. close the old tick stream
+            processForgetTickId();
+            // get ticks for current underlying
+            TradeSocket.send({ ticks : underlying });
+        };
         var underlyingElement = document.getElementById('underlying');
         if (underlyingElement) {
-            underlyingElement.addEventListener('change', function(e) {
-                if (e.target) {
-                    showPriceOverlay();
-                    var underlying = e.target.value;
-                    sessionStorage.setItem('underlying', underlying);
-                    requestTradeAnalysis();
-
-                    Contract.getContracts(underlying);
-
-                    // forget the old tick id i.e. close the old tick stream
-                    processForgetTickId();
-                    // get ticks for current underlying
-                    TradeSocket.send({ ticks : underlying });
-                }
-            });
+            underlyingElement.addEventListener('change', onUnderlyingChange);
         }
 
         /*
          * bind event to change in duration amount, request new price
          */
+        var onDurationAmountChange = function(e){
+            var value = getEventValue(e);
+            processPriceRequest();
+            submitForm(document.getElementById('websocket_form'));
+        };
         var durationAmountElement = document.getElementById('duration_amount');
         if (durationAmountElement) {
             // jquery needed for datepicker
-            $('#duration_amount').on('change', debounce(function (e) {
-                processPriceRequest();
-                submitForm(document.getElementById('websocket_form'));
-            }));
+            $('#duration_amount').on('change', debounce(onDurationAmountChange));
         }
 
         /*
          * attach event to expiry time change, event need to populate duration
          * and request new price
          */
+        var onExpiryTypeChange = function(e){
+            var value = getEventValue(e);
+            Durations.populate();
+            if(value === 'endtime') {
+                var current_moment = moment().add(5, 'minutes').utc();
+
+                document.getElementById('expiry_date').value = current_moment.format('YYYY-MM-DD');
+                document.getElementById('expiry_time').value = current_moment.format('HH:mm');
+                Durations.setTime(current_moment.format('HH:mm'));
+            }
+            processPriceRequest();
+        };
         var expiryTypeElement = document.getElementById('expiry_type');
         if (expiryTypeElement) {
-            expiryTypeElement.addEventListener('change', function(e) {
-                Durations.populate();
-                if(e.target && e.target.value === 'endtime') {
-                    var current_moment = moment().add(5, 'minutes').utc();
-                    document.getElementById('expiry_date').value = current_moment.format('YYYY-MM-DD');
-                    document.getElementById('expiry_time').value = current_moment.format('HH:mm');
-                    Durations.setTime(current_moment.format('HH:mm'));
-                }
-                processPriceRequest();
-            });
+            expiryTypeElement.addEventListener('change', onExpiryTypeChange);
         }
 
         /*
          * bind event to change in duration units, populate duration and request price
          */
+        var onDurationUnitChange = function(e){
+            var value = getEventValue(e);
+            Durations.populate();
+            processPriceRequest();
+        };
         var durationUnitElement = document.getElementById('duration_units');
         if (durationUnitElement) {
-            durationUnitElement.addEventListener('change', function () {
-                Durations.populate();
-                processPriceRequest();
-            });
+            durationUnitElement.addEventListener('change', onDurationUnitChange);
         }
 
         /*
          * bind event to change in endtime date and time
          */
+        var onEndDateChange = function(e){
+            var value = getEventValue(e);
+            if(moment(value).isAfter(moment(),'day')){
+                Durations.setTime('');
+                StartDates.setNow();
+                expiry_time.hide();
+                var date_start = StartDates.node();
+
+                processTradingTimesRequest(value);
+            }
+            else{
+                Durations.setTime(expiry_time.value);
+                expiry_time.show();
+                processPriceRequest();
+            }
+            Barriers.display();
+        };
         var endDateElement = document.getElementById('expiry_date');
         if (endDateElement) {
             // need to use jquery as datepicker is used, if we switch to some other
             // datepicker we can move back to javascript
             $('#expiry_date').on('change', function () {
                 var input = this.value;
-                if(moment(input).isAfter(moment(),'day')){
-                    Durations.setTime('');
-                    StartDates.setNow();
-                    expiry_time.hide();
-                    var date_start = StartDates.node();
-
-                    processTradingTimesRequest(input);
-                }
-                else{
-                    Durations.setTime(expiry_time.value);
-                    expiry_time.show();
-                    processPriceRequest();
-                }
-                Barriers.display();
+                onEndDateChange(input);
             });
         }
 
+        var onEndTimeChange = function(e){
+            var value = getEventValue(e);
+            Durations.setTime(endTimeElement.value);
+            processPriceRequest();
+        };
         var endTimeElement = document.getElementById('expiry_time');
         if (endTimeElement) {
             $('#expiry_time').on('change', function () {
-                Durations.setTime(endTimeElement.value);
-                processPriceRequest();
+                var input = this.value;
+                onEndTimeChange(input);
             });
         }
 
         /*
          * attach event to change in amount, request new price only
          */
+        var onAmountElementChange = function(e){
+            var value = getEventValue(e);
+            sessionStorage.setItem('amount', value);
+            processPriceRequest();
+            submitForm(document.getElementById('websocket_form'));
+        };
         var amountElement = document.getElementById('amount');
         if (amountElement) {
-            amountElement.addEventListener('input', debounce( function(e) {
-                sessionStorage.setItem('amount', e.target.value);
-                processPriceRequest();
-                submitForm(document.getElementById('websocket_form'));
-            }));
+            amountElement.addEventListener('input', debounce(onAmountElementChange));
         }
 
         /*
@@ -11675,71 +11729,79 @@ var TradingEvents = (function () {
          * whether start time is forward starting or not and request
          * new price
          */
+       
+        var onDateStartChange = function(e){
+            var value = getEventValue(e);
+            if (value === 'now') {
+                Durations.display('spot');
+            } else {
+                Durations.display('forward');
+            }
+            sessionStorage.setItem('date_start', value);
+            processPriceRequest();
+        };
         var dateStartElement = StartDates.node();
         if (dateStartElement) {
-            dateStartElement.addEventListener('change', function (e) {
-                if (e.target && e.target.value === 'now') {
-                    Durations.display('spot');
-                } else {
-                    Durations.display('forward');
-                }
-                processPriceRequest();
-            });
+            dateStartElement.addEventListener('change', onDateStartChange);
         }
 
         /*
          * attach event to change in amount type that is whether its
          * payout or stake and request new price
          */
+        var onAmountTypeChange = function(e){
+            var value = getEventValue(e);
+            sessionStorage.setItem('amount_type', value);
+            processPriceRequest();
+        };
         var amountTypeElement = document.getElementById('amount_type');
         if (amountTypeElement) {
-            amountTypeElement.addEventListener('change', function (e) {
-                sessionStorage.setItem('amount_type', e.target.value);
-                processPriceRequest();
-            });
+            amountTypeElement.addEventListener('change', onAmountTypeChange);
         }
 
         /*
          * attach event to change in submarkets. We need to disable
          * underlyings that are not in selected seubmarkets
          */
+        var onSubmarketChange = function(e){
+            var value = getEventValue(e);
+            var elem = document.getElementById('underlying');
+            var underlyings = elem.children;
+
+            for (var i = 0, len = underlyings.length; i < len; i++ ) {
+                if (value !== 'all' && value !== underlyings[i].className) {
+                    underlyings[i].disabled = true;
+                } else {
+                    underlyings[i].disabled = false;
+                }
+            }
+
+            // as submarket change has modified the underlying list so we need to manually
+            // fire change event for underlying
+            document.querySelectorAll('#underlying option:enabled')[0].selected = 'selected';
+            var event = new Event('change');
+            elem.dispatchEvent(event);
+        };
         var submarketElement = document.getElementById('submarket');
         if (submarketElement) {
-            submarketElement.addEventListener('change', function (e) {
-                if (e.target) {
-                    var elem = document.getElementById('underlying');
-                    var underlyings = elem.children;
-
-                    for (var i = 0, len = underlyings.length; i < len; i++ ) {
-                        if (e.target.value !== 'all' && e.target.value !== underlyings[i].className) {
-                            underlyings[i].disabled = true;
-                        } else {
-                            underlyings[i].disabled = false;
-                        }
-                    }
-
-                    // as submarket change has modified the underlying list so we need to manually
-                    // fire change event for underlying
-                    document.querySelectorAll('#underlying option:enabled')[0].selected = 'selected';
-                    var event = new Event('change');
-                    elem.dispatchEvent(event);
-                }
-            });
+            submarketElement.addEventListener('change', onSubmarketChange);
         }
 
         /*
          * attach an event to change in currency
          */
+        var onCurrencyChange = function(e){
+            var value = getEventValue(e);
+            sessionStorage.setItem('currency', value);
+            var stopTypeDollarLabel = document.getElementById('stop_type_dollar_label');
+            if (stopTypeDollarLabel && isVisible(stopTypeDollarLabel)) {
+                stopTypeDollarLabel.textContent = value;
+            }
+            processPriceRequest();
+        };
         var currencyElement = document.getElementById('currency');
         if (currencyElement) {
-            currencyElement.addEventListener('change', function (e) {
-                sessionStorage.setItem('currency', e.target.value);
-                var stopTypeDollarLabel = document.getElementById('stop_type_dollar_label');
-                if (stopTypeDollarLabel && isVisible(stopTypeDollarLabel)) {
-                    stopTypeDollarLabel.textContent = e.target.value;
-                }
-                processPriceRequest();
-            });
+            currencyElement.addEventListener('change', onCurrencyChange);
         }
 
         /*
@@ -11795,56 +11857,66 @@ var TradingEvents = (function () {
         /*
          * attach an event to change in barrier
          */
+        var onBarrierChange = function(e){
+            var value = getEventValue(e);
+            processPriceRequest();
+            submitForm(document.getElementById('websocket_form'));
+        };
         var barrierElement = document.getElementById('barrier');
         if (barrierElement) {
-            barrierElement.addEventListener('input', debounce( function (e) {
-                processPriceRequest();
-                submitForm(document.getElementById('websocket_form'));
-            }));
+            barrierElement.addEventListener('input', debounce(onBarrierChange));
         }
 
         /*
          * attach an event to change in low barrier
          */
+        var onLowBarrierChange = function(e){
+            var value = getEventValue(e);
+            processPriceRequest();
+            submitForm(document.getElementById('websocket_form'));
+        };
         var lowBarrierElement = document.getElementById('barrier_low');
         if (lowBarrierElement) {
-            lowBarrierElement.addEventListener('input', debounce( function (e) {
-                processPriceRequest();
-                submitForm(document.getElementById('websocket_form'));
-            }));
+            lowBarrierElement.addEventListener('input', debounce(onLowBarrierChange));
         }
 
         /*
          * attach an event to change in high barrier
          */
+        var onHighBarrierChange = function(e){
+            var value = getEventValue(e);
+            processPriceRequest();
+            submitForm(document.getElementById('websocket_form'));
+        };
         var highBarrierElement = document.getElementById('barrier_high');
         if (highBarrierElement) {
-            highBarrierElement.addEventListener('input', debounce( function (e) {
-                processPriceRequest();
-                submitForm(document.getElementById('websocket_form'));
-            }));
+            highBarrierElement.addEventListener('input', debounce(onHighBarrierChange));
         }
 
         /*
          * attach an event to change in digit prediction input
          */
+        var onPredictionChange = function(e){
+            var value = getEventValue(e);
+            processPriceRequest();
+            submitForm(document.getElementById('websocket_form'));
+        };
         var predictionElement = document.getElementById('prediction');
         if (predictionElement) {
-            predictionElement.addEventListener('input', debounce( function (e) {
-                processPriceRequest();
-                submitForm(document.getElementById('websocket_form'));
-            }));
+            predictionElement.addEventListener('input', debounce(onPredictionChange));
         }
 
         /*
          * attach an event to change in amount per point for spreads
          */
+        var onAmountPerPoint = function(e){
+            var value = getEventValue(e);
+            processPriceRequest();
+            submitForm(document.getElementById('websocket_form'));
+        };
         var amountPerPointElement = document.getElementById('amount_per_point');
         if (amountPerPointElement) {
-            amountPerPointElement.addEventListener('input', debounce( function (e) {
-                processPriceRequest();
-                submitForm(document.getElementById('websocket_form'));
-            }));
+            amountPerPointElement.addEventListener('input', debounce(onAmountPerPoint));
         }
 
         /*
@@ -11864,23 +11936,27 @@ var TradingEvents = (function () {
         /*
          * attach an event to change in stop loss input value
          */
+        var onStopLossChange = function(e){
+            var value = getEventValue(e);
+            processPriceRequest();
+            submitForm(document.getElementById('websocket_form'));
+        };
         var stopLossElement = document.getElementById('stop_loss');
         if (stopLossElement) {
-            stopLossElement.addEventListener('input', debounce( function (e) {
-                processPriceRequest();
-                submitForm(document.getElementById('websocket_form'));
-            }));
+            stopLossElement.addEventListener('input', debounce(onStopLossChange));
         }
 
         /*
          * attach an event to change in stop profit input value
          */
+        var onStopProfitChange = function(e){
+            var value = getEventValue(e);
+            processPriceRequest();
+            submitForm(document.getElementById('websocket_form'));
+        };
         var stopProfitElement = document.getElementById('stop_profit');
         if (stopProfitElement) {
-            stopProfitElement.addEventListener('input', debounce( function (e) {
-                processPriceRequest();
-                submitForm(document.getElementById('websocket_form'));
-            }));
+            stopProfitElement.addEventListener('input', debounce(onStopProfitChange));
         }
 
         var init_logo = document.getElementById('trading_init_progress');
@@ -11943,7 +12019,7 @@ var Message = (function () {
         if (response) {
             var type = response.msg_type;
             if (type === 'authorize') {
-                User.set(response.authorize);
+                TUser.set(response.authorize);
                 TradeSocket.send({ payout_currencies: 1 });
             } else if (type === 'active_symbols') {
                 processActiveSymbols(response);
@@ -11960,14 +12036,34 @@ var Message = (function () {
                 processTick(response);
             } else if (type === 'trading_times'){
                 processTradingTimes(response);
+            } else if (type === 'statement'){
+                StatementWS.statementHandler(response);
+            } else if (type === 'balance'){
+                var passthroughObj = response.echo_req.passthrough;
+                if (passthroughObj){
+                    switch (passthroughObj.purpose) {
+                        case "statement_footer":
+                            var bal = response.balance[0].balance;
+                            $("#statement-table > tfoot > tr").
+                                first().
+                                children(".bal").
+                                text(Number(parseFloat(bal)).toFixed(2));
+                            break;
+                        default :
+                            //do nothing
+                    }
+                }
+            } else if (type === 'error') {
+                $(".error-msg").text(response.error.message);
             }
         } else {
+
             console.log('some error occured');
         }
     };
 
     return {
-        process: process,
+        process: process
     };
 
 })();
@@ -11989,7 +12085,6 @@ var Price = (function () {
 
     var typeDisplayIdMapping = {},
         bufferedIds = {},
-        bufferRequests = {},
         form_id = 0;
 
     var createProposal = function (typeOfContract) {
@@ -12106,10 +12201,6 @@ var Price = (function () {
             if (!bufferedIds.hasOwnProperty(id)) {
                 bufferedIds[id] = moment().utc().unix();
             }
-
-            if (!bufferRequests.hasOwnProperty(id)) {
-                bufferRequests[id] = params;
-            }
         }
 
         var position = contractTypeDisplayMapping(type);
@@ -12179,9 +12270,9 @@ var Price = (function () {
             purchase.setAttribute('data-ask-price', proposal['ask_price']);
             purchase.setAttribute('data-display_value', proposal['display_value']);
             purchase.setAttribute('data-symbol', id);
-            for(var key in bufferRequests[id]){
+            for(var key in params){
                 if(key && key !== 'proposal'){
-                    purchase.setAttribute('data-'+key, bufferRequests[id][key]);
+                    purchase.setAttribute('data-'+key, params[key]);
                 }
             }
         }
@@ -12202,7 +12293,6 @@ var Price = (function () {
         clearMapping: clearMapping,
         idDisplayMapping: function () { return typeDisplayIdMapping; },
         bufferedIds: function () { return bufferedIds; },
-        bufferRequests: function () { return bufferRequests; },
         getFormId: function(){ return form_id; },
         incrFormId: function(){ form_id++; },
         clearBufferIds: clearBuffer
@@ -12368,24 +12458,25 @@ function displaySpreads() {
 /*
  * Function to request for cancelling the current price proposal
  */
-function processForgetPriceIds() {
+function processForgetPriceIds(forget_id) {
     'use strict';
-    if (Price) {
-        showPriceOverlay();
-        var price_data = Price.bufferRequests();
-        var form_id = Price.getFormId();
-        var price_id = Price.bufferedIds();
-
-        for (var id in price_data) {
-            if(price_data[id] && price_data[id].passthrough.form_id!==form_id){
-                TradeSocket.send({ forget: id });
-                delete price_data[id];
-                delete price_id[id];
-            }
-        }
-
+    showPriceOverlay();
+    var form_id = Price.getFormId();
+    var forget_ids = [];
+    var price_id = Price.bufferedIds();
+    if(forget_id){
+        forget_ids.push(forget_id);
+    }
+    else{
+        forget_ids = Object.keys(price_id);
         Price.clearMapping();
     }
+
+    for (var i=0; i<forget_ids.length;i++) {
+        var id = forget_ids[i];
+        TradeSocket.send({ forget: id });
+        delete price_id[id];
+    }    
 }
 
 /*
@@ -12439,10 +12530,8 @@ function processTick(tick) {
 
 function processProposal(response){
     'use strict';
-    var price_data = Price.bufferRequests();
     var form_id = Price.getFormId();
-    // This is crazy condition but there is no way
-    if((!price_data[response.proposal.id] && response.echo_req.hasOwnProperty('passthrough') && response.echo_req.passthrough.hasOwnProperty('form_id') && response.echo_req.passthrough.form_id === form_id) || (price_data[response.proposal.id] && price_data[response.proposal.id].passthrough.form_id === Price.getFormId())){
+    if(response.echo_req.passthrough.form_id===form_id){
         hideOverlayContainer();
         Price.display(response, Contract.contractType()[Contract.form()]);
         hidePriceOverlay();
@@ -12450,6 +12539,9 @@ function processProposal(response){
             document.getElementById('trading_socket_container').classList.add('show');
             document.getElementById('trading_init_progress').style.display = 'none';
         }
+    }
+    else{
+        processForgetPriceIds(response.proposal.id);
     }
 }
 
@@ -12516,7 +12608,7 @@ var Purchase = (function () {
 
             heading.textContent = Content.localize().textContractConfirmationHeading;
             descr.textContent = receipt['longcode'];
-            reference.textContent = Content.localize().textContractConfirmationReference + ' ' + receipt['contract_id'];
+            reference.textContent = Content.localize().textContractConfirmationReference + ' ' + receipt['transaction_id'];
 
             var payout_value, cost_value, profit_value;
 
@@ -12542,7 +12634,7 @@ var Purchase = (function () {
                 profit.innerHTML = Content.localize().textContractConfirmationProfit + ' <p>' + profit_value + '</p>';
             }
 
-            balance.textContent = Content.localize().textContractConfirmationBalance + ' ' + User.get().currency + ' ' + Math.round(receipt['balance_after']*100)/100;
+            balance.textContent = Content.localize().textContractConfirmationBalance + ' ' + TUser.get().currency + ' ' + Math.round(receipt['balance_after']*100)/100;
 
             if(show_chart){
                 chart.show();
@@ -13329,6 +13421,457 @@ $(document).ready(function () {
     if (window.reality_check_object) return;
     window.reality_check_object = new RealityCheck('reality_check', LocalStore);
 });
+;var CommonData = (function(){
+    function getCookieItem(sKey) {
+        if (!sKey) { return null; }
+        return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+    }
+    
+    //because getCookieItem('login') is confusing and does not looks like we are getting API token
+    function getApiToken(){
+        return getCookieItem("login");
+    }
+
+    return {
+        getCookieItem: getCookieItem,
+        getApiToken: getApiToken
+    };
+}());;
+var DomTable = (function(){
+    "use strict";
+    /***
+     *
+     * @param {Array[]} data ordered data to pump into table body
+     * @param {Object} metadata object containing metadata of table
+     * @param {String[]} metadata.cols cols of table
+     * @param {String} metadata.id table id
+     * @param {String[]} [metadata.tableClass] class used in html
+     * @param {String[]} [header] string to be used as Header in table, if not stated then table will not have Header
+     * @param {String[]} [footer] string to be used as footer, to have empty footer, simply use an empty element in array
+     * eg. ["", "halo", ""] will have 3 elements in footer, 2 of them being empty
+     */
+    function createFlexTable(body, metadata, header, footer){
+
+        var tableClasses = (metadata.tableClass) ? metadata.tableClass + " flex-table" : "flex-table";
+
+        var $tableContainer = $("<div></div>", {class: "flex-table-container"});
+        var $table = $("<table></table>", {class: tableClasses, id: metadata.id});
+        var $body = createFlexTableTopGroup(body, metadata.cols, "body");
+
+        if (header) {
+            var $header = createFlexTableTopGroup([header], metadata.cols, "header");
+            $header.appendTo($table);
+        }
+
+        $body.appendTo($table);
+
+        if (footer) {
+            var $footer = createFlexTableTopGroup([footer], metadata.cols, "footer");
+            $footer.appendTo($table);
+        }
+
+        $table.appendTo($tableContainer);
+
+        return $tableContainer;
+    }
+
+    /***
+     *
+     * @param {object[][]} data header strings
+     * @param {String[]} metadata cols name
+     * @param {"header"\"footer"|"body"} opt optional arg to specify which type of element to create, default to header
+     */
+    function createFlexTableTopGroup(data, metadata, opt){
+
+        var $outer = function(){
+            switch (opt) {
+                case "body":
+                    return $("<tbody></tbody>");
+                case "footer":
+                    return $("<tfoot></tfoot>");
+                default :
+                    return $("<thead></thead>");
+            }
+        }();
+
+        for (var i = 0 ; i < data.length ; i++){
+            var innerType = (opt === "body") ? "data" : "header";
+            var $tr = createFlexTableRow(data[i], metadata, innerType);
+            $tr.appendTo($outer);
+        }
+
+        return $outer;
+    }
+
+    /***
+     *
+     * @param {object[]} data
+     * @param {String[]} metadata cols name
+     * @param {"header"|"data"} opt optional, default to "header"
+     */
+    function createFlexTableRow(data, metadata, opt){
+        if (data.length !== metadata.length) {
+            throw new Error("metadata and data does not match");
+        }
+
+        var isData = (opt === "data");
+
+        var $tr = $("<tr></tr>", {class: "flex-tr"});
+        for (var i = 0 ; i < data.length ; i++){
+            var className = metadata[i].toLowerCase().replace(/\s/g, "-") + " flex-tr-child";
+            var rowElement = (isData) ?
+                $("<td></td>", {class: className, text: data[i]}) :
+                $("<th></th>", {class: className, text: data[i]});
+            rowElement.appendTo($tr);
+        }
+
+        return $tr;
+    }
+
+    return {
+        createFlexTable: createFlexTable,
+        createFlexTableRow: createFlexTableRow
+    };
+}());;
+var StringUtil = (function(){
+    function toTitleCase(str){
+        return str.replace(/\w[^\s\/\\]*/g, function(txt){
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+    }
+
+    function dateToStringWithoutTime(date){
+        return [date.getDate(), date.getMonth()+1, date.getFullYear()].join("/");
+    }
+
+    return {
+        toTitleCase: toTitleCase,
+        dateToStringWithoutTime: dateToStringWithoutTime
+    };
+}());
+
+;pjax_config_page("statementws", function(){
+    return {
+        onLoad: function() {
+            StatementWS.init();
+        },
+        onUnload: function(){
+            StatementWS.clean();
+        }
+    };
+});
+
+;var StatementData = (function(){
+    "use strict";
+    var hasOlder = true;
+
+    function getStatement(opts){
+        var req = {statement: 1, description: 1};
+        if(opts){ 
+            $.extend(true, req, opts);    
+        }
+
+        TradeSocket.send(req);
+    }
+
+    return {
+        getStatement: getStatement,
+        hasOlder: hasOlder
+    };
+}());
+;var StatementWS = (function(){
+    "use strict";
+
+    var chunkPerLoad = 10;
+    var tableCreated = false;
+
+    var shouldNotLoadMore = false;
+    var transactionsCurrentDate = [];
+    var dataLoaded = false;
+
+    function hideIsLoading() {
+        $("#overlay_background").hide();
+        $("#loading_in_progress").hide();
+    }
+
+    function showIsLoading(){
+        $("#overlay_background").show();
+        $("#loading_in_progress").show();
+    }
+
+    function statementHandler(response){
+        if (!tableCreated) {
+            StatementUI.createEmptyStatementTable().appendTo("#statement-ws-container");
+            $("<div></div>", {
+                class: "notice-msg",
+                id: "end-of-table",
+                text: "End of the table"
+            }).appendTo("#statement-ws-container");
+
+            $("#end-of-table").hide();
+
+            tableCreated = true;
+        }
+
+        var statement = response.statement;
+        transactionsCurrentDate = statement.transactions;
+        var top10 = getNextChunkStatement();
+        StatementUI.updateStatementTable(top10);
+
+        dataLoaded = true;
+
+        if (top10.length < 10){
+            shouldNotLoadMore = true;
+            $("#end-of-table").show();
+        }
+
+        Content.statementTranslation();
+        hideIsLoading();
+    }
+
+
+    function getCurrentSelectedDate() {
+        return moment.utc($("#statement-date").val());
+    }
+
+    function getStatementForCurrentSelectedDate(){
+
+        var fromDate = getCurrentSelectedDate();
+        var tillDate = moment(fromDate);
+        tillDate.add(1, "d");
+
+        var fromEpoch = fromDate.unix();
+        var tillEpoch = tillDate.unix();
+
+        StatementData.getStatement({dt_to: tillEpoch, dt_fm: fromEpoch});
+    }
+
+    function getNextChunkStatement(){
+        return transactionsCurrentDate.splice(0, chunkPerLoad);
+    }
+
+
+    function loadStatementChunkWhenScroll(){
+        //Attention: attach event to GLOBAL document : BAD!!
+        $(document).scroll(function(){
+
+            if (!dataLoaded || shouldNotLoadMore) {
+                return;
+            }
+
+            function hidableHeight(percentage){
+                var totalHidable = $document.height() - $(window).height();
+                return Math.floor(totalHidable * percentage / 100);
+            }
+
+            var $document = $(document);
+            var pFromTop = $document.scrollTop();
+            var totalHeight = $document.height();
+
+            if (pFromTop >= hidableHeight(70)) {
+                var top10 = getNextChunkStatement();
+                StatementUI.updateStatementTable(top10);
+                if (top10.length < 10){
+                    shouldNotLoadMore = true;
+                    $("#end-of-table").show();
+                }
+            }
+        });
+    }
+
+    function getStatementOneDayBefore(){
+        var oneDayBefore = getCurrentSelectedDate();
+        oneDayBefore.subtract(1, "d");
+
+        var oneDayBeforeString = oneDayBefore.locale("en").format("YYYY-MM-DD").toString();
+
+        $("#statement-date").val(oneDayBeforeString);       //set view
+        getStatementForCurrentSelectedDate();
+    }
+
+    function getStatementOneDayAfter(){
+        var oneDayAfter = getCurrentSelectedDate();
+        oneDayAfter.add(1,"d");
+
+        var oneDayAfterString = oneDayAfter.locale("en").format("YYYY-MM-DD").toString();
+
+        $("#statement-date").val(oneDayAfterString);      //set view
+        getStatementForCurrentSelectedDate();
+    }
+
+    function initTable(){
+        shouldNotLoadMore = false;
+        transactionsCurrentDate = [];
+        dataLoaded = false;
+
+        $(".error-msg").text("");
+        StatementUI.clearTableContent();
+
+        window.setTimeout(function(){
+            if (dataLoaded) {
+                return;
+            }
+            showIsLoading();
+            $("#end-of-table").hide();
+        }, 500);
+    }
+
+    function limitDateSelection(){
+        var selectedDate = getCurrentSelectedDate();
+        if (selectedDate.isSame(moment.utc(), "day") || selectedDate.isAfter(moment.utc(), "day")) {
+            $("#newer-date").hide();
+        } else {
+            $("#newer-date").show();
+        }
+    }
+
+    function initPage(){
+
+
+        StatementUI.setDatePickerDefault(moment.utc());
+        StatementUI.showButtonOnDateChange();
+
+        $("#submit-date").click(function(){
+            initTable();
+            getStatementForCurrentSelectedDate();
+            $("#submit-date").addClass("invisible");
+            limitDateSelection();
+        });
+        $("#older-date").click(function(){
+            initTable();
+            getStatementOneDayBefore();
+            limitDateSelection();
+        });
+        $("#newer-date").click(function(){
+            initTable();
+            getStatementOneDayAfter();
+            limitDateSelection();
+        });
+
+        initTable();
+        limitDateSelection();
+        getStatementForCurrentSelectedDate();
+        loadStatementChunkWhenScroll();
+    }
+
+    function cleanStatementPageState(){
+        initTable();
+    }
+
+    return {
+        init: initPage,
+        statementHandler: statementHandler,
+        clean: cleanStatementPageState
+    };
+}());
+;var StatementUI = (function(){
+    "use strict";
+    var tableID = "statement-table";
+    var columns = ["date", "ref", "act", "desc", "credit", "bal"];
+
+    function datepickerDefault(date){
+        var utcMoment = moment.utc(date).locale("en").format("YYYY-MM-DD").toString();
+
+        if (!Modernizr.inputtypes.date) {
+            var utcDate = Date.parse(utcMoment);
+            $("#statement-date").
+                datepicker({maxDate: 0, dateFormat: 'yy-mm-dd'}).
+                datepicker("setDate", utcDate);
+            return;
+        }
+
+        $("#statement-date").val(utcMoment);
+        $("#statement-date").attr("max", utcMoment);
+    }
+    function showButtonOnDateChange(){
+        $("#statement-date").on("change", function() {
+            $("#submit-date").removeClass("invisible");
+        });
+    }
+
+    function createEmptyStatementTable(){
+        var currency = User.get().currency;
+        var header = ["Date", "Ref.", "Action", "Description", "Credit/Debit", "Balance("+ currency +")"];
+        header = header.map(function(t){ return text.localize(t); });
+        var footer = ["", "", "", "", "", ""];
+        var metadata = {
+            id: tableID,
+            cols: columns
+        };
+        var data = [];
+        var $tableContainer = DomTable.createFlexTable(data, metadata, header, footer);
+
+        return $tableContainer;
+    }
+
+    function clearTableContent(){
+        var $tbody = $("#" + tableID + "> tbody");
+        $tbody.children("tr").remove();
+    }
+
+    function updateStatementTable(transactions){
+        var $tbody = $("#"+ tableID + "> tbody");
+
+        var $docFrag = $(document.createDocumentFragment());
+
+        transactions.map(function(transaction){
+            var $newRow = createStatementRow(transaction);
+            $newRow.appendTo($docFrag);
+        });
+
+        $tbody.append($docFrag);
+
+        updateStatementFooter(transactions);
+    }
+
+    function updateStatementFooter(transactions){
+        var allCredit = [].slice.call(document.querySelectorAll("td.credit"));
+        allCredit = allCredit.map(function(node){return node.textContent;});
+
+        var totalCredit = allCredit.reduce(function(p, c){return p + parseFloat(c);}, 0);
+
+        TradeSocket.send({balance: 1, passthrough: {purpose: "statement_footer"}});
+
+        totalCredit = Number(totalCredit).toFixed(2);
+
+        var $footerRow = $("#" + tableID + " > tfoot").children("tr").first();
+        $footerRow.children(".credit").text(totalCredit);
+
+        var creditType = (totalCredit >= 0) ? "profit" : "loss";
+        $footerRow.children(".credit").removeClass("profit").removeClass("loss");
+        $footerRow.children(".credit").addClass(creditType);
+    }
+
+    function createStatementRow(transaction){
+        var dateObj = new Date(transaction["transaction_time"] * 1000);
+        var momentObj = moment.utc(dateObj);
+        var dateStr = momentObj.format("YYYY-MM-DD");
+        var timeStr = momentObj.format("HH:mm:ss");
+
+        var date = dateStr + "\n" + timeStr;
+        var ref = transaction["transaction_id"];
+        var action = StringUtil.toTitleCase(transaction["action_type"]);
+        var desc = transaction["longcode"];
+        var amount = Number(parseFloat(transaction["amount"])).toFixed(2);
+        var balance = Number(parseFloat(transaction["balance_after"])).toFixed(2);
+
+        var creditDebitType = (parseInt(amount) >= 0) ? "profit" : "loss";
+
+        var $statementRow = DomTable.createFlexTableRow([date, ref, action, desc, amount, balance], columns, "data");
+        $statementRow.children(".credit").addClass(creditDebitType);
+        $statementRow.children(".date").addClass("break-line");
+
+        return $statementRow;
+    }
+    
+    return {
+        clearTableContent: clearTableContent,
+        setDatePickerDefault: datepickerDefault,
+        showButtonOnDateChange: showButtonOnDateChange,
+        createEmptyStatementTable: createEmptyStatementTable,
+        updateStatementTable: updateStatementTable
+    };
+}());
 ;//////////////////////////////////////////////////////////////////
 // Purpose: Write loading image to a container for ajax request
 // Parameters:
