@@ -1620,8 +1620,7 @@ msgstr "Binary (Europe) Ltd, Mompalao Building, Suite 2, Tower Road, Msida MSD18
 
 #: /home/git/translations/binary-static/src/templates/haml/static/contact.html.haml:1
 msgid "Our Customer service opening hours are: Monday – Friday: 24 Hours"
-msgstr "Jam buka kami dari 12:00am GMT - 03:00pm GMT
-                                 11:00pm - 10:00pm Jakarta time"
+msgstr "Jam buka kami dari 12:00am GMT - 03:00pm GMT 11:00pm - 10:00pm Jakarta time"
 
 #: /home/git/translations/binary-static/src/templates/haml/static/contact.html.haml:1
 msgid "All calls are recoded for training and monitoring purposes"

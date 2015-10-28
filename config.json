@@ -2,7 +2,7 @@
 	"website_name": "Binary.com",
 	"display_languages": "EN,ID,RU,ES,FR,PT,DE,ZH_CN,PL,AR,ZH_TW,VI,IT",
 	"static": {
-		"url": "https://static.binary.com/",
+		"url": "https://nuruddeensalihu.github.io/binary-static/",
 		"version": "3.8.0"
 	},
 	"marketing": {
@@ -37,5 +37,5 @@
 	"binary_js_hash": "45568245fe39db9a437865b278581377",
 	"binary_lib_hash": "235f03c54468b9245a3cf46afe4f14cd",
 	"binary_data_hash": "a8ca021d66bacc3b38fe2a64add1e135",
-	"binary_css_hash": "e08cb7c4efa33e646c8e49e7f9b7d646"
+	"binary_css_hash": "1783c4989ded8503232651ec1be57c68"
 }

@@ -5289,7 +5289,7 @@ table .loss, table .lower {
 
 /* Language based rules */
 /* Specific rules for languages */
-body #customer_service-hours {
+body #customer_service_hours {
   display: none !important;
 }
 body #conversation_recording_notice {
@@ -5297,7 +5297,7 @@ body #conversation_recording_notice {
 }
 
 /*English Language*/
-body.EN #customer_service-hours {
+body.EN #customer_service_hours {
   display: inline !important;
 }
 body.EN #conversation_recording_notice {
@@ -5307,7 +5307,7 @@ body.EN #conversation_recording_notice {
 body.RU #conversation_recording_notice {
   display: inline !important;
 }
-body.RU #customer_service-hours {
+body.RU #customer_service_hours {
   display: inline !important;
 }
 
@@ -5406,7 +5406,7 @@ body.ID .id-hide {
 body.ID .extra-space {
   margin-top: 127px;
 }
-body.ID #customer_service-hours {
+body.ID #customer_service_hours {
   display: inline !important;
 }
 body.ID #conversation_recording_notice {
