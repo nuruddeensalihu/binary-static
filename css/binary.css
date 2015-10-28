@@ -5467,7 +5467,7 @@ table .loss, table .lower {
 /* Language based rules */
 /* Specific rules for languages */
 body .body-hide {
-  display: none !important;
+  display: none;
 }
 
 body.EN en-show {
