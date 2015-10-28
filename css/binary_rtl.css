@@ -5327,25 +5327,11 @@ table .loss, table .lower {
 
 /* Language based rules */
 /* Specific rules for languages */
-body #customer_service_hours {
-  display: none !important;
-}
-body #conversation_recording_notice {
+body .body-hide {
   display: none !important;
 }
 
-/*English Language*/
-body.EN #customer_service_hours {
-  display: inline !important;
-}
-body.EN #conversation_recording_notice {
-  display: inline !important;
-}
-
-body.RU #conversation_recording_notice {
-  display: inline !important;
-}
-body.RU #customer_service_hours {
+body.EN en-show {
   display: inline !important;
 }
 
@@ -5441,14 +5427,11 @@ body.ID #footer #social-networks {
 body.ID .id-hide {
   display: none !important;
 }
+body.ID .id-show {
+  display: inline !important;
+}
 body.ID .extra-space {
   margin-top: 127px;
-}
-body.ID #customer_service_hours {
-  display: inline !important;
-}
-body.ID #conversation_recording_notice {
-  display: inline !important;
 }
 @media screen and (max-width: 480px) {
   body.ID .empty-space {
@@ -5469,6 +5452,11 @@ body.IT a, body.IT button, body.IT .button, body.IT span, body.IT input {
 }
 body.IT h1, body.IT h2, body.IT h3, body.IT h4, body.IT h5, body.IT h6 {
   text-transform: initial !important;
+}
+
+/*Russian Language*/
+body.RU ru-show {
+  display: inline !important;
 }
 
 /* media queries */

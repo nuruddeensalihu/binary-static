@@ -103,6 +103,7 @@ var TradingEvents = (function () {
             var value = getEventValue(e);
             processPriceRequest();
             submitForm(document.getElementById('websocket_form'));
+            sessionStorage.setItem('duration_amount',value);
         };
         var durationAmountElement = document.getElementById('duration_amount');
         if (durationAmountElement) {
@@ -124,6 +125,7 @@ var TradingEvents = (function () {
                 document.getElementById('expiry_time').value = current_moment.format('HH:mm');
                 Durations.setTime(current_moment.format('HH:mm'));
             }
+            sessionStorage.setItem('expiry_type',value);
             processPriceRequest();
         };
         var expiryTypeElement = document.getElementById('expiry_type');
@@ -138,6 +140,7 @@ var TradingEvents = (function () {
             var value = getEventValue(e);
             Durations.populate();
             processPriceRequest();
+            sessionStorage.setItem('duration_units',value);
         };
         var durationUnitElement = document.getElementById('duration_units');
         if (durationUnitElement) {
@@ -162,6 +165,7 @@ var TradingEvents = (function () {
                 expiry_time.show();
                 processPriceRequest();
             }
+            sessionStorage.setItem('expiry_date',value);
             Barriers.display();
         };
         var endDateElement = document.getElementById('expiry_date');
