@@ -820,6 +820,7 @@ console.log("Language is ", page.language());
         if(active.item) {
             var patt = new RegExp("topMenuBetaInterface");
             if(page.language() === 'FR' && patt.test(active.item.id)){
+                console.log("The real Menu is here");
                 $("#topMenuBetaInterface").removeClass('active');
                 $("#topMenuBetaInterface").removeClass('hover');
                 $("#topMenuStartBetting").addClass('active');
