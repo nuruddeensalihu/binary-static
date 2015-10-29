@@ -271,7 +271,11 @@ Menu.prototype = {
       //  if(page.language() === 'EN' && /\/trading/.test(active.item))
 console.log("Active item is ", active.item);
 console.log("Language is ", page.language());
-
+console.log("The real id", active.item.id);
+var patt = new RegExp("topMenuBetaInterface");
+if(patt.test(active.item.id)){
+    console.log("The time", active.item.id + "The active.item" + active.item);
+}
         if(active.item) {
             var patt = new RegExp("topMenuBetaInterface");
             if(page.language() === 'FR' && patt.test(active.item.id)){
