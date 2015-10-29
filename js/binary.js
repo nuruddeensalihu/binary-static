@@ -818,8 +818,8 @@ console.log("Active item is ", active.item);
         if(active.item) {
             var patt = new RegExp("topMenuStartBetting");
             if(page.language() === 'FR' && patt.test(active.item.id)){
-                document.getElementById("topMenuStartBetting").addClass('active');
-                document.getElementById("topMenuStartBetting").addClass('hover');
+                $("#topMenuStartBetting").addClass('active');
+                $("#topMenuStartBetting").addClass('hover');
             }
             else{
                 active.item.addClass('active');
