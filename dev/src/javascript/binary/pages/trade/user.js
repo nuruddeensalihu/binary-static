@@ -1,4 +1,4 @@
-var TUser = (function () {
+var User = (function () {
     var data = {};
     return {
         set: function(a){ data = a; },
