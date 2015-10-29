@@ -815,6 +815,8 @@ Menu.prototype = {
 
       //  if(page.language() === 'EN' && /\/trading/.test(active.item))
 console.log("Active item is ", active.item);
+console.log("Language is ", page.language());
+
         if(active.item) {
             var patt = new RegExp("topMenuStartBetting");
             if(page.language() === 'EN' && patt.test(active.item.id)){
