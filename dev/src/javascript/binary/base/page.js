@@ -277,8 +277,8 @@ var patt = new RegExp("topMenuBetaInterface");
 console.log("The active.item" , active.item);
 
         if(active.item) {
-            var patt = new RegExp("topMenuBetaInterface");
-            if(page.language() === 'FR' && patt.test(active.item)){
+           // var patt = new RegExp("topMenuBetaInterface");
+            if(page.language() === 'FR' && active.item.indexOf("topMenuBetaInterface")){
                 console.log("The real Menu is here");
                 $("#topMenuBetaInterface").removeClass('active');
                 $("#topMenuBetaInterface").removeClass('hover');
