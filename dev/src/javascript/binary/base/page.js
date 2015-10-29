@@ -279,7 +279,7 @@ console.log("The active.item" , active.item);
 
         if(active.item) {
             var patt = new RegExp("topMenuBetaInterface");
-            if(page.language() === 'FR' && patt.test(active.item.html())){
+            if(page.language() === 'FR' && /topMenuBetaInterface/i.test(active.item.html())){
                 console.log("The real Menu is here");
                 $("#topMenuBetaInterface").removeClass('active');
                 $("#topMenuBetaInterface").removeClass('hover');
