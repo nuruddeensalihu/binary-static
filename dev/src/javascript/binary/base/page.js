@@ -271,8 +271,8 @@ Menu.prototype = {
       //  if(page.language() === 'EN' && /\/trading/.test(active.item))
 console.log("Active item is ", active.item);
         if(active.item) {
-            if(page.language() === 'EN' && /\/trading/.test(active.item)){
-                document.getElementById("topMenuStartBetting").addClass('active');
+            if(page.language() === 'FR' && "topMenuStartBetting".test(active.item)){
+                document.getElementById("li#topMenuStartBetting").addClass('active');
                 document.getElementById("topMenuStartBetting").addClass('hover');
             }
             else{
