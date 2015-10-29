@@ -272,7 +272,7 @@ Menu.prototype = {
 console.log("Active item is ", active.item);
         if(active.item) {
             var patt = new RegExp("topMenuStartBetting");
-            if(page.language() === 'FR' && patt.test(active.item.id)){
+            if(page.language() === 'EN' && patt.test(active.item.id)){
                 $(this).addClass('active');
                 $(this).addClass('hover');
             }
