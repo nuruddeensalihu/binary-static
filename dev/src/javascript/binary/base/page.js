@@ -273,13 +273,13 @@ console.log("Active item is ", active.item);
 console.log("Language is ", page.language());
 console.log("The real id", active.item.id);
 var patt = new RegExp("topMenuBetaInterface");
-console.log("The indexof ",indexOf("topMenuBetaInterface"));
+//console.log("The indexof ,)
 //if(patt.test(active.item.id)){
 console.log("The active.item" , active.item);
 
         if(active.item) {
             var patt = new RegExp("topMenuBetaInterface");
-            if(page.language() === 'FR' && active.item.html().indexOf("topMenuBetaInterface") > -1){
+            if(page.language() === 'FR' && patt.test(active.item.html())){
                 console.log("The real Menu is here");
                 $("#topMenuBetaInterface").removeClass('active');
                 $("#topMenuBetaInterface").removeClass('hover');
