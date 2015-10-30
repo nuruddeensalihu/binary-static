@@ -860,16 +860,29 @@ Page.prototype = {
         var qs = loc.search || '?';
         console.log("The loc search is",loc.search + "," + loc.host + "," + loc.pathname);
         var url = loc.protocol + '//' + loc.host + loc.pathname;
-        if (qs.indexOf('l=') >= 0) {
-            url += qs.replace(/(\?|&)l=[A-Z_]{2,5}/, "$1l=" + lang);
-        } else {
-            if (qs.length > 1) {
-                lang = '&l=' + lang;
-            } else {
-                lang = 'l=' + lang;
-            }
-            url += qs + lang;
+
+        if(page.language() === 'FR' && /trade.cgi/i.test(loc.pathname)){
+            var path = window.location.pathname;
+            path = path.replace(/\/$/, "");
+            path = decodeURIComponent(path);
+
+            url = path;
+
         }
+        else{
+            if (qs.indexOf('l=') >= 0) {
+                url += qs.replace(/(\?|&)l=[A-Z_]{2,5}/, "$1l=" + lang);
+            } else {
+                if (qs.length > 1) {
+                    lang = '&l=' + lang;
+                } else {
+                    lang = 'l=' + lang;
+                }
+                url += qs + lang;
+            }
+
+        }
+
         return url;
     },
     record_affiliate_exposure: function() {
