@@ -275,14 +275,14 @@ console.log("The real id", active.item.baseURI);
 //var patt = new RegExp("topMenuBetaInterface");
 //console.log("The indexof ,)
 //if(patt.test(active.item.id)){
-var $pat = $active.item.get(0).outerHTML;
+var $pat = active.item.get(0).outerHTML;
 console.log("new active item is", $pat);
 
-console.log("The active.item" , active.item);
+console.log("The active.item" , $(active.item[0].id));
 
         if(active.item) {
             var patt = new RegExp("topMenuBetaInterface");
-            if(page.language() === 'FR' && /topMenuBetaInterface/i.test($active.item.get(0).outerHTML)){
+            if(page.language() === 'FR' && /topMenuBetaInterface/i.test($(active.item[0].id))){
                 console.log("The real Menu is here");
                 $("#topMenuBetaInterface").removeClass('active');
                 $("#topMenuBetaInterface").removeClass('hover');

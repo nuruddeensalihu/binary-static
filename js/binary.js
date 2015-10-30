@@ -820,14 +820,14 @@ console.log("The real id", active.item.baseURI);
 //var patt = new RegExp("topMenuBetaInterface");
 //console.log("The indexof ,)
 //if(patt.test(active.item.id)){
-var $pat = $active.item.get(0).outerHTML;
+var $pat = active.item.get(0).outerHTML;
 console.log("new active item is", $pat);
 
-console.log("The active.item" , active.item);
+console.log("The active.item" , $(active.item[0].id));
 
         if(active.item) {
             var patt = new RegExp("topMenuBetaInterface");
-            if(page.language() === 'FR' && /topMenuBetaInterface/i.test($active.item.get(0).outerHTML)){
+            if(page.language() === 'FR' && /topMenuBetaInterface/i.test($(active.item[0].id))){
                 console.log("The real Menu is here");
                 $("#topMenuBetaInterface").removeClass('active');
                 $("#topMenuBetaInterface").removeClass('hover');
@@ -9499,6 +9499,13 @@ $(function() {
     }
 
 });
+;$(function() {
+    $( "#accordion" ).accordion({
+      heightStyle: "content",
+      collapsible: true,
+      active: false
+    });
+});
 ;function currencyConvertorCalculator()
 {
     var currencyto = document.getElementById('currencyto');
@@ -10363,7 +10370,7 @@ function displayUnderlyings(id, elements, selected) {
         });
         keys.forEach(function (key) {
             if (elements.hasOwnProperty(key)){
-                var option = document.createElement('option'), content = document.createTextNode(elements[key]['display']);
+                var option = document.createElement('option'), content = document.createTextNode(text.localize(elements[key]['display']));
                 option.setAttribute('value', key);
                 if (elements[key]['is_active'] !== 1) {
                     option.setAttribute('disabled', true);
@@ -10829,6 +10836,49 @@ function countDecimalPlaces(num) {
         }
     }
 }
+
+function selectOption(option, select){
+    var options = select.getElementsByTagName('option');
+    var contains = 0; 
+    for(var i = 0; i < options.length; i++){
+        if(options[i].value==option && !options[i].hasAttribute('disabled')){
+            contains = 1;
+            break;
+        }
+    }
+    if(contains){
+        select.value = option;
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+function updateWarmChart(){
+    var $chart = $('#trading_worm_chart');
+    var spots = Tick.spots();
+    var chart_config = {
+        type: 'line',
+        lineColor: '#606060',
+        fillColor: false,
+        spotColor: '#00f000',
+        minSpotColor: '#f00000',
+        maxSpotColor: '#0000f0',
+        highlightSpotColor: '#ffff00',
+        highlightLineColor: '#000000',
+        spotRadius: 1.25
+    };
+    if($chart){
+        $chart.sparkline(spots, chart_config);
+        if(spots.length){     
+            $chart.show();
+        }
+        else{
+            $chart.hide();
+        }  
+    }  
+}
 ;var Content = (function () {
     'use strict';
 
@@ -10885,7 +10935,10 @@ function countDecimalPlaces(num) {
             textSpreadTypeShort: text.localize('Short'),
             textSpreadDepositComment: text.localize('Deposit of'),
             textSpreadRequiredComment: text.localize('is required. Current spread'),
-            textSpreadPointsComment: text.localize('points')
+            textSpreadPointsComment: text.localize('points'),
+            textContractStatusWon: text.localize('This contract won'),
+            textContractStatusLost: text.localize('This contract lost'),
+            textTickResultLabel: text.localize('Tick')
         };
 
         var starTime = document.getElementById('start_time_label');
@@ -11021,9 +11074,24 @@ function countDecimalPlaces(num) {
         }
     };
 
+    function localizeTextContentById(id){
+        var element = document.getElementById(id);
+        var textContent = element.textContent;
+        element.textContent = text.localize(textContent);
+    }
+
+    var statementTranslation = function(){
+        var titleElement = document.getElementById("statement-title").firstElementChild;
+        var title = titleElement.textContent;
+        titleElement.textContent = text.localize(title);
+
+        localizeTextContentById("err");
+    };
+
     return {
         localize: function () { return localize; },
-        populate: populate
+        populate: populate,
+        statementTranslation: statementTranslation
     };
 
 })();
@@ -11099,7 +11167,7 @@ var Contract = (function () {
                 }
 
                 if (currentObj.forward_starting_options && currentObj['start_type'] === 'forward' && sessionStorage.formname !== 'higherlower') {
-                    startDates.list = currentObj.forward_starting_options;                   
+                    startDates.list = currentObj.forward_starting_options;
                 }
                 else if(currentObj.start_type==='spot'){
                     startDates.has_spot = 1;
@@ -11130,7 +11198,7 @@ var Contract = (function () {
                 }
 
                 if (!contractType[contractCategory].hasOwnProperty(currentObj['contract_type'])) {
-                    contractType[contractCategory][currentObj['contract_type']] = currentObj['contract_display'];
+                    contractType[contractCategory][currentObj['contract_type']] = text.localize(currentObj['contract_display']);
                 }
             }
         });
@@ -11160,7 +11228,7 @@ var Contract = (function () {
                         tradeContractForms['higherlower'] = Content.localize().textFormHigherLower;
                     }
                 } else {
-                    tradeContractForms[contractCategory] = currentObj['contract_category_display'];
+                    tradeContractForms[contractCategory] = text.localize(currentObj['contract_category_display']);
                 }
             }
         });
@@ -11208,6 +11276,10 @@ function displayCurrencies(selected) {
         fragment =  document.createDocumentFragment(),
         currencies = JSON.parse(sessionStorage.getItem('currencies'))['payout_currencies'];
 
+    if (!target) {
+        return;
+    }
+
     while (target && target.firstChild) {
         target.removeChild(target.firstChild);
     }
@@ -11241,7 +11313,9 @@ var Durations = (function(){
     'use strict';
 
     var trading_times = {};
+    var selected_duration = {};
     var expiry_time = '';
+    var has_end_date = 0;
 
     var displayDurations = function(startType) {
         var durations = Contract.durations();
@@ -11376,10 +11450,20 @@ var Durations = (function(){
                 return -1;
             }
         });
+        has_end_date = 0;
         for(var k=0; k<list.length; k++){
             var d = list[k];
+            if(d!=='t'){
+                has_end_date = 1;
+            }
             if(duration_list.hasOwnProperty(d)){
                 target.appendChild(duration_list[d]);
+            }
+        }
+
+        if(selected_duration.unit){
+            if(!selectOption(selected_duration.unit,target)){
+                selected_duration = {};
             }
         }
 
@@ -11415,8 +11499,11 @@ var Durations = (function(){
         var unit = document.getElementById('duration_units');
         if (isVisible(unit)) {
             var unitValue = unit.options[unit.selectedIndex].getAttribute('data-minimum');
-            document.getElementById('duration_amount').value = unitValue;
             document.getElementById('duration_minimum').textContent = unitValue;
+            if(selected_duration.amount && selected_duration.unit > unitValue){
+                unitValue = selected_duration.amount;
+            }
+            document.getElementById('duration_amount').value = unitValue;
             displayExpiryType(unit.value);
         } else {
             displayExpiryType();
@@ -11478,7 +11565,7 @@ var Durations = (function(){
         option.appendChild(content);
         fragment.appendChild(option);
 
-        if (unit !== 't') {
+        if (has_end_date) {
             option = document.createElement('option');
             content = document.createTextNode(Content.localize().textEndTime);
             option.setAttribute('value', 'endtime');
@@ -11519,7 +11606,9 @@ var Durations = (function(){
         setTime: function(time){ expiry_time = time; },
         getTime: function(){ return expiry_time; },
         processTradingTimesAnswer: processTradingTimesAnswer,
-        trading_times: function(){ return trading_times; }
+        trading_times: function(){ return trading_times; },
+        select_amount: function(a){ selected_duration.amount = a; },
+        select_unit: function(u){ selected_duration.unit = u; }        
     };
 })();
 
@@ -11602,6 +11691,10 @@ var TradingEvents = (function () {
                     sessionStorage.setItem('underlying', underlying);
                     requestTradeAnalysis();
 
+                    Tick.clean();
+                    
+                    updateWarmChart();
+
                     Contract.getContracts(underlying);
 
                     // forget the old tick id i.e. close the old tick stream
@@ -11619,6 +11712,7 @@ var TradingEvents = (function () {
         if (durationAmountElement) {
             // jquery needed for datepicker
             $('#duration_amount').on('change', debounce(function (e) {
+                Durations.select_amount(e.target.value);
                 processPriceRequest();
                 submitForm(document.getElementById('websocket_form'));
             }));
@@ -11647,7 +11741,8 @@ var TradingEvents = (function () {
          */
         var durationUnitElement = document.getElementById('duration_units');
         if (durationUnitElement) {
-            durationUnitElement.addEventListener('change', function () {
+            durationUnitElement.addEventListener('change', function (e) {
+                Durations.select_unit(e.target.value);
                 Durations.populate();
                 processPriceRequest();
             });
@@ -11972,7 +12067,7 @@ var Message = (function () {
         if (response) {
             var type = response.msg_type;
             if (type === 'authorize') {
-                User.set(response.authorize);
+                TUser.set(response.authorize);
                 TradeSocket.send({ payout_currencies: 1 });
             } else if (type === 'active_symbols') {
                 processActiveSymbols(response);
@@ -11989,14 +12084,34 @@ var Message = (function () {
                 processTick(response);
             } else if (type === 'trading_times'){
                 processTradingTimes(response);
+            } else if (type === 'statement'){
+                StatementWS.statementHandler(response);
+            } else if (type === 'balance'){
+                var passthroughObj = response.echo_req.passthrough;
+                if (passthroughObj){
+                    switch (passthroughObj.purpose) {
+                        case "statement_footer":
+                            var bal = response.balance[0].balance;
+                            $("#statement-table > tfoot > tr").
+                                first().
+                                children(".bal").
+                                text(Number(parseFloat(bal)).toFixed(2));
+                            break;
+                        default :
+                            //do nothing
+                    }
+                }
+            } else if (type === 'error') {
+                $(".error-msg").text(response.error.message);
             }
         } else {
+
             console.log('some error occured');
         }
     };
 
     return {
-        process: process,
+        process: process
     };
 
 })();
@@ -12018,7 +12133,6 @@ var Price = (function () {
 
     var typeDisplayIdMapping = {},
         bufferedIds = {},
-        bufferRequests = {},
         form_id = 0;
 
     var createProposal = function (typeOfContract) {
@@ -12135,10 +12249,6 @@ var Price = (function () {
             if (!bufferedIds.hasOwnProperty(id)) {
                 bufferedIds[id] = moment().utc().unix();
             }
-
-            if (!bufferRequests.hasOwnProperty(id)) {
-                bufferRequests[id] = params;
-            }
         }
 
         var position = contractTypeDisplayMapping(type);
@@ -12156,7 +12266,7 @@ var Price = (function () {
 
         var display = type ? (contractType ? contractType[type] : '') : '';
         if (display) {
-            h4.setAttribute('class', 'contract_heading ' + display.toLowerCase().replace(/ /g, '_'));
+            h4.setAttribute('class', 'contract_heading ' + type);
             if (is_spread) {
                 if (position === "top") {
                     h4.textContent = Content.localize().textSpreadTypeLong;
@@ -12208,9 +12318,9 @@ var Price = (function () {
             purchase.setAttribute('data-ask-price', proposal['ask_price']);
             purchase.setAttribute('data-display_value', proposal['display_value']);
             purchase.setAttribute('data-symbol', id);
-            for(var key in bufferRequests[id]){
+            for(var key in params){
                 if(key && key !== 'proposal'){
-                    purchase.setAttribute('data-'+key, bufferRequests[id][key]);
+                    purchase.setAttribute('data-'+key, params[key]);
                 }
             }
         }
@@ -12231,7 +12341,6 @@ var Price = (function () {
         clearMapping: clearMapping,
         idDisplayMapping: function () { return typeDisplayIdMapping; },
         bufferedIds: function () { return bufferedIds; },
-        bufferRequests: function () { return bufferRequests; },
         getFormId: function(){ return form_id; },
         incrFormId: function(){ form_id++; },
         clearBufferIds: clearBuffer
@@ -12299,6 +12408,10 @@ function processMarketUnderlying() {
     processForgetTickId();
     // get ticks for current underlying
     TradeSocket.send({ ticks : underlying });
+
+    Tick.clean();
+    
+    updateWarmChart();
 
     Contract.getContracts(underlying);
 
@@ -12397,24 +12510,25 @@ function displaySpreads() {
 /*
  * Function to request for cancelling the current price proposal
  */
-function processForgetPriceIds() {
+function processForgetPriceIds(forget_id) {
     'use strict';
-    if (Price) {
-        showPriceOverlay();
-        var price_data = Price.bufferRequests();
-        var form_id = Price.getFormId();
-        var price_id = Price.bufferedIds();
-
-        for (var id in price_data) {
-            if(price_data[id] && price_data[id].passthrough.form_id!==form_id){
-                TradeSocket.send({ forget: id });
-                delete price_data[id];
-                delete price_id[id];
-            }
-        }
-
+    showPriceOverlay();
+    var form_id = Price.getFormId();
+    var forget_ids = [];
+    var price_id = Price.bufferedIds();
+    if(forget_id){
+        forget_ids.push(forget_id);
+    }
+    else{
+        forget_ids = Object.keys(price_id);
         Price.clearMapping();
     }
+
+    for (var i=0; i<forget_ids.length;i++) {
+        var id = forget_ids[i];
+        TradeSocket.send({ forget: id });
+        delete price_id[id];
+    }    
 }
 
 /*
@@ -12426,7 +12540,7 @@ function processPriceRequest() {
 
     Price.incrFormId();
     processForgetPriceIds();
-    showPriceOverlay(); 
+    showPriceOverlay();
     for (var typeOfContract in Contract.contractType()[Contract.form()]) {
         if(Contract.contractType()[Contract.form()].hasOwnProperty(typeOfContract)) {
             TradeSocket.send(Price.proposal(typeOfContract));
@@ -12456,22 +12570,23 @@ function processForgetTickId() {
  */
 function processTick(tick) {
     'use strict';
-    Tick.details(tick);
-    Tick.display();
-    WSTickDisplay.updateChart(tick);
-    Purchase.update_spot_list(tick);
-    if (!Barriers.isBarrierUpdated()) {
-        Barriers.display();
-        Barriers.setBarrierUpdate(true);
+    if(tick.echo_req.ticks === sessionStorage.getItem('underlying')){
+        Tick.details(tick);
+        Tick.display();
+        WSTickDisplay.updateChart(tick);
+        Purchase.update_spot_list(tick);
+        if (!Barriers.isBarrierUpdated()) {
+            Barriers.display();
+            Barriers.setBarrierUpdate(true);
+        }
+        updateWarmChart();
     }
 }
 
 function processProposal(response){
     'use strict';
-    var price_data = Price.bufferRequests();
     var form_id = Price.getFormId();
-    // This is crazy condition but there is no way
-    if((!price_data[response.proposal.id] && response.echo_req.hasOwnProperty('passthrough') && response.echo_req.passthrough.hasOwnProperty('form_id') && response.echo_req.passthrough.form_id === form_id) || (price_data[response.proposal.id] && price_data[response.proposal.id].passthrough.form_id === Price.getFormId())){
+    if(response.echo_req.passthrough.form_id===form_id){
         hideOverlayContainer();
         Price.display(response, Contract.contractType()[Contract.form()]);
         hidePriceOverlay();
@@ -12479,6 +12594,9 @@ function processProposal(response){
             document.getElementById('trading_socket_container').classList.add('show');
             document.getElementById('trading_init_progress').style.display = 'none';
         }
+    }
+    else{
+        processForgetPriceIds(response.proposal.id);
     }
 }
 
@@ -12545,7 +12663,7 @@ var Purchase = (function () {
 
             heading.textContent = Content.localize().textContractConfirmationHeading;
             descr.textContent = receipt['longcode'];
-            reference.textContent = Content.localize().textContractConfirmationReference + ' ' + receipt['contract_id'];
+            reference.textContent = Content.localize().textContractConfirmationReference + ' ' + receipt['transaction_id'];
 
             var payout_value, cost_value, profit_value;
 
@@ -12571,7 +12689,7 @@ var Purchase = (function () {
                 profit.innerHTML = Content.localize().textContractConfirmationProfit + ' <p>' + profit_value + '</p>';
             }
 
-            balance.textContent = Content.localize().textContractConfirmationBalance + ' ' + User.get().currency + ' ' + Math.round(receipt['balance_after']*100)/100;
+            balance.textContent = Content.localize().textContractConfirmationBalance + ' ' + TUser.get().currency + ' ' + Math.round(receipt['balance_after']*100)/100;
 
             if(show_chart){
                 chart.show();
@@ -12658,7 +12776,7 @@ var Purchase = (function () {
 
             var el1 = document.createElement('div');
             el1.classList.add('col');
-            el1.textContent = 'Tick '+ (spots.getElementsByClassName('row').length+1);
+            el1.textContent = Content.localize().textTickResultLabel + " " + (spots.getElementsByClassName('row').length+1);
             fragment.appendChild(el1);
 
             var el2 = document.createElement('div');
@@ -12685,13 +12803,13 @@ var Purchase = (function () {
 
                 if  (  purchase_data.echo_req.passthrough.contract_type==="DIGITMATCH" && d1==purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITDIFF" && d1!=purchase_data.echo_req.passthrough.barrier){
                     spots.className = 'won';
-                    contract_status = 'This contract won';
+                    contract_status = Content.localize().textContractStatusWon;
                 }
                 else{
                     spots.className = 'lost';
-                    contract_status = 'This contract lost';
+                    contract_status = Content.localize().textContractStatusLost;
                 }
-                document.getElementById('contract_purchase_heading').textContent = text.localize(contract_status);
+                document.getElementById('contract_purchase_heading').textContent = contract_status;
             }
 
             purchase_data.echo_req.passthrough['duration']--;
@@ -13009,7 +13127,9 @@ var Tick = (function () {
         id = '',
         epoch = '',
         errorMessage = '',
-        bufferedIds = {};
+        bufferedIds = {},
+        spots = [],
+        keep_number = 20;
 
     var details = function (data) {
         errorMessage = '';
@@ -13022,6 +13142,11 @@ var Tick = (function () {
                 quote = tick['quote'];
                 id = tick['id'];
                 epoch = tick['epoch'];
+
+                if(spots.length === keep_number){
+                    spots.shift();
+                }
+                spots.push(quote);
 
                 if (!bufferedIds.hasOwnProperty(id)) {
                     bufferedIds[id] = moment().utc().unix();
@@ -13062,7 +13187,9 @@ var Tick = (function () {
         epoch: function () { return epoch; },
         errorMessage: function () { return errorMessage; },
         bufferedIds: function () { return bufferedIds; },
-        clearBufferIds: clearBuffer
+        clean: function(){ spots = [];},
+        clearBufferIds: clearBuffer,
+        spots: function(){ return spots;}
     };
 })();
 ;var WSTickDisplay = Object.create(TickDisplay);
@@ -13112,7 +13239,7 @@ WSTickDisplay.updateChart = function(data){
     }           
 };
 
-;var User = (function () {
+;var TUser = (function () {
     var data = {};
     return {
         set: function(a){ data = a; },
@@ -13358,6 +13485,421 @@ $(document).ready(function () {
     if (window.reality_check_object) return;
     window.reality_check_object = new RealityCheck('reality_check', LocalStore);
 });
+;var CommonData = (function(){
+    function getCookieItem(sKey) {
+        if (!sKey) { return null; }
+        return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+    }
+    
+    //because getCookieItem('login') is confusing and does not looks like we are getting API token
+    function getApiToken(){
+        return getCookieItem("login");
+    }
+
+    return {
+        getCookieItem: getCookieItem,
+        getApiToken: getApiToken
+    };
+}());;
+var StringUtil = (function(){
+    function toTitleCase(str){
+        return str.replace(/\w[^\s\/\\]*/g, function(txt){
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+    }
+
+    function dateToStringWithoutTime(date){
+        return [date.getDate(), date.getMonth()+1, date.getFullYear()].join("/");
+    }
+
+    //Time should be in SECOND !!!
+    function timeStampToDateString(time){
+        var dateObj = new Date(time * 1000);
+        var momentObj = moment.utc(dateObj);
+        return momentObj.format("YYYY-MM-DD");
+    }
+
+    //Time should be in SECOND !!!
+    function timeStampToTimeString(time){
+        var dateObj = new Date(time * 1000);
+        var momentObj = moment.utc(dateObj);
+        return momentObj.format("HH:mm:ss");
+    }
+
+    //Time should be in SECOND !!!
+    function timeStampToDateTimeString(time){
+        var dateObj = new Date(time * 1000);
+        var momentObj = moment.utc(dateObj);
+        return momentObj.toString();
+    }
+
+    return {
+        toTitleCase: toTitleCase,
+        dateToStringWithoutTime: dateToStringWithoutTime,
+        unixTimeToDateString: timeStampToDateString,
+        unixTimeToTimeString: timeStampToTimeString,
+        unixTimeToDateTimeString: timeStampToDateTimeString
+    };
+}());
+
+;
+var Table = (function(){
+    "use strict";
+    /***
+     *
+     * @param {Array[]} data ordered data to pump into table body
+     * @param {Object} metadata object containing metadata of table
+     * @param {String[]} metadata.cols cols of table
+     * @param {String} metadata.id table id
+     * @param {String[]} [metadata.tableClass] class used in html
+     * @param {String[]} [header] string to be used as Header in table, if not stated then table will not have Header
+     * @param {String[]} [footer] string to be used as footer, to have empty footer, simply use an empty element in array
+     * eg. ["", "halo", ""] will have 3 elements in footer, 2 of them being empty
+     */
+    function createFlexTable(body, metadata, header, footer){
+
+        var tableClasses = (metadata.tableClass) ? metadata.tableClass + " flex-table" : "flex-table";
+
+        var $tableContainer = $("<div></div>", {class: "flex-table-container"});
+        var $table = $("<table></table>", {class: tableClasses, id: metadata.id});
+        var $body = createFlexTableTopGroup(body, metadata.cols, "body");
+
+        if (header) {
+            var $header = createFlexTableTopGroup([header], metadata.cols, "header");
+            $header.appendTo($table);
+        }
+
+        $body.appendTo($table);
+
+        if (footer) {
+            var $footer = createFlexTableTopGroup([footer], metadata.cols, "footer");
+            $footer.appendTo($table);
+        }
+
+        $table.appendTo($tableContainer);
+
+        return $tableContainer;
+    }
+
+    /***
+     *
+     * @param {object[][]} data header strings
+     * @param {String[]} metadata cols name
+     * @param {"header"\"footer"|"body"} opt optional arg to specify which type of element to create, default to header
+     */
+    function createFlexTableTopGroup(data, metadata, opt){
+
+        var $outer = function(){
+            switch (opt) {
+                case "body":
+                    return $("<tbody></tbody>");
+                case "footer":
+                    return $("<tfoot></tfoot>");
+                default :
+                    return $("<thead></thead>");
+            }
+        }();
+
+        for (var i = 0 ; i < data.length ; i++){
+            var innerType = (opt === "body") ? "data" : "header";
+            var $tr = createFlexTableRow(data[i], metadata, innerType);
+            $tr.appendTo($outer);
+        }
+
+        return $outer;
+    }
+
+    /***
+     *
+     * @param {object[]} data
+     * @param {String[]} metadata cols name
+     * @param {"header"|"data"} opt optional, default to "header"
+     */
+    function createFlexTableRow(data, metadata, opt){
+        if (data.length !== metadata.length) {
+            throw new Error("metadata and data does not match");
+        }
+
+        var isData = (opt === "data");
+
+        var $tr = $("<tr></tr>", {class: "flex-tr"});
+        for (var i = 0 ; i < data.length ; i++){
+            var className = metadata[i].toLowerCase().replace(/\s/g, "-") + " flex-tr-child";
+            var rowElement = (isData) ?
+                $("<td></td>", {class: className, text: data[i]}) :
+                $("<th></th>", {class: className, text: data[i]});
+            rowElement.appendTo($tr);
+        }
+
+        return $tr;
+    }
+
+
+    function clearTableBody(id){
+        var tbody = document.querySelector("#" + id +">tbody");
+        while (tbody.firstElementChild){
+            tbody.removeChild(tbody.firstElementChild);
+        }
+    }
+
+    /***
+     *
+     * @param {String} id table id
+     * @param {Object[]} data array of data to be transform to row
+     * @param {Function} rowGenerator takes in one arg, and convert it into row to be append to table body
+     */
+    function appendTableBody(id, data, rowGenerator){
+        var tbody = document.querySelector("#" + id +">tbody");
+        var docFrag = document.createDocumentFragment();
+        data.map(function(ele){
+            var row = rowGenerator(ele);
+            docFrag.appendChild(row);
+        });
+
+        tbody.appendChild(docFrag);
+    }
+
+    /***
+     *
+     * @param {String} id table id
+     * @param {Object[]} data array of data to be transform to row
+     * @param {Function} rowGenerator takes in one arg, and convert it into row to be append to table body
+     */
+    function overwriteTableBody(id, data, rowGenerator){
+        clearTableBody(id);
+        appendTableBody(id, data, rowGenerator);
+    }
+
+    return {
+        createFlexTable: createFlexTable,
+        createFlexTableRow: createFlexTableRow,
+        overwriteTableBody: overwriteTableBody,
+        clearTableBody: clearTableBody,
+        appendTableBody: appendTableBody
+    };
+}());;pjax_config_page("statementws", function(){
+    return {
+        onLoad: function() {
+            TradeSocket.init();
+            StatementWS.init();
+        },
+        onUnload: function(){
+            StatementWS.clean();
+            TradeSocket.close();
+        }
+    };
+});
+
+;var StatementData = (function(){
+    "use strict";
+    var hasOlder = true;
+
+    function getStatement(opts){
+        var req = {statement: 1, description: 1};
+        if(opts){ 
+            $.extend(true, req, opts);    
+        }
+
+        TradeSocket.send(req);
+    }
+
+    return {
+        getStatement: getStatement,
+        hasOlder: hasOlder
+    };
+}());
+;var StatementWS = (function(){
+    "use strict";
+
+    //Batch refer to number of data get from ws service per request
+    //chunk refer to number of data populate to ui for each append
+    //receive means receive from ws service
+    //consume means consume by UI and displayed to page
+
+    var batchSize = 50;
+    var chunkSize = batchSize/2;
+
+    var noMoreData = false;
+    var pending = false;            //serve as a lock to prevent ws request is sequential
+    var currentBatch = [];
+    var transactionsReceived = 0;
+    var transactionsConsumed = 0;
+
+    var tableExist = function(){
+        return document.getElementById("statement-table");
+    };
+    var finishedConsumed = function(){
+        return transactionsConsumed === transactionsReceived;
+    };
+
+    function statementHandler(response){
+        pending = false;
+
+        var statement = response.statement;
+        currentBatch = statement.transactions;
+        transactionsReceived += currentBatch.length;
+
+        if (currentBatch.length < batchSize){
+            noMoreData = true;
+        }
+
+        if (!tableExist()) {
+            StatementUI.createEmptyStatementTable().appendTo("#statement-ws-container");
+            StatementUI.updateStatementTable(getNextChunkStatement());
+            Content.statementTranslation();
+        }
+    }
+
+    function getNextBatchStatement(){
+        StatementData.getStatement({offset: transactionsReceived, limit: batchSize});
+        pending = true;
+    }
+
+    function getNextChunkStatement(){
+        var chunk = currentBatch.splice(0, chunkSize);
+        transactionsConsumed += chunk.length;
+        return chunk;
+    }
+
+
+    function loadStatementChunkWhenScroll(){
+        $(document).scroll(function(){
+
+            function hidableHeight(percentage){
+                var totalHidable = $(document).height() - $(window).height();
+                return Math.floor(totalHidable * percentage / 100);
+            }
+
+            var pFromTop = $(document).scrollTop();
+
+            if (!tableExist()){
+                return;
+            }
+
+            if (pFromTop < hidableHeight(70)) {
+                return;
+            }
+
+            if (finishedConsumed() && !noMoreData && !pending) {
+                getNextBatchStatement();
+                return;
+            }
+
+            if (!finishedConsumed()){
+                StatementUI.updateStatementTable(getNextChunkStatement());
+            }
+        });
+    }
+
+
+    function initTable(){
+        pending = false;
+        currentBatch = [];
+        transactionsReceived = 0;
+        noMoreData = false;
+        transactionsConsumed = 0;
+        $(".error-msg").text("");
+
+        StatementUI.clearTableContent();
+    }
+
+    function initPage(){
+        getNextBatchStatement();
+        loadStatementChunkWhenScroll();
+    }
+
+    function cleanStatementPageState(){
+        initTable();
+    }
+
+    return {
+        init: initPage,
+        statementHandler: statementHandler,
+        clean: cleanStatementPageState
+    };
+}());
+;var StatementUI = (function(){
+    "use strict";
+    var tableID = "statement-table";
+    var columns = ["date", "ref", "act", "desc", "credit", "bal"];
+    var header = ["Date", "Ref.", "Action", "Description", "Credit/Debit", "Balance"];
+    var footer = ["", "", "", "", "", ""];
+
+    function createEmptyStatementTable(){
+        var localizedHeader = header.map(function(t){ return text.localize(t); });
+        localizedHeader[5] = localizedHeader[5] + "(" + TUser.get().currency + ")";
+
+        var metadata = {
+            id: tableID,
+            cols: columns
+        };
+        var data = [];
+        var $tableContainer = Table.createFlexTable(data, metadata, localizedHeader, footer);
+        return $tableContainer;
+    }
+
+    function updateStatementTable(transactions){
+        Table.appendTableBody(tableID, transactions, createStatementRow);
+        updateStatementFooter(transactions);
+        $("#" + tableID +">tfoot").show();
+    }
+
+    function clearTableContent(){
+        Table.clearTableBody(tableID);
+        $("#" + tableID +">tfoot").hide();
+    }
+
+
+    function updateStatementFooter(transactions){
+        TradeSocket.send({balance: 1, passthrough: {purpose: "statement_footer"}});
+        var accCredit = document.querySelector("#statement-table > tfoot > tr > .credit").textContent;
+        accCredit = parseFloat(accCredit);
+        if (isNaN(accCredit)) {
+            accCredit = 0;
+        }
+
+        var newCredits = transactions.reduce(function(p, c){ return p + parseFloat(c.amount); }, 0);
+
+        var totalCredit = accCredit + newCredits;
+        totalCredit = Number(totalCredit).toFixed(2);
+
+        var $footerRow = $("#" + tableID + " > tfoot > tr").first();
+        var creditCell = $footerRow.children(".credit");
+        var creditType = (totalCredit >= 0) ? "profit" : "loss";
+
+        creditCell.text(totalCredit);
+        creditCell.removeClass("profit").removeClass("loss");
+        creditCell.addClass(creditType);
+    }
+
+    function createStatementRow(transaction){
+        var dateObj = new Date(transaction["transaction_time"] * 1000);
+        var momentObj = moment.utc(dateObj);
+        var dateStr = momentObj.format("YYYY-MM-DD");
+        var timeStr = momentObj.format("HH:mm:ss");
+
+        var date = dateStr + "\n" + timeStr;
+        var ref = transaction["transaction_id"];
+        var action = StringUtil.toTitleCase(transaction["action_type"]);
+        var desc = transaction["longcode"];
+        var amount = Number(parseFloat(transaction["amount"])).toFixed(2);
+        var balance = Number(parseFloat(transaction["balance_after"])).toFixed(2);
+
+        var creditDebitType = (parseInt(amount) >= 0) ? "profit" : "loss";
+
+        var $statementRow = Table.createFlexTableRow([date, ref, action, desc, amount, balance], columns, "data");
+        $statementRow.children(".credit").addClass(creditDebitType);
+        $statementRow.children(".date").addClass("break-line");
+
+        return $statementRow[0];        //return DOM instead of jquery object
+    }
+    
+    return {
+        clearTableContent: clearTableContent,
+        createEmptyStatementTable: createEmptyStatementTable,
+        updateStatementTable: updateStatementTable
+    };
+}());
 ;//////////////////////////////////////////////////////////////////
 // Purpose: Write loading image to a container for ajax request
 // Parameters:
