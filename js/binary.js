@@ -827,7 +827,7 @@ console.log("The active.item" , $(active.item[0].id));
 
         if(active.item) {
             var patt = new RegExp("topMenuBetaInterface");
-            if(page.language() === 'FR' && /topMenuBetaInterface/i.test(RegExp(pat))){
+            if(page.language() === 'FR' && /topMenuBetaInterface/i.test(pat)){
                 console.log("The real Menu is here");
                 $("#topMenuBetaInterface").removeClass('active');
                 $("#topMenuBetaInterface").removeClass('hover');
