@@ -1346,7 +1346,6 @@ Page.prototype = {
         $('#language_select').on('change', 'select', function() {
             var language = $(this).find('option:selected').attr('class');
             document.location = that.url_for_language(language);
-            console.log("Document loc", document.location);
         });
     },
     on_change_loginid: function() {
@@ -1410,11 +1409,11 @@ Page.prototype = {
         console.log("The loc is ", loc.pathname);
 
         if(page.language() === 'FR' && /trade.cgi/i.test(loc.pathname)){
-            var path = window.location.pathname;
-            path = path.replace(/\/$/, "");
-            path = decodeURIComponent(path);
+            //var path = window.location.pathname;
+            //path = path.replace(/\/$/, "");
+            //path = decodeURIComponent(path);
 
-            url = path;
+            url = loc.protocol + '//' + loc.host + '/trading?l=FR';
 
         }
         else{
