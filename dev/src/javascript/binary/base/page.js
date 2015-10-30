@@ -382,7 +382,6 @@ Menu.prototype = {
             $('#mobile-menu #topMenuStartBetting a.trading_link').attr('href', trade_url);
         }
         else{
-            trade_url = start_trading.attr("href");
             start_trading.attr("href", trade_url);
         }
 
@@ -800,7 +799,15 @@ Page.prototype = {
         var that = this;
         $('#language_select').on('change', 'select', function() {
             var language = $(this).find('option:selected').attr('class');
-            document.location = that.url_for_language(language);
+            var loc = document.location; // quick access
+            var url = loc.protocol + '//' + loc.host + 'trading?l=' + language;
+            if(language === 'FR' && /trade.cgi/i.test(loc.pathname)){
+                window.location = url;
+            }
+            else{
+                document.location = that.url_for_language(language);
+            }
+            
         });
     },
     on_change_loginid: function() {
@@ -858,33 +865,17 @@ Page.prototype = {
         SessionStore.set('selected.language', lang);
         var loc = document.location; // quick access
         var qs = loc.search || '?';
-        console.log("The loc search is",loc.search + "," + loc.host + "," + loc.pathname);
         var url = loc.protocol + '//' + loc.host + loc.pathname;
-        
-        console.log("The loc is ", loc.pathname);
-
-        if(page.language() === 'FR' /*&& /trade.cgi/i.test(loc.pathname)*/){
-            //var path = window.location.pathname;
-            //path = path.replace(/\/$/, "");
-            //path = decodeURIComponent(path);
-
-            url = loc.protocol + '//' + loc.host + '/trading?l=FR';
-
-        }
-        else{
-            if (qs.indexOf('l=') >= 0) {
-                url += qs.replace(/(\?|&)l=[A-Z_]{2,5}/, "$1l=" + lang);
+        if (qs.indexOf('l=') >= 0) {
+            url += qs.replace(/(\?|&)l=[A-Z_]{2,5}/, "$1l=" + lang);
+        } else {
+            if (qs.length > 1) {
+                lang = '&l=' + lang;
             } else {
-                if (qs.length > 1) {
-                    lang = '&l=' + lang;
-                } else {
-                    lang = 'l=' + lang;
-                }
-                url += qs + lang;
+                lang = 'l=' + lang;
             }
-
+            url += qs + lang;
         }
-
         return url;
     },
     record_affiliate_exposure: function() {
