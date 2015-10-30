@@ -1347,7 +1347,7 @@ Page.prototype = {
             var loc = document.location; // quick access
             var url = loc.protocol + '//' + loc.host + '/trading?l=' + language;
             if(language === 'FR' && /trade.cgi/i.test(loc.pathname)){
-                window.location = that.url_for('/trading');
+                window.location = page.url.url_for('/trading');
             }
             else{
                 document.location = that.url_for_language(language);
