@@ -1345,7 +1345,7 @@ Page.prototype = {
         $('#language_select').on('change', 'select', function() {
             var language = $(this).find('option:selected').attr('class');
             var loc = document.location; // quick access
-            var url = loc.protocol + '//' + loc.host + 'trading?l=' + language;
+            var url = loc.protocol + '//' + loc.host + '/trading?l=' + language;
             if(language === 'FR' && /trade.cgi/i.test(loc.pathname)){
                 window.location = url;
             }
