@@ -858,6 +858,7 @@ Page.prototype = {
         SessionStore.set('selected.language', lang);
         var loc = document.location; // quick access
         var qs = loc.search || '?';
+        console.log("The loc search is",loc.search + "," + loc.host + "," + loc.pathname);
         var url = loc.protocol + '//' + loc.host + loc.pathname;
         if (qs.indexOf('l=') >= 0) {
             url += qs.replace(/(\?|&)l=[A-Z_]{2,5}/, "$1l=" + lang);
