@@ -812,6 +812,7 @@ Menu.prototype = {
         if(active.subitem) {
             active.subitem.addClass('a-active');
         }
+         console.log("Good morning Nuru", $(active.item.get(0).id));
         if("topMenuBetaInterface" === $(active.item.get(0).id)){
             console.log("Good morning Nuru");
         }
