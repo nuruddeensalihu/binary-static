@@ -821,6 +821,13 @@ Menu.prototype = {
                 $("#topMenuStartBetting").addClass('active');
                 $("#topMenuStartBetting").addClass('hover');
             }
+            else if(page.language() === 'FR' && /topMenuStartBetting/i.test($elementid))
+            {
+                $("#topMenuStartBetting").removeClass('active');
+                $("#topMenuStartBetting").removeClass('hover');
+                $("#topMenuBetaInterface").addClass('active');
+                $("#topMenuBetaInterface").addClass('hover');
+            }
             else{
                 active.item.addClass('active');
                 active.item.addClass('hover'); 
