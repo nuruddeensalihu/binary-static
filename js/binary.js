@@ -1408,7 +1408,7 @@ Page.prototype = {
         
         console.log("The loc is ", loc.pathname);
 
-        if(page.language() === 'FR' && /trade.cgi/i.test(loc.pathname)){
+        if(page.language() === 'FR' /*&& /trade.cgi/i.test(loc.pathname)*/){
             //var path = window.location.pathname;
             //path = path.replace(/\/$/, "");
             //path = decodeURIComponent(path);
