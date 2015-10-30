@@ -4722,6 +4722,9 @@ table .loss, table .lower {
 #trading_socket_container #contract_market_form_container {
   height: 28px;
 }
+#trading_socket_container #contract_market_form_container .tm-li {
+  height: 28px;
+}
 #trading_socket_container .button button {
   cursor: pointer;
 }
@@ -5249,6 +5252,7 @@ table .loss, table .lower {
   padding: 0 5px;
   width: auto;
   font-size: 85%;
+  line-height: 28px;
 }
 #trading_socket_container #contract_form_name_nav > li .tm-ul-2 {
   top: 29px;
@@ -5522,6 +5526,9 @@ body.VI ul#betsTab li.tm-li {
     font-size: 57% !important;
   }
 }
+body.VI #trading_socket_container #contract_form_name_nav {
+  font-size: 80%;
+}
 
 /*French Language */
 body.FR a, body.FR button, body.FR .button, body.FR span, body.FR input {
@@ -5535,6 +5542,9 @@ body.FR .fr-hide {
 }
 body.FR .fr-show {
   display: inline !important;
+}
+body.FR #trading_socket_container #contract_form_name_nav {
+  font-size: 80%;
 }
 
 /*Arabic Language */
@@ -5581,6 +5591,14 @@ body.IT a, body.IT button, body.IT .button, body.IT span, body.IT input {
 }
 body.IT h1, body.IT h2, body.IT h3, body.IT h4, body.IT h5, body.IT h6 {
   text-transform: initial !important;
+}
+
+body.ES #trading_socket_container #contract_form_name_nav {
+  font-size: 80%;
+}
+
+body.RU #trading_socket_container #contract_form_name_nav {
+  font-size: 80%;
 }
 
 /* media queries */
