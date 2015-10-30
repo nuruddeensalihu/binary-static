@@ -820,10 +820,10 @@ console.log("The real id", active.item.baseURI);
 //var patt = new RegExp("topMenuBetaInterface");
 //console.log("The indexof ,)
 //if(patt.test(active.item.id)){
-var $pat = active.item.get(0).outerHTML.id;
+var $pat = active.item.get(0).id;
 console.log("new active item is", $pat);
 
-console.log("The active.item" , $(active.item[0].id));
+console.log("The active.item" , $(active.item.attr('id')));
 
         if(active.item) {
             var patt = new RegExp("topMenuBetaInterface");
