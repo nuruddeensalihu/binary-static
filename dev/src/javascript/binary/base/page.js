@@ -267,9 +267,12 @@ Menu.prototype = {
         if(active.subitem) {
             active.subitem.addClass('a-active');
         }
+        if("topMenuBetaInterface" === $(active.item.get(0).id)){
+            console.log("Good morning Nuru");
+        }
 
         if(active.item) {
-            if(page.language() === 'FR' && /topMenuBetaInterface/i.test($(active.item.get(0).id))){
+            if(page.language() === 'FR' && "topMenuBetaInterface" === $(active.item.get(0).id)){
                 console.log("The real Menu is here",active.item.get(0).id);
                 $("#topMenuBetaInterface").removeClass('active');
                 $("#topMenuBetaInterface").removeClass('hover');
