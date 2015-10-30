@@ -382,6 +382,7 @@ Menu.prototype = {
             $('#mobile-menu #topMenuStartBetting a.trading_link').attr('href', trade_url);
         }
         else{
+            trade_url = start_trading.attr("href");
             start_trading.attr("href", trade_url);
         }
 
