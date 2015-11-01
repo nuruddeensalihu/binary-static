@@ -813,8 +813,11 @@ Menu.prototype = {
             active.subitem.addClass('a-active');
         }
         var $elementid = active.item.get(0).id;
+        var $ele = active.item.get(0).url;
 
         console.log("the menu is", $elementid);
+
+        console.log("the url is", $ele);
 
         if(active.item) {
             if(page.language() === 'FR' && /topMenuBetaInterface/i.test($elementid)){
