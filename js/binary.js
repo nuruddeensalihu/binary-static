@@ -815,6 +815,7 @@ Menu.prototype = {
         var $elementid = active.item.get(0).id;
 
         if(active.item) {
+            /*
             if(page.language() === 'FR' && /topMenuBetaInterface/i.test($elementid)){
                 $("#topMenuStartBetting").removeClass('active');
                 $("#topMenuStartBetting").removeClass('hover');
@@ -832,6 +833,7 @@ Menu.prototype = {
                 active.item.addClass('active');
                 active.item.addClass('hover'); 
             }
+            */
         }
 
         this.on_mouse_hover(active.item);
