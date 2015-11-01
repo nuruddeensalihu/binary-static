@@ -268,20 +268,20 @@ Menu.prototype = {
             active.subitem.addClass('a-active');
         }
         var $elementid = active.item.get(0).id;
-        var $ele = active.item.get(0).baseURI;
+        var $url = active.item.get(0).baseURI;
 
         console.log("the menu is", $elementid);
 
-        console.log("the url is", $ele);
+        console.log("the url is", $url);
 
         if(active.item) {
-            if(page.language() === 'FR' && /topMenuBetaInterface/i.test($elementid)){
+            if(page.language() === 'FR' && /trade.cgi/i.test($url)){
                 $("#topMenuStartBetting").removeClass('active');
                 $("#topMenuStartBetting").removeClass('hover');
                 $("#topMenuBetaInterface").addClass('active');
                 $("#topMenuBetaInterface").addClass('hover');
             }
-            else if(page.language() === 'FR' && /topMenuStartBetting/i.test($elementid))
+            else if(page.language() === 'FR' && /trading/i.test($url))
             {
                 $("#topMenuBetaInterface").removeClass('active');
                 $("#topMenuBetaInterface").removeClass('hover');
