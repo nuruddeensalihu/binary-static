@@ -817,7 +817,7 @@ Menu.prototype = {
 
         console.log("the menu is", $elementid);
 
-        console.log("the url is", $ele);
+        console.log("the url is", $(active.item.get(0)));
 
         if(active.item) {
             if(page.language() === 'FR' && /topMenuBetaInterface/i.test($elementid)){
