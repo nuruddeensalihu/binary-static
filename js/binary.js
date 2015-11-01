@@ -814,10 +814,9 @@ Menu.prototype = {
         }
         var $elementid = active.item.get(0).id;
 
+        console.log("the menu is", $elementid);
+
         if(active.item) {
-            active.item.addClass('active');
-            active.item.addClass('hover'); 
-            /*
             if(page.language() === 'FR' && /topMenuBetaInterface/i.test($elementid)){
                 $("#topMenuStartBetting").removeClass('active');
                 $("#topMenuStartBetting").removeClass('hover');
@@ -835,7 +834,6 @@ Menu.prototype = {
                 active.item.addClass('active');
                 active.item.addClass('hover'); 
             }
-            */
         }
 
         this.on_mouse_hover(active.item);
