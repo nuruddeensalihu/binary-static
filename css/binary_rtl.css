@@ -5326,6 +5326,10 @@ table .loss, table .lower {
 
 /* Language based rules */
 /* Specific rules for languages */
+body .bd-hide {
+  display: none !important;
+}
+
 /*Japan Language */
 body.JA .ja-hide {
   display: none !important;
