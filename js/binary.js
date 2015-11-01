@@ -816,17 +816,17 @@ Menu.prototype = {
 
         if(active.item) {
             if(page.language() === 'FR' && /topMenuBetaInterface/i.test($elementid)){
-                $("#topMenuBetaInterface").removeClass('active');
-                $("#topMenuBetaInterface").removeClass('hover');
-                $("#topMenuStartBetting").addClass('active');
-                $("#topMenuStartBetting").addClass('hover');
-            }
-            else if(page.language() === 'FR' && /topMenuStartBetting/i.test($elementid))
-            {
                 $("#topMenuStartBetting").removeClass('active');
                 $("#topMenuStartBetting").removeClass('hover');
                 $("#topMenuBetaInterface").addClass('active');
                 $("#topMenuBetaInterface").addClass('hover');
+            }
+            else if(page.language() === 'FR' && /topMenuStartBetting/i.test($elementid))
+            {
+                $("#topMenuBetaInterface").removeClass('active');
+                $("#topMenuBetaInterface").removeClass('hover');
+                $("#topMenuStartBetting").addClass('active');
+                $("#topMenuStartBetting").addClass('hover');
             }
             else{
                 active.item.addClass('active');
