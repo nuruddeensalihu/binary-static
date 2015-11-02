@@ -812,12 +812,8 @@ Menu.prototype = {
         if(active.subitem) {
             active.subitem.addClass('a-active');
         }
-        var $elementid = active.item.get(0).id;
+
         var $url = active.item.get(0).baseURI;
-
-        console.log("the menu is", $elementid);
-
-        console.log("the url is", $url);
 
         if(active.item) {
             if(page.language() === 'FR' && /trade.cgi/i.test($url)){
