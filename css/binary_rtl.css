@@ -5411,6 +5411,9 @@ body.FR .fr-show {
 body.FR #trading_socket_container #contract_form_name_nav {
   font-size: 80%;
 }
+body.FR .bd-hide {
+  display: inline !important;
+}
 
 /*Arabic Language */
 body.AR .regulatory-logo {
