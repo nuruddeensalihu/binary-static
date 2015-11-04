@@ -1,14 +1,14 @@
-pjax_config_page("statementws", function(){
+
+pjax_config_page("profit_tablews", function(){
     return {
         onLoad: function() {
             Content.populate();
             TradeSocket.init();
-            StatementWS.init();
+            ProfitTableWS.init();
         },
         onUnload: function(){
-            StatementWS.clean();
             TradeSocket.close();
+            ProfitTableWS.clean();
         }
     };
 });
-

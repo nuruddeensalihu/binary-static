@@ -4669,6 +4669,7 @@ table .loss, table .lower {
   left: 50%;
   top: 250px;
   margin-left: -5rem;
+  z-index: 9999;
 }
 
 #trading_socket_container {
@@ -5271,20 +5272,6 @@ table .loss, table .lower {
 #statement-ws-container .act {
   flex: 0.8 1 35px;
 }
-#statement-ws-container .button {
-  color: #fff;
-  text-decoration: none;
-  text-align: center;
-  line-height: 100%;
-  background: #2e8836;
-  border-radius: 4px;
-  text-transform: capitalize;
-  padding: 10px 25px;
-  display: inline-block;
-  letter-spacing: .75px;
-  overflow: visible;
-  border: 0;
-}
 #statement-ws-container label[for="date-picker"] {
   left: 30%;
 }
@@ -5322,6 +5309,24 @@ table .loss, table .lower {
   flex-grow: 1;
   flex-shrink: 1;
   flex-basis: 50px;
+}
+
+#profit-table-ws-container th {
+  padding-right: 8px;
+}
+#profit-table-ws-container td {
+  padding-right: 8px;
+}
+#profit-table-ws-container .pl {
+  text-align: right !important;
+}
+#profit-table-ws-container #pl-day-total .buy-date {
+  flex-grow: 6;
+  flex-shrink: 6;
+}
+#profit-table-ws-container .contract {
+  flex: 2 1 100px;
+  padding-right: 20px;
 }
 
 /* Language based rules */

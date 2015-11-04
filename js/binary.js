@@ -6783,6 +6783,7 @@ BetForm.Time.EndTime.prototype = {
         reload_page_on_close: false,
     };
     return {
+        change_prev_button:function(prev_button){_previous_button_clicked = prev_button;},
         _init: function () {
             _sell_request = null;
             _analyse_request = null;
@@ -7521,12 +7522,13 @@ BetForm.Time.EndTime.prototype = {
                         $loading.hide();
                     }
                     var con = that.show_spread_popup(data);
-                    var contract_status = con.find('#status').text();
-                    // if (contract_status === 'Open') {
+                    var closed = con.find('#status').hasClass('loss');
+                    if (!closed) {
+                        console.log('test');
                         var field = $('#sell_extra_info_data');
                         var sell_channel = field.attr('sell_channel');
                         BetPrice.spread.stream(attr.model.sell_channel() ? attr.model.sell_channel() : sell_channel);
-                    // }
+                    }
                },
             })).always(function () {
                 that.enable_button(dom_element);
@@ -10936,8 +10938,7 @@ function updateWarmChart(){
     var localize = {};
 
     var populate = function () {
-
-        localize =  {
+        localize = {
             textStartTime: text.localize('Start time'),
             textSpot: text.localize('Spot'),
             textBarrier: text.localize('Barrier'),
@@ -10989,7 +10990,22 @@ function updateWarmChart(){
             textSpreadPointsComment: text.localize('points'),
             textContractStatusWon: text.localize('This contract won'),
             textContractStatusLost: text.localize('This contract lost'),
-            textTickResultLabel: text.localize('Tick')
+            textTickResultLabel: text.localize('Tick'),
+            textStatement: text.localize('Statement'),
+            textDate: text.localize('Date'),
+            textRef: text.localize('Ref.'),
+            textAction: text.localize('Action'),
+            textDescription: text.localize('Description'),
+            textCreditDebit: text.localize('Credit/Debit'),
+            textBalance: text.localize('Balance'),
+            textProfitTable: text.localize('Profit Table'),
+            textPurchaseDate: text.localize('Purchase Date'),
+            textContract: text.localize('Contract'),
+            textPurchasePrice: text.localize('Purchase Price'),
+            textSaleDate: text.localize('Sale Date'),
+            textSalePrice: text.localize('Sale Price'),
+            textProfitLoss: text.localize('Profit/Loss'),
+            textTotalProfitLoss: text.localize('Total Profit/Loss')
         };
 
         var starTime = document.getElementById('start_time_label');
@@ -11125,24 +11141,21 @@ function updateWarmChart(){
         }
     };
 
-    function localizeTextContentById(id){
-        var element = document.getElementById(id);
-        var textContent = element.textContent;
-        element.textContent = text.localize(textContent);
-    }
-
     var statementTranslation = function(){
         var titleElement = document.getElementById("statement-title").firstElementChild;
-        var title = titleElement.textContent;
-        titleElement.textContent = text.localize(title);
-
-        localizeTextContentById("err");
+        titleElement.textContent = localize.textStatement;
+    };
+    
+    var profitTableTranslation = function(){
+        var titleElement = document.getElementById("profit-table-title").firstElementChild;
+        titleElement.textContent = localize.textProfitTable;
     };
 
     return {
         localize: function () { return localize; },
         populate: populate,
-        statementTranslation: statementTranslation
+        statementTranslation: statementTranslation,
+        profitTableTranslation: profitTableTranslation
     };
 
 })();
@@ -12079,6 +12092,7 @@ var TradingEvents = (function () {
         var view_button = document.getElementById('contract_purchase_button');
         if(view_button){
             view_button.addEventListener('click', debounce( function (e) {
+                BetSell.change_prev_button(e.target);
                 if(sessionStorage.getItem('formname')==='spreads'){
                     BetSell.show_buy_sell(e.target);
                 }
@@ -12137,16 +12151,14 @@ var Message = (function () {
                 processTradingTimes(response);
             } else if (type === 'statement'){
                 StatementWS.statementHandler(response);
+            } else if (type === 'profit_table'){
+                ProfitTableWS.profitTableHandler(response);
             } else if (type === 'balance'){
                 var passthroughObj = response.echo_req.passthrough;
                 if (passthroughObj){
                     switch (passthroughObj.purpose) {
                         case "statement_footer":
-                            var bal = response.balance[0].balance;
-                            $("#statement-table > tfoot > tr").
-                                first().
-                                children(".bal").
-                                text(Number(parseFloat(bal)).toFixed(2));
+                            StatementUI.updateStatementFooterBalance(response.balance);
                             break;
                         default :
                             //do nothing
@@ -12780,7 +12792,8 @@ var Purchase = (function () {
                     purchase_time: (purchase_date.getUTCFullYear()+'-'+(purchase_date.getUTCMonth()+1)+'-'+purchase_date.getUTCDate()+' '+purchase_date.getUTCHours()+':'+purchase_date.getUTCMinutes()+':'+purchase_date.getUTCSeconds()),
                     shortcode:receipt['shortcode'],
                     spread_bet:spread_bet,
-                    language:page.language(),
+                    l:page.language(),
+                    payout:payout_value,
                     url:url
                 };
                 for(var k in button_attrs){
@@ -13735,9 +13748,243 @@ var Table = (function(){
         clearTableBody: clearTableBody,
         appendTableBody: appendTableBody
     };
+}());;
+pjax_config_page("profit_tablews", function(){
+    return {
+        onLoad: function() {
+            Content.populate();
+            TradeSocket.init();
+            ProfitTableWS.init();
+        },
+        onUnload: function(){
+            TradeSocket.close();
+            ProfitTableWS.clean();
+        }
+    };
+});;
+var ProfitTableData = (function(){
+    function getProfitTable(opts){
+        var req = {profit_table: 1, description: 1};
+        if(opts){
+            $.extend(true, req, opts);
+        }
+
+        TradeSocket.send(req);
+    }
+
+    return {
+        getProfitTable: getProfitTable
+    };
+}());;
+var ProfitTableWS = (function () {
+    var batchSize = 50;
+    var chunkSize = batchSize/2;
+
+    var transactionsReceived = 0;
+    var transactionsConsumed = 0;
+    var noMoreData = false;
+    var pending = false;
+
+    var currentBatch = [];
+
+    var tableExist = function(){
+        return document.getElementById("profit-table");
+    };
+
+    var finishedConsumed = function(){
+        return transactionsConsumed === transactionsReceived;
+    };
+
+    function initTable(){
+        currentBatch = [];
+        transactionsConsumed = 0;
+        transactionsReceived = 0;
+        pending = false;
+
+        $(".error-msg").text("");
+
+        if (tableExist()) {
+            ProfitTableUI.cleanTableContent();
+        }
+    }
+
+    function profitTableHandler(response){
+
+        pending = false;
+        var profitTable = response.profit_table;
+        currentBatch = profitTable.transactions;
+        transactionsReceived += currentBatch.length;
+
+        if (currentBatch.length < batchSize) {
+            noMoreData = true;
+        }
+
+        if (!tableExist()) {
+            ProfitTableUI.createEmptyTable().appendTo("#profit-table-ws-container");
+            ProfitTableUI.updateProfitTable(getNextChunk());
+            Content.profitTableTranslation();
+        }
+    }
+
+    function getNextBatchTransactions(){
+        ProfitTableData.getProfitTable({offset: transactionsReceived, limit: batchSize});
+        pending = true;
+    }
+
+    function getNextChunk(){
+        var chunk = currentBatch.splice(0, chunkSize);
+        transactionsConsumed += chunk.length;
+        return chunk;
+    }
+
+    function onScrollLoad(){
+        $(document).scroll(function(){
+            function hidableHeight(percentage){
+                var totalHidable = $(document).height() - $(window).height();
+                return Math.floor(totalHidable * percentage / 100);
+            }
+
+            var pFromTop = $(document).scrollTop();
+
+            if (!tableExist()){
+                return;
+            }
+
+            if (pFromTop < hidableHeight(70)) {
+                return;
+            }
+
+            if (finishedConsumed() && !noMoreData && !pending) {
+                getNextBatchTransactions();
+                return;
+            }
+
+            if (!finishedConsumed()) {
+                ProfitTableUI.updateProfitTable(getNextChunk());
+            }
+        });
+    }
+
+
+
+    function init(){
+        getNextBatchTransactions();
+        onScrollLoad();
+    }
+
+    return {
+        profitTableHandler: profitTableHandler,
+        init: init,
+        clean: initTable
+    };
+}());
+;
+var ProfitTableUI = (function(){
+    "use strict";
+
+    var profitTableID = "profit-table";
+    var cols = ["buy-date", "ref", "contract", "buy-price", "sell-date", "sell-price", "pl"];
+
+    function createEmptyTable(){
+        var header = [
+            Content.localize().textPurchaseDate,
+            Content.localize().textRef,
+            Content.localize().textContract,
+            Content.localize().textPurchasePrice,
+            Content.localize().textSaleDate,
+            Content.localize().textSalePrice,
+            Content.localize().textProfitLoss
+        ];
+        var footer = [Content.localize().textTotalProfitLoss, "", "", "", "", "", ""];
+
+        var data = [];
+        var metadata = {
+            cols: cols,
+            id: profitTableID
+        };
+        var $tableContainer = Table.createFlexTable(data, metadata, header, footer);
+
+        var $pltotal = $tableContainer.
+            children("table").
+            children("tfoot").
+            children("tr").
+            attr("id", "pl-day-total");
+
+        return $tableContainer;
+    }
+
+    function updateProfitTable(transactions){
+        Table.appendTableBody(profitTableID, transactions, createProfitTableRow);
+        updateFooter(transactions);
+    }
+
+    function updateFooter(transactions){
+        var accTotal = document.querySelector("#pl-day-total > .pl").textContent;
+        accTotal = parseFloat(accTotal);
+        if (isNaN(accTotal)) {
+            accTotal = 0;
+        }
+
+        var currentTotal = transactions.reduce(function(previous, current){
+            var buyPrice = Number(parseFloat(current["buy_price"])).toFixed(2);
+            var sellPrice = Number(parseFloat(current["sell_price"])).toFixed(2);
+            var pl = sellPrice - buyPrice;
+            return previous + pl;
+        }, 0);
+
+        var total = accTotal + currentTotal;
+
+        $("#pl-day-total > .pl").text(Number(total).toFixed(2));
+
+        var subTotalType = (total >= 0 ) ? "profit" : "loss";
+        $("#pl-day-total > .pl").removeClass("profit").removeClass("loss");
+        $("#pl-day-total > .pl").addClass(subTotalType);
+    }
+
+    function createProfitTableRow(transaction){
+        var buyMoment = moment.utc(transaction["purchase_time"] * 1000);
+        var sellMoment = moment.utc(transaction["sell_time"] * 1000);
+
+        var buyDate = buyMoment.format("YYYY-MM-DD") + "\n" + buyMoment.format("HH:mm:ss");
+        var sellDate = sellMoment.format("YYYY-MM-DD") + "\n" + sellMoment.format("HH:mm:ss");
+
+        var ref = transaction["transaction_id"];
+        var contract = transaction["longcode"];
+        var buyPrice = Number(parseFloat(transaction["buy_price"])).toFixed(2);
+        var sellPrice = Number(parseFloat(transaction["sell_price"])).toFixed(2);
+
+        var pl = Number(sellPrice - buyPrice).toFixed(2);
+
+        var plType = (pl >= 0) ? "profit" : "loss";
+
+        var data = [buyDate, ref, contract, buyPrice, sellDate, sellPrice, pl];
+        var $row = Table.createFlexTableRow(data, cols, "data");
+
+        $row.children(".buy-date").addClass("break-line");
+        $row.children(".pl").addClass(plType);
+
+        return $row[0];
+    }
+
+    function initDatepicker(){
+        DatepickerUtil.initDatepicker("profit-table-date", moment.utc(), null, 0);
+    }
+
+    function clearTableContent(){
+        Table.clearTableBody(profitTableID);
+        $("#" + profitTableID + ">tfoot").hide();
+    }
+
+    return {
+        createEmptyTable: createEmptyTable,
+        updateProfitTable: updateProfitTable,
+        initDatepicker: initDatepicker,
+        cleanTableContent: clearTableContent
+    };
 }());;pjax_config_page("statementws", function(){
     return {
         onLoad: function() {
+            Content.populate();
             TradeSocket.init();
             StatementWS.init();
         },
@@ -13852,10 +14099,13 @@ var Table = (function(){
 
     function initTable(){
         pending = false;
-        currentBatch = [];
-        transactionsReceived = 0;
         noMoreData = false;
+
+        currentBatch = [];
+
+        transactionsReceived = 0;
         transactionsConsumed = 0;
+
         $(".error-msg").text("");
 
         StatementUI.clearTableContent();
@@ -13880,19 +14130,25 @@ var Table = (function(){
     "use strict";
     var tableID = "statement-table";
     var columns = ["date", "ref", "act", "desc", "credit", "bal"];
-    var header = ["Date", "Ref.", "Action", "Description", "Credit/Debit", "Balance"];
-    var footer = ["", "", "", "", "", ""];
 
     function createEmptyStatementTable(){
-        var localizedHeader = header.map(function(t){ return text.localize(t); });
-        localizedHeader[5] = localizedHeader[5] + "(" + TUser.get().currency + ")";
+        var header = [
+            Content.localize().textPurchaseDate,
+            Content.localize().textRef,
+            Content.localize().textAction,
+            Content.localize().textDescription,
+            Content.localize().textCreditDebit,
+            Content.localize().textBalance
+        ];
+        var footer = ["", "", "", "", "", ""];
+        header[5] = header[5] + "(" + TUser.get().currency + ")";
 
         var metadata = {
             id: tableID,
             cols: columns
         };
         var data = [];
-        var $tableContainer = Table.createFlexTable(data, metadata, localizedHeader, footer);
+        var $tableContainer = Table.createFlexTable(data, metadata, header, footer);
         return $tableContainer;
     }
 
@@ -13907,6 +14163,19 @@ var Table = (function(){
         $("#" + tableID +">tfoot").hide();
     }
 
+
+    function updateStatementFooterBalance(balances){
+        var accDropDown = document.getElementById("client_loginid");
+        var acc = accDropDown.options[accDropDown.selectedIndex].value;
+        var bal = balances.filter(function(element){
+            return element.loginid === acc;
+        });
+
+        $("#statement-table > tfoot > tr").
+            first().
+            children(".bal").
+            text(Number(parseFloat(bal[0].balance)).toFixed(2));
+    }
 
     function updateStatementFooter(transactions){
         TradeSocket.send({balance: 1, passthrough: {purpose: "statement_footer"}});
@@ -13955,7 +14224,8 @@ var Table = (function(){
     return {
         clearTableContent: clearTableContent,
         createEmptyStatementTable: createEmptyStatementTable,
-        updateStatementTable: updateStatementTable
+        updateStatementTable: updateStatementTable,
+        updateStatementFooterBalance: updateStatementFooterBalance
     };
 }());
 ;//////////////////////////////////////////////////////////////////
