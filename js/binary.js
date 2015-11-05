@@ -62235,7 +62235,7 @@ var Table = (function(){
         for(var i=0;i<header.length; i++){
                 $("<div></div>", {class: "Table-row-item",text:header[i]}).appendTo($tableHeaders);
           }
-          $tableHeaders.appendTo(tableClass);
+          $tableHeaders.appendTo($tableClasses);
 
           for(var row=0; row<body.length; row++){
             for (var col=0;col<header.length; col++){
