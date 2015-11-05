@@ -5403,12 +5403,6 @@ body.FR a, body.FR button, body.FR .button, body.FR span, body.FR input {
 body.FR h1, body.FR h2, body.FR h3, body.FR h4, body.FR h5, body.FR h6 {
   text-transform: initial !important;
 }
-body.FR .fr-hide {
-  display: none !important;
-}
-body.FR .fr-show {
-  display: inline !important;
-}
 body.FR #trading_socket_container #contract_form_name_nav {
   font-size: 80%;
 }
