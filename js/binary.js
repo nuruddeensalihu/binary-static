@@ -62236,7 +62236,7 @@ var Table = (function(){
                 $("<div></div>", {class: "Table-row-item",text:header[i]}).appendTo($tableHeaders);
           }
           $tableHeaders.appendTo($tableClasses);
-
+          console.log("the body is", body);
           for(var row=0; row<body.length; row++){
             for (var col=0;col<header.length; col++){
                 console.log("The text"+ col + " is ",data[row][col]);
