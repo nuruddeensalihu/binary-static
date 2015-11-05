@@ -62239,6 +62239,7 @@ var Table = (function(){
 
           for(var row=0; row<body.length; row++){
             for (var col=0;col<header.length; col++){
+                console.log("The text"+ col + " is ",data[row][col]);
                 $("<div></div>", {
                     class: "Table-row-item",
                     text:data[row][col],
