@@ -143,7 +143,7 @@ var Table = (function(){
         tbody.appendChild(docFrag);
     }
     function newAppendTableBody(id,data,rowGenerator){
-        console.log("the new data is ", data);
+        console.log("the new data is ", data[0]);
         console.log("the new row is ", rowGenerator);
 
 
