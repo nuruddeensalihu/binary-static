@@ -21,7 +21,6 @@ var StatementUI = (function(){
         };
         var data = [];
         var $tableContainer = Table.createFlexTable(data, metadata, header);
-        // var $tableContainer = Table.createNewFlexTable(data, metadata, header);
         return $tableContainer;
     }
 

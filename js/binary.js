@@ -62228,32 +62228,6 @@ var Table = (function(){
         return $tableContainer;
     }
 
-    function createNewFlexTable(body,metadata,header)
-    {
-       //  var tableClasses = (metadata.tableClass) ? metadata.tableClass + " flex-table" : "flex-table";
-         var $tableClasses = $("<div></div>", {class: "flex-table-container"});
-         var $tableContainer = $("<div></div>", {class: "Table-row"});
-         var $tableHeaders = $("<div></div>", {class: "Table-header"});
-
-         for(var i=0;i<header.length; i++){
-                $("<div></div>", {class: "Table-row-item",text:header[i]}).appendTo(tableHeaders);
-          }
-          $tableHeaders.appendTo(tableClass);
-
-          for(var row=0; row<body.length; row++){
-            for (var col=0;col<header.length; col++){
-                $("<div></div>", {
-                    class: "Table-row-item",
-                    text:data[row][col],
-                    dataheader:header[col]
-                }).appendTo($tableContainer);
-            }
-            $tableContainer.appendTo(tableClasses);
-          }
-         console.log("tableclasses is ", $tableClasses);
-         return $tableClasses;
-    }
-
     /***
      *
      * @param {object[][]} data header strings
@@ -62751,7 +62725,6 @@ var ProfitTableUI = (function(){
         };
         var data = [];
         var $tableContainer = Table.createFlexTable(data, metadata, header);
-        // var $tableContainer = Table.createNewFlexTable(data, metadata, header);
         return $tableContainer;
     }
 
