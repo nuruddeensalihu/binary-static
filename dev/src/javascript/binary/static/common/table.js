@@ -59,7 +59,7 @@ var Table = (function(){
             }
             $tableContainer.appendTo(tableClasses);
           }
-
+         console.log("tableclasses is ", $tableClasses);
          return $tableClasses;
     }
 
