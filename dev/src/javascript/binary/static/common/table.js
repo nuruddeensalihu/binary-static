@@ -42,7 +42,7 @@ var Table = (function(){
         var $tableHeaders = $("<div></div>", {class: "Table-header"});
 
         for(var i=0;i<header.length; i++){
-                $("<div></div>", {class: "Table-row-item",text:header[i]}).appendTo(tableHeaders);
+                $("<div></div>", {class: "Table-row-item",text:header[i]}).appendTo($tableHeaders);
           }
           $tableHeaders.appendTo(tableClass);
 
