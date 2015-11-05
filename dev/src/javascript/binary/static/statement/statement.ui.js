@@ -26,7 +26,8 @@ var StatementUI = (function(){
     }
 
     function updateStatementTable(transactions){
-        Table.appendTableBody(tableID, transactions, createStatementRow);
+      //  Table.appendTableBody(tableID, transactions, createStatementRow);
+        Table.newAppendTableBody(tableID,transactions,createStatementRow);
     }
 
     function clearTableContent(){

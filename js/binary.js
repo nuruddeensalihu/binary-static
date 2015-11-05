@@ -62247,7 +62247,10 @@ var Table = (function(){
             }
             $tableContainer.appendTo(tableClasses);
           }
-         console.log("tableclasses is ", $tableClasses);
+         console.log("the table headers are ", $tableHeaders[0]);
+
+         console.log("the table containers are ", $tableContainer[0]);
+         console.log("tableclasses is ", $tableClasses[0]);
 
          return $tableClasses;
     }
@@ -62329,6 +62332,12 @@ var Table = (function(){
 
         tbody.appendChild(docFrag);
     }
+    function newAppendTableBody(id,data,rowGenerator){
+        console.log("the new data is ", data);
+        console.log("the new row is ", rowGenerator);
+
+
+    }
 
     /***
      *
@@ -62347,7 +62356,8 @@ var Table = (function(){
         createNewFlexTable : createNewFlexTable,
         overwriteTableBody: overwriteTableBody,
         clearTableBody: clearTableBody,
-        appendTableBody: appendTableBody
+        appendTableBody: appendTableBody,
+        newAppendTableBody:newAppendTableBody
     };
 }());;
 pjax_config_page("profit_tablews", function(){
@@ -62755,7 +62765,8 @@ var ProfitTableUI = (function(){
     }
 
     function updateStatementTable(transactions){
-        Table.appendTableBody(tableID, transactions, createStatementRow);
+      //  Table.appendTableBody(tableID, transactions, createStatementRow);
+        Table.newAppendTableBody(tableID,transactions,createStatementRow);
     }
 
     function clearTableContent(){
