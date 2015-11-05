@@ -36,7 +36,7 @@ var Table = (function(){
 
         return $tableContainer;
     }
-    function createNewFlexTable(body,metadata,header){
+    function createNewFlexTable(body,metadata,header,footer){
         var $tableClasses = $("<div></div>", {class: "flex-table-container"});
         var $tableContainer = $("<div></div>", {class: "Table-row"});
         var $tableHeaders = $("<div></div>", {class: "Table-header"});
