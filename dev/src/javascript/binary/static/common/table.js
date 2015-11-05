@@ -57,6 +57,7 @@ var Table = (function(){
             $tableContainer.appendTo(tableClasses);
           }
          console.log("tableclasses is ", $tableClasses);
+
          return $tableClasses;
     }
 
@@ -152,6 +153,7 @@ var Table = (function(){
     return {
         createFlexTable: createFlexTable,
         createFlexTableRow: createFlexTableRow,
+        createNewFlexTable : createNewFlexTable,
         overwriteTableBody: overwriteTableBody,
         clearTableBody: clearTableBody,
         appendTableBody: appendTableBody
