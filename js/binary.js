@@ -62205,7 +62205,6 @@ var Table = (function(){
      */
     function createFlexTable(body, metadata, header, footer){
 
-      /*
         var tableClasses = (metadata.tableClass) ? metadata.tableClass + " flex-table" : "flex-table";
 
         var $tableContainer = $("<div></div>", {class: "flex-table-container"});
@@ -62227,35 +62226,6 @@ var Table = (function(){
         $table.appendTo($tableContainer);
 
         return $tableContainer;
-        */
-        var $tableClasses = $("<div></div>", {class: "flex-table-container",id:metadata.id});
-        var $tableContainer = $("<div></div>", {class: "Table-row"});
-        var $tableHeaders = $("<div></div>", {class: "Table-header"});
-        //var $body = createFlexTableTopGroup(body, metadata.cols, "body");
-
-        for(var i=0;i<header.length; i++){
-                $("<div></div>", {class: "Table-row-item",text:header[i]}).appendTo($tableHeaders);
-          }
-          $tableHeaders.appendTo($tableContainer);
-          console.log("the body is", body);
-          for(var row=0; row<body.length; row++){
-            for (var col=0;col<header.length; col++){
-                console.log("The text"+ col + " is ",data[row][col]);
-                $("<div></div>", {
-                    class: "Table-row-item",
-                    text:data[row][col],
-                    dataheader:header[col]
-                }).appendTo($tableContainer);
-            }
-            
-          }
-         $tableContainer.appendTo($tableClasses);
-         console.log("the table headers are ", $tableHeaders[0]);
-
-         console.log("the table containers are ", $tableContainer[0]);
-         console.log("tableclasses is ", $tableClasses[0]);
-
-         return $tableClasses;
     }
 
     /***
@@ -62293,6 +62263,7 @@ var Table = (function(){
      * @param {"header"|"data"} opt optional, default to "header"
      */
     function createFlexTableRow(data, metadata, opt){
+        /*
         if (data.length !== metadata.length) {
             throw new Error("metadata and data does not match");
         }
@@ -62307,7 +62278,22 @@ var Table = (function(){
                 $("<th></th>", {class: className, text: data[i]});
             rowElement.appendTo($tr);
         }
+       */
+         if (data.length !== metadata.length) {
+            throw new Error("metadata and data does not match");
+        }
 
+        var isData = (opt === "data");
+
+        var $tr = $("<tr></tr>", {class: "Table-row"});
+        for (var i = 0 ; i < data.length ; i++){
+            var className = "Table-row-item";
+            var rowElement = (isData) ?
+                $("<td></td>", {class: className, text: data[i]}) :
+                $("<th></th>", {class: className, text: data[i]});
+            rowElement.appendTo($tr);
+        }
+        
         return $tr;
     }
 
@@ -62326,30 +62312,12 @@ var Table = (function(){
      * @param {Function} rowGenerator takes in one arg, and convert it into row to be append to table body
      */
     function appendTableBody(id, data, rowGenerator){
-        /*
         var tbody = document.querySelector("#" + id +">tbody");
         var docFrag = document.createDocumentFragment();
         data.map(function(ele){
             var row = rowGenerator(ele);
             docFrag.appendChild(row);
         });
-
-        tbody.appendChild(docFrag);
-        */
-        var tbody = document.querySelector("#" + id );
-        console.log("The table body is ", tbody);
-        console.log("The row generator is ", rowGenerator);
-        var $data = data[0];
-        console.log("The data is ", $data);
-
-        var docFrag = document.createDocumentFragment();
-        /*
-        data.map(function(ele){
-            var row = rowGenerator(ele);
-            docFrag.appendChild(row);
-        });
-
-        */
 
         tbody.appendChild(docFrag);
     }
