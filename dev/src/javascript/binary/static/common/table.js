@@ -14,6 +14,7 @@ var Table = (function(){
      */
     function createFlexTable(body, metadata, header, footer){
 
+      /*
         var tableClasses = (metadata.tableClass) ? metadata.tableClass + " flex-table" : "flex-table";
 
         var $tableContainer = $("<div></div>", {class: "flex-table-container"});
@@ -35,8 +36,36 @@ var Table = (function(){
         $table.appendTo($tableContainer);
 
         return $tableContainer;
-    }
+        */
+        var $tableClasses = $("<div></div>", {class: "flex-table-container"});
+        var $tableContainer = $("<div></div>", {class: "Table-row"});
+        var $tableHeaders = $("<div></div>", {class: "Table-header"});
 
+        for(var i=0;i<header.length; i++){
+                $("<div></div>", {class: "Table-row-item",text:header[i]}).appendTo($tableHeaders);
+          }
+          $tableHeaders.appendTo($tableContainer);
+          console.log("the body is", body);
+          for(var row=0; row<body.length; row++){
+            for (var col=0;col<header.length; col++){
+                console.log("The text"+ col + " is ",data[row][col]);
+                $("<div></div>", {
+                    class: "Table-row-item",
+                    text:data[row][col],
+                    dataheader:header[col]
+                }).appendTo($tableContainer);
+            }
+            
+          }
+         $tableContainer.appendTo($tableClasses);
+         console.log("the table headers are ", $tableHeaders[0]);
+
+         console.log("the table containers are ", $tableContainer[0]);
+         console.log("tableclasses is ", $tableClasses[0]);
+
+         return $tableClasses;
+    }
+    
     /***
      *
      * @param {object[][]} data header strings
@@ -105,6 +134,7 @@ var Table = (function(){
      * @param {Function} rowGenerator takes in one arg, and convert it into row to be append to table body
      */
     function appendTableBody(id, data, rowGenerator){
+    /*
         var tbody = document.querySelector("#" + id +">tbody");
         var docFrag = document.createDocumentFragment();
         data.map(function(ele){
@@ -113,6 +143,9 @@ var Table = (function(){
         });
 
         tbody.appendChild(docFrag);
+        */
+        console.log("the new data is ", data[0]);
+        console.log("the new row is ", rowGenerator);
     }
 
     /***
