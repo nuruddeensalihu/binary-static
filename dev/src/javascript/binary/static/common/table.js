@@ -148,7 +148,7 @@ var Table = (function(){
         var tbody = document.querySelector("#" + id );
         console.log("The table body is ", tbody);
         console.log("The row generator is ", rowGenerator);
-        var $data = data.get(0);
+        var $data = data[0];
         console.log("The data is ", $data);
 
         var docFrag = document.createDocumentFragment();
