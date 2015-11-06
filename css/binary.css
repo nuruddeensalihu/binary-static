@@ -5446,9 +5446,6 @@ table .loss, table .lower {
 }
 @media (min-width: 500px) {
   .flex-table-row {
-    display: -webkit-box;
-    display: -moz-box;
-    display: box;
     display: -webkit-flex;
     display: -moz-flex;
     display: -ms-flexbox;
