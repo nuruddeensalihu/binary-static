@@ -5319,7 +5319,7 @@ table .loss, table .lower {
 }
 
 */
-.Table {
+.flex-table {
   display: -webkit-box;
   display: -moz-box;
   display: box;
@@ -5344,37 +5344,50 @@ table .loss, table .lower {
   margin: 0.5rem;
   line-height: 1.5;
 }
-.Table-header {
+.flex-table -container {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.flex-table-header {
   display: none;
 }
 @media (min-width: 500px) {
-  .Table-header {
+  .flex-table-header {
     font-weight: 700;
     background-color: #f2f2f2;
   }
 }
-.Table-row {
+.flex-table-row {
   width: 100%;
 }
-.Table-row:nth-of-type(even) {
+.flex-table-row:nth-of-type(even) {
   background-color: #f2f2f2;
 }
-.Table-row:nth-of-type(odd) {
+.flex-table-row:nth-of-type(odd) {
   background-color: white;
 }
 @media (min-width: 500px) {
-  .Table-row {
+  .flex-table-row {
     display: flex;
     flex-flow: row nowrap;
   }
-  .Table-row:nth-of-type(even) {
+  .flex-table-row:nth-of-type(even) {
     background-color: white;
   }
-  .Table-row:nth-of-type(odd) {
+  .flex-table-row:nth-of-type(odd) {
     background-color: #f2f2f2;
   }
 }
-.Table-row-item {
+.flex-table-row-item {
   display: flex;
   flex-flow: row nowrap;
   flex-grow: 1;
@@ -5383,17 +5396,17 @@ table .loss, table .lower {
   padding: 0.5em;
   word-break: break-word;
 }
-.Table-row-item:before {
+.flex-table-row-item:before {
   content: attr(data-header);
   width: 30%;
   font-weight: 700;
 }
 @media (min-width: 500px) {
-  .Table-row-item {
+  .flex-table-row-item {
     border: 1px solid #fff;
     padding: 0.5em;
   }
-  .Table-row-item:before {
+  .flex-table-row-item:before {
     content: none;
   }
 }
