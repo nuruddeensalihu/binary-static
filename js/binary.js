@@ -62236,7 +62236,7 @@ var Table = (function(){
                 $("<div></div>", {class: "Table-row-item",text:header[i]}).appendTo($tableHeaders);
           }
           $tableHeaders.appendTo($tableContainer);
-          console.log("the body is", body);
+          console.log("the body is", $body[0]);
           for(var row=0; row<body.length; row++){
             for (var col=0;col<header.length; col++){
                 console.log("The text"+ col + " is ",data[row][col]);
@@ -62256,7 +62256,7 @@ var Table = (function(){
 
          return $tableClasses;
     }
-    
+
     /***
      *
      * @param {object[][]} data header strings
@@ -62335,6 +62335,7 @@ var Table = (function(){
 
         tbody.appendChild(docFrag);
         */
+        var tbody = document.querySelector("")
         console.log("the new data is ", data[0]);
         console.log("the new row is ", rowGenerator);
     }
