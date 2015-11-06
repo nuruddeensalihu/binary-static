@@ -5276,39 +5276,83 @@ table .loss, table .lower {
   left: 30%;
 }
 
-.flex-table-container {
-  min-width: 100px;
-  overflow-x: auto;
-}
-.flex-table-container th {
-  text-align: left !important;
-  border-bottom: none !important;
-}
-.flex-table-container td {
-  text-align: left !important;
-  padding-left: 10px;
-}
-.flex-table-container .break-line {
-  white-space: pre-line;
-}
-.flex-table-container .flex-table {
-  min-width: 700px;
+.Table {
+  display: -webkit-box;
+  display: -moz-box;
+  display: box;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
   display: flex;
-  flex-direction: column;
+  -webkit-flex-flow: column nowrap;
+  -moz-flex-flow: column nowrap;
+  flex-flow: column nowrap;
+  -webkit-box-pack: justify;
+  -moz-box-pack: justify;
+  box-pack: justify;
+  -webkit-justify-content: space-between;
+  -moz-justify-content: space-between;
+  -ms-justify-content: space-between;
+  -o-justify-content: space-between;
+  justify-content: space-between;
+  -ms-flex-pack: justify;
+  border: 1px solid #f2f2f2;
+  font-size: 1rem;
+  margin: 0.5rem;
+  line-height: 1.5;
 }
-.flex-table-container .flex-table .flex-tr {
+.Table-header {
+  display: none;
+}
+@media (min-width: 500px) {
+  .Table-header {
+    font-weight: 700;
+    background-color: #f2f2f2;
+  }
+}
+.Table-row {
+  width: 100%;
+}
+.Table-row:nth-of-type(even) {
+  background-color: #f2f2f2;
+}
+.Table-row:nth-of-type(odd) {
+  background-color: white;
+}
+@media (min-width: 500px) {
+  .Table-row {
+    display: flex;
+    flex-flow: row nowrap;
+  }
+  .Table-row:nth-of-type(even) {
+    background-color: white;
+  }
+  .Table-row:nth-of-type(odd) {
+    background-color: #f2f2f2;
+  }
+}
+.Table-row-item {
   display: flex;
-  flex-wrap: wrap;
+  flex-flow: row nowrap;
   flex-grow: 1;
-  flex-shrink: 1;
-  flex-basis: 100px;
-  flex-direction: row;
-  align-items: stretch;
+  flex-basis: 0;
+  word-wrap: break-word;
+  padding: 0.5em;
+  word-break: break-word;
 }
-.flex-table-container .flex-table .flex-tr .flex-tr-child {
-  flex-grow: 1;
-  flex-shrink: 1;
-  flex-basis: 50px;
+.Table-row-item:before {
+  content: attr(data-header);
+  width: 30%;
+  font-weight: 700;
+}
+@media (min-width: 500px) {
+  .Table-row-item {
+    border: 1px solid #fff;
+    padding: 0.5em;
+  }
+  .Table-row-item:before {
+    content: none;
+  }
 }
 
 #profit-table-ws-container th {

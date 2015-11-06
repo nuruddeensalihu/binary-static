@@ -99,10 +99,10 @@ var Table = (function(){
             var className = "Table-row-item";
             var rowElement = (isData) ?
                 $("<td></td>", {class: className, text: data[i]}) :
-                $("<th></th>", {class: className, text: data[i]});
+                $("<th></th>", {class: className,text: data[i]});
             rowElement.appendTo($tr);
         }
-        
+
         return $tr;
     }
 
