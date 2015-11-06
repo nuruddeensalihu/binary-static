@@ -5353,7 +5353,6 @@ table .loss, table .lower {
 .flex-table-row-item {
   display: -webkit-box;
   display: -moz-box;
-  display: box;
   display: -webkit-flex;
   display: -moz-flex;
   display: -ms-flexbox;
