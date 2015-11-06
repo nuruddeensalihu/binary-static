@@ -62246,8 +62246,9 @@ var Table = (function(){
                     dataheader:header[col]
                 }).appendTo($tableContainer);
             }
-            $tableContainer.appendTo(tableClasses);
+            
           }
+         $tableContainer.appendTo(tableClasses);
          console.log("the table headers are ", $tableHeaders[0]);
 
          console.log("the table containers are ", $tableContainer[0]);
@@ -62277,7 +62278,7 @@ var Table = (function(){
 
         for (var i = 0 ; i < data.length ; i++){
             var innerType = (opt === "body") ? "data" : "header";
-            var $tr = createFlexTableRow(data[i], metadata, innerType);
+            var $tr = (data[i], metadata, innerType);
             $tr.appendTo($outer);
         }
 
