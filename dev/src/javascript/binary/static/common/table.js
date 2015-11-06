@@ -36,35 +36,6 @@ var Table = (function(){
 
         return $tableContainer;
     }
-    function createNewFlexTable(body,metadata,header,footer){
-        var $tableClasses = $("<div></div>", {class: "flex-table-container"});
-        var $tableContainer = $("<div></div>", {class: "Table-row"});
-        var $tableHeaders = $("<div></div>", {class: "Table-header"});
-
-        for(var i=0;i<header.length; i++){
-                $("<div></div>", {class: "Table-row-item",text:header[i]}).appendTo($tableHeaders);
-          }
-          $tableHeaders.appendTo($tableClasses);
-          console.log("the body is", body);
-          for(var row=0; row<body.length; row++){
-            for (var col=0;col<header.length; col++){
-                console.log("The text"+ col + " is ",data[row][col]);
-                $("<div></div>", {
-                    class: "Table-row-item",
-                    text:data[row][col],
-                    dataheader:header[col]
-                }).appendTo($tableContainer);
-            }
-            
-          }
-         $tableContainer.appendTo($tableClasses);
-         console.log("the table headers are ", $tableHeaders[0]);
-
-         console.log("the table containers are ", $tableContainer[0]);
-         console.log("tableclasses is ", $tableClasses[0]);
-
-         return $tableClasses;
-    }
 
     /***
      *
@@ -87,7 +58,7 @@ var Table = (function(){
 
         for (var i = 0 ; i < data.length ; i++){
             var innerType = (opt === "body") ? "data" : "header";
-            var $tr = (data[i], metadata, innerType);
+            var $tr = createFlexTableRow(data[i], metadata, innerType);
             $tr.appendTo($outer);
         }
 
@@ -143,12 +114,6 @@ var Table = (function(){
 
         tbody.appendChild(docFrag);
     }
-    function newAppendTableBody(id,data,rowGenerator){
-        console.log("the new data is ", data[0]);
-        console.log("the new row is ", rowGenerator);
-
-
-    }
 
     /***
      *
@@ -164,10 +129,8 @@ var Table = (function(){
     return {
         createFlexTable: createFlexTable,
         createFlexTableRow: createFlexTableRow,
-        createNewFlexTable : createNewFlexTable,
         overwriteTableBody: overwriteTableBody,
         clearTableBody: clearTableBody,
-        appendTableBody: appendTableBody,
-        newAppendTableBody:newAppendTableBody
+        appendTableBody: appendTableBody
     };
 }());
