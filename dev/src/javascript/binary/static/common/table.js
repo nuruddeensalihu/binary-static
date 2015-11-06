@@ -57,7 +57,7 @@ var Table = (function(){
             }
             
           }
-         $tableContainer.appendTo(tableClasses);
+         $tableContainer.appendTo($tableClasses);
          console.log("the table headers are ", $tableHeaders[0]);
 
          console.log("the table containers are ", $tableContainer[0]);
