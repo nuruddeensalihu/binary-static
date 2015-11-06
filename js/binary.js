@@ -62228,15 +62228,16 @@ var Table = (function(){
 
         return $tableContainer;
         */
-        var $tableClasses = $("<div></div>", {class: "flex-table-container"});
+        var $tableClasses = $("<div></div>", {class: "flex-table-container",id:metadata.id});
         var $tableContainer = $("<div></div>", {class: "Table-row"});
         var $tableHeaders = $("<div></div>", {class: "Table-header"});
+        //var $body = createFlexTableTopGroup(body, metadata.cols, "body");
 
         for(var i=0;i<header.length; i++){
                 $("<div></div>", {class: "Table-row-item",text:header[i]}).appendTo($tableHeaders);
           }
           $tableHeaders.appendTo($tableContainer);
-          console.log("the body is", $body[0]);
+          console.log("the body is", body);
           for(var row=0; row<body.length; row++){
             for (var col=0;col<header.length; col++){
                 console.log("The text"+ col + " is ",data[row][col]);
@@ -62325,7 +62326,7 @@ var Table = (function(){
      * @param {Function} rowGenerator takes in one arg, and convert it into row to be append to table body
      */
     function appendTableBody(id, data, rowGenerator){
-    /*
+        /*
         var tbody = document.querySelector("#" + id +">tbody");
         var docFrag = document.createDocumentFragment();
         data.map(function(ele){
@@ -62335,9 +62336,22 @@ var Table = (function(){
 
         tbody.appendChild(docFrag);
         */
-        var tbody = document.querySelector("")
-        console.log("the new data is ", data[0]);
-        console.log("the new row is ", rowGenerator);
+        var tbody = document.querySelector("#" + id );
+        console.log("The table body is ", tbody);
+        console.log("The row generator is ", rowGenerator);
+        var $data = data.get(0);
+        console.log("The data is ", $data);
+
+        var docFrag = document.createDocumentFragment();
+        /*
+        data.map(function(ele){
+            var row = rowGenerator(ele);
+            docFrag.appendChild(row);
+        });
+
+        */
+
+        tbody.appendChild(docFrag);
     }
 
     /***
