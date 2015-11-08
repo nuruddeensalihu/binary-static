@@ -5423,6 +5423,24 @@ table .loss, table .lower {
     background-color: #f2f2f2;
   }
 }
+.flex-table-container .flex-table .u-Flex-grow1 {
+  -webkit-flex-grow: 1;
+  -moz-flex-grow: 1;
+  flex-grow: 1;
+  -ms-flex-positive: 1;
+}
+.flex-table-container .flex-table .u-Flex-grow2 {
+  -webkit-flex-grow: 2;
+  -moz-flex-grow: 2;
+  flex-grow: 2;
+  -ms-flex-positive: 2;
+}
+.flex-table-container .flex-table .u-Flex-grow3 {
+  -webkit-flex-grow: 3;
+  -moz-flex-grow: 3;
+  flex-grow: 3;
+  -ms-flex-positive: 3;
+}
 @media (min-width: 500px) {
   .flex-table-container .flex-table .u-Flex-grow1 {
     -webkit-flex-grow: 1;
