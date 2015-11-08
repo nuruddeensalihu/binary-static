@@ -94,7 +94,9 @@ var Table = (function(){
 
         var isData = (opt === "data");
 
-        var $tr = $("<div></div>",{ class:"Table-header"}).appendTo($("<tr></tr>", {class: "Table-row"}));
+        var $tr = $("<tr></tr>", {class: "Table-row"});
+
+        //var $tr = $("<div></div>",{ class:"Table-header"}).appendTo($("<tr></tr>", {class: "Table-row"}));
         for (var i = 0 ; i < data.length ; i++){
             var className = "Table-row-item";
             var rowElement = (isData) ?
