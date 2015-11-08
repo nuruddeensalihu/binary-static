@@ -62139,9 +62139,9 @@ var Table = (function(){
         return $tableContainer;
         */
 
-        var $tableClasses = $("<div></div>",{class : "flex-table"});//(metadata.tableClass) ? metadata.tableClass + " flex-table" : "flex-table";
+        var $tableClasses = $("<div></div>",{class : "flex-table",id: metadata.id});//(metadata.tableClass) ? metadata.tableClass + " flex-table" : "flex-table";
 
-        var $tableContainer = $("<div></div>",{class : "flex-table-container",id: metadata.id});
+        var $tableContainer = $("<div></div>",{class : "flex-table-container"});
 
         var $tableRowClass = $("<div></div>",{class : "Table-row"});
 
