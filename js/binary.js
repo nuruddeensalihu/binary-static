@@ -62233,7 +62233,7 @@ var Table = (function(){
         */
         var $tr = $("<div></div>", {class: "Table-row"});
         for (var i = 0 ; i < data.length ; i++){
-            var className = metadata["cols"][i].toLowerCase().replace(/\s/g, "-") + " Table-row-item";
+            var className = " Table-row-item";
             var rowElement = $("<div></div>", {class: className, text: data[i], 'data-header' :metadata["head"][i]})
 
             rowElement.appendTo($tr);
