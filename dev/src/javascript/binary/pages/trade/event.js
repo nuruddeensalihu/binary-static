@@ -425,20 +425,6 @@ var TradingEvents = (function () {
             }));
         }
 
-        var view_button = document.getElementById('contract_purchase_button');
-        if(view_button){
-            view_button.addEventListener('click', debounce( function (e) {
-                BetSell.change_prev_button(e.target);
-                if(sessionStorage.getItem('formname')==='spreads'){
-                    BetSell.show_buy_sell(e.target);
-                }
-                else{
-                    BetSell.sell_at_market(e.target);           
-                }
-            }));
-        }
-
-
         /*
          * attach datepicker and timepicker to end time durations
          * have to use jquery

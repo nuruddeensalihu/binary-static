@@ -51914,7 +51914,7 @@ pjax_config_page('rise_fall_table', function() {
     };
 });
 
-pjax_config_page('portfolio|trade.cgi|statement|f_manager_statement|f_manager_history|f_profit_table|profit_table', function() {
+pjax_config_page('portfolio|trade.cgi|statement|f_manager_statement|f_manager_history|f_profit_table|profit_table|trading', function() {
     return {
         onLoad: function() {
             BetSell.register();
@@ -54589,7 +54589,6 @@ BetForm.Time.EndTime.prototype = {
                 this.display_buy_error(data.error);
             } else if (data.display) {
                 this.display_buy_results(data);
-                BetSell.register();
             } else {
                 throw new Error("Invalid server response: " + data);
             }
@@ -55286,7 +55285,6 @@ BetForm.Time.EndTime.prototype = {
     var _sell_button_disabled = false;
     var _timer_interval_obj = {};
     var _timeout_variables = {};
-    var _previous_button_clicked = null;
     var _diff_end_start_time = 300; // we show point markers if end time start time difference is <= than this (5 minutes default)
     var _model = {
         currency: null,
@@ -55296,7 +55294,6 @@ BetForm.Time.EndTime.prototype = {
         reload_page_on_close: false,
     };
     return {
-        change_prev_button:function(prev_button){_previous_button_clicked = prev_button;},
         _init: function () {
             _sell_request = null;
             _analyse_request = null;
@@ -55304,7 +55301,6 @@ BetForm.Time.EndTime.prototype = {
             _sell_button_disabled = false;
             _timer_interval_obj = {};
             _timeout_variables = {};
-            _previous_button_clicked = null;
             _model = {
                 currency: null,
                 shortcode: null,
@@ -55442,6 +55438,11 @@ BetForm.Time.EndTime.prototype = {
                 data['is_negative'] = field.attr('is_negative');
                 data['is_forward_starting'] = field.attr('is_forward_starting');
                 data['trade_feed_delay'] = field.attr('trade_feed_delay');
+                data['currency'] = field.attr('currency');
+                data['purchase_price'] = field.attr('purchase_price');
+                data['shortcode'] = field.attr('shortcode');
+                data['payout'] = field.attr('payout');
+                data['contract_id'] = field.attr('contract_id');
             }
             return data;
         },
@@ -55693,138 +55694,119 @@ BetForm.Time.EndTime.prototype = {
             this.add_overlay();
             $('#reload_sell_container').show();
             $('#reload_sell_container').on('click', '#reload_sell', function () {
+                var contractId = that.server_data().contract_id;
                 that.close_container();
                 _timeout_variables[Object.keys(_timeout_variables).length] = setTimeout(function() {
-                    that.sell_at_market(_previous_button_clicked);
+                    that.get_analyse_contract(contractId);
                 }, 2000);
                 // invoke submit after 2 seconds so settlement time differ from expiry date
             });
         },
-        sell_at_market: function (element) {
+        sell_at_market: function (data) {
             var that = this;
-            var dom_element = $(element);
-            this.cancel_previous_analyse_request();
-            var attr = this.data_attr(element);
-            var params = this.get_params(element);
-            var $loading = $('#trading_init_progress');
-            if($loading){
-                $loading.show();
-            }
-            _analyse_request = $.ajax(ajax_loggedin({
-                url     : attr.url(),
-                type    : 'POST',
-                async   : true,
-                data    : params,
-                success : function (data) {
-                    if($loading){
-                        $loading.hide();
-                    }
-                    var con = that.show_sell_at_market(data);
-                    var server_data = that.server_data();
-                    $('.tab_menu_container').tabs({
-                        load: function(event, ui){
-                           var load_live_chart = ui.tab.find(".ui-tabs-anchor").attr('load_live_chart');
-                           if (load_live_chart && load_live_chart == 1) {
-                               var symbol = ui.tab.find(".ui-tabs-anchor").attr('underlying_symbol');
-                               var liveChartConfig = new LiveChartConfig({ renderTo: 'analysis_live_chart', symbol: symbol, with_trades: 0, shift: 0});
-                               var time_obj = that.get_time_interval();
-                               if(time_obj['is_live'] && time_obj['is_live'] === 1) {
-                                    liveChartConfig.update( {
-                                        live: '10min'
-                                    });
-                               } else {
-                                   var from_date, to_date;
-                                   if (server_data.is_forward_starting > 0) {
-                                       if(server_data.trade_feed_delay > 0) {
-                                           from_date = that.get_date_from_seconds(time_obj['from_time'] - parseInt(server_data.trade_feed_delay));
-                                           to_date = that.get_date_from_seconds(time_obj['to_time'] + parseInt(server_data.trade_feed_delay));
-                                       }
-                                   } else {
-                                       from_date = that.get_date_from_seconds(time_obj['from_time'] - 5);
-                                       to_date = that.get_date_from_seconds(time_obj['to_time']);
-                                   }
+            var con = that.show_sell_at_market(data);
+            var server_data = that.server_data();
 
-                                   var display_marker = false;
-                                   if(time_obj['to_time'] - time_obj['from_time'] <= _diff_end_start_time) {
-                                       display_marker = true;
-                                   }
-
-                                   if(time_obj['force_tick']) {
-                                       liveChartConfig.update({
-                                           force_tick: true,
-                                       });
-                                   }
-
-                                   liveChartConfig.update({
-                                       interval: {
-                                           from: from_date,
-                                           to: to_date
-                                       },
-                                       with_markers: display_marker,
-                                   });
+            $('.tab_menu_container').tabs({
+                load: function(event, ui){
+                   var load_live_chart = ui.tab.find(".ui-tabs-anchor").attr('load_live_chart');
+                   if (load_live_chart && load_live_chart == 1) {
+                       var symbol = ui.tab.find(".ui-tabs-anchor").attr('underlying_symbol');
+                       var liveChartConfig = new LiveChartConfig({ renderTo: 'analysis_live_chart', symbol: symbol, with_trades: 0, shift: 0});
+                       var time_obj = that.get_time_interval();
+                       if(time_obj['is_live'] && time_obj['is_live'] === 1) {
+                            liveChartConfig.update( {
+                                live: '10min'
+                            });
+                       } else {
+                           var from_date, to_date;
+                           if (server_data.is_forward_starting > 0) {
+                               if(server_data.trade_feed_delay > 0) {
+                                   from_date = that.get_date_from_seconds(time_obj['from_time'] - parseInt(server_data.trade_feed_delay));
+                                   to_date = that.get_date_from_seconds(time_obj['to_time'] + parseInt(server_data.trade_feed_delay));
                                }
-                               configure_livechart();
-                               updateLiveChart(liveChartConfig);
-                               var barrier,
-                                   purchase_time = $('#trade_details_purchase_date').attr('epoch_time');
-                               if (!purchase_time) { // dont add barrier if its forward starting
-                                   if(server_data.barrier && server_data.barrier2) {
-                                       if (liveChartConfig.has_indicator('high')) {
-                                           live_chart.remove_indicator('high');
-                                       }
-                                       barrier = new LiveChartIndicator.Barrier({ name: "high", value: server_data.barrier, color: 'green', label: text.localize('High Barrier')});
-                                       live_chart.add_indicator(barrier);
-
-                                       if (liveChartConfig.has_indicator('low')) {
-                                           live_chart.remove_indicator('low');
-                                       }
-                                       barrier = new LiveChartIndicator.Barrier({ name: "low", value: server_data.barrier2, color: 'red', label: text.localize('Low Barrier')});
-                                       live_chart.add_indicator(barrier);
-
-                                   } else {
-                                       if (liveChartConfig.has_indicator('barrier')) {
-                                           live_chart.remove_indicator('barrier');
-                                       }
-                                       barrier = new LiveChartIndicator.Barrier({ name: "barrier", value: server_data.barrier, color: 'green', label: text.localize('Barrier')});
-                                       live_chart.add_indicator(barrier);
-                                   }
-                               }
-                               that.add_time_indicators(liveChartConfig);
+                           } else {
+                               from_date = that.get_date_from_seconds(time_obj['from_time'] - 5);
+                               to_date = that.get_date_from_seconds(time_obj['to_time']);
                            }
-                        }
-                    });
-                    that.model.currency(attr.model.currency());
-                    that.model.shortcode(attr.model.shortcode());
-                    that.model.payout(attr.model.payout());
-                    that.model.purchase_price(attr.model.purchase_price());
-                    that.clear_warnings();
-                    var now_time_con = con.find('#now_time_container');
-                    if (now_time_con.length > 0 ) {
-                        var stream_url = server_data.stream_url + '/' + server_data.sell_channel;
-                        that.streaming.start(stream_url);
-                        that.start_now_timer(con, 'now_time_container', 'trade_date_now'); // now timer
-                        that.create_date_timer(con.find('#trade_details_now_date'));
 
-                        var duration = now_time_con.attr('duration'); // need now duration to subtract from end duration
-                        if(parseInt(duration) > 0) { // if now duration is positive then start the timer for end date
-                            if(con.find('#end_time_container').attr('duration') !== '') {
-                                duration = parseInt(con.find('#end_time_container').attr('duration')) - parseInt(duration);
-                                if (duration > 0) {
-                                    that.start_end_timer(con, 'end_time_container', 'now_time_container', 'trade_date_end', duration); // end timer
-                                }
-                            }
+                           var display_marker = false;
+                           if(time_obj['to_time'] - time_obj['from_time'] <= _diff_end_start_time) {
+                               display_marker = true;
+                           }
+
+                           if(time_obj['force_tick']) {
+                               liveChartConfig.update({
+                                   force_tick: true,
+                               });
+                           }
+
+                           liveChartConfig.update({
+                               interval: {
+                                   from: from_date,
+                                   to: to_date
+                               },
+                               with_markers: display_marker,
+                           });
+                       }
+                       configure_livechart();
+                       updateLiveChart(liveChartConfig);
+                       var barrier,
+                           purchase_time = $('#trade_details_purchase_date').attr('epoch_time');
+                       if (!purchase_time) { // dont add barrier if its forward starting
+                           if(server_data.barrier && server_data.barrier2) {
+                               if (liveChartConfig.has_indicator('high')) {
+                                   live_chart.remove_indicator('high');
+                               }
+                               barrier = new LiveChartIndicator.Barrier({ name: "high", value: server_data.barrier, color: 'green', label: text.localize('High Barrier')});
+                               live_chart.add_indicator(barrier);
+
+                               if (liveChartConfig.has_indicator('low')) {
+                                   live_chart.remove_indicator('low');
+                               }
+                               barrier = new LiveChartIndicator.Barrier({ name: "low", value: server_data.barrier2, color: 'red', label: text.localize('Low Barrier')});
+                               live_chart.add_indicator(barrier);
+
+                           } else {
+                               if (liveChartConfig.has_indicator('barrier')) {
+                                   live_chart.remove_indicator('barrier');
+                               }
+                               barrier = new LiveChartIndicator.Barrier({ name: "barrier", value: server_data.barrier, color: 'green', label: text.localize('Barrier')});
+                               live_chart.add_indicator(barrier);
+                           }
+                       }
+                       that.add_time_indicators(liveChartConfig);
+                   }
+                }
+            });
+            that.model.currency(server_data.currency);
+            that.model.shortcode(server_data.shortcode);
+            that.model.payout(server_data.payout);
+            that.model.purchase_price(server_data.purchase_price);
+            that.clear_warnings();
+            var now_time_con = con.find('#now_time_container');
+            if (now_time_con.length > 0 ) {
+                var stream_url = server_data.stream_url + '/' + server_data.sell_channel;
+                that.streaming.start(stream_url);
+                that.start_now_timer(con, 'now_time_container', 'trade_date_now'); // now timer
+                that.create_date_timer(con.find('#trade_details_now_date'));
+
+                var duration = now_time_con.attr('duration'); // need now duration to subtract from end duration
+                if(parseInt(duration) > 0) { // if now duration is positive then start the timer for end date
+                    if(con.find('#end_time_container').attr('duration') !== '') {
+                        duration = parseInt(con.find('#end_time_container').attr('duration')) - parseInt(duration);
+                        if (duration > 0) {
+                            that.start_end_timer(con, 'end_time_container', 'now_time_container', 'trade_date_end', duration); // end timer
                         }
                     }
-                    if (con.find($('#sell_price_container')).length > 0) {
-                        that.sparkline.init(55);
-                        con.on('click', '#sell_at_market', function (e) { e.preventDefault(); that.on_sell_button_click('#sell_at_market', element); return false; });
-                    }
-                    that.update_high_low(true);
-                    that.reposition_confirmation();
-               },
-            })).always(function () {
-                that.enable_button(dom_element);
-            });
+                }
+            }
+            if (con.find($('#sell_price_container')).length > 0) {
+                that.sparkline.init(55);
+                con.on('click', '#sell_at_market', function (e) { e.preventDefault(); that.on_sell_button_click('#sell_at_market'); return false; });
+            }
+            that.update_high_low(true);
+            that.reposition_confirmation();
         },
         start_end_timer: function (con, end_attr_selector_id, now_attr_selector_id, container_id, duration) {
             var that = this;
@@ -55916,12 +55898,12 @@ BetForm.Time.EndTime.prototype = {
         show_sell_at_market: function (data) {
             return this.show_inpage_popup('<div class="inpage_popup_content_box">' + data + '</div>');
         },
-        on_sell_button_click: function (target, element) {
+        on_sell_button_click: function (target) {
             this.disable_sell_button(target, true);
             this.streaming.stop();
             this.model.reload_page_on_close(true);
             this.show_loading();
-            this.sell_bet(element);
+            this.sell_bet();
         },
         cancel_previous_sell_request: function() {
             if (_sell_request) {
@@ -55945,19 +55927,18 @@ BetForm.Time.EndTime.prototype = {
             var con = this.container();
             con.find('.loading').each( function () { $(this).hide().remove(); } );
         },
-        sell_bet: function (element) {
+        get_sell_bet_data: function () {
+            return 'controller_action=sell&purchase_price=' + this.server_data().purchase_price + '&currency=' + this.server_data().currency + '&shortcode=' + this.server_data().shortcode + '&contract_id=' + this.server_data().contract_id + '&payout=' + this.server_data().payout + '&price=' + $('input[name="price"]', $('#sell_price_container')).val() + '&ajax_only=1';
+        },
+        sell_bet: function () {
             var that = this;
             var timeout = 60000;
-            var attr = this.data_attr(element);
-            var data = this.get_params(element) + '&ajax_only=1';
-            data += '&price=' + $('input[name="price"]', $('#sell_price_container')).val();
             this.cancel_previous_sell_request();
-            var submit_url = this.server_data().submit_url;
             _sell_request = $.ajax(ajax_loggedin({
-                url     : submit_url,
+                url     : that.server_data().submit_url,
                 type    : 'POST',
                 async   : true,
-                data    : data,
+                data    : that.get_sell_bet_data(),
                 timeout : timeout,
                 success : function (resp, resp_status, jqXHR) {
                     that.on_sell_bet_success(resp, resp_status, jqXHR);
@@ -55997,55 +55978,60 @@ BetForm.Time.EndTime.prototype = {
             }
             this.show_warning(details, true);
         },
-        register: function () {
-            var that = this;
-            $('#profit-table, #portfolio-table, #bet_container, #statement-table').on('click', '.open_contract_details', function (e) {
-                var $this = $(this);
-                e.preventDefault();
-                _previous_button_clicked = this;
-                that.disable_button($this);
-                if (that.data_attr(this).model.tick_expiry()) {
-                    that.only_show_chart(this);
-                } else if (that.data_attr(this).model.spread_bet()) {
-                    that.show_buy_sell(this);
-                } else {
-                    that.sell_at_market(this);
-                }
-                that.enable_button($this);
-                return false;
-            });
-        },
-        show_buy_sell: function(element) {
-            var that = this;
-            var dom_element = $(element);
+        get_analyse_contract: function (contract_id, bologinid, clicked_button) {
+            if (clicked_button) {
+                this.disable_button($(clicked_button));
+            }
             this.cancel_previous_analyse_request();
-            var attr = this.data_attr(element);
-            var params = this.get_params(element);
             var $loading = $('#trading_init_progress');
-            if($loading){
+            if($loading.length){
                 $loading.show();
             }
+            var data = "contract_id=" + encodeURIComponent(contract_id);
+            if (bologinid) {
+                data += '&bo_client=' + encodeURIComponent(bologinid);
+            }
             _analyse_request = $.ajax(ajax_loggedin({
-                url     : attr.url(),
+                context : this,
+                url     : page.url.url_for('trade/analyse_contract'),
                 type    : 'POST',
-                async   : true,
-                data    : params,
-                success : function (data) {
-                    if($loading){
-                        $loading.hide();
+                data    : data,
+                success : function (data, textStatus, jqXHR) {
+                    if (jqXHR.responseJSON) {
+                        this.only_show_chart(data);
+                    } else {
+                        var html = $.parseHTML(data);
+                        if ($(html).find('#is_spread_contract').length) {
+                            this.show_buy_sell(data);
+                        } else {
+                            this.sell_at_market(data);
+                        }
                     }
-                    var con = that.show_spread_popup(data);
-                    var closed = con.find('#status').hasClass('loss');
-                    if (!closed) {
-                        console.log('test');
-                        var field = $('#sell_extra_info_data');
-                        var sell_channel = field.attr('sell_channel');
-                        BetPrice.spread.stream(attr.model.sell_channel() ? attr.model.sell_channel() : sell_channel);
-                    }
-               },
+                },
+                error   : function (jqXHR, resp_status, exp) {
+                    this.show_sell_at_market(text.localize("Please try again."));
+                },
             })).always(function () {
-                that.enable_button(dom_element);
+                if($loading.length){
+                    $loading.hide();
+                }
+                if (clicked_button) {
+                    this.enable_button($(clicked_button));
+                }
             });
+        },
+        register: function () {
+            var that = this;
+            $('#profit-table, #portfolio-table, #bet_calculation_container, #statement-table, #contract_confirmation_container').on('click', '.open_contract_details', function (e) {
+                e.preventDefault();
+                that.get_analyse_contract($(this).attr('contract_id'), $(this).attr('bo_client'), this);
+            });
+        },
+        show_buy_sell: function(data) {
+            var con = this.show_spread_popup(data);
+            if (con && !con.find('#status').hasClass('loss')) {
+                BetPrice.spread.stream($('#sell_extra_info_data').attr('sell_channel'));
+            }
         },
         show_spread_popup: function(data) {
             var that = this;
@@ -56071,44 +56057,10 @@ BetForm.Time.EndTime.prototype = {
             this.reposition_confirmation();
             return con;
         },
-        only_show_chart: function(element) {
-            var that = this;
-            var attr = that.data_attr(element);
-            var params = that.get_params(element);
-
-            _analyse_request = $.ajax(ajax_loggedin({
-                url     : attr.url(),
-                type    : 'POST',
-                async   : true,
-                data    : params,
-                success : function (ajax_data) {
-                    var data = ajax_data;
-                    that.show_inpage_popup('<div class="inpage_popup_content_box"><div class="popup_bet_desc drag-handle">'+data.longcode+'</div><div id="tick_chart"></div></div>');
-                    TickDisplay.initialize(data);
-                },
-            })).always(function() {
-                that.enable_button($(element));
-            });
-
+        only_show_chart: function(data) {
+            this.show_inpage_popup('<div class="inpage_popup_content_box"><div class="popup_bet_desc drag-handle">'+data.longcode+'</div><div id="tick_chart"></div></div>');
+            TickDisplay.initialize(data);
         },
-        data_attr: function (element) {
-            var dom_element = $(element);
-            return {
-                selector: dom_element,
-                url: function() { return dom_element.attr('url'); },
-                model: {
-                    shortcode: function() { return dom_element.attr('shortcode'); },
-                    currency: function () { return dom_element.attr('currency'); },
-                    purchase_price: function() { return dom_element.attr('purchase_price'); },
-                    payout: function() { return dom_element.attr('payout'); },
-                    sell_channel: function() { return dom_element.attr('sell_channel'); },
-                    controller_action: function () { return dom_element.attr('controller_action'); },
-                    tick_expiry: function() { return dom_element.attr('tick_expiry') || 0; },
-                    spread_bet: function() { return dom_element.attr('spread_bet') || 0; },
-                    is_expired: function() { return dom_element.attr('is_expired') || 0; }
-                }, // data_attr.model
-            };
-        }, // data_attr
         streaming: function() {
             var _stream = null;
             var _update_from_stream = false;
@@ -60658,20 +60610,6 @@ var TradingEvents = (function () {
             }));
         }
 
-        var view_button = document.getElementById('contract_purchase_button');
-        if(view_button){
-            view_button.addEventListener('click', debounce( function (e) {
-                BetSell.change_prev_button(e.target);
-                if(sessionStorage.getItem('formname')==='spreads'){
-                    BetSell.show_buy_sell(e.target);
-                }
-                else{
-                    BetSell.sell_at_market(e.target);           
-                }
-            }));
-        }
-
-
         /*
          * attach datepicker and timepicker to end time durations
          * have to use jquery
@@ -61273,7 +61211,6 @@ var Purchase = (function () {
     'use strict';
 
     var purchase_data = {};
-    BetSell.register();
 
     var display = function (details) {
         purchase_data = details;
@@ -61356,36 +61293,9 @@ var Purchase = (function () {
             }
 
             if(sessionStorage.formname !== 'digits' && !show_chart){
-                button.show();
                 button.textContent = Content.localize().textContractConfirmationButton;
-                var purchase_date = new Date(receipt['purchase_time']*1000);
-
-                var url,spread_bet;
-                if(sessionStorage.getItem('formname')==='spreads'){
-                    url = 'https://'+window.location.host+'/trade/analyse_spread_contract';
-                    spread_bet = 1;
-                    cost_value = passthrough.stop_loss;
-                }
-                else{
-                    url = 'https://'+window.location.host+'/trade/analyse_contract';
-                    spread_bet = 0;
-                }
-                var button_attrs = {
-                    contract_id: receipt['contract_id'],
-                    currency: document.getElementById('currency').value,
-                    purchase_price: cost_value,
-                    purchase_time: (purchase_date.getUTCFullYear()+'-'+(purchase_date.getUTCMonth()+1)+'-'+purchase_date.getUTCDate()+' '+purchase_date.getUTCHours()+':'+purchase_date.getUTCMinutes()+':'+purchase_date.getUTCSeconds()),
-                    shortcode:receipt['shortcode'],
-                    spread_bet:spread_bet,
-                    l:page.language(),
-                    payout:payout_value,
-                    url:url
-                };
-                for(var k in button_attrs){
-                    if(k){
-                        button.setAttribute(k,button_attrs[k]);
-                    }
-                }
+                button.setAttribute('contract_id', receipt['contract_id']);
+                button.show();
             }
             else{
                 button.hide();
@@ -62205,6 +62115,7 @@ var Table = (function(){
      */
     function createFlexTable(body, metadata, header, footer){
 
+       /*
         var tableClasses = (metadata.tableClass) ? metadata.tableClass + " flex-table" : "flex-table";
 
         var $tableContainer = $("<div></div>", {class: "flex-table-container"});
@@ -62226,6 +62137,32 @@ var Table = (function(){
         $table.appendTo($tableContainer);
 
         return $tableContainer;
+        */
+
+        var $tableClasses = (metadata.tableClass) ? metadata.tableClass + " flex-table" : "flex-table";
+
+        var $tableContainer = $("<div></div>",{class : "flex-table-container"});
+
+        var $tableRowClass = $("<div></div>",{class : "Table-row"});
+
+        var $tableHeaders = $("<div></div>", {class: "Table-header"});
+
+        //create table headers
+
+         for(var i=0;i<header.length; i++){
+            $("<div></div>", {class: "Table-row-item",text:header[i]}).appendTo($tableHeaders);
+
+         }
+
+         $tableHeaders.appendTo($tableRowClass);
+
+         $tableRowClass.appendTo($tableContainer);
+
+         console.log("The table container is : ",$tableContainer);
+
+
+         return $tableContainer;
+
     }
 
     /***
@@ -62263,7 +62200,6 @@ var Table = (function(){
      * @param {"header"|"data"} opt optional, default to "header"
      */
     function createFlexTableRow(data, metadata, opt){
-        /*
         if (data.length !== metadata.length) {
             throw new Error("metadata and data does not match");
         }
@@ -62273,26 +62209,6 @@ var Table = (function(){
         var $tr = $("<tr></tr>", {class: "flex-tr"});
         for (var i = 0 ; i < data.length ; i++){
             var className = metadata[i].toLowerCase().replace(/\s/g, "-") + " flex-tr-child";
-            var rowElement = (isData) ?
-                $("<td></td>", {class: className, text: data[i]}) :
-                $("<th></th>", {class: className, text: data[i]});
-            rowElement.appendTo($tr);
-        }
-       */
-         if (data.length !== metadata.length) {
-            throw new Error("metadata and data does not match");
-        }
-
-        var isData = (opt === "data");
-
-        var $tr = $("<tr></tr>", {class: "Table-row Table-header"});
-        //var $head = $("<div></div>", {class: "Table-header"});
-       // $tr = $head.appendTo($tr);
-       console.log("the new tr is ",$tr);
-
-        //var $tr = $("<div></div>",{ class:"Table-header"}).appendTo($("<tr></tr>", {class: "Table-row"}));
-        for (var i = 0 ; i < data.length ; i++){
-            var className = "Table-row-item";
             var rowElement = (isData) ?
                 $("<td></td>", {class: className, text: data[i]}) :
                 $("<th></th>", {class: className, text: data[i]});
@@ -62317,6 +62233,7 @@ var Table = (function(){
      * @param {Function} rowGenerator takes in one arg, and convert it into row to be append to table body
      */
     function appendTableBody(id, data, rowGenerator){
+        /*
         var tbody = document.querySelector("#" + id +">tbody");
         var docFrag = document.createDocumentFragment();
         data.map(function(ele){
@@ -62325,6 +62242,14 @@ var Table = (function(){
         });
 
         tbody.appendChild(docFrag);
+        */
+        var tbody = document.querySelector("#" + id);
+
+        console.log("The table body is :", tbody);
+
+        console.log("The table data is :" , data);
+
+        console.log("The Table data 1 is : ", data[0]);
     }
 
     /***
@@ -62647,7 +62572,6 @@ var ProfitTableUI = (function(){
 
         if (!tableExist()) {
             StatementUI.createEmptyStatementTable().appendTo("#statement-ws-container");
-           // console.log("The chunk is ", getNextChunkStatement());
             StatementUI.updateStatementTable(getNextChunkStatement());
             Content.statementTranslation();
         }

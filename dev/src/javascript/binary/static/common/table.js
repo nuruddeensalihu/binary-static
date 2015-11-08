@@ -14,6 +14,7 @@ var Table = (function(){
      */
     function createFlexTable(body, metadata, header, footer){
 
+       /*
         var tableClasses = (metadata.tableClass) ? metadata.tableClass + " flex-table" : "flex-table";
 
         var $tableContainer = $("<div></div>", {class: "flex-table-container"});
@@ -35,6 +36,32 @@ var Table = (function(){
         $table.appendTo($tableContainer);
 
         return $tableContainer;
+        */
+
+        var $tableClasses = (metadata.tableClass) ? metadata.tableClass + " flex-table" : "flex-table";
+
+        var $tableContainer = $("<div></div>",{class : "flex-table-container"});
+
+        var $tableRowClass = $("<div></div>",{class : "Table-row"});
+
+        var $tableHeaders = $("<div></div>", {class: "Table-header"});
+
+        //create table headers
+
+         for(var i=0;i<header.length; i++){
+            $("<div></div>", {class: "Table-row-item",text:header[i]}).appendTo($tableHeaders);
+
+         }
+
+         $tableHeaders.appendTo($tableRowClass);
+
+         $tableRowClass.appendTo($tableContainer);
+
+         console.log("The table container is : ",$tableContainer);
+
+
+         return $tableContainer;
+
     }
 
     /***
@@ -72,7 +99,6 @@ var Table = (function(){
      * @param {"header"|"data"} opt optional, default to "header"
      */
     function createFlexTableRow(data, metadata, opt){
-        /*
         if (data.length !== metadata.length) {
             throw new Error("metadata and data does not match");
         }
@@ -82,26 +108,6 @@ var Table = (function(){
         var $tr = $("<tr></tr>", {class: "flex-tr"});
         for (var i = 0 ; i < data.length ; i++){
             var className = metadata[i].toLowerCase().replace(/\s/g, "-") + " flex-tr-child";
-            var rowElement = (isData) ?
-                $("<td></td>", {class: className, text: data[i]}) :
-                $("<th></th>", {class: className, text: data[i]});
-            rowElement.appendTo($tr);
-        }
-       */
-         if (data.length !== metadata.length) {
-            throw new Error("metadata and data does not match");
-        }
-
-        var isData = (opt === "data");
-
-        var $tr = $("<tr></tr>", {class: "Table-row Table-header"});
-        //var $head = $("<div></div>", {class: "Table-header"});
-       // $tr = $head.appendTo($tr);
-       console.log("the new tr is ",$tr);
-
-        //var $tr = $("<div></div>",{ class:"Table-header"}).appendTo($("<tr></tr>", {class: "Table-row"}));
-        for (var i = 0 ; i < data.length ; i++){
-            var className = "Table-row-item";
             var rowElement = (isData) ?
                 $("<td></td>", {class: className, text: data[i]}) :
                 $("<th></th>", {class: className, text: data[i]});
@@ -126,6 +132,7 @@ var Table = (function(){
      * @param {Function} rowGenerator takes in one arg, and convert it into row to be append to table body
      */
     function appendTableBody(id, data, rowGenerator){
+        /*
         var tbody = document.querySelector("#" + id +">tbody");
         var docFrag = document.createDocumentFragment();
         data.map(function(ele){
@@ -134,6 +141,14 @@ var Table = (function(){
         });
 
         tbody.appendChild(docFrag);
+        */
+        var tbody = document.querySelector("#" + id);
+
+        console.log("The table body is :", tbody);
+
+        console.log("The table data is :" , data);
+
+        console.log("The Table data 1 is : ", data[0]);
     }
 
     /***

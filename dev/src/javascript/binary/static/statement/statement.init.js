@@ -35,7 +35,6 @@ var StatementWS = (function(){
 
         if (!tableExist()) {
             StatementUI.createEmptyStatementTable().appendTo("#statement-ws-container");
-           // console.log("The chunk is ", getNextChunkStatement());
             StatementUI.updateStatementTable(getNextChunkStatement());
             Content.statementTranslation();
         }
