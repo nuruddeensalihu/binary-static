@@ -5444,7 +5444,7 @@ table .loss, table .lower {
   }
 }
 .flex-table-container .flex-table .Table-row .Table-header {
-  display: none;
+  display: none !important;
 }
 @media (min-width: 500px) {
   .flex-table-container .flex-table .Table-row .Table-header {
