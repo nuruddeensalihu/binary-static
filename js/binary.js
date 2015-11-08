@@ -62150,7 +62150,16 @@ var Table = (function(){
         //create table headers
 
          for(var i=0;i<header.length; i++){
-            $("<div></div>", {class: "Table-row-item",text:header[i]}).appendTo($tableRowClass);
+            if(i === 0)
+            {
+                $("<div></div>", {class: "Table-row-item u-Flex-grow2",text:header[i]}).appendTo($tableRowClass);
+            }
+            else if (i == 3){
+                $("<div></div>", {class: "Table-row-item u-Flex-grow3",text:header[i]}).appendTo($tableRowClass);
+            }
+            else{
+                $("<div></div>", {class: "Table-row-item",text:header[i]}).appendTo($tableRowClass);
+            }
 
          }
 
