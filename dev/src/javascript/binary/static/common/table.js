@@ -105,7 +105,7 @@ var Table = (function(){
 
         console.log("The headers are lenght are : " , metadata["head"].length);
 
-        if (data.length !== metadata[0].length) {
+        if (data.length !== metadata["cols"].length) {
             throw new Error("metadata and data does not match");
         }
 
