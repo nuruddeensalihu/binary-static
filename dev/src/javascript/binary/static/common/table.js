@@ -120,12 +120,12 @@ var Table = (function(){
         for (var i = 0 ; i < data.length ; i++){
             var className = metadata[i].toLowerCase().replace(/\s/g, "-") + " Table-row-item";
             var rowElement = (isData) ?
-                $("<div></div>", {class: className, text: data[i]}) :
+                $("<div></div>", {class: className, text: data[i], 'data-header' :'value'}) :
                 $("<div></div>", {class: className, text: data[i]});
 
            // $('.Table-row-item').prop('data-header', 'value');
             rowElement.appendTo($tr);
-            rowElement.prop('data-header', 'value');
+            //rowElement.prop('data-header', 'value');
         }
 
         return $tr;
