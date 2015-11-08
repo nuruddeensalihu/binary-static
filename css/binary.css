@@ -5444,11 +5444,12 @@ table .loss, table .lower {
   }
 }
 .flex-table-container .flex-table .Table-row .Table-header {
-  display: none !important;
+  display: none;
 }
 @media (min-width: 500px) {
   .flex-table-container .flex-table .Table-row .Table-header {
     font-weight: 700;
+    display: inline !important;
     background-color: #f2f2f2;
   }
 }
