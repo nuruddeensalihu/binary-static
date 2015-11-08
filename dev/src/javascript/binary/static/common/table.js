@@ -142,13 +142,14 @@ var Table = (function(){
 
         tbody.appendChild(docFrag);
         */
-        var tbody = document.querySelector("#" + id);
+        var tbody = document.querySelector(id);
+        var $data = data.get(0);
 
         console.log("The table body is :", tbody);
 
-        console.log("The table data is :" , data);
+        console.log("The table data is :" , $data);
 
-        console.log("The Table data 1 is : ", data[0]);
+        console.log("The Table data length is : ", data.length);
     }
 
     /***
