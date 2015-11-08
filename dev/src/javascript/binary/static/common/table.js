@@ -122,6 +122,7 @@ var Table = (function(){
             var rowElement = (isData) ?
                 $("<div></div>", {class: className, text: data[i]}) :
                 $("<div></div>", {class: className, text: data[i]});
+                $('.'+className).attr('data-header', 'value');
             rowElement.appendTo($tr);
         }
 
