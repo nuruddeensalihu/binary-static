@@ -5443,6 +5443,9 @@ table .loss, table .lower {
     background-color: white;
   }
 }
+.flex-table-container .flex-table .Table-row .Table-header {
+  display: none;
+}
 @media (min-width: 500px) {
   .flex-table-container .flex-table .Table-row .Table-header {
     font-weight: 700;

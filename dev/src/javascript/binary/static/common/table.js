@@ -42,18 +42,18 @@ var Table = (function(){
 
         var $tableContainer = $("<div></div>",{class : "flex-table-container"});
 
-        var $tableRowClass = $("<div></div>",{class : "Table-row"});
+        var $tableRowClass = $("<div></div>",{class : "Table-row Table-header"});
 
-        var $tableHeaders = $("<div></div>", {class: "Table-header"});
+       // var $tableHeaders = $("<div></div>", {class: "Table-header"});
 
         //create table headers
 
          for(var i=0;i<header.length; i++){
-            $("<div></div>", {class: "Table-row-item",text:header[i]}).appendTo($tableHeaders);
+            $("<div></div>", {class: "Table-row-item",text:header[i]}).appendTo($tableRowClass);
 
          }
 
-         $tableHeaders.appendTo($tableRowClass);
+         //$tableHeaders.appendTo($tableRowClass);
 
          $tableRowClass.appendTo($tableClasses);
          $tableClasses.appendTo($tableContainer);
