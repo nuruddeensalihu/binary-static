@@ -62244,7 +62244,7 @@ var Table = (function(){
         tbody.appendChild(docFrag);
         */
         var tbody = document.querySelector(id);
-        var $data = $data.get(0);
+        var $data = data.get(0);
 
         console.log("The table body is :", tbody);
 
