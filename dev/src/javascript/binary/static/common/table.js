@@ -49,16 +49,8 @@ var Table = (function(){
         //create table headers
 
          for(var i=0;i<header.length; i++){
-            if(i === 0)
-            {
-                $("<div></div>", {class: "Table-row-item u-Flex-grow2",text:header[i]}).appendTo($tableRowClass);
-            }
-            else if (i == 3){
-                $("<div></div>", {class: "Table-row-item u-Flex-grow3",text:header[i]}).appendTo($tableRowClass);
-            }
-            else{
-                $("<div></div>", {class: "Table-row-item",text:header[i]}).appendTo($tableRowClass);
-            }
+            var className = metadata["cols"][i].toLowerCase().replace(/\s/g, "-") + " Table-row-item";
+            $("<div></div>", {class: className,text:header[i]}).appendTo($tableRowClass);
 
          }
 
@@ -132,7 +124,7 @@ var Table = (function(){
         */
         var $tr = $("<div></div>", {class: "Table-row"});
         for (var i = 0 ; i < data.length ; i++){
-            var className = " Table-row-item";
+            var className = metadata["cols"][i].toLowerCase().replace(/\s/g, "-") + " Table-row-item";
             var rowElement = $("<div></div>", {class: className, text: data[i], 'data-header' :metadata["head"][i]})
 
             rowElement.appendTo($tr);
