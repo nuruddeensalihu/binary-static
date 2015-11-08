@@ -94,7 +94,7 @@ var Table = (function(){
 
         var isData = (opt === "data");
 
-        var $tr = $("<div></div>", {class: "Table-header"}).appendTo($("<tr></tr>", {class: "Table-row"}));
+        var $tr = $("<tr></tr>", {class: "Table-row Table-header"});
         //var $head = $("<div></div>", {class: "Table-header"});
        // $tr = $head.appendTo($tr);
        console.log("the new tr is ",$tr);
