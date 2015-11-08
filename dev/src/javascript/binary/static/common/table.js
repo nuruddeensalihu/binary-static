@@ -38,7 +38,7 @@ var Table = (function(){
         return $tableContainer;
         */
 
-        var $tableClasses = (metadata.tableClass) ? metadata.tableClass + " flex-table" : "flex-table";
+        var $tableClasses = $("<div></div>",{class : "flex-table"});//(metadata.tableClass) ? metadata.tableClass + " flex-table" : "flex-table";
 
         var $tableContainer = $("<div></div>",{class : "flex-table-container",id: metadata.id});
 
