@@ -144,6 +144,7 @@ var Table = (function(){
     function appendTableBody(id, data, rowGenerator){
         
         var tbody = document.querySelector("#" + id +"");
+        console.log("the table id is" , id);
         console.log("the table body is" , tbody);
         var docFrag = document.createDocumentFragment();
         data.map(function(ele){
