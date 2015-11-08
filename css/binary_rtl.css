@@ -5339,6 +5339,56 @@ table .loss, table .lower {
     background-color: white;
   }
 }
+@media (min-width: 500px) {
+  .flex-table-container .flex-table .Table-row .u-Flex-grow1 {
+    flex-grow: 1;
+  }
+}
+@media (min-width: 500px) {
+  .flex-table-container .flex-table .Table-row .u-Flex-grow2 {
+    flex-grow: 2;
+  }
+}
+@media (min-width: 500px) {
+  .flex-table-container .flex-table .Table-row .u-Flex-grow3 {
+    flex-grow: 3;
+  }
+}
+@media (min-width: 500px) {
+  .flex-table-container .flex-table .Table-row .u-Flex-grow4 {
+    flex-grow: 4;
+  }
+}
+@media (min-width: 500px) {
+  .flex-table-container .flex-table .Table-row .u-Flex-grow5 {
+    flex-grow: 5;
+  }
+}
+@media (min-width: 500px) {
+  .flex-table-container .flex-table .Table-row .u-Flex-grow6 {
+    flex-grow: 6;
+  }
+}
+@media (min-width: 500px) {
+  .flex-table-container .flex-table .Table-row .u-Flex-grow7 {
+    flex-grow: 7;
+  }
+}
+@media (min-width: 500px) {
+  .flex-table-container .flex-table .Table-row .u-Flex-grow8 {
+    flex-grow: 8;
+  }
+}
+@media (min-width: 500px) {
+  .flex-table-container .flex-table .Table-row .u-Flex-grow9 {
+    flex-grow: 9;
+  }
+}
+@media (min-width: 500px) {
+  .flex-table-container .flex-table .Table-row .u-Flex-grow10 {
+    flex-grow: 10;
+  }
+}
 .flex-table-container .flex-table .Table-row .Table-row-item {
   display: -webkit-box;
   display: -moz-box;
@@ -5376,66 +5426,6 @@ table .loss, table .lower {
   }
   .flex-table-container .flex-table .Table-row .Table-row-item:before {
     content: none;
-  }
-}
-
-@media (min-width: 500px) {
-  .u-Flex-grow1 {
-    flex-grow: 1;
-  }
-}
-
-@media (min-width: 500px) {
-  .u-Flex-grow2 {
-    flex-grow: 2;
-  }
-}
-
-@media (min-width: 500px) {
-  .u-Flex-grow3 {
-    flex-grow: 3;
-  }
-}
-
-@media (min-width: 500px) {
-  .u-Flex-grow4 {
-    flex-grow: 4;
-  }
-}
-
-@media (min-width: 500px) {
-  .u-Flex-grow5 {
-    flex-grow: 5;
-  }
-}
-
-@media (min-width: 500px) {
-  .u-Flex-grow6 {
-    flex-grow: 6;
-  }
-}
-
-@media (min-width: 500px) {
-  .u-Flex-grow7 {
-    flex-grow: 7;
-  }
-}
-
-@media (min-width: 500px) {
-  .u-Flex-grow8 {
-    flex-grow: 8;
-  }
-}
-
-@media (min-width: 500px) {
-  .u-Flex-grow9 {
-    flex-grow: 9;
-  }
-}
-
-@media (min-width: 500px) {
-  .u-Flex-grow10 {
-    flex-grow: 10;
   }
 }
 
