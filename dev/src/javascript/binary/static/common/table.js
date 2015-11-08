@@ -105,12 +105,22 @@ var Table = (function(){
 
         var isData = (opt === "data");
 
+        /*
         var $tr = $("<tr></tr>", {class: "flex-tr"});
         for (var i = 0 ; i < data.length ; i++){
             var className = metadata[i].toLowerCase().replace(/\s/g, "-") + " flex-tr-child";
             var rowElement = (isData) ?
                 $("<td></td>", {class: className, text: data[i]}) :
                 $("<th></th>", {class: className, text: data[i]});
+            rowElement.appendTo($tr);
+        }
+        */
+        var $tr = $("<div></div>", {class: "Table-row"});
+        for (var i = 0 ; i < data.length ; i++){
+            var className = metadata[i].toLowerCase().replace(/\s/g, "-") + " Table-row-item";
+            var rowElement = (isData) ?
+                $("<div></td>", {class: className, text: data[i]}) :
+                $("<div></div>", {class: className, text: data[i]});
             rowElement.appendTo($tr);
         }
 
@@ -132,8 +142,9 @@ var Table = (function(){
      * @param {Function} rowGenerator takes in one arg, and convert it into row to be append to table body
      */
     function appendTableBody(id, data, rowGenerator){
-        /*
+        
         var tbody = document.querySelector("#" + id +">tbody");
+        console.log("the table body is" , tbody);
         var docFrag = document.createDocumentFragment();
         data.map(function(ele){
             var row = rowGenerator(ele);
@@ -141,7 +152,7 @@ var Table = (function(){
         });
 
         tbody.appendChild(docFrag);
-        */
+        /*
         var tbody = document.querySelector(id);
         var $data = data;
         var $state = rowGenerator;
@@ -153,6 +164,7 @@ var Table = (function(){
         console.log("The Table data length is: ", data.length);
         console.log("The first rowGenerator is : ", rowGenerator);
         console.log("The rowGenerator is : ", $state);
+        */
     }
 
     /***
