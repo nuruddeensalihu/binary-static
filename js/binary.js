@@ -62141,7 +62141,7 @@ var Table = (function(){
 
         var $tableClasses = (metadata.tableClass) ? metadata.tableClass + " flex-table" : "flex-table";
 
-        var $tableContainer = $("<div></div>",{class : "flex-table-container"});
+        var $tableContainer = $("<div></div>",{class : "flex-table-container",id: metadata.id});
 
         var $tableRowClass = $("<div></div>",{class : "Table-row"});
 
@@ -62244,9 +62244,10 @@ var Table = (function(){
      */
     function appendTableBody(id, data, rowGenerator){
         
-        var tbody = document.querySelector("#" + id +"");
+        var tbody = document.querySelector(id);
         console.log("the table id is" , id);
         console.log("the table body is" , tbody);
+        console.log("the table data is" , data);
         var docFrag = document.createDocumentFragment();
         data.map(function(ele){
             var row = rowGenerator(ele);
