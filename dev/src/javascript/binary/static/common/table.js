@@ -101,9 +101,9 @@ var Table = (function(){
      */
     function createFlexTableRow(data, metadata, opt){
 
-        console.log("The metadata lenght is : " , metadata[0].length);
+        console.log("The metadata lenght is : " , metadata["cols"].length);
 
-        console.log("The headers are lenght are : " , metadata[1].length);
+        console.log("The headers are lenght are : " , metadata["head"].length);
 
         if (data.length !== metadata[0].length) {
             throw new Error("metadata and data does not match");
@@ -124,7 +124,7 @@ var Table = (function(){
         var $tr = $("<div></div>", {class: "Table-row"});
         for (var i = 0 ; i < data.length ; i++){
             var className = metadata[i].toLowerCase().replace(/\s/g, "-") + " Table-row-item";
-            var rowElement = $("<div></div>", {class: className, text: data[i], 'data-header' :metadata[1][i]});
+            var rowElement = $("<div></div>", {class: className, text: data[i], 'data-header' :metadata["head"][i]})
 
             rowElement.appendTo($tr);
         }
