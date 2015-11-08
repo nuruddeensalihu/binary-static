@@ -123,7 +123,7 @@ var Table = (function(){
                 $("<div></div>", {class: className, text: data[i]}) :
                 $("<div></div>", {class: className, text: data[i]});
 
-            $('.'+className).attr('data-header', 'value');
+            $('.'+className).prop('data-header', 'value');
             rowElement.appendTo($tr);
         }
 
