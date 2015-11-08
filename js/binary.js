@@ -62201,7 +62201,12 @@ var Table = (function(){
      * @param {"header"|"data"} opt optional, default to "header"
      */
     function createFlexTableRow(data, metadata, opt){
-        if (data.length !== metadata.length) {
+
+        console.log("The metadata lenght is : " , metadata[0].length);
+
+        console.log("The headers are lenght are : " , metadata[1].length);
+
+        if (data.length !== metadata[0].length) {
             throw new Error("metadata and data does not match");
         }
 
@@ -62220,13 +62225,9 @@ var Table = (function(){
         var $tr = $("<div></div>", {class: "Table-row"});
         for (var i = 0 ; i < data.length ; i++){
             var className = metadata[i].toLowerCase().replace(/\s/g, "-") + " Table-row-item";
-            var rowElement = (isData) ?
-                $("<div></div>", {class: className, text: data[i], 'data-header' :'value'}) :
-                $("<div></div>", {class: className, text: data[i]});
+            var rowElement = $("<div></div>", {class: className, text: data[i], 'data-header' :metadata[1][i]});
 
-           // $('.Table-row-item').prop('data-header', 'value');
             rowElement.appendTo($tr);
-            //rowElement.prop('data-header', 'value');
         }
 
         return $tr;
@@ -62720,7 +62721,21 @@ var ProfitTableUI = (function(){
 
         var creditDebitType = (parseInt(amount) >= 0) ? "profit" : "loss";
 
-        var $statementRow = Table.createFlexTableRow([date, ref, action, desc, amount, balance], columns, "data");
+        var header = [
+            Content.localize().textPurchaseDate,
+            Content.localize().textRef,
+            Content.localize().textAction,
+            Content.localize().textDescription,
+            Content.localize().textCreditDebit,
+            Content.localize().textBalance
+        ];
+
+         var metadata = {
+            cols: columns,
+            head: header
+        };
+
+        var $statementRow = Table.createFlexTableRow([date, ref, action, desc, amount, balance], metadata, "data");
         $statementRow.children(".credit").addClass(creditDebitType);
         $statementRow.children(".date").addClass("break-line");
 

@@ -48,7 +48,21 @@ var StatementUI = (function(){
 
         var creditDebitType = (parseInt(amount) >= 0) ? "profit" : "loss";
 
-        var $statementRow = Table.createFlexTableRow([date, ref, action, desc, amount, balance], columns, "data");
+        var header = [
+            Content.localize().textPurchaseDate,
+            Content.localize().textRef,
+            Content.localize().textAction,
+            Content.localize().textDescription,
+            Content.localize().textCreditDebit,
+            Content.localize().textBalance
+        ];
+
+         var metadata = {
+            cols: columns,
+            head: header
+        };
+
+        var $statementRow = Table.createFlexTableRow([date, ref, action, desc, amount, balance], metadata, "data");
         $statementRow.children(".credit").addClass(creditDebitType);
         $statementRow.children(".date").addClass("break-line");
 
