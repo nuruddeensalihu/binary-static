@@ -5414,6 +5414,15 @@ table .loss, table .lower {
   margin: 0.5rem;
   line-height: 1.5;
 }
+.flex-table-container .flex-table .Table-header {
+  display: none;
+}
+@media (min-width: 500px) {
+  .flex-table-container .flex-table .Table-header {
+    font-weight: 700;
+    background-color: #f2f2f2;
+  }
+}
 .flex-table-container .flex-table .Table-row {
   width: 100%;
 }
@@ -5422,15 +5431,6 @@ table .loss, table .lower {
 }
 .flex-table-container .flex-table .Table-row:nth-of-type(odd) {
   background-color: white;
-}
-.flex-table-container .flex-table .Table-row .Table-header {
-  display: none !important;
-}
-@media (min-width: 500px) {
-  .flex-table-container .flex-table .Table-row .Table-header {
-    font-weight: 700;
-    background-color: #f2f2f2;
-  }
 }
 @media (min-width: 500px) {
   .flex-table-container .flex-table .Table-row {
