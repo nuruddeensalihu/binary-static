@@ -62224,7 +62224,7 @@ var Table = (function(){
                 $("<div></div>", {class: className, text: data[i]}) :
                 $("<div></div>", {class: className, text: data[i]});
 
-            $('.'+className).prop('data-header', 'value');
+            $('.Table-row-item').prop('data-header', 'value');
             rowElement.appendTo($tr);
         }
 
