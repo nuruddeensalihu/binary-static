@@ -40,7 +40,7 @@ var Table = (function(){
 
         var $tableClasses = (metadata.tableClass) ? metadata.tableClass + " flex-table" : "flex-table";
 
-        var $tableContainer = $("<div></div>",{class : "flex-table",id: metadata.id});
+        var $tableContainer = $("<div></div>",{class : "flex-table-container",id: metadata.id});
 
         var $tableRowClass = $("<div></div>",{class : "Table-row"});
 
@@ -55,8 +55,8 @@ var Table = (function(){
 
          $tableHeaders.appendTo($tableRowClass);
 
-         $tableRowClass.appendTo($tableContainer);
-         $tableContainer.appendTo($tableClasses);
+         $tableRowClass.appendTo($tableClasses);
+         $tableClasses.appendTo($tableContainer);
 
          console.log("The table container is : ",$tableContainer);
 
