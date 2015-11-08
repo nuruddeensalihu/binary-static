@@ -62244,13 +62244,16 @@ var Table = (function(){
         tbody.appendChild(docFrag);
         */
         var tbody = document.querySelector(id);
-        var $data = data.get(0);
+        var $data = data;
+        var $state = rowGenerator;
 
         console.log("The table body is :", tbody);
 
         console.log("The table data is :" , $data);
 
-        console.log("The Table data length is : ", data.length);
+        console.log("The Table data length is: ", data.length);
+        console.log("The first rowGenerator is : ", rowGenerator);
+        console.log("The rowGenerator is : ", $state);
     }
 
     /***
