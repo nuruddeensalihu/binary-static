@@ -5446,7 +5446,7 @@ table .loss, table .lower {
 }
 .flex-table-container .flex-table .Table-row .Table-row-item:before {
   content: attr(data-header);
-  width: 30%;
+  width: 40%;
   font-weight: 700;
 }
 @media (min-width: 500px) {
