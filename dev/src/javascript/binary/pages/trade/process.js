@@ -52,6 +52,10 @@ function processMarket(flag) {
 function processMarketUnderlying() {
     'use strict';
 
+    if (!document.getElementById('underlying')) {
+        return;
+    }
+
     var underlying = document.getElementById('underlying').value;
     sessionStorage.setItem('underlying', underlying);
 

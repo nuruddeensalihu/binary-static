@@ -742,7 +742,7 @@ var BetSell = function() {
         },
         register: function () {
             var that = this;
-            $('#profit-table, #portfolio-table, #bet_calculation_container, #statement-table, #contract_confirmation_container').on('click', '.open_contract_details', function (e) {
+            $('#profit-table, #portfolio-table, #bet_calculation_container, #statement-table, #statement-ws-container, #contract_confirmation_container, #profit-table-ws-container').on('click', '.open_contract_details', function (e) {
                 e.preventDefault();
                 that.get_analyse_contract($(this).attr('contract_id'), $(this).attr('bo_client'), this);
             });

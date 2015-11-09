@@ -97,6 +97,7 @@
     "src/javascript/binary/pages/trade/tick_trade.js",
     "src/javascript/binary/pages/trade/user.js",
     "src/javascript/binary/reality-check.js",
+    "src/javascript/binary/static/common/button.js",
     "src/javascript/binary/static/common/common_data.js",
     "src/javascript/binary/static/common/string_util.js",
     "src/javascript/binary/static/common/table.js",

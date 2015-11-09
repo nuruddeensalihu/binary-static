@@ -51914,7 +51914,8 @@ pjax_config_page('rise_fall_table', function() {
     };
 });
 
-pjax_config_page('portfolio|trade.cgi|statement|f_manager_statement|f_manager_history|f_profit_table|profit_table|trading', function() {
+pjax_config_page('portfolio|trade.cgi|statement|f_manager_statement|f_manager_history|' +
+    'f_profit_table|profit_table|trading|statementws|profit_tablews', function() {
     return {
         onLoad: function() {
             BetSell.register();
@@ -56022,7 +56023,7 @@ BetForm.Time.EndTime.prototype = {
         },
         register: function () {
             var that = this;
-            $('#profit-table, #portfolio-table, #bet_calculation_container, #statement-table, #contract_confirmation_container').on('click', '.open_contract_details', function (e) {
+            $('#profit-table, #portfolio-table, #bet_calculation_container, #statement-table, #statement-ws-container, #contract_confirmation_container, #profit-table-ws-container').on('click', '.open_contract_details', function (e) {
                 e.preventDefault();
                 that.get_analyse_contract($(this).attr('contract_id'), $(this).attr('bo_client'), this);
             });
@@ -60953,6 +60954,10 @@ function processMarket(flag) {
 function processMarketUnderlying() {
     'use strict';
 
+    if (!document.getElementById('underlying')) {
+        return;
+    }
+
     var underlying = document.getElementById('underlying').value;
     sessionStorage.setItem('underlying', underlying);
 
@@ -62042,6 +62047,20 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
                                                        LocalStore);
     });
 }
+;var Button = (function(){
+    "use strict";
+    function createBinaryStyledButton(){
+        var span = $("<span></span>", {class: "button"});
+        var button = $("<button></button>", {class: "button"});
+        span.append(button);
+
+        return span;
+    }
+
+    return {
+        createBinaryStyledButton: createBinaryStyledButton
+    };
+}());
 ;var CommonData = (function(){
     function getCookieItem(sKey) {
         if (!sKey) { return null; }
@@ -62449,6 +62468,19 @@ var ProfitTableUI = (function(){
         $row.children(".buy-date").addClass("break-line");
         $row.children(".pl").addClass(plType);
 
+        //create view button and append
+        var $viewButtonSpan = Button.createBinaryStyledButton();
+        var $viewButton = $viewButtonSpan.children(".button").first();
+        $viewButton.text(text.localize("View"));
+        $viewButton.addClass("open_contract_details");
+        $viewButton.attr("contract_id", transaction["contract_id"]);
+
+        $row.
+            children(".contract").
+            first().
+            append("<br>").
+            append($viewButtonSpan);
+
         return $row[0];
     }
 
@@ -62665,6 +62697,21 @@ var ProfitTableUI = (function(){
         var $statementRow = Table.createFlexTableRow([date, ref, action, desc, amount, balance], columns, "data");
         $statementRow.children(".credit").addClass(creditDebitType);
         $statementRow.children(".date").addClass("break-line");
+
+        //create view button and append
+        if (action === "Sell" || action === "Buy") {
+            var $viewButtonSpan = Button.createBinaryStyledButton();
+            var $viewButton = $viewButtonSpan.children(".button").first();
+            $viewButton.text(text.localize("View"));
+            $viewButton.addClass("open_contract_details");
+            $viewButton.attr("contract_id", transaction["contract_id"]);
+
+            $statementRow.
+                children(".desc").
+                first().
+                append("<br>").
+                append($viewButtonSpan);    
+        }
 
         return $statementRow[0];        //return DOM instead of jquery object
     }
