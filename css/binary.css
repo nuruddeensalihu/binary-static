@@ -5412,6 +5412,10 @@ table .loss, table .lower {
   -moz-flex-shrink: 1;
   -o-flex-shrink: 1;
   -ms-flex-shrink: 1;
+  -webkit-flex-grow: 1;
+  -moz-flex-grow: 1;
+  -ms-flex-positive: 1;
+      flex-grow: 1;
 }
 @media (max-width: 600px) {
   .flex-table-container .flex-table .flex-tr > th:nth-child(1) {
@@ -5428,6 +5432,11 @@ table .loss, table .lower {
   }
 }
 .flex-table-container .flex-table .flex-tr .flex-tr-child {
+  -ms-flex-positive: 1;
+      flex-grow: 1;
+  -webkit-flex-grow: 1;
+  -moz-flex-grow: 1;
+  flex-grow: 1;
   -ms-flex-negative: 1;
       flex-shrink: 1;
   -webkit-flex-shrink: 1;
