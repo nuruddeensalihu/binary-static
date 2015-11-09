@@ -5581,6 +5581,7 @@ table .loss, table .lower {
   }
   .flex-table-container .flex-table .Table-row .Table-row-item:before {
     content: none;
+    display: none;
   }
 }
 
