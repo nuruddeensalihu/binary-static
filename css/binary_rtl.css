@@ -5304,13 +5304,13 @@ table .loss, table .lower {
 .flex-table-container .flex-table .Table-header {
   display: none;
 }
-@media (min-width: 650px) {
+@media (min-width: 600px) {
   .flex-table-container .flex-table .Table-header {
     font-weight: 700;
     background-color: #f2f2f2;
   }
 }
-@media (min-width: 650px) {
+@media (min-width: 600px) {
   .flex-table-container .flex-table .u-Flex-grow1 {
     -webkit-flex-grow: 1;
     -moz-flex-grow: 1;
@@ -5318,7 +5318,7 @@ table .loss, table .lower {
     -ms-flex-positive: 1;
   }
 }
-@media (min-width: 650px) {
+@media (min-width: 600px) {
   .flex-table-container .flex-table .u-Flex-grow2 {
     -webkit-flex-grow: 2;
     -moz-flex-grow: 2;
@@ -5326,7 +5326,7 @@ table .loss, table .lower {
     -ms-flex-positive: 2;
   }
 }
-@media (min-width: 650px) {
+@media (min-width: 600px) {
   .flex-table-container .flex-table .u-Flex-grow3 {
     -webkit-flex-grow: 3;
     -moz-flex-grow: 3;
@@ -5334,7 +5334,7 @@ table .loss, table .lower {
     -ms-flex-positive: 3;
   }
 }
-@media (min-width: 650px) {
+@media (min-width: 600px) {
   .flex-table-container .flex-table .u-Flex-grow4 {
     -webkit-flex-grow: 4;
     -moz-flex-grow: 4;
@@ -5342,7 +5342,7 @@ table .loss, table .lower {
     -ms-flex-positive: 4;
   }
 }
-@media (min-width: 650px) {
+@media (min-width: 600px) {
   .flex-table-container .flex-table .u-Flex-grow5 {
     -webkit-flex-grow: 5;
     -moz-flex-grow: 5;
@@ -5350,7 +5350,7 @@ table .loss, table .lower {
     -ms-flex-positive: 5;
   }
 }
-@media (min-width: 650px) {
+@media (min-width: 600px) {
   .flex-table-container .flex-table .u-Flex-grow6 {
     -webkit-flex-grow: 6;
     -moz-flex-grow: 6;
@@ -5358,7 +5358,7 @@ table .loss, table .lower {
     -ms-flex-positive: 6;
   }
 }
-@media (min-width: 650px) {
+@media (min-width: 600px) {
   .flex-table-container .flex-table .u-Flex-grow7 {
     -webkit-flex-grow: 7;
     -moz-flex-grow: 7;
@@ -5366,7 +5366,7 @@ table .loss, table .lower {
     -ms-flex-positive: 7;
   }
 }
-@media (min-width: 650px) {
+@media (min-width: 600px) {
   .flex-table-container .flex-table .u-Flex-grow8 {
     -webkit-flex-grow: 8;
     -moz-flex-grow: 8;
@@ -5374,7 +5374,7 @@ table .loss, table .lower {
     -ms-flex-positive: 8;
   }
 }
-@media (min-width: 650px) {
+@media (min-width: 600px) {
   .flex-table-container .flex-table .u-Flex-grow9 {
     -webkit-flex-grow: 9;
     -moz-flex-grow: 9;
@@ -5382,7 +5382,7 @@ table .loss, table .lower {
     -ms-flex-positive: 9;
   }
 }
-@media (min-width: 650px) {
+@media (min-width: 600px) {
   .flex-table-container .flex-table .u-Flex-grow10 {
     -webkit-flex-grow: 10;
     -moz-flex-grow: 10;
@@ -5405,7 +5405,7 @@ table .loss, table .lower {
 .flex-table-container .flex-table .Table-row > div:nth-child(4) {
   display: none;
 }
-@media (min-width: 650px) {
+@media (min-width: 600px) {
   .flex-table-container .flex-table .Table-row {
     display: -webkit-box;
     display: -moz-box;
@@ -5461,7 +5461,7 @@ table .loss, table .lower {
   width: 40%;
   font-weight: 700;
 }
-@media (min-width: 650px) {
+@media (min-width: 600px) {
   .flex-table-container .flex-table .Table-row .Table-row-item {
     border: 1px solid #fff;
     padding: 0.5em;
