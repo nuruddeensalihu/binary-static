@@ -5391,9 +5391,6 @@ table .loss, table .lower {
   left: 30%;
 }
 
-.flex-table-container {
-  min-width: 100px;
-}
 .flex-table-container th {
   text-align: left !important;
   border-bottom: none !important;
