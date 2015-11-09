@@ -5418,6 +5418,12 @@ table .loss, table .lower {
     -moz-flex-flow: row nowrap;
     flex-flow: row nowrap;
   }
+  .flex-table-container .flex-table .Table-row > div:nth-child(1) {
+    display: inline !important;
+  }
+  .flex-table-container .flex-table .Table-row > div:nth-child(3) {
+    display: inline !important;
+  }
   .flex-table-container .flex-table .Table-row:nth-of-type(even) {
     background-color: #f2f2f2;
   }
