@@ -5403,7 +5403,7 @@ table .loss, table .lower {
   white-space: pre-line;
 }
 .flex-table-container .flex-table {
-  min-width: 700px;
+  /*min-width: 700px;*/
 }
 .flex-table-container .flex-table .flex-tr {
   display: flex;
