@@ -5288,13 +5288,7 @@ table .loss, table .lower {
   white-space: pre-line;
 }
 @media (max-width: 600px) {
-  .flex-table-container .flex-table .flex-tr > th:nth-child(1) {
-    display: none !important;
-  }
   .flex-table-container .flex-table .flex-tr > th:nth-child(4) {
-    display: none !important;
-  }
-  .flex-table-container .flex-table .flex-tr > td:nth-child(1) {
     display: none !important;
   }
   .flex-table-container .flex-table .flex-tr > td:nth-child(4) {
@@ -5303,6 +5297,7 @@ table .loss, table .lower {
   .flex-table-container .flex-table .flex-tr .flex-tr-child {
     white-space: nowrap;
     font-size: 12px;
+    pading: 0 !important;
   }
 }
 
