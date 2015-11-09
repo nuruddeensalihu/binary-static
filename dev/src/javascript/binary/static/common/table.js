@@ -78,9 +78,9 @@ var Table = (function(){
 
         var isData = (opt === "data");
 
-        var $tr = $("<tr></tr>", {class: "Table-row"});
+        var $tr = $("<tr></tr>", {class: "flex-tr Table-row Table-header"});
         for (var i = 0 ; i < data.length ; i++){
-            var className = metadata[i].toLowerCase().replace(/\s/g, "-") + " Table-row-item";
+            var className = metadata[i].toLowerCase().replace(/\s/g, "-") + " flex-tr-child Table-row-item";
             var rowElement = (isData) ?
                 $("<td></td>", {class: className, text: data[i]}) :
                 $("<th></th>", {class: className, text: data[i]});
