@@ -5412,7 +5412,6 @@ table .loss, table .lower {
   .flex-table-container .flex-table .flex-tr .flex-tr-child {
     white-space: nowrap;
     font-size: 12px;
-    pading: 0 !important;
   }
 }
 
