@@ -5405,6 +5405,14 @@ table .loss, table .lower {
 .flex-table-container .flex-table {
   min-width: 700px;
 }
+.flex-table-container .flex-table .flex-tr {
+  -ms-flex-negative: 1;
+      flex-shrink: 1;
+  -webkit-flex-shrink: 1;
+  -moz-flex-shrink: 1;
+  -o-flex-shrink: 1;
+  -ms-flex-shrink: 1;
+}
 @media (max-width: 600px) {
   .flex-table-container .flex-table .flex-tr > th:nth-child(1) {
     display: none !important;
@@ -5418,6 +5426,14 @@ table .loss, table .lower {
   .flex-table-container .flex-table .flex-tr > td:nth-child(4) {
     display: none !important;
   }
+}
+.flex-table-container .flex-table .flex-tr .flex-tr-child {
+  -ms-flex-negative: 1;
+      flex-shrink: 1;
+  -webkit-flex-shrink: 1;
+  -moz-flex-shrink: 1;
+  -o-flex-shrink: 1;
+  -ms-flex-shrink: 1;
 }
 
 #profit-table-ws-container th {
