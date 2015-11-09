@@ -5406,16 +5406,11 @@ table .loss, table .lower {
   min-width: 700px;
 }
 .flex-table-container .flex-table .flex-tr {
-  -ms-flex-negative: 1;
-      flex-shrink: 1;
-  -webkit-flex-shrink: 1;
-  -moz-flex-shrink: 1;
-  -o-flex-shrink: 1;
-  -ms-flex-shrink: 1;
-  -webkit-flex-grow: 1;
-  -moz-flex-grow: 1;
-  -ms-flex-positive: 1;
-      flex-grow: 1;
+  flex-wrap: nowrap;
+  -moz-flex-wrap: nowrap;
+  -o-flex-wrap: nowrap;
+  -ms-flex-wrap: nowrap;
+  -webkit-flex-wrap: nowrap;
 }
 @media (max-width: 600px) {
   .flex-table-container .flex-table .flex-tr > th:nth-child(1) {
@@ -5432,17 +5427,11 @@ table .loss, table .lower {
   }
 }
 .flex-table-container .flex-table .flex-tr .flex-tr-child {
-  -ms-flex-positive: 1;
-      flex-grow: 1;
-  -webkit-flex-grow: 1;
-  -moz-flex-grow: 1;
-  flex-grow: 1;
-  -ms-flex-negative: 1;
-      flex-shrink: 1;
-  -webkit-flex-shrink: 1;
-  -moz-flex-shrink: 1;
-  -o-flex-shrink: 1;
-  -ms-flex-shrink: 1;
+  flex-wrap: nowrap;
+  -moz-flex-wrap: nowrap;
+  -o-flex-wrap: nowrap;
+  -ms-flex-wrap: nowrap;
+  -webkit-flex-wrap: nowrap;
 }
 
 #profit-table-ws-container th {
