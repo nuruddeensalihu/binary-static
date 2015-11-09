@@ -5406,11 +5406,16 @@ table .loss, table .lower {
   min-width: 700px;
 }
 .flex-table-container .flex-table .flex-tr {
-  flex-wrap: nowrap;
-  -moz-flex-wrap: nowrap;
-  -o-flex-wrap: nowrap;
-  -ms-flex-wrap: nowrap;
-  -webkit-flex-wrap: nowrap;
+  display: flex;
+  display: -webkit-box;
+  display: -moz-box;
+  display: box;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  -webkit-justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
 }
 @media (max-width: 600px) {
   .flex-table-container .flex-table .flex-tr > th:nth-child(1) {
@@ -5427,11 +5432,7 @@ table .loss, table .lower {
   }
 }
 .flex-table-container .flex-table .flex-tr .flex-tr-child {
-  flex-wrap: nowrap;
-  -moz-flex-wrap: nowrap;
-  -o-flex-wrap: nowrap;
-  -ms-flex-wrap: nowrap;
-  -webkit-flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
 #profit-table-ws-container th {
