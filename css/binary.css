@@ -5420,7 +5420,6 @@ table .loss, table .lower {
 @media (min-width: 500px) {
   .flex-table-container .flex-table .Table-header {
     font-weight: 700;
-    display: inline !important;
     background-color: #f2f2f2;
   }
 }
@@ -5581,7 +5580,6 @@ table .loss, table .lower {
   }
   .flex-table-container .flex-table .Table-row .Table-row-item:before {
     content: none;
-    display: none;
   }
 }
 
