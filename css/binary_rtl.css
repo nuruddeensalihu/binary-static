@@ -5295,6 +5295,12 @@ table .loss, table .lower {
   min-width: 700px;
   display: flex;
   flex-direction: column;
+  -webkit-justify-content: space-between;
+  -moz-justify-content: space-between;
+  -ms-justify-content: space-between;
+  -o-justify-content: space-between;
+  justify-content: space-between;
+  -ms-flex-pack: justify;
 }
 .flex-table-container .flex-table .flex-tr {
   display: flex;
