@@ -109,7 +109,7 @@ var Table = (function(){
             throw new Error("metadata and data does not match");
         }
 
-        var isData = (opt === "data");
+        //var isData = (opt === "data");
 
         /*
         var $tr = $("<tr></tr>", {class: "flex-tr"});
@@ -134,7 +134,8 @@ var Table = (function(){
 
 
     function clearTableBody(id){
-        var tbody = document.querySelector("#" + id +">tbody");
+        //var tbody = document.querySelector("#" + id +">tbody");
+        var tbody = document.querySelector("#" + id);
         while (tbody.firstElementChild){
             tbody.removeChild(tbody.firstElementChild);
         }
