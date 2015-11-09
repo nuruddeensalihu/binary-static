@@ -5477,6 +5477,12 @@ table .loss, table .lower {
     -ms-flex-positive: 10;
   }
 }
+.flex-table-container .flex-table .Table-row > div:nth-child(1) {
+  display: none !important;
+}
+.flex-table-container .flex-table .Table-row > div:nth-child(4) {
+  display: none !important;
+}
 @media (min-width: 600px) {
   .flex-table-container .flex-table .Table-row {
     display: -webkit-box;
