@@ -5290,9 +5290,6 @@ table .loss, table .lower {
 .flex-table-container .flex-table {
   /*min-width: 700px;*/
 }
-.flex-table-container .flex-table .flex-tr {
-  justify-content: space-between;
-}
 @media (max-width: 600px) {
   .flex-table-container .flex-table .flex-tr > th:nth-child(1) {
     display: none !important;
