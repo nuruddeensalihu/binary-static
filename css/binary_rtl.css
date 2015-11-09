@@ -5301,9 +5301,6 @@ table .loss, table .lower {
   margin: 0.5rem;
   line-height: 1.5;
 }
-.flex-table-container .flex-table .Table-header {
-  display: none;
-}
 @media (min-width: 500px) {
   .flex-table-container .flex-table .Table-header {
     font-weight: 700;
