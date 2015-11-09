@@ -5287,9 +5287,6 @@ table .loss, table .lower {
 .flex-table-container .break-line {
   white-space: pre-line;
 }
-.flex-table-container .flex-table {
-  /*min-width: 700px;*/
-}
 @media (max-width: 600px) {
   .flex-table-container .flex-table .flex-tr > th:nth-child(1) {
     display: none !important;
@@ -5305,6 +5302,7 @@ table .loss, table .lower {
   }
   .flex-table-container .flex-table .flex-tr .flex-tr-child {
     white-space: nowrap;
+    font-size: 12px;
   }
 }
 
