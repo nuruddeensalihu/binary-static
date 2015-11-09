@@ -5399,7 +5399,7 @@ table .loss, table .lower {
 .flex-table-container .flex-table .Table-row:nth-of-type(odd) {
   background-color: white;
 }
-.flex-table-container .flex-table .Table-row .Table-row > div:nth-child(1) {
+.flex-table-container .flex-table .Table-row > div:nth-child(1) {
   display: none;
 }
 .flex-table-container .flex-table .Table-row > div:nth-child(3) {
