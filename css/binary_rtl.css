@@ -4200,6 +4200,15 @@ table .loss, table .lower {
   height: 38px;
 }
 
+.no_side_padding {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+}
+
+#payment_agent {
+  outline: none;
+}
+
 .static_full {
   margin-top: 40px;
 }
@@ -5276,6 +5285,10 @@ table .loss, table .lower {
   left: 30%;
 }
 
+.flex-table-container {
+  min-width: 100px;
+  overflow-x: auto;
+}
 .flex-table-container th {
   text-align: left !important;
   border-bottom: none !important;
@@ -5287,17 +5300,24 @@ table .loss, table .lower {
 .flex-table-container .break-line {
   white-space: pre-line;
 }
-@media (max-width: 600px) {
-  .flex-table-container .flex-table .flex-tr > th:nth-child(4) {
-    display: none !important;
-  }
-  .flex-table-container .flex-table .flex-tr > td:nth-child(4) {
-    display: none !important;
-  }
-  .flex-table-container .flex-table .flex-tr .flex-tr-child {
-    white-space: nowrap;
-    font-size: 12px;
-  }
+.flex-table-container .flex-table {
+  min-width: 700px;
+  display: flex;
+  flex-direction: column;
+}
+.flex-table-container .flex-table .flex-tr {
+  display: flex;
+  flex-wrap: wrap;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 100px;
+  flex-direction: row;
+  align-items: stretch;
+}
+.flex-table-container .flex-table .flex-tr .flex-tr-child {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 50px;
 }
 
 #profit-table-ws-container th {
@@ -5392,6 +5412,12 @@ body.FR a, body.FR button, body.FR .button, body.FR span, body.FR input {
 body.FR h1, body.FR h2, body.FR h3, body.FR h4, body.FR h5, body.FR h6 {
   text-transform: initial !important;
 }
+body.FR .fr-hide {
+  display: none !important;
+}
+body.FR .fr-show {
+  display: inline !important;
+}
 body.FR #trading_socket_container #contract_form_name_nav {
   font-size: 80%;
 }
@@ -5448,6 +5474,17 @@ body.ES #trading_socket_container #contract_form_name_nav {
 
 body.RU #trading_socket_container #contract_form_name_nav {
   font-size: 80%;
+}
+
+body.DE #legal-tab li.tm-li-2 {
+  margin-right: 0px !important;
+  padding: 0 8px !important;
+}
+body.DE a, body.DE button, body.DE .button, body.DE span, body.DE input {
+  text-transform: initial !important;
+}
+body.DE h1, body.DE h2, body.DE h3, body.DE h4, body.DE h5, body.DE h6 {
+  text-transform: initial !important;
 }
 
 /* media queries */

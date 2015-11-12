@@ -111,7 +111,6 @@
     "src/javascript/binary/static/statement/statement.ui.js",
     "src/javascript/binary/utility.js",
     "src/javascript/binary_japan/contract.js",
-    "src/javascript/binary_japan/event.js",
     "src/javascript/binary_japan/periods.js",
     "src/javascript/binary_japan/price.js",
     "src/javascript/binary_japan/process.js",

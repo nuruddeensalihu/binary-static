@@ -1096,7 +1096,7 @@ msgstr "Thêm Lớp phủ"
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/Form.pm:421
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/Form.pm:93
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/User.pm:1254
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:457
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:470
 msgid "Address"
 msgstr "Địa chỉ"
 
@@ -1503,6 +1503,12 @@ msgstr "Điện chuyển khoản ngân hàng/Chuyển tiền"
 #: /home/git/translations/binary-static/src/templates/haml/static/tour.html.haml:1
 msgid "Bank your way"
 msgstr "Giao dịch Ngân hàng theo cách của bạn"
+
+#: /home/git/translations/binary-static/src/templates/haml/cashier/index.html.haml:1
+#, fuzzy
+#| msgid "Deposit or withdraw to your account via bank-wire, credit card, or e-cash wallet."
+msgid "Bank-wire, credit card, e-cash wallet"
+msgstr "Gửi hay rút tiền qua tài khoản của bạn bằng điện chuyển khoản ngân hàng, thẻ tín dụng hay ví thẻ điện tử."
 
 #: /home/git/translations/binary-static/src/templates/toolkit/cashier/paymentagent_application.html.tt:35
 msgid "Bank/Credit Union/Building Society/Credit/Debit Card statement or passbook (within last 3 months)."
@@ -1977,16 +1983,16 @@ msgstr "Hủy"
 msgid "Candlestick Chart"
 msgstr "Biểu đồ hình nến"
 
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/MarketDiscovery.pm:309
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/PortfolioManagement.pm:35
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/MarketDiscovery.pm:370
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/PortfolioManagement.pm:34
 msgid "Cannot create contract"
 msgstr "Không thể tạo hợp đồng"
 
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/PortfolioManagement.pm:247
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/PortfolioManagement.pm:253
 msgid "Cannot create sell contract"
 msgstr "Không thể tạo hợp đồng bán"
 
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/MarketDiscovery.pm:328
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/MarketDiscovery.pm:389
 msgid "Cannot validate contract"
 msgstr "Không thể xác thực hợp đồng"
 
@@ -2052,7 +2058,7 @@ msgid "Change Password"
 msgstr "Thay đổi Mật khẩu"
 
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/User.pm:1279
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:482
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:495
 msgid "Change in account settings"
 msgstr "Thay đổi trong thiết lập tài khoản"
 
@@ -2611,7 +2617,7 @@ msgstr "Chi phí và Lệ phí"
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/Form.pm:3400
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/Form.pm:3694
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/User.pm:1252
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:455
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:468
 msgid "Country of Residence"
 msgstr "Quốc gia cư trú"
 
@@ -2789,7 +2795,7 @@ msgstr "Thân mến"
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/Cashier.pm:1490
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/Cashier.pm:1798
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/User.pm:1243
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:447
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:460
 msgid "Dear %1 %2 %3,"
 msgstr "%1 %2 %3 thân mến,"
 
@@ -2967,10 +2973,6 @@ msgstr "Gửi tiền %1 ảo vào tài khoản của bạn"
 #: /home/git/translations/binary-static/src/templates/toolkit/legal/promocode.html.tt:3
 msgid "Deposit Bonus"
 msgstr "Tiền thưởng Kí quỹ"
-
-#: /home/git/translations/binary-static/src/templates/haml/cashier/index.html.haml:1
-msgid "Deposit To Payment Agent"
-msgstr "Gửi tiền cho đại lý thanh toán"
 
 #: /home/git/regentmarkets/bom-app/bin/GenerateStaticData.pm:215
 msgid "Deposit of"
@@ -3294,7 +3296,7 @@ msgstr "Xác minh Email"
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/Form.pm:3023
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/Form.pm:3709
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/User.pm:1251
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:454
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:467
 #: /home/git/translations/binary-static/src/templates/haml/user/lost_password.html.haml:1
 msgid "Email address"
 msgstr "Địa chỉ hòm thư"
@@ -3634,6 +3636,11 @@ msgstr "Nhằm tăng cường bảo vệ khỏi việc rút tiền trái phép, 
 #: /home/git/translations/binary-static/src/templates/toolkit/portfolio/contract_details.html.tt:44
 msgid "For contracts which expire at market close, we will use the official closing value of the market to settle your contract and update your results at settlement time."
 msgstr "Đối với hợp đồng hết hạn tại điểm đóng cửa thị trường, chúng tôi sẽ sử dụng giá thị trường tại điểm đóng cửa chính thức để quyết toán hợp đồng của bạn và cập nhật kết quả tại thời gian quyết toán."
+
+#. (stash->{website_name})
+#: /home/git/translations/binary-static/src/templates/haml/cashier/index.html.haml:1
+msgid "For e-cash methods or local currencies not supported by %1."
+msgstr ""
 
 #: /home/git/translations/binary-static/src/templates/toolkit/legal/betting_rules.html.tt:45
 msgid "For forex quotes the closing times are defined by the Company as shown in the Market Opening Times section of the website. In the event of any dispute regarding market or settlement values, the decision of the Company shall be final and binding. Clients should note that certain markets (such as stocks and stock indices) are not open throughout the day and that trading may not be available when the markets are closed."
@@ -4632,7 +4639,7 @@ msgstr "Số tiền không hợp lệ"
 msgid "Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places."
 msgstr "Số tiền không hợp lệ. Số tiền chuyển khoản tối thiểu là 0.10 và lên tới 2 chữ số thập phân."
 
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/MarketDiscovery.pm:232
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/MarketDiscovery.pm:280
 msgid "Invalid candles request"
 msgstr "Yêu cầu nến không hợp lệ"
 
@@ -6013,7 +6020,7 @@ msgstr "Tối thiểu"
 msgid "Miss"
 msgstr "Cô"
 
-#: /home/git/regentmarkets/bom/lib/BOM/Product/Role/AmericanExpiry.pm:75
+#: /home/git/regentmarkets/bom/lib/BOM/Product/Role/AmericanExpiry.pm:77
 msgid "Missing market data for contract duration"
 msgstr "Thiếu dữ liệu thị trường cho kì hạn hợp đồng"
 
@@ -6204,7 +6211,7 @@ msgstr "Yêu cầu Mật khẩu mới"
 
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/User.pm:334
 #: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v2/Accounts.pm:188
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:335
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:348
 msgid "New password is same as old password."
 msgstr "Mật khẩu mới giống mật khẩu cũ."
 
@@ -6322,6 +6329,10 @@ msgstr "Chú ý: Chuyển tiền qua Đại lý Thanh toán chỉ có cho
 msgid "Note: The company reserves the right to cancel affiliate commissions that remain unclaimed for more than 2 years. Please also read our affiliate terms and conditions."
 msgstr "Lưu ý: Công ty có quyền hủy bỏ hoa hồng liên kết mà không được trình báo trong hơn hai năm. Xin vui lòng đọc điều khoản và điều kiện liên kết của chúng tôi."
 
+#: /home/git/translations/binary-static/src/templates/haml/cashier/index.html.haml:1
+msgid "Note: Withdrawal via payment agent is available only if you deposit exclusively via payment agent"
+msgstr ""
+
 #. ($currency,            $withdrawal_limits->{'frozen_free_gift'},            $withdrawal_limits->{'free_gift_turnover_limit'})
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/Cashier.pm:1953
 msgid "Note: You will be able to withdraw your bonus of %1%2 only once your aggregate volume of trades exceeds %1%3. This restriction applies only to the bonus and profits derived therefrom.  All other deposits and profits derived therefrom can be withdrawn at any time."
@@ -6408,7 +6419,7 @@ msgstr "OK"
 
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/User.pm:332
 #: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v2/Accounts.pm:190
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:337
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:350
 msgid "Old password is wrong."
 msgstr "Mật khẩu cũ sai."
 
@@ -6767,6 +6778,7 @@ msgstr "Thiết lập lại mật khẩu"
 msgid "Patents"
 msgstr "Bằng sáng chế"
 
+#: /home/git/translations/binary-static/src/templates/haml/cashier/index.html.haml:1
 #: /home/git/translations/binary-static/src/templates/haml/static/partners.html.haml:1
 msgid "Payment Agent"
 msgstr "Đại lý Thanh toán"
@@ -6875,8 +6887,8 @@ msgstr "Thời gian"
 msgid "Perl modules"
 msgstr "module Perl"
 
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:323
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:404
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:336
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:417
 msgid "Permission denied."
 msgstr "Quyền bị từ chối."
 
@@ -7104,7 +7116,7 @@ msgid "Please note that you may update your personal information at any time by 
 msgstr "Vui lòng chú ý rằng bạn có thể cập nhật thông tin cá nhân của mình bất kì lúc nào bằng cách đăng nhập vào khu vực \"Thiết lập) trong tài khoản. Bạn phải có trách nhiệm đảm bảo rằng bạn sẽ phải thông báo kịp thời và liên tục nếu có bất cứ sự thay đổi nào về thông tin cá nhân của mình."
 
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/User.pm:1246
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:449
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:462
 msgid "Please note that your settings have been updated as follows:"
 msgstr "Vui lòng chú ý rằng thiết lập của bạn đã được cập nhật như sau:"
 
@@ -7629,7 +7641,7 @@ msgstr "Quãng Kiểm tra tính Xác thực:"
 msgid "Realtime data is not available for this underlying"
 msgstr "Dữ liệu trong thời gian thực không có cho tài sản cơ sở này"
 
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/MarketDiscovery.pm:198
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/MarketDiscovery.pm:246
 msgid "Realtime quotes not available"
 msgstr "Định giá thời gian thực không khả dụng"
 
@@ -8256,7 +8268,7 @@ msgstr "Xin lỗi, có lỗi xảy ra trong khi đang tải mẫu. Xin vui l
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/User.pm:1211
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/User.pm:1363
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/User.pm:1420
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:439
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:452
 msgid "Sorry, an error occurred while processing your account."
 msgstr "Xin lỗi, Lỗi xảy ra trong khi đang xử lý tài khoản của bạn."
 
@@ -8402,7 +8414,7 @@ msgstr "Xin lỗi, bạn đã có vị thế mở. Vui lòng đóng tấ
 
 #. ($lim)
 #: /home/git/regentmarkets/bom-app/lib/BOM/View/Controller/Bet.pm:2103
-#: /home/git/regentmarkets/bom-web/lib/BOM/Web/Hooks.pm:180
+#: /home/git/regentmarkets/bom-web/lib/BOM/Web/Hooks.pm:181
 msgid "Sorry, you have reached your session duration limit of %plural(%1,%d minute,%d minutes)."
 msgstr "Rất tiếc, bạn đã đạt tới mức giới hạn thời hạn phiên của %số nhiều (%1, %d phút, %d nhiều phút)."
 
@@ -8658,7 +8670,7 @@ msgid "Study our live charts"
 msgstr "Tìm hiểu về biểu đồ trực tiếp của chúng tôi"
 
 #. ($style)
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/MarketDiscovery.pm:235
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/MarketDiscovery.pm:283
 msgid "Style %1 invalid"
 msgstr "Kiểu %1 không hợp lệ"
 
@@ -8722,8 +8734,8 @@ msgid "Switch to normal mode"
 msgstr "Chuyển sang chế độ bình thường"
 
 #. ($symbol)
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/MarketDiscovery.pm:180
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/MarketDiscovery.pm:209
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/MarketDiscovery.pm:182
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/MarketDiscovery.pm:257
 msgid "Symbol %1 invalid"
 msgstr "Ký hiệu %1 không hợp lệ"
 
@@ -8770,7 +8782,7 @@ msgstr "Điện thoại"
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/Form.pm:355
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/Form.pm:3566
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/User.pm:1262
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:465
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:478
 msgid "Telephone"
 msgstr "Điện thoại"
 
@@ -8873,7 +8885,7 @@ msgstr "%1 mô phỏng thị trường năng động vào ban ngày (nhưng 
 #. ($r->website->display_name)
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/Cashier.pm:1809
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/User.pm:1274
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:477
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:490
 msgid "The %1 team."
 msgstr "Nhóm %1."
 
@@ -9399,7 +9411,7 @@ msgstr "Trang web đã hết thời gian. Điều này có thể do kết nối 
 #. ($client_obj->email,                    $r->client_ip)
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/User.pm:359
 #: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v2/Accounts.pm:213
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:360
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:373
 msgid "The password for your account %1 has been changed. This request originated from IP address %2. If this request was not performed by you, please immediately contact Customer Support."
 msgstr "Mật khẩu cho tài khoản của bạn %1 đã được thay đổi. Yêu cầu này được lấy từ địa chỉ IP %2. Nếu yêu cầu này không phải bạn thực hiện, vui lòng liên hệ với Nhóm Hỗ trợ Khách hàng ngay lập tức."
 
@@ -9835,6 +9847,24 @@ msgstr "Trang này không có sẵn."
 #: /home/git/translations/binary-static/src/templates/toolkit/legal/promocode.html.tt:49
 msgid "This promotion is only available to new Clients. Existing or former Clients do not qualify. It is only available once to each Client."
 msgstr "Khuyến mãi này chỉ dành cho những khách hàng mới. Khách hàng hiện tại hoặc cũ không đủ điều kiện. Mỗi khách hàng chỉ có một lần."
+
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/MarketDiscovery.pm:313
+msgid "This stream has been canceled due to resource limitations"
+msgstr ""
+
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:264
+msgid "This stream was canceled due to resource limitations"
+msgstr ""
+
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/MarketDiscovery.pm:221
+#, fuzzy
+#| msgid "Connection failure. Please try again later."
+msgid "This tick stream has been disrupted. Please try again later."
+msgstr "Kết nối bị thất bại. Xin vui lòng thử lại sau."
+
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/MarketDiscovery.pm:198
+msgid "This tick stream was canceled due to resource limitations"
+msgstr ""
 
 #: /home/git/regentmarkets/bom/lib/BOM/Product/Contract.pm:2020
 msgid "This trade is not offered."
@@ -10324,11 +10354,11 @@ msgstr "Unemployed"
 msgid "Unfortunately your answers to the questions above indicate that you do not have sufficient financial resources or trading experience to be eligible to open a trading account at this time."
 msgstr "Thật không may câu trả lời cho câu hỏi trên đã chỉ ra rằng bạn không đủ nguồn tài chính hoặc không đủ kinh nghiệm giao dịch để có thể mở tài khoản giao dịch vào lúc này."
 
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/PortfolioManagement.pm:30
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/PortfolioManagement.pm:28
 msgid "Unknown contract proposal"
 msgstr "Đề nghị hợp đồng không rõ"
 
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/PortfolioManagement.pm:91
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/PortfolioManagement.pm:90
 msgid "Unknown contract sell proposal"
 msgstr "Đề nghị bán hợp đồng không rõ"
 
@@ -11144,10 +11174,6 @@ msgstr "Với Binary.com, tiền của bạn được an toàn. Chúng tôi
 msgid "Withdraw"
 msgstr "Rút tiền"
 
-#: /home/git/translations/binary-static/src/templates/haml/cashier/index.html.haml:1
-msgid "Withdraw Via Payment Agent"
-msgstr "Rút tiền qua Đại lý Thanh toán"
-
 #. (1)
 #: /home/git/translations/binary-static/src/templates/toolkit/cashier/payment_methods.html.tt:242
 #: /home/git/translations/binary-static/src/templates/toolkit/cashier/payment_methods.html.tt:265
@@ -11298,11 +11324,6 @@ msgstr "Bạn có thể giao một loạt các thị trường, thang thời gia
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/Cashier.pm:1858
 msgid "You can try another <a href=\"%1\">payment option</a> or for additional assistance:"
 msgstr "Bạn có thể thử <a href=\"%1\">một lựa chọn thanh toán khác </a> hoặc muốn được hỗ trợ thêm:"
-
-#. (stash->{website_name})
-#: /home/git/translations/binary-static/src/templates/haml/cashier/index.html.haml:1
-msgid "You can use an authorized payment agent to process deposits and withdrawals for e-cash methods or local currencies not supported by %1."
-msgstr "Bạn có thể sử dụng một đại lý thanh toán uỷ quyền để xử lý các khoản tiền gửi và rút tiền với phương thức tiền mặt trực tuyến hoặc đồng tiền địa phương không được hỗ trợ bởi %1."
 
 #. (website)
 #: /home/git/translations/binary-static/src/templates/toolkit/cashier/payment_agent_list.html.tt:4
@@ -11756,7 +11777,7 @@ msgstr "Mật khẩu của bạn chứa những kí tự không hợp lê
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/User.pm:353
 #: /home/git/regentmarkets/bom-web/lib/BOM/Web/User.pm:366
 #: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v2/Accounts.pm:207
-#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:354
+#: /home/git/regentmarkets/bom-websocket-api/lib/BOM/WebSocketAPI/v3/Accounts.pm:367
 msgid "Your password has been changed."
 msgstr "Mật khẩu của bạn đã được thay đổi."
 
@@ -12577,17 +12598,9 @@ msgstr "Chỉ số chứng khoán Đức"
 msgid "AP Ordinary"
 msgstr "AP thông thường"
 
-#: Underlying Symbol SYNFCHI
-msgid "French Smart Index"
-msgstr "Chỉ số Thông minh Pháp"
-
 #: Underlying Symbol JCI
 msgid "Jakarta Index"
 msgstr "Chỉ số Jakarta"
-
-#: Underlying Symbol SYNN225
-msgid "Japanese Smart Index"
-msgstr "Chỉ số thông minh Nhật Bản"
 
 #: Underlying Symbol OEX
 msgid "US S&P 100"
@@ -12612,10 +12625,6 @@ msgstr "Chỉ số chứng khoán Thượng Hải"
 #: Underlying Symbol FCHI
 msgid "French Index"
 msgstr "Chỉ số chứng khoán Pháp"
-
-#: Underlying Symbol SYNFTSE
-msgid "UK Smart Index"
-msgstr "Chỉ số thông minh Anh"
 
 #: Underlying Symbol EGX30
 msgid "Egypt Index"
@@ -12645,14 +12654,6 @@ msgstr "Chỉ số 50 châu Âu"
 msgid "Australian Index"
 msgstr "Chỉ số Úc"
 
-#: Underlying Symbol SYNSX5E
-msgid "Euro 50 Smart Index"
-msgstr "Chỉ số thông minh 50 Euro"
-
-#: Underlying Symbol SYNDJI
-msgid "Wall Street Smart Index"
-msgstr "Chỉ số Thông minh phố Wall"
-
 #: Underlying Symbol STI
 msgid "Singapore Index"
 msgstr "Chỉ số Singapore"
@@ -12669,10 +12670,6 @@ msgstr "Chỉ số Na Uy"
 msgid "Japanese Index"
 msgstr "Chỉ số Nhật Bản"
 
-#: Underlying Symbol SYNAEX
-msgid "Dutch Smart Index"
-msgstr "Chỉ số thông minh Hà Lan"
-
 #: Underlying Symbol SSMI
 msgid "Swiss Index"
 msgstr "Chỉ số Thụy Sĩ"
@@ -12681,25 +12678,13 @@ msgstr "Chỉ số Thụy Sĩ"
 msgid "Hong Kong Index"
 msgstr "Chỉ số Hồng Kông"
 
-#: Underlying Symbol SPTSX60
-msgid "Canadian Index"
-msgstr "Chỉ số Canada"
-
 #: Underlying Symbol AEX
 msgid "Dutch Index"
 msgstr "Chỉ số Hà Lan"
 
-#: Underlying Symbol SYNGDAXI
-msgid "German Smart Index"
-msgstr "Chỉ số thông minh Đức"
-
 #: Underlying Symbol MIB30
 msgid "Italian 30 Index"
 msgstr "Chỉ số 30 Italia"
-
-#: Underlying Symbol SYNSSMI
-msgid "Swiss Smart Index"
-msgstr "Chỉ số thông minh Thụy Sĩ"
 
 #: Underlying Symbol RTSI
 msgid "Russian Regular Index"
@@ -12721,10 +12706,6 @@ msgstr "Chỉ số 100 Euro"
 msgid "Abu Dhabi Index"
 msgstr "Chỉ số Abu Dhabi"
 
-#: Underlying Symbol SYNSPC
-msgid "US Smart Index"
-msgstr "Chỉ số thông minh Mỹ"
-
 #: Underlying Symbol BFX
 msgid "Belgian Index"
 msgstr "Chỉ số Bỉ"
@@ -12732,10 +12713,6 @@ msgstr "Chỉ số Bỉ"
 #: Underlying Symbol ISEQ
 msgid "Irish Index"
 msgstr "Chỉ số Ailen"
-
-#: Underlying Symbol IBOV
-msgid "Brazilian Index"
-msgstr "Chỉ số Brazil"
 
 #: Underlying Symbol BSESENSEX30
 msgid "Bombay Index"
@@ -13890,6 +13867,48 @@ msgstr "%1 %2 lãi nếu %3 đi ra ngoài %7 tới %6 qua %5."
 #: Translation for contract type description (UPORDOWN - intraday)
 msgid "%1 %2 payout if %3 goes outside %7 and %6 through %5 after %4."
 msgstr "%1 %2 tiền lãi nếu %3 đi ra ngoài %7 và %6 qua %5 sau %4."
+
+#~ msgid "Deposit To Payment Agent"
+#~ msgstr "Gửi tiền cho đại lý thanh toán"
+
+#~ msgid "Withdraw Via Payment Agent"
+#~ msgstr "Rút tiền qua Đại lý Thanh toán"
+
+#~ msgid "You can use an authorized payment agent to process deposits and withdrawals for e-cash methods or local currencies not supported by %1."
+#~ msgstr "Bạn có thể sử dụng một đại lý thanh toán uỷ quyền để xử lý các khoản tiền gửi và rút tiền với phương thức tiền mặt trực tuyến hoặc đồng tiền địa phương không được hỗ trợ bởi %1."
+
+#~ msgid "French Smart Index"
+#~ msgstr "Chỉ số Thông minh Pháp"
+
+#~ msgid "Japanese Smart Index"
+#~ msgstr "Chỉ số thông minh Nhật Bản"
+
+#~ msgid "UK Smart Index"
+#~ msgstr "Chỉ số thông minh Anh"
+
+#~ msgid "Euro 50 Smart Index"
+#~ msgstr "Chỉ số thông minh 50 Euro"
+
+#~ msgid "Wall Street Smart Index"
+#~ msgstr "Chỉ số Thông minh phố Wall"
+
+#~ msgid "Dutch Smart Index"
+#~ msgstr "Chỉ số thông minh Hà Lan"
+
+#~ msgid "Canadian Index"
+#~ msgstr "Chỉ số Canada"
+
+#~ msgid "German Smart Index"
+#~ msgstr "Chỉ số thông minh Đức"
+
+#~ msgid "Swiss Smart Index"
+#~ msgstr "Chỉ số thông minh Thụy Sĩ"
+
+#~ msgid "US Smart Index"
+#~ msgstr "Chỉ số thông minh Mỹ"
+
+#~ msgid "Brazilian Index"
+#~ msgstr "Chỉ số Brazil"
 
 #~ msgid "Sorry, your account cash balance is too high (%1). <B>Your maximum account balance is %2 </b>. Please withdraw money from your account to bring down your cash balance under that amount. You may not trade until you do so."
 #~ msgstr "Xin lỗi, số dư tài khoản của bạn quá cao (%1). <B>Số dư tài khoản tối đa của bạn là %1 </b>. Vui lòng rút tiền để số dư tài khoản của bạn xuống dưới mức đó. Bạn không thể giao dịch cho tới khi bạn thực hiện điều đó."

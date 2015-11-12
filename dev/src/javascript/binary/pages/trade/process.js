@@ -16,8 +16,7 @@ function processActiveSymbols(data) {
     displayMarkets('contract_markets', Symbols.markets(), market);
     processMarket();
     setTimeout(function(){
-        if(TradeSocket.socket().readyState === 1){
-            var underlying = document.getElementById('underlying').value;
+        if(document.getElementById('underlying')){
             Symbols.getSymbols(0);
         }
     }, 60*1000);
@@ -216,6 +215,10 @@ function displaySpreads() {
     }
 }
 
+function forgetTradingStreams(){
+    processForgetProposals();
+    processForgetTicks();
+}
 /*
  * Function to request for cancelling the current price proposal
  */
