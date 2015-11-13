@@ -5295,6 +5295,9 @@ table .loss, table .lower {
   min-width: 210px;
 }
 
+.flex-table-container {
+  table-width: 100px;
+}
 .flex-table-container th {
   text-align: left !important;
   border-bottom: none !important;
