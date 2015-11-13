@@ -5316,7 +5316,7 @@ table .loss, table .lower {
     display: none !important;
   }
   .flex-table-container #statement-table .flex-tr .flex-tr-child {
-    /*white-space:nowrap;*/
+    white-space: nowrap;
     font-size: 12px;
   }
 }
@@ -5328,7 +5328,7 @@ table .loss, table .lower {
     display: none !important;
   }
   .flex-table-container #profit-table .flex-tr .flex-tr-child {
-    /*white-space:nowrap;*/
+    white-space: nowrap;
     font-size: 12px;
   }
 }
