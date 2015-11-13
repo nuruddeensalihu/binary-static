@@ -5422,6 +5422,11 @@ table .loss, table .lower {
   white-space: pre-line;
 }
 @media (max-width: 600px) {
+  .flex-table-container .break-line {
+    white-space: pre-line;
+  }
+}
+@media (max-width: 600px) {
   .flex-table-container #statement-table .flex-tr > th:nth-child(4) {
     display: none !important;
   }
@@ -5431,11 +5436,6 @@ table .loss, table .lower {
   .flex-table-container #statement-table .flex-tr .flex-tr-child {
     white-space: nowrap;
     font-size: 12px;
-  }
-}
-@media (max-width: 600px) {
-  .flex-table-container #statement-table .break-line {
-    white-space: pre-line;
   }
 }
 @media (max-width: 600px) {
