@@ -5413,6 +5413,7 @@ table .loss, table .lower {
 .flex-table-container th {
   text-align: left !important;
   border-bottom: none !important;
+  overflow: hidden;
 }
 .flex-table-container td {
   text-align: left !important;
@@ -5421,13 +5422,6 @@ table .loss, table .lower {
 }
 .flex-table-container .break-line {
   white-space: pre-line;
-}
-@media (max-width: 600px) {
-  .flex-table-container {
-    text-align: left !important;
-    padding-left: 10px;
-    overflow: hidden;
-  }
 }
 @media (max-width: 600px) {
   .flex-table-container #statement-table .flex-tr > th:nth-child(4) {
