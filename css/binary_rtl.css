@@ -5307,10 +5307,16 @@ table .loss, table .lower {
   white-space: pre-line;
 }
 @media (max-width: 600px) {
-  .flex-table-container .flex-table .flex-tr > th:nth-child(4) {
+  .flex-table-container .flex-table .flex-tr #statement-table > th:nth-child(4) {
     display: none !important;
   }
-  .flex-table-container .flex-table .flex-tr > td:nth-child(4) {
+  .flex-table-container .flex-table .flex-tr #statement-table > td:nth-child(4) {
+    display: none !important;
+  }
+  .flex-table-container .flex-table .flex-tr #profit-table > th:nth-child(3) {
+    display: none !important;
+  }
+  .flex-table-container .flex-table .flex-tr #profit-table > td:nth-child(3) {
     display: none !important;
   }
   .flex-table-container .flex-table .flex-tr .flex-tr-child {
