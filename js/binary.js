@@ -49351,26 +49351,9 @@ Menu.prototype = {
             active.subitem.addClass('a-active');
         }
 
-        var $url = active.item.get(0).baseURI;
-
         if(active.item) {
-            if(page.language() === 'FR' && /trade.cgi/i.test($url)){
-                $("#topMenuStartBetting").removeClass('active');
-                $("#topMenuStartBetting").removeClass('hover');
-                $("#topMenuBetaInterface").addClass('active');
-                $("#topMenuBetaInterface").addClass('hover');
-            }
-            else if(page.language() === 'FR' && /trading/i.test($url))
-            {
-                $("#topMenuBetaInterface").removeClass('active');
-                $("#topMenuBetaInterface").removeClass('hover');
-                $("#topMenuStartBetting").addClass('active');
-                $("#topMenuStartBetting").addClass('hover');
-            }
-            else{
-                active.item.addClass('active');
-                active.item.addClass('hover'); 
-            }
+            active.item.addClass('active');
+            active.item.addClass('hover');
         }
 
         this.on_mouse_hover(active.item);
@@ -49461,7 +49444,7 @@ Menu.prototype = {
         }
         var start_trading = $('#topMenuStartBetting a:first');
         var trade_url = start_trading.attr("href");
-        if(stored_market && !/\/trading/.test(trade_url)) {
+        if(stored_market) {
             if(/market=/.test(trade_url)) {
                 trade_url = trade_url.replace(/market=\w+/, 'market=' + stored_market);
             } else {
@@ -49471,9 +49454,6 @@ Menu.prototype = {
 
             $('#menu-top li:eq(3) a').attr('href', trade_url);
             $('#mobile-menu #topMenuStartBetting a.trading_link').attr('href', trade_url);
-        }
-        else{
-            start_trading.attr("href", trade_url);
         }
 
         start_trading.on('click', function(event) {
@@ -49897,15 +49877,7 @@ Page.prototype = {
         var that = this;
         $('#language_select').on('change', 'select', function() {
             var language = $(this).find('option:selected').attr('class');
-            var loc = document.location; // quick access
-            var url = loc.protocol + '//' + loc.host + '/trading?l=' + language;
-            if(language === 'FR' && /trade.cgi/i.test(loc.pathname)){
-                window.location = url;
-            }
-            else{
-                document.location = that.url_for_language(language);
-            }
-            
+            document.location = that.url_for_language(language);
         });
     },
     on_change_loginid: function() {
@@ -51964,19 +51936,8 @@ pjax_config_page('chart_application', function () {
 
 pjax_config_page('trading', function () {
     return {
-        onLoad: function () {
-            TradeSocket.init();
-            TradingEvents.init();
-            Content.populate();
-            Symbols.getSymbols(1);
-            if (document.getElementById('websocket_form')) {
-                addEventListenerForm();
-            }
-        },
-        onUnload: function() {
-            forgetTradingStreams();
-            TradeSocket.socket().onclose(1);
-        }
+        onLoad: function(){TradePage.onLoad();},
+        onUnload: function(){TradePage.onUnload();}
     };
 });
 ;var BetAnalysis = function () {
@@ -59775,7 +59736,7 @@ var Contract = (function () {
     };
 
     var getContracts = function(underlying) {
-        TradeSocket.send({ contracts_for: underlying });
+        BinarySocket.send({ contracts_for: underlying });
     };
 
     var getContractForms = function() {
@@ -60294,7 +60255,7 @@ var TradingEvents = (function () {
                     // forget the old tick id i.e. close the old tick stream
                     processForgetTicks();
                     // get ticks for current underlying
-                    TradeSocket.send({ ticks : underlying });
+                    BinarySocket.send({ ticks : underlying });
                 }
             });
         }
@@ -60467,7 +60428,7 @@ var TradingEvents = (function () {
                 }
             }
             if (id && askPrice) {
-                TradeSocket.send(params);
+                BinarySocket.send(params);
                 Price.incrFormId();
                 processForgetProposals();
             }
@@ -60720,10 +60681,7 @@ var Message = (function () {
         var response = JSON.parse(msg.data);
         if (response) {
             var type = response.msg_type;
-            if (type === 'authorize') {
-                TUser.set(response.authorize);
-                TradeSocket.send({ payout_currencies: 1 });
-            } else if (type === 'active_symbols') {
+            if (type === 'active_symbols') {
                 processActiveSymbols(response);
             } else if (type === 'contracts_for') {
                 processContract(response);
@@ -61044,7 +61002,7 @@ function processMarketUnderlying() {
     // forget the old tick id i.e. close the old tick stream
     processForgetTicks();
     // get ticks for current underlying
-    TradeSocket.send({ ticks : underlying });
+    BinarySocket.send({ ticks : underlying });
 
     Tick.clean();
     
@@ -61208,7 +61166,7 @@ function forgetTradingStreams(){
 function processForgetProposals() {
     'use strict';
     showPriceOverlay();
-    TradeSocket.send({forget_all: "proposal"});
+    BinarySocket.send({forget_all: "proposal"});
     Price.clearMapping();   
 }
 
@@ -61224,7 +61182,7 @@ function processPriceRequest() {
     showPriceOverlay();
     for (var typeOfContract in Contract.contractType()[Contract.form()]) {
         if(Contract.contractType()[Contract.form()].hasOwnProperty(typeOfContract)) {
-            TradeSocket.send(Price.proposal(typeOfContract));
+            BinarySocket.send(Price.proposal(typeOfContract));
         }
     }
 }
@@ -61235,7 +61193,7 @@ function processPriceRequest() {
  */
 function processForgetTicks() {
     'use strict';
-    TradeSocket.send({ forget_all: 'ticks' });
+    BinarySocket.send({ forget_all: 'ticks' });
 }
 
 /*
@@ -61282,7 +61240,7 @@ function processTradingTimesRequest(date){
     }
     else{
         showPriceOverlay();
-        TradeSocket.send({ trading_times: date });
+        BinarySocket.send({ trading_times: date });
     }
 }
 
@@ -61471,120 +61429,6 @@ var Purchase = (function () {
 
 })();
 ;/*
- * It provides a abstraction layer over native javascript Websocket.
- *
- * Provide additional functionality like if connection is close, open
- * it again and process the buffered requests
- *
- *
- * Usage:
- *
- * `TradeSocket.init()` to initiate the connection
- * `TradeSocket.send({contracts_for : 1})` to send message to server
- */
-var TradeSocket = (function () {
-    'use strict';
-
-    var tradeSocket,
-        socketUrl = "wss://"+window.location.host+"/websockets/v3",
-        bufferedSends = [],
-        isClosedOnNavigation = false;
-
-    if (page.language()) {
-        socketUrl += '?l=' + page.language();
-    }
-
-    var status = function () {
-        return tradeSocket && tradeSocket.readyState;
-    };
-
-    var isReady = function () {
-        return tradeSocket && tradeSocket.readyState === 1;
-    };
-
-    var isClose = function () {
-        return !tradeSocket || tradeSocket.readyState === 3;
-    };
-
-    var sendBufferedSends = function () {
-        while (bufferedSends.length > 0) {
-            tradeSocket.send(JSON.stringify(bufferedSends.shift()));
-        }
-    };
-
-    var init = function () {
-        if(!isClose()){
-            return;
-        }
-
-        tradeSocket = new WebSocket(socketUrl);
-
-        tradeSocket.onopen = function (){
-            var loginToken = getCookieItem('login');
-            if(loginToken) {
-                tradeSocket.send(JSON.stringify({authorize: loginToken}));
-            } else {
-                tradeSocket.send(JSON.stringify({ payout_currencies: 1 }));
-            }
-            sendBufferedSends();
-        };
-
-        tradeSocket.onmessage = function (msg){
-            Message.process(msg);
-        };
-
-        tradeSocket.onclose = function (e) {
-            // clear buffer ids of price and ticks as connection is closed
-            Price.clearMapping();
-            Price.clearFormId();
-
-            if(e===1){
-                isClosedOnNavigation = true;
-            }
-            // if not closed on navigation start it again as server may have closed it
-            else if(!isClosedOnNavigation){
-                processMarketUnderlying();
-            }
-            // set it again to false as it class variables
-            else{
-                isClosedOnNavigation = false;
-            }
-
-            init();
-        };
-
-        tradeSocket.onerror = function (error) {
-            console.log('socket error', error);
-        };
-    };
-
-    var send = function(data) {
-        if (isClose()) {
-            bufferedSends.push(data);
-            init();
-        } else if (isReady()) {
-            tradeSocket.send(JSON.stringify(data));
-        } else {
-            bufferedSends.push(data);
-        }
-    };
-
-    var close = function () {
-        if (tradeSocket) {
-            tradeSocket.close();
-        }
-    };
-
-    return {
-        init: init,
-        send: send,
-        close: close,
-        socket: function () { return tradeSocket; },
-        setClosedFlag: function (flag) { isClosedOnNavigation = flag; }
-    };
-
-})();
-;/*
  * Handles start time display
  *
  * It process `Contract.startDates` in case of forward
@@ -61754,7 +61598,7 @@ var Symbols = (function () {
     };
 
     var getSymbols = function (update) {
-        TradeSocket.send({
+        BinarySocket.send({
             active_symbols: "brief"
         });
         need_page_update = update;
@@ -61894,7 +61738,47 @@ WSTickDisplay.updateChart = function(data){
     }           
 };
 
-;var TUser = (function () {
+;var TradePage = (function(){
+	
+	var onLoad = function(){
+		if(sessionStorage.getItem('currencies')){
+			displayCurrencies();
+		}		
+		BinarySocket.init({
+			onmessage: function(msg){
+				Message.process(msg);
+			},
+			onclose: function(){
+				processMarketUnderlying();
+			},
+			onauth: function(){
+				if(!sessionStorage.getItem('currencies')){
+					BinarySocket.send({ payout_currencies: 1 });
+				}
+				else{
+					displayCurrencies();
+				}			
+			}
+		});
+		Price.clearFormId();
+		TradingEvents.init();
+		Content.populate();
+		Symbols.getSymbols(1);
+		if (document.getElementById('websocket_form')) {
+		    addEventListenerForm();
+		}
+	};
+
+	var onUnload = function(){
+		forgetTradingStreams();
+		BinarySocket.clear();
+	};
+
+	return {
+		onLoad: onLoad,
+		onUnload : onUnload
+	};
+})();;var TUser = (function () {
     var data = {};
     return {
         set: function(a){ data = a; },
@@ -62143,6 +62027,143 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
                                                        LocalStore);
     });
 }
+;/*
+ * It provides a abstraction layer over native javascript Websocket.
+ *
+ * Provide additional functionality like if connection is close, open
+ * it again and process the buffered requests
+ *
+ *
+ * Usage:
+ *
+ * `BinarySocket.init()` to initiate the connection
+ * `BinarySocket.send({contracts_for : 1})` to send message to server
+ */
+var BinarySocket = (function () {
+    'use strict';
+
+    var binarySocket,
+        socketUrl = "wss://"+window.location.host+"/websockets/v3",
+        bufferedSends = [],
+        manualClosed = false,
+        events = {};
+
+    if (page.language()) {
+        socketUrl += '?l=' + page.language();
+    }
+
+    var status = function () {
+        return binarySocket && binarySocket.readyState;
+    };
+
+    var isReady = function () {
+        return binarySocket && binarySocket.readyState === 1;
+    };
+
+    var isClose = function () {
+        return !binarySocket || binarySocket.readyState === 3;
+    };
+
+    var sendBufferedSends = function () {
+        while (bufferedSends.length > 0) {
+            binarySocket.send(JSON.stringify(bufferedSends.shift()));
+        }
+    };
+
+    var send = function(data) {
+        if (isClose()) {
+            bufferedSends.push(data);
+            init(1);
+        } else if (isReady()) {
+            binarySocket.send(JSON.stringify(data));
+        } else {
+            bufferedSends.push(data);
+        }
+    };
+
+    var init = function (es) {
+
+        if(!es){
+            events = {};
+        }
+        if(typeof es === 'object'){
+            bufferedSends = [];
+            manualClosed = false;
+            events = es;
+        }
+
+        if(isClose()){
+            binarySocket = new WebSocket(socketUrl);
+        }
+        
+        binarySocket.onopen = function (){
+            var loginToken = getCookieItem('login');
+            if(loginToken) {
+                send({authorize: loginToken});
+            }
+            else{
+                sendBufferedSends();
+            }
+            if(typeof events.onopen === 'function'){
+                events.onopen();
+            }
+        };
+
+        binarySocket.onmessage = function (msg){
+            var response = JSON.parse(msg.data);
+            if (response) {
+                var type = response.msg_type;
+                if (type === 'authorize') {
+                    TUser.set(response.authorize);
+                    if(typeof events.onauth === 'function'){
+                        events.onauth();
+                    }
+                    sendBufferedSends();
+                }
+                if(typeof events.onmessage === 'function'){
+                    events.onmessage(msg);
+                }
+            }
+        };
+
+        binarySocket.onclose = function (e) {
+            if(!manualClosed){
+                init(1);
+            }
+            if(typeof events.onclose === 'function'){
+                events.onclose();
+            }
+        };
+
+        binarySocket.onerror = function (error) {
+            console.log('socket error', error);
+        };
+    };
+
+    var close = function () {
+        manualClosed = true;
+        bufferedSends = [];
+        events = {};
+        if (binarySocket) {
+            binarySocket.close();
+        }
+    };
+
+    var clear = function(){
+        bufferedSends = [];
+        manualClosed = false;
+        events = {};
+    };
+
+    return {
+        init: init,
+        send: send,
+        close: close,
+        socket: function () { return binarySocket; },
+        clear: clear
+    };
+
+})();
 ;var Button = (function(){
     "use strict";
     function createBinaryStyledButton(){
@@ -62353,7 +62374,9 @@ var Table = (function(){
 pjax_config_page("profit_table", function(){
     return {
         onLoad: function() {
-            TradeSocket.init();
+            BinarySocket.init({
+                onmessage: Message.process
+            });
             Content.populate();
             ProfitTableWS.init();
         },
@@ -62369,7 +62392,7 @@ var ProfitTableData = (function(){
             $.extend(true, req, opts);
         }
 
-        TradeSocket.send(req);
+        BinarySocket.send(req);
     }
 
     return {
@@ -62597,7 +62620,9 @@ var ProfitTableUI = (function(){
 }());;pjax_config_page("statementws", function(){
     return {
         onLoad: function() {
-            TradeSocket.init();
+            BinarySocket.init({
+                onmessage: Message.process
+            });
             Content.populate();
             StatementWS.init();
         },
@@ -62617,7 +62642,7 @@ var ProfitTableUI = (function(){
             $.extend(true, req, opts);    
         }
 
-        TradeSocket.send(req);
+        BinarySocket.send(req);
     }
 
     return {
@@ -63311,7 +63336,7 @@ function attach_tabs(element) {
         };
 
         var getContracts = function(underlying) {
-            TradeSocket.send({ contracts_for: underlying, region: 'japan' });
+            BinarySocket.send({ contracts_for: underlying, region: 'japan' });
         };
 
         var getContractForms = function() {

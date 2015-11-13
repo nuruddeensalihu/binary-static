@@ -86,7 +86,7 @@ var TradingEvents = (function () {
                     // forget the old tick id i.e. close the old tick stream
                     processForgetTicks();
                     // get ticks for current underlying
-                    TradeSocket.send({ ticks : underlying });
+                    BinarySocket.send({ ticks : underlying });
                 }
             });
         }
@@ -259,7 +259,7 @@ var TradingEvents = (function () {
                 }
             }
             if (id && askPrice) {
-                TradeSocket.send(params);
+                BinarySocket.send(params);
                 Price.incrFormId();
                 processForgetProposals();
             }

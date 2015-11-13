@@ -268,26 +268,9 @@ Menu.prototype = {
             active.subitem.addClass('a-active');
         }
 
-        var $url = active.item.get(0).baseURI;
-
         if(active.item) {
-            if(page.language() === 'FR' && /trade.cgi/i.test($url)){
-                $("#topMenuStartBetting").removeClass('active');
-                $("#topMenuStartBetting").removeClass('hover');
-                $("#topMenuBetaInterface").addClass('active');
-                $("#topMenuBetaInterface").addClass('hover');
-            }
-            else if(page.language() === 'FR' && /trading/i.test($url))
-            {
-                $("#topMenuBetaInterface").removeClass('active');
-                $("#topMenuBetaInterface").removeClass('hover');
-                $("#topMenuStartBetting").addClass('active');
-                $("#topMenuStartBetting").addClass('hover');
-            }
-            else{
-                active.item.addClass('active');
-                active.item.addClass('hover'); 
-            }
+            active.item.addClass('active');
+            active.item.addClass('hover');
         }
 
         this.on_mouse_hover(active.item);
@@ -378,7 +361,7 @@ Menu.prototype = {
         }
         var start_trading = $('#topMenuStartBetting a:first');
         var trade_url = start_trading.attr("href");
-        if(stored_market && !/\/trading/.test(trade_url)) {
+        if(stored_market) {
             if(/market=/.test(trade_url)) {
                 trade_url = trade_url.replace(/market=\w+/, 'market=' + stored_market);
             } else {
@@ -388,9 +371,6 @@ Menu.prototype = {
 
             $('#menu-top li:eq(3) a').attr('href', trade_url);
             $('#mobile-menu #topMenuStartBetting a.trading_link').attr('href', trade_url);
-        }
-        else{
-            start_trading.attr("href", trade_url);
         }
 
         start_trading.on('click', function(event) {
@@ -814,15 +794,7 @@ Page.prototype = {
         var that = this;
         $('#language_select').on('change', 'select', function() {
             var language = $(this).find('option:selected').attr('class');
-            var loc = document.location; // quick access
-            var url = loc.protocol + '//' + loc.host + '/trading?l=' + language;
-            if(language === 'FR' && /trade.cgi/i.test(loc.pathname)){
-                window.location = url;
-            }
-            else{
-                document.location = that.url_for_language(language);
-            }
-            
+            document.location = that.url_for_language(language);
         });
     },
     on_change_loginid: function() {

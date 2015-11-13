@@ -2,7 +2,9 @@
 pjax_config_page("profit_table", function(){
     return {
         onLoad: function() {
-            TradeSocket.init();
+            BinarySocket.init({
+                onmessage: Message.process
+            });
             Content.populate();
             ProfitTableWS.init();
         },

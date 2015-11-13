@@ -1,7 +1,9 @@
 pjax_config_page("statementws", function(){
     return {
         onLoad: function() {
-            TradeSocket.init();
+            BinarySocket.init({
+                onmessage: Message.process
+            });
             Content.populate();
             StatementWS.init();
         },
