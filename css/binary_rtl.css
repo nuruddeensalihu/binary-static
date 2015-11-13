@@ -5319,13 +5319,13 @@ table .loss, table .lower {
   }
 }
 @media (max-width: 600px) {
-  .flex-table-container #profit_table .flex-tr > th:nth-child(3) {
+  .flex-table-container #profit-table .flex-tr > th:nth-child(3) {
     display: none !important;
   }
-  .flex-table-container #profit_table .flex-tr > td:nth-child(3) {
+  .flex-table-container #profit-table .flex-tr > td:nth-child(3) {
     display: none !important;
   }
-  .flex-table-container #profit_table .flex-tr .flex-tr-child {
+  .flex-table-container #profit-table .flex-tr .flex-tr-child {
     white-space: nowrap;
     font-size: 12px;
   }
