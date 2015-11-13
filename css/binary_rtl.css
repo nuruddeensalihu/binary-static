@@ -5319,6 +5319,11 @@ table .loss, table .lower {
   }
 }
 @media (max-width: 600px) {
+  .flex-table-container #statement-table .break-line {
+    white-space: pre-line;
+  }
+}
+@media (max-width: 600px) {
   .flex-table-container #profit-table .flex-tr > th:nth-child(3) {
     display: none !important;
   }
