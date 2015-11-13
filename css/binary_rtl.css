@@ -5313,6 +5313,10 @@ table .loss, table .lower {
     padding-left: 0px !important;
     padding-right: 0px !important;
   }
+  .flex-table-container th {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+  }
 }
 @media (max-width: 600px) {
   .flex-table-container #statement-table .flex-tr > th:nth-child(4) {
