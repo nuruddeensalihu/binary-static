@@ -5302,13 +5302,16 @@ table .loss, table .lower {
 .flex-table-container td {
   text-align: left !important;
   padding-left: 10px;
+  overflow: hidden;
 }
 .flex-table-container .break-line {
   white-space: pre-line;
 }
 @media (max-width: 600px) {
-  .flex-table-container .break-line {
-    white-space: pre-line;
+  .flex-table-container {
+    text-align: left !important;
+    padding-left: 10px;
+    overflow: hidden;
   }
 }
 @media (max-width: 600px) {
