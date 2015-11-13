@@ -5424,6 +5424,12 @@ table .loss, table .lower {
   white-space: pre-line;
 }
 @media (max-width: 600px) {
+  .flex-table-container td {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+  }
+}
+@media (max-width: 600px) {
   .flex-table-container #statement-table .flex-tr > th:nth-child(4) {
     display: none !important;
   }
