@@ -12,4 +12,3 @@ pjax_config_page("statementws", function(){
         }
     };
 });
-

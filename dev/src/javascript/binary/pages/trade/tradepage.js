@@ -10,20 +10,20 @@ var TradePage = (function(){
 			},
 			onclose: function(){
 				processMarketUnderlying();
-			},
-			onauth: function(){
-				if(!sessionStorage.getItem('currencies')){
-					BinarySocket.send({ payout_currencies: 1 });
-				}
-				else{
-					displayCurrencies();
-				}			
 			}
 		});
 		Price.clearFormId();
 		TradingEvents.init();
 		Content.populate();
-		Symbols.getSymbols(1);
+		
+		if(sessionStorage.getItem('currencies')){
+			displayCurrencies();
+			Symbols.getSymbols(1);
+		}
+		else {
+			BinarySocket.send({ payout_currencies: 1 });
+		}
+		
 		if (document.getElementById('websocket_form')) {
 		    addEventListenerForm();
 		}

@@ -109,6 +109,8 @@
     "src/javascript/binary/static/statement/statement.data.js",
     "src/javascript/binary/static/statement/statement.init.js",
     "src/javascript/binary/static/statement/statement.ui.js",
+    "src/javascript/binary/static/viewbalance/viewbalance.init.js",
+    "src/javascript/binary/static/viewbalance/viewbalance.ui.js",
     "src/javascript/binary/utility.js",
     "src/javascript/binary_japan/contract.js",
     "src/javascript/binary_japan/periods.js",

@@ -5400,10 +5400,16 @@ table .loss, table .lower {
   left: 30%;
 }
 
-.flex-table-container {
-  min-width: 100px;
-  overflow-x: auto;
+#balance {
+  float: left;
+  padding-left: 8px;
+  margin-top: 1em;
 }
+
+#client_loginid {
+  min-width: 210px;
+}
+
 .flex-table-container th {
   text-align: left !important;
   border-bottom: none !important;
@@ -5415,48 +5421,17 @@ table .loss, table .lower {
 .flex-table-container .break-line {
   white-space: pre-line;
 }
-.flex-table-container .flex-table {
-  min-width: 700px;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
-}
-.flex-table-container .flex-table .flex-tr {
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-wrap: wrap;
-      -ms-flex-wrap: wrap;
-          flex-wrap: wrap;
-  -webkit-flex-grow: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
-  -webkit-flex-shrink: 1;
-      -ms-flex-negative: 1;
-          flex-shrink: 1;
-  -webkit-flex-basis: 100px;
-      -ms-flex-preferred-size: 100px;
-          flex-basis: 100px;
-  -webkit-flex-direction: row;
-      -ms-flex-direction: row;
-          flex-direction: row;
-  -webkit-align-items: stretch;
-      -ms-flex-align: stretch;
-          align-items: stretch;
-}
-.flex-table-container .flex-table .flex-tr .flex-tr-child {
-  -webkit-flex-grow: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
-  -webkit-flex-shrink: 1;
-      -ms-flex-negative: 1;
-          flex-shrink: 1;
-  -webkit-flex-basis: 50px;
-      -ms-flex-preferred-size: 50px;
-          flex-basis: 50px;
+@media (max-width: 600px) {
+  .flex-table-container .flex-table .flex-tr > th:nth-child(4) {
+    display: none !important;
+  }
+  .flex-table-container .flex-table .flex-tr > td:nth-child(4) {
+    display: none !important;
+  }
+  .flex-table-container .flex-table .flex-tr .flex-tr-child {
+    white-space: nowrap;
+    font-size: 12px;
+  }
 }
 
 #profit-table-ws-container th {

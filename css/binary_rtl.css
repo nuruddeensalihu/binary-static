@@ -5285,10 +5285,16 @@ table .loss, table .lower {
   left: 30%;
 }
 
-.flex-table-container {
-  min-width: 100px;
-  overflow-x: auto;
+#balance {
+  float: left;
+  padding-left: 8px;
+  margin-top: 1em;
 }
+
+#client_loginid {
+  min-width: 210px;
+}
+
 .flex-table-container th {
   text-align: left !important;
   border-bottom: none !important;
@@ -5300,24 +5306,17 @@ table .loss, table .lower {
 .flex-table-container .break-line {
   white-space: pre-line;
 }
-.flex-table-container .flex-table {
-  min-width: 700px;
-  display: flex;
-  flex-direction: column;
-}
-.flex-table-container .flex-table .flex-tr {
-  display: flex;
-  flex-wrap: wrap;
-  flex-grow: 1;
-  flex-shrink: 1;
-  flex-basis: 100px;
-  flex-direction: row;
-  align-items: stretch;
-}
-.flex-table-container .flex-table .flex-tr .flex-tr-child {
-  flex-grow: 1;
-  flex-shrink: 1;
-  flex-basis: 50px;
+@media (max-width: 600px) {
+  .flex-table-container .flex-table .flex-tr > th:nth-child(4) {
+    display: none !important;
+  }
+  .flex-table-container .flex-table .flex-tr > td:nth-child(4) {
+    display: none !important;
+  }
+  .flex-table-container .flex-table .flex-tr .flex-tr-child {
+    white-space: nowrap;
+    font-size: 12px;
+  }
 }
 
 #profit-table-ws-container th {
