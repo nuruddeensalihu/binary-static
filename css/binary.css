@@ -5410,9 +5410,6 @@ table .loss, table .lower {
   min-width: 210px;
 }
 
-.flex-table-container {
-  table-width: 100px;
-}
 .flex-table-container th {
   text-align: left !important;
   border-bottom: none !important;
@@ -5434,7 +5431,6 @@ table .loss, table .lower {
     display: none !important;
   }
   .flex-table-container #statement-table .flex-tr .flex-tr-child {
-    /*white-space:nowrap;*/
     font-size: 12px;
   }
 }
@@ -5446,7 +5442,6 @@ table .loss, table .lower {
     display: none !important;
   }
   .flex-table-container #profit-table .flex-tr .flex-tr-child {
-    /*white-space:nowrap;*/
     font-size: 12px;
   }
 }
