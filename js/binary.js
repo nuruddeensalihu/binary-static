@@ -60652,10 +60652,8 @@ var Message = (function () {
     var process = function (msg) {
         var response = JSON.parse(msg.data);
         if(!TradePage.is_trading_page()){
-            return;
-        }
-        else{
             forgetTradingStreams();
+            return;
         }
         if (response) {
             var type = response.msg_type;
@@ -62060,9 +62058,7 @@ var BinarySocket = (function () {
         if (isClose()) {
             bufferedSends.push(data);
             init(1);
-        } else if (!authorized){
-            bufferedSends.push(data);
-        } else if (isReady()) {
+        } else if (isReady() && (authorized || TradePage.is_trading_page())) {
             binarySocket.send(JSON.stringify(data));
         } else {
             bufferedSends.push(data);
