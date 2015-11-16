@@ -80,6 +80,7 @@ var ProfitTableUI = (function(){
         var data = [buyDate, ref, contract, buyPrice, sellDate, sellPrice, pl];
         var $row = Table.createFlexTableRow(data, cols, "data");
 
+        $row.children(".buy-date").addClass("break-line");
         $row.children(".pl").addClass(plType);
 
         //create view button and append
