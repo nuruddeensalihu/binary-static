@@ -60651,6 +60651,12 @@ var Message = (function () {
 
     var process = function (msg) {
         var response = JSON.parse(msg.data);
+        if(!TradePage.is_trading_page()){
+            return;
+        }
+        else{
+            forgetTradingStreams();
+        }
         if (response) {
             var type = response.msg_type;
             if (type === 'active_symbols') {
@@ -61713,7 +61719,10 @@ WSTickDisplay.updateChart = function(data){
 
 ;var TradePage = (function(){
 	
+	var trading_page = 0;
+
 	var onLoad = function(){
+		trading_page = 1;
 		if(sessionStorage.getItem('currencies')){
 			displayCurrencies();
 		}		
@@ -61743,13 +61752,15 @@ WSTickDisplay.updateChart = function(data){
 	};
 
 	var onUnload = function(){
+		trading_page = 0;
 		forgetTradingStreams();
 		BinarySocket.clear();
 	};
 
 	return {
 		onLoad: onLoad,
-		onUnload : onUnload
+		onUnload : onUnload,
+		is_trading_page: function(){return trading_page;}
 	};
 })();;var TUser = (function () {
     var data = {};
@@ -62035,7 +62046,7 @@ var BinarySocket = (function () {
     };
 
     var isClose = function () {
-        return !binarySocket || binarySocket.readyState === 3;
+        return !binarySocket || binarySocket.readyState === 2 || binarySocket.readyState === 3;
     };
 
     var sendBufferedSends = function () {
@@ -62358,11 +62369,21 @@ var Table = (function(){
         appendTableBody: appendTableBody
     };
 }());;
+
 pjax_config_page("profit_table", function(){
     return {
         onLoad: function() {
             BinarySocket.init({
-                onmessage: Message.process
+                onmessage: function(msg){
+                    var response = JSON.parse(msg.data);
+
+                    if (response) {
+                        var type = response.msg_type;
+                        if (type === 'profit_table'){
+                            ProfitTableWS.profitTableHandler(response);
+                        }
+                    }
+                }
             });
             Content.populate();
             ProfitTableWS.init();
@@ -62460,7 +62481,7 @@ var ProfitTableWS = (function () {
                 return;
             }
 
-            if (pFromTop < hidableHeight(70)) {
+            if (pFromTop < hidableHeight(50)) {
                 return;
             }
 
@@ -62608,7 +62629,16 @@ var ProfitTableUI = (function(){
     return {
         onLoad: function() {
             BinarySocket.init({
-                onmessage: Message.process
+                onmessage: function(msg){
+                    var response = JSON.parse(msg.data);
+
+                    if (response) {
+                        var type = response.msg_type;
+                        if (type === 'statement'){
+                            StatementWS.statementHandler(response);
+                        }
+                    }
+                }
             });
             Content.populate();
             StatementWS.init();

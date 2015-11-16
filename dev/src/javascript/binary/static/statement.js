@@ -2,7 +2,16 @@ pjax_config_page("statementws", function(){
     return {
         onLoad: function() {
             BinarySocket.init({
-                onmessage: Message.process
+                onmessage: function(msg){
+                    var response = JSON.parse(msg.data);
+
+                    if (response) {
+                        var type = response.msg_type;
+                        if (type === 'statement'){
+                            StatementWS.statementHandler(response);
+                        }
+                    }
+                }
             });
             Content.populate();
             StatementWS.init();
