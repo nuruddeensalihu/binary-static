@@ -62591,7 +62591,6 @@ var ProfitTableUI = (function(){
         var data = [buyDate, ref, contract, buyPrice, sellDate, sellPrice, pl];
         var $row = Table.createFlexTableRow(data, cols, "data");
 
-        //$row.children(".buy-date").addClass("break-line");
         $row.children(".pl").addClass(plType);
 
         //create view button and append
@@ -62831,7 +62830,6 @@ var ProfitTableUI = (function(){
 
         var $statementRow = Table.createFlexTableRow([date, ref, action, desc, amount, balance], columns, "data");
         $statementRow.children(".credit").addClass(creditDebitType);
-       // $statementRow.children(".date").addClass("break-line");
 
         //create view button and append
         if (action === "Sell" || action === "Buy") {

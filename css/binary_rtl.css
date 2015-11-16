@@ -5305,9 +5305,6 @@ table .loss, table .lower {
   padding-left: 10px;
   overflow: hidden;
 }
-.flex-table-container .break-line {
-  white-space: pre-line;
-}
 @media (max-width: 600px) {
   .flex-table-container td {
     padding-left: 5px !important;
