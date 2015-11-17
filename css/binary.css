@@ -5422,8 +5422,6 @@ table .loss, table .lower {
 }
 .flex-table-container .break-line {
   white-space: pre;
-  white-space: -moz-pre;
-  white-space: -pre;
 }
 @media (max-width: 600px) {
   .flex-table-container td {
