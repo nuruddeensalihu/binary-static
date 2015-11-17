@@ -62589,6 +62589,7 @@ var ProfitTableUI = (function(){
 
         $row.children(".buy-date").addClass("break-line");
         $row.children(".pl").addClass(plType);
+        $row.children(".sell-date").addClass("break-line");
 
         //create view button and append
         var $viewButtonSpan = Button.createBinaryStyledButton();
