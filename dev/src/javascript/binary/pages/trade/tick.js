@@ -71,7 +71,7 @@ var Tick = (function () {
         id: function () { return id; },
         epoch: function () { return epoch; },
         errorMessage: function () { return errorMessage; },
-        clean: function(){ spots = [];},
+        clean: function(){ spots = []; quote = '';},
         spots: function(){ return spots;}
     };
 })();

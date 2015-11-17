@@ -58,6 +58,8 @@ function processMarketUnderlying() {
     var underlying = document.getElementById('underlying').value;
     sessionStorage.setItem('underlying', underlying);
 
+    showFormOverlay();
+
     // forget the old tick id i.e. close the old tick stream
     processForgetTicks();
     // get ticks for current underlying
@@ -66,7 +68,7 @@ function processMarketUnderlying() {
     Tick.clean();
     
     updateWarmChart();
-
+    
     Contract.getContracts(underlying);
 
     displayTooltip(sessionStorage.getItem('market'),underlying);

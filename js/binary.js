@@ -58980,6 +58980,23 @@ function hidePriceOverlay() {
     if (elm) {
         elm.style.display = 'none';
     }
+    
+}
+
+function hideFormOverlay(){
+    'use strict';
+    var elm = document.getElementById('loading_container3');
+    if (elm) {
+        elm.style.display = 'none';
+    }
+}
+
+function showFormOverlay(){
+    'use strict';
+    var elm = document.getElementById('loading_container3');
+    if (elm) {
+        elm.style.display = 'block';
+    }
 }
 
 /*
@@ -60213,6 +60230,7 @@ var TradingEvents = (function () {
         if (underlyingElement) {
             underlyingElement.addEventListener('change', function(e) {
                 if (e.target) {
+                    showFormOverlay();
                     showPriceOverlay();
                     var underlying = e.target.value;
                     sessionStorage.setItem('underlying', underlying);
@@ -60239,6 +60257,9 @@ var TradingEvents = (function () {
         if (durationAmountElement) {
             // jquery needed for datepicker
             $('#duration_amount').on('change', debounce(function (e) {
+                if (e.target.value % 1 !== 0 ) {
+                    e.target.value = Math.floor(e.target.value);
+                }
                 sessionStorage.setItem('duration_amount',e.target.value);
                 Durations.select_amount(e.target.value);
                 processPriceRequest();
@@ -60823,6 +60844,11 @@ var Price = (function () {
         }
 
         var position = contractTypeDisplayMapping(type);
+
+        if(!position){
+            return;
+        }
+        
         var container = document.getElementById('price_container_'+position);
 
         var h4 = container.getElementsByClassName('contract_heading')[0],
@@ -60976,6 +61002,8 @@ function processMarketUnderlying() {
     var underlying = document.getElementById('underlying').value;
     sessionStorage.setItem('underlying', underlying);
 
+    showFormOverlay();
+
     // forget the old tick id i.e. close the old tick stream
     processForgetTicks();
     // get ticks for current underlying
@@ -60984,7 +61012,7 @@ function processMarketUnderlying() {
     Tick.clean();
     
     updateWarmChart();
-
+    
     Contract.getContracts(underlying);
 
     displayTooltip(sessionStorage.getItem('market'),underlying);
@@ -61664,7 +61692,7 @@ var Tick = (function () {
         id: function () { return id; },
         epoch: function () { return epoch; },
         errorMessage: function () { return errorMessage; },
-        clean: function(){ spots = [];},
+        clean: function(){ spots = []; quote = '';},
         spots: function(){ return spots;}
     };
 })();
@@ -62388,7 +62416,8 @@ pjax_config_page("profit_table", function(){
             ProfitTableWS.clean();
         }
     };
-});;
+});
+;
 var ProfitTableData = (function(){
     function getProfitTable(opts){
         var req = {profit_table: 1, description: 1};
@@ -62587,9 +62616,9 @@ var ProfitTableUI = (function(){
         var data = [buyDate, ref, contract, buyPrice, sellDate, sellPrice, pl];
         var $row = Table.createFlexTableRow(data, cols, "data");
 
-        $row.children(".buy-date").addClass("break-line");
+        $row.children(".buy-date").addClass("pre");
         $row.children(".pl").addClass(plType);
-        $row.children(".sell-date").addClass("break-line");
+        $row.children(".sell-date").addClass("pre");
 
         //create view button and append
         var $viewButtonSpan = Button.createBinaryStyledButton();
@@ -62828,7 +62857,7 @@ var ProfitTableUI = (function(){
 
         var $statementRow = Table.createFlexTableRow([date, ref, action, desc, amount, balance], columns, "data");
         $statementRow.children(".credit").addClass(creditDebitType);
-        $statementRow.children(".date").addClass("break-line");
+        $statementRow.children(".date").addClass("pre");
 
         //create view button and append
         if (action === "Sell" || action === "Buy") {
