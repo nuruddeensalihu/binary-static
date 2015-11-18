@@ -124,8 +124,36 @@ RealityCheck = (function ($) {
     RealityCheck.prototype.fire = function () {
         this._fire(reality_check_url, this.display);
 
-         var obj = document.getElementById('realityDuration');
-        console.log("The new obj is ", obj);
+          //Allow numbers only
+
+        var obj = document.getElementById('realityDuration');
+        console.log("The obj is ", obj);
+        console.log("The obj is ", document.getElementById('realityDuration'));
+        console.log("the hasOwnProperty", document.getElementById('realityDuration'));
+        console.log("The obj has prototype", obj.hasOwnProperty);
+        if (obj.hasOwnProperty('oninput') || ('oninput' in obj)) 
+        {
+            $('#realityDuration').on('input', function (event) { 
+                 this.value = this.value.replace(/[^0-9]/g, '');
+            });
+
+        }
+        else{
+            $('#realityDuration').on('keypress',function(e){
+                var deleteCode = 8;  var backspaceCode = 46;
+                var key = e.which;
+                if ((key>=48 && key<=57) || key === deleteCode || key === backspaceCode || (key>=37 &&  key<=40) || key===0)    
+                {    
+                    character = String.fromCharCode(key);
+                    if( character != '.' && character != '%' && character != '&' && character != '(' && character != '\'' ) 
+                    { 
+                        return true; 
+                    }
+                    else { return false; }
+                 }
+                 else   { return false; }
+            });
+        }
     };
 
     RealityCheck.prototype.display = function (data) {
@@ -181,9 +209,6 @@ RealityCheck = (function ($) {
 
     RealityCheck.prototype.askForFrequency = function () {
         this._fire(reality_freq_url, this.displayFrequencyChoice);
-
-         var obj = document.getElementById('realityDuration');
-        console.log("The new obj is ", obj);
     };
 
     RealityCheck.prototype.displayFrequencyChoice = function (data) {
@@ -236,9 +261,6 @@ RealityCheck = (function ($) {
         };
         $('#reality-check [bcont=1]').on('click', click_handler);
         $('#reality-check [interval=1]').on('change', click_handler);
-
-        var obj = document.getElementById('realityDuration');
-        console.log("The new obj is ", obj);
     };
 
     return RealityCheck;
@@ -251,36 +273,5 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         if (window.reality_check_object) return;
         window.reality_check_object = new RealityCheck('reality_check',
                                                        LocalStore);
-
-           //Allow numbers only
-
-        var obj = document.getElementById('realityDuration');
-        console.log("The obj is ", obj);
-        console.log("The obj is ", document.getElementById('realityDuration'));
-        console.log("the hasOwnProperty", document.getElementById('realityDuration'));
-        console.log("The obj has prototype", obj.hasOwnProperty);
-        if (obj.hasOwnProperty('oninput') || ('oninput' in obj)) 
-        {
-            $('#realityDuration').on('input', function (event) { 
-                 this.value = this.value.replace(/[^0-9]/g, '');
-            });
-
-        }
-        else{
-            $('#realityDuration').on('keypress',function(e){
-                var deleteCode = 8;  var backspaceCode = 46;
-                var key = e.which;
-                if ((key>=48 && key<=57) || key === deleteCode || key === backspaceCode || (key>=37 &&  key<=40) || key===0)    
-                {    
-                    character = String.fromCharCode(key);
-                    if( character != '.' && character != '%' && character != '&' && character != '(' && character != '\'' ) 
-                    { 
-                        return true; 
-                    }
-                    else { return false; }
-                 }
-                 else   { return false; }
-            });
-        }
     });
 }
