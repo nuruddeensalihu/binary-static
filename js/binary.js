@@ -62270,6 +62270,9 @@ WSTickDisplay.updateChart = function(data){
         };
         $('#reality-check [bcont=1]').on('click', click_handler);
         $('#reality-check [interval=1]').on('change', click_handler);
+
+        var obj = document.getElementById('realityDuration');
+        console.log("The obj is ", obj);
     };
 
     return RealityCheck;
