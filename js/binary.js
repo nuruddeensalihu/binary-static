@@ -62105,8 +62105,6 @@ WSTickDisplay.updateChart = function(data){
             }
         });
 
-
-
         // The cookie is formatted as DEFAULT_INTERVAL , SERVER_TIME_WHEN_IT_WAS_ISSUED
         // We save the server time in local storage. If the stored time differs from
         // the cookie time we are in a new session. Hence, we have to reset all stored
@@ -62124,7 +62122,6 @@ WSTickDisplay.updateChart = function(data){
             this.basetime = parseInt(persistentStore.get('reality_check.basetime'));
             this.setAlarm();
         }
-        
     }
 
     RealityCheck.prototype.setAlarm = function () {
@@ -62164,36 +62161,8 @@ WSTickDisplay.updateChart = function(data){
     RealityCheck.prototype.fire = function () {
         this._fire(reality_check_url, this.display);
 
-          //Allow numbers only
-
         var obj = document.getElementById('realityDuration');
-        console.log("The obj is ", obj);
-        console.log("The obj is ", document.getElementById('realityDuration'));
-        console.log("the hasOwnProperty", document.getElementById('realityDuration'));
-        console.log("The obj has prototype", obj.hasOwnProperty);
-        if (obj.hasOwnProperty('oninput') || ('oninput' in obj)) 
-        {
-            $('#realityDuration').on('input', function (event) { 
-                 this.value = this.value.replace(/[^0-9]/g, '');
-            });
-
-        }
-        else{
-            $('#realityDuration').on('keypress',function(e){
-                var deleteCode = 8;  var backspaceCode = 46;
-                var key = e.which;
-                if ((key>=48 && key<=57) || key === deleteCode || key === backspaceCode || (key>=37 &&  key<=40) || key===0)    
-                {    
-                    character = String.fromCharCode(key);
-                    if( character != '.' && character != '%' && character != '&' && character != '(' && character != '\'' ) 
-                    { 
-                        return true; 
-                    }
-                    else { return false; }
-                 }
-                 else   { return false; }
-            });
-        }
+        console.log("The nuru's obj is ", obj);
     };
 
     RealityCheck.prototype.display = function (data) {
@@ -62242,6 +62211,9 @@ WSTickDisplay.updateChart = function(data){
         $('#reality-check .blogout').on('click', function () {
             window.location.href = logout_url;
         });
+
+        var obj = document.getElementById('realityDuration');
+        console.log("The musas is ", obj);
     };
 
     // On session start we need to ask for the reality-check interval.
@@ -62313,6 +62285,9 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         if (window.reality_check_object) return;
         window.reality_check_object = new RealityCheck('reality_check',
                                                        LocalStore);
+
+        var obj = document.getElementById('realityDuration');
+        console.log("The obj is ", obj);
     });
 }
 ;/*
