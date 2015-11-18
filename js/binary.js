@@ -62104,6 +62104,34 @@ WSTickDisplay.updateChart = function(data){
                 that.setAlarm();
             }
         });
+        
+        var obj = document.getElementById("realityDuration");
+        if (obj.hasOwnProperty('oninput') || ('oninput' in obj)) 
+        {
+            $('#realityDuration').on('input', function (event) { 
+                 this.value = this.value.replace(/[^0-9]/g, '');
+            });
+
+        }
+        else{
+            $('#realityDuration').on('keypress',function(e){
+                var deleteCode = 8;  var backspaceCode = 46;
+                var key = e.which;
+                if ((key>=48 && key<=57) || key === deleteCode || key === backspaceCode || (key>=37 &&  key<=40) || key===0)    
+                {    
+                    character = String.fromCharCode(key);
+                    if( character != '.' && character != '%' && character != '&' && character != '(' && character != '\'' ) 
+                    { 
+                        return true; 
+                    }
+                    else { return false; }
+                 }
+                 else   { return false; }
+            });
+        }
+        //Allow numbers only
+
+
 
         // The cookie is formatted as DEFAULT_INTERVAL , SERVER_TIME_WHEN_IT_WAS_ISSUED
         // We save the server time in local storage. If the stored time differs from
