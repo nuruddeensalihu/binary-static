@@ -282,4 +282,7 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         var obj = document.getElementById('realityDuration');
         console.log("The obj is ", obj);
     });
+
+    var obj = document.getElementById('realityDuration');
+    console.log("The wasa is ", obj);
 }
