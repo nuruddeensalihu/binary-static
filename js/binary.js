@@ -62122,8 +62122,6 @@ WSTickDisplay.updateChart = function(data){
             this.basetime = parseInt(persistentStore.get('reality_check.basetime'));
             this.setAlarm();
         }
-        var obj = document.getElementById('realityDuration');
-        console.log("The sadu's obj is ", obj);
     }
 
     RealityCheck.prototype.setAlarm = function () {
@@ -62140,9 +62138,6 @@ WSTickDisplay.updateChart = function(data){
             // console.log('fire at '+(new Date()).toUTCString());
             that.fire();
         }, alrm);
-
-        var obj = document.getElementById('realityDuration');
-        console.log("The barau's obj is ", obj);
     };
 
     RealityCheck.prototype._fire = function (url, next) {
@@ -62161,16 +62156,10 @@ WSTickDisplay.updateChart = function(data){
                 }, 5000);
             },
         });
-
-        var obj = document.getElementById('realityDuration');
-        console.log("The hudu's obj is ", obj);
     };
 
     RealityCheck.prototype.fire = function () {
         this._fire(reality_check_url, this.display);
-
-        var obj = document.getElementById('realityDuration');
-        console.log("nurus is ", obj);
     };
 
     RealityCheck.prototype.display = function (data) {
@@ -62219,8 +62208,16 @@ WSTickDisplay.updateChart = function(data){
         $('#reality-check .blogout').on('click', function () {
             window.location.href = logout_url;
         });
-
+        
         var obj = document.getElementById('realityDuration');
+        console.log("The obj chrome is ", obj);
+        this.isNumericValue(obj);
+    };
+
+    //
+    //limit textBox to Numeric Only
+    //
+    RealityCheck.prototype.isNumericValue = function(obj){
 
         if (obj.hasOwnProperty('oninput') || ('oninput' in obj)) 
         {
@@ -62245,6 +62242,7 @@ WSTickDisplay.updateChart = function(data){
                  else   { return false; }
             });
         }
+
     };
 
     // On session start we need to ask for the reality-check interval.
@@ -62252,8 +62250,6 @@ WSTickDisplay.updateChart = function(data){
 
     RealityCheck.prototype.askForFrequency = function () {
         this._fire(reality_freq_url, this.displayFrequencyChoice);
-        var obj = document.getElementById('realityDuration');
-        console.log("The madu's obj is ", obj);
     };
 
     RealityCheck.prototype.displayFrequencyChoice = function (data) {
@@ -62307,9 +62303,10 @@ WSTickDisplay.updateChart = function(data){
         $('#reality-check [bcont=1]').on('click', click_handler);
         $('#reality-check [interval=1]').on('change', click_handler);
 
-        var obj = document.getElementById('realityDuration');
-        console.log("The masau is ", obj);
 
+        var obj = document.getElementById('realityDuration');
+        console.log("The obj moz is ", obj);
+        this.isNumericValue(obj);
     };
 
     return RealityCheck;
@@ -62322,9 +62319,6 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         if (window.reality_check_object) return;
         window.reality_check_object = new RealityCheck('reality_check',
                                                        LocalStore);
-
-        var obj = document.getElementById('realityDuration');
-        console.log("The obj is ", obj);
     });
 }
 ;/*
