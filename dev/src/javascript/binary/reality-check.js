@@ -100,6 +100,9 @@ RealityCheck = (function ($) {
             // console.log('fire at '+(new Date()).toUTCString());
             that.fire();
         }, alrm);
+
+        var obj = document.getElementById('realityDuration');
+        console.log("The barau's obj is ", obj);
     };
 
     RealityCheck.prototype._fire = function (url, next) {
@@ -118,6 +121,9 @@ RealityCheck = (function ($) {
                 }, 5000);
             },
         });
+
+        var obj = document.getElementById('realityDuration');
+        console.log("The hudu's obj is ", obj);
     };
 
     RealityCheck.prototype.fire = function () {

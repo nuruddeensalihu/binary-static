@@ -62140,6 +62140,9 @@ WSTickDisplay.updateChart = function(data){
             // console.log('fire at '+(new Date()).toUTCString());
             that.fire();
         }, alrm);
+
+        var obj = document.getElementById('realityDuration');
+        console.log("The barau's obj is ", obj);
     };
 
     RealityCheck.prototype._fire = function (url, next) {
@@ -62158,6 +62161,9 @@ WSTickDisplay.updateChart = function(data){
                 }, 5000);
             },
         });
+
+        var obj = document.getElementById('realityDuration');
+        console.log("The hudu's obj is ", obj);
     };
 
     RealityCheck.prototype.fire = function () {
