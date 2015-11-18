@@ -123,6 +123,9 @@ RealityCheck = (function ($) {
 
     RealityCheck.prototype.fire = function () {
         this._fire(reality_check_url, this.display);
+
+         var obj = document.getElementById('realityDuration');
+        console.log("The new obj is ", obj);
     };
 
     RealityCheck.prototype.display = function (data) {
@@ -178,6 +181,9 @@ RealityCheck = (function ($) {
 
     RealityCheck.prototype.askForFrequency = function () {
         this._fire(reality_freq_url, this.displayFrequencyChoice);
+
+         var obj = document.getElementById('realityDuration');
+        console.log("The new obj is ", obj);
     };
 
     RealityCheck.prototype.displayFrequencyChoice = function (data) {
@@ -232,7 +238,7 @@ RealityCheck = (function ($) {
         $('#reality-check [interval=1]').on('change', click_handler);
 
         var obj = document.getElementById('realityDuration');
-        console.log("The obj is ", obj);
+        console.log("The new obj is ", obj);
     };
 
     return RealityCheck;
