@@ -266,6 +266,10 @@ RealityCheck = (function ($) {
         };
         $('#reality-check [bcont=1]').on('click', click_handler);
         $('#reality-check [interval=1]').on('change', click_handler);
+
+        var obj = document.getElementById('realityDuration');
+        console.log("The masau is ", obj);
+
     };
 
     return RealityCheck;
@@ -282,7 +286,4 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         var obj = document.getElementById('realityDuration');
         console.log("The obj is ", obj);
     });
-
-    var obj = document.getElementById('realityDuration');
-    console.log("The wasa is ", obj);
 }
