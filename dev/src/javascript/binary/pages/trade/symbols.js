@@ -55,18 +55,14 @@ var Symbols = (function () {
             if (!tradeUnderlyings[currentMarket].hasOwnProperty(currentUnderlying)) {
                 tradeUnderlyings[currentMarket][currentUnderlying] = {
                     is_active: is_active,
-                    display: element['display_name'],
-                    market: currentMarket,
-                    submarket: currentSubMarket
+                    display: element['display_name']
                 };
             }
 
             if (!tradeUnderlyings[currentSubMarket].hasOwnProperty(currentUnderlying)) {
                 tradeUnderlyings[currentSubMarket][currentUnderlying] = {
                     is_active: is_active,
-                    display: element['display_name'],
-                    market: currentMarket,
-                    submarket: currentSubMarket
+                    display: element['display_name']
                 };
             }
 
