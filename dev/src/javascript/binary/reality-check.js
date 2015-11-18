@@ -242,36 +242,36 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         if (window.reality_check_object) return;
         window.reality_check_object = new RealityCheck('reality_check',
                                                        LocalStore);
+
+           //Allow numbers only
+
+        var obj = document.getElementById('realityDuration');
+        console.log("The obj is ", obj);
+        console.log("The obj is ", document.getElementById('realityDuration'));
+        console.log("the hasOwnProperty", document.getElementById('realityDuration'));
+        console.log("The obj has prototype", obj.hasOwnProperty);
+        if (obj.hasOwnProperty('oninput') || ('oninput' in obj)) 
+        {
+            $('#realityDuration').on('input', function (event) { 
+                 this.value = this.value.replace(/[^0-9]/g, '');
+            });
+
+        }
+        else{
+            $('#realityDuration').on('keypress',function(e){
+                var deleteCode = 8;  var backspaceCode = 46;
+                var key = e.which;
+                if ((key>=48 && key<=57) || key === deleteCode || key === backspaceCode || (key>=37 &&  key<=40) || key===0)    
+                {    
+                    character = String.fromCharCode(key);
+                    if( character != '.' && character != '%' && character != '&' && character != '(' && character != '\'' ) 
+                    { 
+                        return true; 
+                    }
+                    else { return false; }
+                 }
+                 else   { return false; }
+            });
+        }
     });
-
-   //Allow numbers only
-
-    var obj = document.getElementById('realityDuration');
-    console.log("The obj is ", obj);
-    console.log("The obj is ", document.getElementById('realityDuration'));
-    console.log("the hasOwnProperty", document.getElementById('realityDuration'));
-    console.log("The obj has prototype", obj.hasOwnProperty);
-    if (obj.hasOwnProperty('oninput') || ('oninput' in obj)) 
-    {
-        $('#realityDuration').on('input', function (event) { 
-             this.value = this.value.replace(/[^0-9]/g, '');
-        });
-
-    }
-    else{
-        $('#realityDuration').on('keypress',function(e){
-            var deleteCode = 8;  var backspaceCode = 46;
-            var key = e.which;
-            if ((key>=48 && key<=57) || key === deleteCode || key === backspaceCode || (key>=37 &&  key<=40) || key===0)    
-            {    
-                character = String.fromCharCode(key);
-                if( character != '.' && character != '%' && character != '&' && character != '(' && character != '\'' ) 
-                { 
-                    return true; 
-                }
-                else { return false; }
-             }
-             else   { return false; }
-        });
-    }
 }
