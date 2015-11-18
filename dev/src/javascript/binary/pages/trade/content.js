@@ -75,7 +75,10 @@ var Content = (function () {
             textBuyPrice: text.localize('Buy price'),
             textFinalPrice: text.localize('Final price'),
             textLoss: text.localize('Loss'),
-            textProfit: text.localize('Profit')
+            textProfit: text.localize('Profit'),
+            textFormMatchesDiffers: text.localize('Matches/Differs'),
+            textFormEvenOdd: text.localize('Even/Odd'),
+            textFormOverUnder: text.localize('Over/Under')
         };
 
         var starTime = document.getElementById('start_time_label');

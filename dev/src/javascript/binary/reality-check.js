@@ -170,7 +170,6 @@ RealityCheck = (function ($) {
         });
         
         var obj = document.getElementById('realityDuration');
-        console.log("The obj chrome is ", obj);
         this.isNumericValue(obj);
     };
 
@@ -265,7 +264,6 @@ RealityCheck = (function ($) {
 
 
         var obj = document.getElementById('realityDuration');
-        console.log("The obj moz is ", obj);
         this.isNumericValue(obj);
     };
 
