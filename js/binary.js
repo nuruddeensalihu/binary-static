@@ -62122,6 +62122,8 @@ WSTickDisplay.updateChart = function(data){
             this.basetime = parseInt(persistentStore.get('reality_check.basetime'));
             this.setAlarm();
         }
+        var obj = document.getElementById('realityDuration');
+        console.log("The sadu's obj is ", obj);
     }
 
     RealityCheck.prototype.setAlarm = function () {
@@ -62162,7 +62164,7 @@ WSTickDisplay.updateChart = function(data){
         this._fire(reality_check_url, this.display);
 
         var obj = document.getElementById('realityDuration');
-        console.log("The nuru's obj is ", obj);
+        console.log("nurus is ", obj);
     };
 
     RealityCheck.prototype.display = function (data) {
