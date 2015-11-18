@@ -64,7 +64,29 @@ RealityCheck = (function ($) {
                 that.setAlarm();
             }
         });
-        
+
+
+
+        // The cookie is formatted as DEFAULT_INTERVAL , SERVER_TIME_WHEN_IT_WAS_ISSUED
+        // We save the server time in local storage. If the stored time differs from
+        // the cookie time we are in a new session. Hence, we have to reset all stored
+        // data and to ask the user to check the reality-check frequency.
+
+        if (val[1] && val[1] != persistentStore.get('reality_check.srvtime')) {
+            persistentStore.set('reality_check.srvtime', val[1]);
+            persistentStore.set('reality_check.basetime', this.basetime = new Date().getTime());
+            persistentStore.set('reality_check.ack', 1);
+            this.askForFrequency();
+        } else if (persistentStore.get('reality_check.askingForInterval')) {
+            this.basetime = parseInt(persistentStore.get('reality_check.basetime'));
+            this.askForFrequency();
+        } else {
+            this.basetime = parseInt(persistentStore.get('reality_check.basetime'));
+            this.setAlarm();
+        }
+
+        //Allow numbers only
+
         var obj = document.getElementById('realityDuration');
         console.log("The obj is ," , obj);
         if (obj.hasOwnProperty('oninput') || ('oninput' in obj)) 
@@ -90,27 +112,7 @@ RealityCheck = (function ($) {
                  else   { return false; }
             });
         }
-        //Allow numbers only
-
-
-
-        // The cookie is formatted as DEFAULT_INTERVAL , SERVER_TIME_WHEN_IT_WAS_ISSUED
-        // We save the server time in local storage. If the stored time differs from
-        // the cookie time we are in a new session. Hence, we have to reset all stored
-        // data and to ask the user to check the reality-check frequency.
-
-        if (val[1] && val[1] != persistentStore.get('reality_check.srvtime')) {
-            persistentStore.set('reality_check.srvtime', val[1]);
-            persistentStore.set('reality_check.basetime', this.basetime = new Date().getTime());
-            persistentStore.set('reality_check.ack', 1);
-            this.askForFrequency();
-        } else if (persistentStore.get('reality_check.askingForInterval')) {
-            this.basetime = parseInt(persistentStore.get('reality_check.basetime'));
-            this.askForFrequency();
-        } else {
-            this.basetime = parseInt(persistentStore.get('reality_check.basetime'));
-            this.setAlarm();
-        }
+        
     }
 
     RealityCheck.prototype.setAlarm = function () {
