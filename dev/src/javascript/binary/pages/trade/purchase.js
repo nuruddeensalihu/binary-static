@@ -107,18 +107,18 @@ var Purchase = (function () {
                 contract_sentiment = 'down';
             }
             WSTickDisplay.initialize({
-                "symbol":passthrough.symbol,
-                "number_of_ticks":passthrough.duration,
-                "previous_tick_epoch":receipt['start_time'],
-                "contract_category":"callput",
-
-                "display_symbol":Symbols.getName(passthrough.symbol),
-                "contract_start":receipt['start_time'],
-                "decimal":3,
-                "contract_sentiment":contract_sentiment,
-                "price":passthrough['ask-price'],
-                "payout":passthrough['amount'],
-                "show_contract_result":1
+                symbol:passthrough.symbol,
+                number_of_ticks:passthrough.duration,
+                previous_tick_epoch:receipt['start_time'],
+                contract_category:sessionStorage.getItem('formname')==='asian' ? 'asian' : 'callput',
+                display_symbol:Symbols.getName(passthrough.symbol),
+                contract_start:receipt['start_time'],
+                decimal:3,
+                contract_sentiment:contract_sentiment,
+                price:passthrough['ask-price'],
+                payout:passthrough['amount'],
+                show_contract_result:1,
+                width: $('#confirmation_message').width(),
             });
         }
     };
@@ -154,17 +154,24 @@ var Purchase = (function () {
             spots.scrollTop = spots.scrollHeight;
 
             if(d1 && purchase_data.echo_req.passthrough['duration']===1){
-                var contract_status;
+                var contract_status,
+                    final_price, 
+                    pnl;
 
                 if  (  purchase_data.echo_req.passthrough.contract_type==="DIGITMATCH" && d1==purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITDIFF" && d1!=purchase_data.echo_req.passthrough.barrier){
                     spots.className = 'won';
+                    final_price = $('#contract_purchase_payout p').text();
+                    pnl = $('#contract_purchase_cost p').text();
                     contract_status = Content.localize().textContractStatusWon;
                 }
                 else{
                     spots.className = 'lost';
+                    final_price = 0;
+                    pnl = -$('#contract_purchase_cost p').text();
                     contract_status = Content.localize().textContractStatusLost;
                 }
-                document.getElementById('contract_purchase_heading').textContent = contract_status;
+
+                updatePurchaseStatus(final_price, pnl, contract_status);
             }
 
             purchase_data.echo_req.passthrough['duration']--;
