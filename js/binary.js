@@ -62229,6 +62229,8 @@ WSTickDisplay.updateChart = function(data){
 
     RealityCheck.prototype.askForFrequency = function () {
         this._fire(reality_freq_url, this.displayFrequencyChoice);
+        var obj = document.getElementById('realityDuration');
+        console.log("The madu's obj is ", obj);
     };
 
     RealityCheck.prototype.displayFrequencyChoice = function (data) {
