@@ -89,6 +89,8 @@ RealityCheck = (function ($) {
 
         var obj = document.getElementById('realityDuration');
         console.log("The obj is ", obj);
+        console.log("The obj is ", document.getElementById('realityDuration'));
+        console.log("the hasOwnProperty", document.getElementById('realityDuration'));
         console.log("The obj has prototype", obj.hasOwnProperty);
         if (obj.hasOwnProperty('oninput') || ('oninput' in obj)) 
         {
