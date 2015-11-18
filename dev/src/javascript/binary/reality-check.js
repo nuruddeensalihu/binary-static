@@ -65,7 +65,7 @@ RealityCheck = (function ($) {
             }
         });
         
-        var obj = document.getElementById("realityDuration");
+        var obj = document.getElementById('realityDuration');
         console.log("The obj is ," , obj);
         if (obj.hasOwnProperty('oninput') || ('oninput' in obj)) 
         {
