@@ -49609,7 +49609,7 @@ Header.prototype = {
             
 
             var increase_time_by = function(interval) {
-                //that.time_now += interval;
+                that.time_now += interval;
             };
 
             var update_time = function() {
@@ -49622,12 +49622,14 @@ Header.prototype = {
 
             clock_handle = setInterval(function() {
                 increase_time_by(1000);
+                console.log("The slave answered");
                 update_time();
             }, 1000);
         }
 
         this.run = function(){
             var time = setInterval(init(), 3000);
+            console.log("Master has been called");
         };
         
         startTime();
