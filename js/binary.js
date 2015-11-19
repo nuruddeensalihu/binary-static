@@ -49632,7 +49632,7 @@ Header.prototype = {
             console.log("Master has been called");
         };
         
-       // startTime();
+        startTime();
         this.run();
         this.clock_started = true;
 
