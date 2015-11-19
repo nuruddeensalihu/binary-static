@@ -49476,12 +49476,33 @@ var Header = function(params) {
     this.menu = new Menu(params['url']);
     this.clock_started = false;
 };
+function initTime(){
+    function init(){
+        binarySocket.send({ "time": 1});
+        this.Time();
+    };
+    function Time(){
+        binarySocket.init({
+        onmessage : function(msg){
+            var response = JSON.parse(msg.data);
 
+            console.log("The time is ", response.time);
+        }
+    });
+    };
+    this.run = function(){
+        var time = setInterval(init, 60000);
+    };
+
+    this.run();
+};
 Header.prototype = {
     on_load: function() {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
-        if (!this.clock_started) this.start_clock();
+        //if (!this.clock_started) this.start_clock();
+        if (!this.clock_started) this.start_clock_ws();
+        //start_clock_ws
         this.simulate_input_placeholder_for_ie();
     },
     on_unload: function() {
@@ -49551,6 +49572,7 @@ Header.prototype = {
 
         this.menu.register_dynamic_links();
     },
+    start_clock_ws : initTime(),
     start_clock: function() {
         var clock = $('#gmt-clock');
         if (clock.length === 0) {
@@ -62249,40 +62271,6 @@ WSTickDisplay.updateChart = function(data){
         $('#reality-check .blogout').on('click', function () {
             window.location.href = logout_url;
         });
-        
-        var obj = document.getElementById('realityDuration');
-        this.isNumericValue(obj);
-    };
-
-    //
-    //limit textBox to Numeric Only
-    //
-    RealityCheck.prototype.isNumericValue = function(obj){
-
-        if (obj.hasOwnProperty('oninput') || ('oninput' in obj)) 
-        {
-            $('#realityDuration').on('input', function (event) { 
-                 this.value = this.value.replace(/[^0-9]/g, '');
-            });
-
-        }
-        else{
-            $('#realityDuration').on('keypress',function(e){
-                var deleteCode = 8;  var backspaceCode = 46;
-                var key = e.which;
-                if ((key>=48 && key<=57) || key === deleteCode || key === backspaceCode || (key>=37 &&  key<=40) || key===0)    
-                {    
-                    character = String.fromCharCode(key);
-                    if( character != '.' && character != '%' && character != '&' && character != '(' && character != '\'' ) 
-                    { 
-                        return true; 
-                    }
-                    else { return false; }
-                 }
-                 else   { return false; }
-            });
-        }
-
     };
 
     // On session start we need to ask for the reality-check interval.
@@ -62342,10 +62330,6 @@ WSTickDisplay.updateChart = function(data){
         };
         $('#reality-check [bcont=1]').on('click', click_handler);
         $('#reality-check [interval=1]').on('change', click_handler);
-
-
-        var obj = document.getElementById('realityDuration');
-        this.isNumericValue(obj);
     };
 
     return RealityCheck;
@@ -62380,11 +62364,22 @@ var BinarySocket = (function () {
         bufferedSends = [],
         manualClosed = false,
         events = {},
-        authorized = false;
+        authorized = false,
+        timeouts = {},
+        req_number = 0;
 
     if (page.language()) {
         socketUrl += '?l=' + page.language();
     }
+
+    var clearTimeouts = function(){
+        for(var k in timeouts){
+            if(timeouts.hasOwnProperty(k)){
+                clearInterval(timeouts[k]);
+                delete timeouts[k];
+            }
+        }
+    };
 
     var status = function () {
         return binarySocket && binarySocket.readyState;
@@ -62410,6 +62405,19 @@ var BinarySocket = (function () {
             bufferedSends.push(data);
             init(1);
         } else if (isReady() && (authorized || TradePage.is_trading_page())) {
+            if(!data.hasOwnProperty('passthrough')){
+                data.passthrough = {};
+            }
+            data.passthrough.req_number = ++req_number;
+            timeouts[req_number] = setInterval(function(){
+                if(typeof reloadPage === 'function'){
+                    var r = confirm("The server didn't respond. Reload page?");
+                    console.log(data,'Last Error Request');
+                    if (r === true) {
+                        reloadPage();
+                    } 
+                }
+            }, 7*1000);
             binarySocket.send(JSON.stringify(data));
         } else {
             bufferedSends.push(data);
@@ -62425,6 +62433,7 @@ var BinarySocket = (function () {
             bufferedSends = [];
             manualClosed = false;
             events = es;
+            clearTimeouts();
         }
 
         if(isClose()){
@@ -62450,6 +62459,10 @@ var BinarySocket = (function () {
 
             var response = JSON.parse(msg.data);
             if (response) {
+                if(response.hasOwnProperty('echo_req') && response.echo_req.hasOwnProperty('passthrough') && response.echo_req.passthrough.hasOwnProperty('req_number')){
+                    clearInterval(timeouts[response.echo_req.passthrough.req_number]);
+                    delete timeouts[response.echo_req.passthrough.req_number];
+                }
                 var type = response.msg_type;
                 if (type === 'authorize') {
                     authorized = true;
@@ -62472,6 +62485,7 @@ var BinarySocket = (function () {
         binarySocket.onclose = function (e) {
 
             authorized = false;
+            clearTimeouts();
 
             if(!manualClosed){
                 init(1);

@@ -393,12 +393,33 @@ var Header = function(params) {
     this.menu = new Menu(params['url']);
     this.clock_started = false;
 };
+function initTime(){
+    function init(){
+        binarySocket.send({ "time": 1});
+        this.Time();
+    };
+    function Time(){
+        binarySocket.init({
+        onmessage : function(msg){
+            var response = JSON.parse(msg.data);
 
+            console.log("The time is ", response.time);
+        }
+    });
+    };
+    this.run = function(){
+        var time = setInterval(init, 60000);
+    };
+
+    this.run();
+};
 Header.prototype = {
     on_load: function() {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
-        if (!this.clock_started) this.start_clock();
+        //if (!this.clock_started) this.start_clock();
+        if (!this.clock_started) this.start_clock_ws();
+        //start_clock_ws
         this.simulate_input_placeholder_for_ie();
     },
     on_unload: function() {
@@ -468,6 +489,7 @@ Header.prototype = {
 
         this.menu.register_dynamic_links();
     },
+    start_clock_ws : initTime(),
     start_clock: function() {
         var clock = $('#gmt-clock');
         if (clock.length === 0) {
