@@ -49490,11 +49490,11 @@ function initTime(){
     }
     });
 
-    this.run = function(){
+    var run = function(){
         var time = setInterval(init, 60000);
     };
 
-     var run = this.run();
+    // var run = this.run();
 
     return{ run : run };
 };
