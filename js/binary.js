@@ -49594,7 +49594,7 @@ Header.prototype = {
 
                     if (response && response.msg_type === 'time') {
 
-                        that.responseMsg(response);
+                        responseMsg(response);
                     }
                 }
             });
