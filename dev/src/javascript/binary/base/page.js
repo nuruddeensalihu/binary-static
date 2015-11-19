@@ -494,18 +494,43 @@ Header.prototype = {
     start_clock_ws : function(){
         //this.initTime();
         //this.initTime.run();
+        var that = this;
+        var clock_handle;
+        var query_start_time
         function init(){
             BinarySocket.send({ "time": 1});
+            query_start_time = (new Date().getTime());
         };
 
         BinarySocket.init({
         onmessage : function(msg){
             var response = JSON.parse(msg.data);
 
+            console.log("message data is ", msg.data);
+            console.log("message is ", msg);
+
+            var start_timestamp = msg.timestamp;
+
             console.log("The time is ", response.time);
 
              if (response && response.msg_type === 'time') {
+
+                that.time_now = (start_timestamp * 1000) + (((new Date().getTime()) - query_start_time)/2);
                 console.log("the msg type is", response.msg_type);
+                
+
+                console.log("The new time is ",  that.time_now);
+
+
+                var increase_time_by = function(interval) {
+                    that.time_now += interval;
+                };
+         
+                var update_time = function() {
+                    clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+                };
+
+                update_time();
 
              }
         }
@@ -513,10 +538,10 @@ Header.prototype = {
 
         this.run = function(){
             var time = setInterval(init, 60000);
-            this.clock_started = true;
         };
 
         this.run();
+        this.clock_started = true;
 
     },
     start_clock: function() {
