@@ -493,7 +493,25 @@ Header.prototype = {
     },
     start_clock_ws : function(){
         //this.initTime();
-        this.initTime.run();
+        //this.initTime.run();
+        function init(){
+            BinarySocket.send({ "time": 1});
+        };
+
+        BinarySocket.init({
+        onmessage : function(msg){
+            var response = JSON.parse(msg.data);
+
+            console.log("The time is ", response.time);
+        }
+        });
+
+        this.run = function(){
+            var time = setInterval(init, 60000);
+        };
+
+        this.run();
+
     },
     start_clock: function() {
         var clock = $('#gmt-clock');
