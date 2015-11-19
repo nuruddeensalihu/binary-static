@@ -499,6 +499,7 @@ Header.prototype = {
         var init = function(){
             BinarySocket.send({ "time": 1});
             query_start_time = (new Date().getTime());
+            console.log("Master has been called");
         }
         var startTime = function(){
           //  init();
@@ -544,7 +545,6 @@ Header.prototype = {
 
         this.run = function(){
             var time = setInterval(init(), 60000);
-            console.log("Master has been called");
         };
         
         startTime();
