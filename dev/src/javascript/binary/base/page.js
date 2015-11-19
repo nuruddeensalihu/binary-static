@@ -550,7 +550,7 @@ Header.prototype = {
         };
         
         startTime();
-        this.run();
+      //  this.run();
         this.clock_started = true;
 
     },
