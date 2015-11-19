@@ -395,7 +395,11 @@ var Header = function(params) {
 };
 function initTime(){
 
-    binarySocket.init({
+    function init(){
+        BinarySocket.send({ "time": 1});
+    };
+
+    BinarySocket.init({
     onmessage : function(msg){
         var response = JSON.parse(msg.data);
 
@@ -403,10 +407,6 @@ function initTime(){
     }
     });
 
-    function init(){
-        binarySocket.send({ "time": 1});
-    };
-    console.log("The new time is ");
     this.run = function(){
         var time = setInterval(init, 60000);
     };
