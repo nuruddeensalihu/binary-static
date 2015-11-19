@@ -49604,9 +49604,6 @@ Header.prototype = {
         function responseMsg(response){
             var start_timestamp = response.time;
 
-                //time now is timestamp from server + ping time.
-                //ping time = roundtrip time / 2
-                //roundtrip time = time at start of request - time after response.
             that.time_now = (start_timestamp + ((new Date().getTime()) - query_start_time));
             var increase_time_by = function(interval) {
                 that.time_now += interval;
@@ -49627,7 +49624,7 @@ Header.prototype = {
         }
 
         this.run = function(){
-            var time = setInterval(init(), 900000);
+            var time = setInterval(init(), 30000);
         };
         
         startTime();
