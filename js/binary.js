@@ -49580,7 +49580,7 @@ Header.prototype = {
         var that = this;
         var clock_handle;
         var query_start_time;
-        function init(){
+        var init = function(){
             BinarySocket.send({ "time": 1});
             query_start_time = (new Date().getTime());
         }
@@ -49626,7 +49626,7 @@ Header.prototype = {
         }
 
         this.run = function(){
-            var time = setInterval(init, 3000);
+            var time = setInterval(init(), 3000);
         };
         
         startTime();
