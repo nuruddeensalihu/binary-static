@@ -49477,19 +49477,19 @@ var Header = function(params) {
     this.clock_started = false;
 };
 function initTime(){
+
     function init(){
         binarySocket.send({ "time": 1});
-        this.Time();
     };
-    function Time(){
-        binarySocket.init({
-        onmessage : function(msg){
-            var response = JSON.parse(msg.data);
+    
+    binarySocket.init({
+    onmessage : function(msg){
+        var response = JSON.parse(msg.data);
 
-            console.log("The time is ", response.time);
-        }
+        console.log("The time is ", response.time);
+    }
     });
-    };
+
     this.run = function(){
         var time = setInterval(init, 60000);
     };
