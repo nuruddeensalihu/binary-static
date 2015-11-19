@@ -49580,6 +49580,7 @@ Header.prototype = {
         var that = this;
         var clock_handle;
         var query_start_time;
+        var clock = $('#gmt-clock');
         var init = function(){
             BinarySocket.send({ "time": 1});
             query_start_time = (new Date().getTime());
