@@ -49584,10 +49584,9 @@ Header.prototype = {
         var init = function(){
             BinarySocket.send({ "time": 1});
             query_start_time = (new Date().getTime());
-            startTime();
         }
         var startTime = function(){
-            init();
+          //  init();
             BinarySocket.init({
                 onmessage : function(msg){
                     var response = JSON.parse(msg.data);
@@ -49633,7 +49632,7 @@ Header.prototype = {
             console.log("Master has been called");
         };
         
-        //startTime();
+        startTime();
         this.run();
         this.clock_started = true;
 
