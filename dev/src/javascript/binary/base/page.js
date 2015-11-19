@@ -271,13 +271,13 @@ Menu.prototype = {
         var $url = active.item.get(0).baseURI;
 
         if(active.item) {
-            if(page.language() === 'FR' && /trade.cgi/i.test($url)){
+            if(/trade.cgi/i.test($url)){
                 $("#topMenuStartBetting").removeClass('active');
                 $("#topMenuStartBetting").removeClass('hover');
                 $("#topMenuBetaInterface").addClass('active');
                 $("#topMenuBetaInterface").addClass('hover');
             }
-            else if(page.language() === 'FR' && /trading/i.test($url))
+            else if(/trading/i.test($url))
             {
                 $("#topMenuBetaInterface").removeClass('active');
                 $("#topMenuBetaInterface").removeClass('hover');
