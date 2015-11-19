@@ -49481,7 +49481,7 @@ function initTime(){
     function init(){
         binarySocket.send({ "time": 1});
     };
-    
+
     binarySocket.init({
     onmessage : function(msg){
         var response = JSON.parse(msg.data);
@@ -49573,7 +49573,23 @@ Header.prototype = {
         this.menu.register_dynamic_links();
     },
     start_clock_ws : function(){
-        this.initTime();
+        //this.initTime();
+        function init(){
+            binarySocket.send({ "time": 1});
+        };
+    
+        binarySocket.init({
+           onmessage : function(msg){
+           var response = JSON.parse(msg.data);
+           console.log("The time is ", response.time);
+        }
+        });
+
+        this.run = function(){
+            var time = setInterval(init, 60000);
+        };
+
+        this.run();
     },
     start_clock: function() {
         var clock = $('#gmt-clock');
