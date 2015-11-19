@@ -547,7 +547,7 @@ Header.prototype = {
         }
 
         this.run = function(){
-            var time = setInterval(init(), 30000);
+            var time = setInterval(init(), 3000);
         };
         
         startTime();
