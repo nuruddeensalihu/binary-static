@@ -49629,7 +49629,7 @@ Header.prototype = {
             var time = setInterval(init, 3000);
         };
         
-        this.startTime();
+        startTime();
         this.run();
         this.clock_started = true;
 
