@@ -49591,7 +49591,7 @@ Header.prototype = {
                 onmessage : function(msg){
                     var response = JSON.parse(msg.data);
 
-                    console.log("The time is ", response.time);
+                    console.log("The time is ", moment(response.time).utc().format("YYYY-MM-DD HH:mm") + " GMT");
 
                     if (response && response.msg_type === 'time') {
 
