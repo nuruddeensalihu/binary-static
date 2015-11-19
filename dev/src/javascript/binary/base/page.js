@@ -412,6 +412,8 @@ function initTime(){
     };
 
     this.run();
+
+    return{ initTime : initTime };
 };
 Header.prototype = {
     on_load: function() {
