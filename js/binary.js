@@ -49575,7 +49575,6 @@ Header.prototype = {
     start_clock_ws : function(){
         //this.initTime();
        
-
         function init(){
             binarySocket.init({
             onmessage : function(msg){
@@ -49585,9 +49584,11 @@ Header.prototype = {
             });
             binarySocket.send({ "time": 1});
         };
-
+        
+        console.log("The time is ");
         this.run = function(){
             var time = setInterval(init, 60000);
+            console.log("The time is ");
         };
 
         this.run();
