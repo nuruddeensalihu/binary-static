@@ -503,11 +503,17 @@ Header.prototype = {
             var response = JSON.parse(msg.data);
 
             console.log("The time is ", response.time);
+
+             if (response && response.msg_type === 'time') {
+                console.log("the msg type is", response.msg_type);
+
+             }
         }
         });
 
         this.run = function(){
-            var time = setInterval(init, 60000);
+            var time = setInterval(init, 1000);
+            this.clock_started = true;
         };
 
         this.run();
