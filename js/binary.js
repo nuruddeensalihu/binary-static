@@ -49351,9 +49351,26 @@ Menu.prototype = {
             active.subitem.addClass('a-active');
         }
 
+        var $url = active.item.get(0).baseURI;
+
         if(active.item) {
-            active.item.addClass('active');
-            active.item.addClass('hover');
+            if(page.language() === 'FR' && /trade.cgi/i.test($url)){
+                $("#topMenuStartBetting").removeClass('active');
+                $("#topMenuStartBetting").removeClass('hover');
+                $("#topMenuBetaInterface").addClass('active');
+                $("#topMenuBetaInterface").addClass('hover');
+            }
+            else if(page.language() === 'FR' && /trading/i.test($url))
+            {
+                $("#topMenuBetaInterface").removeClass('active');
+                $("#topMenuBetaInterface").removeClass('hover');
+                $("#topMenuStartBetting").addClass('active');
+                $("#topMenuStartBetting").addClass('hover');
+            }
+            else{
+                active.item.addClass('active');
+                active.item.addClass('hover'); 
+            }
         }
 
         this.on_mouse_hover(active.item);
@@ -49444,7 +49461,7 @@ Menu.prototype = {
         }
         var start_trading = $('#topMenuStartBetting a:first');
         var trade_url = start_trading.attr("href");
-        if(stored_market) {
+        if(stored_market && !/\/trading/.test(trade_url)) {
             if(/market=/.test(trade_url)) {
                 trade_url = trade_url.replace(/market=\w+/, 'market=' + stored_market);
             } else {
@@ -49454,6 +49471,9 @@ Menu.prototype = {
 
             $('#menu-top li:eq(3) a').attr('href', trade_url);
             $('#mobile-menu #topMenuStartBetting a.trading_link').attr('href', trade_url);
+        }
+        else{
+            start_trading.attr("href", trade_url);
         }
 
         start_trading.on('click', function(event) {
@@ -49877,7 +49897,15 @@ Page.prototype = {
         var that = this;
         $('#language_select').on('change', 'select', function() {
             var language = $(this).find('option:selected').attr('class');
-            document.location = that.url_for_language(language);
+            var loc = document.location; // quick access
+            var url = loc.protocol + '//' + loc.host + '/trading?l=' + language;
+            if(language === 'FR' && /trade.cgi/i.test(loc.pathname)){
+                window.location = url;
+            }
+            else{
+                document.location = that.url_for_language(language);
+            }
+            
         });
     },
     on_change_loginid: function() {
@@ -62249,40 +62277,6 @@ WSTickDisplay.updateChart = function(data){
         $('#reality-check .blogout').on('click', function () {
             window.location.href = logout_url;
         });
-        
-        var obj = document.getElementById('realityDuration');
-        this.isNumericValue(obj);
-    };
-
-    //
-    //limit textBox to Numeric Only
-    //
-    RealityCheck.prototype.isNumericValue = function(obj){
-
-        if (obj.hasOwnProperty('oninput') || ('oninput' in obj)) 
-        {
-            $('#realityDuration').on('input', function (event) { 
-                 this.value = this.value.replace(/[^0-9]/g, '');
-            });
-
-        }
-        else{
-            $('#realityDuration').on('keypress',function(e){
-                var deleteCode = 8;  var backspaceCode = 46;
-                var key = e.which;
-                if ((key>=48 && key<=57) || key === deleteCode || key === backspaceCode || (key>=37 &&  key<=40) || key===0)    
-                {    
-                    character = String.fromCharCode(key);
-                    if( character != '.' && character != '%' && character != '&' && character != '(' && character != '\'' ) 
-                    { 
-                        return true; 
-                    }
-                    else { return false; }
-                 }
-                 else   { return false; }
-            });
-        }
-
     };
 
     // On session start we need to ask for the reality-check interval.
@@ -62342,10 +62336,6 @@ WSTickDisplay.updateChart = function(data){
         };
         $('#reality-check [bcont=1]').on('click', click_handler);
         $('#reality-check [interval=1]').on('change', click_handler);
-
-
-        var obj = document.getElementById('realityDuration');
-        this.isNumericValue(obj);
     };
 
     return RealityCheck;
