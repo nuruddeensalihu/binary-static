@@ -49574,16 +49574,17 @@ Header.prototype = {
     },
     start_clock_ws : function(){
         //this.initTime();
+       
+
         function init(){
+            binarySocket.init({
+            onmessage : function(msg){
+            var response = JSON.parse(msg.data);
+            console.log("The time is ", response.time);
+            }
+            });
             binarySocket.send({ "time": 1});
         };
-    
-        binarySocket.init({
-           onmessage : function(msg){
-           var response = JSON.parse(msg.data);
-           console.log("The time is ", response.time);
-        }
-        });
 
         this.run = function(){
             var time = setInterval(init, 60000);
