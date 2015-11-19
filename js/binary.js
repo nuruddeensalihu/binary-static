@@ -49627,7 +49627,7 @@ Header.prototype = {
         }
 
         this.run = function(){
-            var time = setInterval(init(), 3000);
+            var time = setInterval(init(), 900000);
         };
         
         startTime();
