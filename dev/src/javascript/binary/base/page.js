@@ -395,10 +395,6 @@ var Header = function(params) {
 };
 function initTime(){
 
-    function init(){
-        binarySocket.send({ "time": 1});
-    };
-
     binarySocket.init({
     onmessage : function(msg){
         var response = JSON.parse(msg.data);
@@ -407,13 +403,17 @@ function initTime(){
     }
     });
 
+    function init(){
+        binarySocket.send({ "time": 1});
+    };
+    console.log("The new time is ");
     this.run = function(){
         var time = setInterval(init, 60000);
     };
 
-    this.run();
+     var run = this.run();
 
-    return{ initTime : initTime };
+    return{ run : run };
 };
 Header.prototype = {
     on_load: function() {
@@ -493,24 +493,7 @@ Header.prototype = {
     },
     start_clock_ws : function(){
         //this.initTime();
-       
-        function init(){
-            binarySocket.init({
-            onmessage : function(msg){
-            var response = JSON.parse(msg.data);
-            console.log("The time is ", response.time);
-            }
-            });
-            binarySocket.send({ "time": 1});
-        };
-        
-        console.log("The time is ");
-        this.run = function(){
-            var time = setInterval(init, 60000);
-            console.log("The time is ");
-        };
-
-        this.run();
+        this.initTime.run();
     },
     start_clock: function() {
         var clock = $('#gmt-clock');
