@@ -1054,7 +1054,7 @@ ul.checked li {
   margin: 0 2em 0 0;
   display: inline-block;
 }
-.tab-menu-wrap ul li#topMenuStartBetting, #content .tab-menu-wrap ul li#topMenuStartBetting {
+.tab-menu-wrap ul li#topMenuBetaInterface, #content .tab-menu-wrap ul li#topMenuBetaInterface {
   float: right;
 }
 .tab-menu-wrap ul li a, #content .tab-menu-wrap ul li a {
