@@ -49606,14 +49606,11 @@ Header.prototype = {
             console.log("The time taken to send is", query_start_time);
             that.time_now = (start_timestamp + ((new Date().getTime()) - query_start_time));
 
-            console.log("The time now is", (new Date().getTime()));
+            
 
             var increase_time_by = function(interval) {
-                that.time_now += interval;
+                //that.time_now += interval;
             };
-            that.myass = "Nuru's ass";
-
-            console.log(that.myass);
 
             var update_time = function() {
                  clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
