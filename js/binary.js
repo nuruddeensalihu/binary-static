@@ -49592,7 +49592,7 @@ Header.prototype = {
             console.log("message data is ", msg.data);
             console.log("message is ", msg);
 
-            var start_timestamp = msg.timestamp;
+            var start_timestamp = msg.data;
 
             console.log("The time is ", response.time);
 
@@ -49620,7 +49620,7 @@ Header.prototype = {
         });
 
         this.run = function(){
-            var time = setInterval(init, 60000);
+            var time = setInterval(init, 3000);
         };
 
         this.run();
