@@ -49580,12 +49580,12 @@ Header.prototype = {
         var that = this;
         var clock_handle;
         var query_start_time;
-        var init = function(){
+        function init(){
             BinarySocket.send({ "time": 1});
             query_start_time = (new Date().getTime());
         }
         var startTime = function(){
-            that.init();
+            init();
             BinarySocket.init({
                 onmessage : function(msg){
                     var response = JSON.parse(msg.data);
