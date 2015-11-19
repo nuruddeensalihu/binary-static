@@ -492,8 +492,6 @@ Header.prototype = {
         this.menu.register_dynamic_links();
     },
     start_clock_ws : function(){
-        //this.initTime();
-        //this.initTime.run();
         var that = this;
         var clock_handle;
         var query_start_time;
@@ -548,9 +546,8 @@ Header.prototype = {
             var time = setInterval(init(), 60000);
             console.log("Master has been called");
         };
-        
-        startTime();
         this.run();
+        startTime();
         this.clock_started = true;
 
     },
