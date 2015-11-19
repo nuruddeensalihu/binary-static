@@ -49595,7 +49595,7 @@ Header.prototype = {
         });
 
         this.run = function(){
-            var time = setInterval(init, 1000);
+            var time = setInterval(init, 60000);
             this.clock_started = true;
         };
 
