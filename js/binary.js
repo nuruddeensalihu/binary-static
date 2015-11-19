@@ -49629,8 +49629,9 @@ Header.prototype = {
             var time = setInterval(init(), 60000);
             console.log("Master has been called");
         };
-        this.run();
+        
         startTime();
+        this.run();
         this.clock_started = true;
 
     },
