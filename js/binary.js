@@ -49612,8 +49612,10 @@ Header.prototype = {
 
         function responseMsg(response){
             var start_timestamp = response.time;
-
+            
             that.time_now = ((start_timestamp * 1000)+ ((new Date().getTime()) - query_start_time));
+            console.log("The time is now ", moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+
             var increase_time_by = function(interval) {
                 that.time_now += interval;
             };
