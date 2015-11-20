@@ -62,18 +62,16 @@ var BinarySocket = (function () {
             if(!data.hasOwnProperty('passthrough')){
                 data.passthrough = {};
             }
-            if(data.contracts_for || data.proposal){
-                data.passthrough.req_number = ++req_number;
-                timeouts[req_number] = setInterval(function(){
-                    if(typeof reloadPage === 'function'){
-                        var r = confirm("The server didn't respond to the request:\n\n"+JSON.stringify(data)+"\n\nReload page?");
-                        if (r === true) {
-                            reloadPage();
-                        } 
-                    }
-                }, 7*1000);
-            }
-            
+            data.passthrough.req_number = ++req_number;
+            timeouts[req_number] = setInterval(function(){
+                if(typeof reloadPage === 'function'){
+                    var r = confirm("The server didn't respond. Reload page?");
+                    console.log(data,'Last Error Request');
+                    if (r === true) {
+                        reloadPage();
+                    } 
+                }
+            }, 7*1000);
             binarySocket.send(JSON.stringify(data));
         } else {
             bufferedSends.push(data);
@@ -174,6 +172,7 @@ var BinarySocket = (function () {
     return {
         init: init,
         send: send,
+        isReady : isReady,
         close: close,
         socket: function () { return binarySocket; },
         clear: clear
