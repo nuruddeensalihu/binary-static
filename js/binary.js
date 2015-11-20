@@ -49579,11 +49579,11 @@ Header.prototype = {
         var clock_handle;
         var query_start_time;
         var clock = $('#gmt-clock');
-        var init = function(){
+        function init(){
             BinarySocket.send({ "time": 1});
             query_start_time = (new Date().getTime());
             console.log("Master has been called");
-        }
+        };
         var startTime = function(){
           //  init();
             BinarySocket.init({
@@ -49623,9 +49623,7 @@ Header.prototype = {
         }
 
         this.run = function(){
-            setInterval(function() {
-                init();
-            }, 60000);
+            setInterval(init, 60000);
         };
         
         startTime();
