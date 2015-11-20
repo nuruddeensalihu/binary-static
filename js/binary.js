@@ -49583,10 +49583,14 @@ Header.prototype = {
         var clock = $('#gmt-clock');
 
         function init(){
-            BinarySocket.send({ "time": 1});
-            console.log("clock started");
-            query_start_time = (new Date().getTime());
-           // startTime();
+            if(BinarySocket.isReady() === true){
+                BinarySocket.send({ "time": 1});
+                console.log("clock started");
+                query_start_time = (new Date().getTime());
+            }else{
+                console.log("The other guy");
+                that.start_clock();
+            }
         };
       
      
