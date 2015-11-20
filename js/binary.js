@@ -49476,35 +49476,12 @@ var Header = function(params) {
     this.menu = new Menu(params['url']);
     this.clock_started = false;
 };
-function initTime(){
 
-    function init(){
-        BinarySocket.send({ "time": 1});
-    };
-
-    BinarySocket.init({
-    onmessage : function(msg){
-        var response = JSON.parse(msg.data);
-
-        console.log("The time is ", response.time);
-    }
-    });
-
-    var run = function(){
-        var time = setInterval(init, 60000);
-    };
-
-    // var run = this.run();
-
-    return{ run : run };
-};
 Header.prototype = {
     on_load: function() {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
-        //if (!this.clock_started) this.start_clock();
-        if (!this.clock_started) this.start_clock_ws();
-        //start_clock_ws
+        if (!this.clock_started) this.start_clock();
         this.simulate_input_placeholder_for_ie();
     },
     on_unload: function() {
@@ -49573,73 +49550,6 @@ Header.prototype = {
         }).addClass('unbind_later');
 
         this.menu.register_dynamic_links();
-    },
-    start_clock_ws : function(){
-        //this.initTime();
-        //this.initTime.run();
-        var that = this;
-        var clock_handle;
-        var query_start_time;
-        var clock = $('#gmt-clock');
-        function init(){
-            if(BinarySocket.isReady())
-            {
-                BinarySocket.send({ "time": 1});
-                console.log("clock started");
-                query_start_time = (new Date().getTime());
-                startTime();
-
-            }
-            else{
-                that.start_clock();
-            }
-        }
-        var startTime = function(){
-            //init();
-            BinarySocket.init({
-                onmessage : function(msg){
-                    var response = JSON.parse(msg.data);
-
-                    console.log("The time is ", moment(response.time).utc().format("YYYY-MM-DD HH:mm") + " GMT");
-
-                    if (response && response.msg_type === 'time') {
-
-                        responseMsg(response);
-                    }
-                }
-            });
-        };
-
-        function responseMsg(response){
-            var start_timestamp = response.time;
-
-            that.time_now = ((start_timestamp * 1000)+ ((new Date().getTime()) - query_start_time));
-            var increase_time_by = function(interval) {
-                that.time_now += interval;
-            };
-
-            var update_time = function() {
-                 clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
-            };
-
-            update_time();
-
-            clearInterval(clock_handle);
-
-            clock_handle = setInterval(function() {
-                increase_time_by(1000);
-                update_time();
-            }, 1000);
-        }
-
-        this.run = function(){
-            setInterval(init, 30000);
-        };
-        
-        init();
-        this.run();
-        this.clock_started = true;
-
     },
     start_clock: function() {
         var clock = $('#gmt-clock');
@@ -49956,7 +49866,9 @@ Page.prototype = {
         this.record_affiliate_exposure();
         this.contents.on_load();
         this.on_click_acc_transfer();
-        ViewBalance.init();
+        if(getCookieItem('login')){
+            ViewBalance.init();
+        }
         $('#current_width').val(get_container_width());//This should probably not be here.
     },
     on_unload: function() {
@@ -51977,7 +51889,7 @@ pjax_config_page('rise_fall_table', function() {
 });
 
 pjax_config_page('portfolio|trade.cgi|statement|f_manager_statement|f_manager_history|' +
-    'f_profit_table|profit_table|trading|statementws|profit_tablews', function() {
+    'f_profit_table|profit_table|trading|legacy-statement|legacy-profittable', function() {
     return {
         onLoad: function() {
             BetSell.register();
@@ -58551,6 +58463,11 @@ onLoad.queue_for_url(function () {
     self_exclusion_date_picker();
     self_exclusion_validate_date();
 }, 'self_exclusion');
+;onLoad.queue_for_url(function() {
+    $('#statement-date').on('change', function() {
+        $('#submit-date').removeClass('invisible');
+    });
+}, 'legacy-statement');
 ;/*
  * This file contains the code related to loading of trading page bottom analysis
  * content. It will contain jquery so as to compatible with old code and less rewrite
@@ -62339,6 +62256,40 @@ WSTickDisplay.updateChart = function(data){
         $('#reality-check .blogout').on('click', function () {
             window.location.href = logout_url;
         });
+        
+        var obj = document.getElementById('realityDuration');
+        this.isNumericValue(obj);
+    };
+
+    //
+    //limit textBox to Numeric Only
+    //
+    RealityCheck.prototype.isNumericValue = function(obj){
+
+        if (obj.hasOwnProperty('oninput') || ('oninput' in obj)) 
+        {
+            $('#realityDuration').on('input', function (event) { 
+                 this.value = this.value.replace(/[^0-9]/g, '');
+            });
+
+        }
+        else{
+            $('#realityDuration').on('keypress',function(e){
+                var deleteCode = 8;  var backspaceCode = 46;
+                var key = e.which;
+                if ((key>=48 && key<=57) || key === deleteCode || key === backspaceCode || (key>=37 &&  key<=40) || key===0)    
+                {    
+                    character = String.fromCharCode(key);
+                    if( character != '.' && character != '%' && character != '&' && character != '(' && character != '\'' ) 
+                    { 
+                        return true; 
+                    }
+                    else { return false; }
+                 }
+                 else   { return false; }
+            });
+        }
+
     };
 
     // On session start we need to ask for the reality-check interval.
@@ -62398,6 +62349,10 @@ WSTickDisplay.updateChart = function(data){
         };
         $('#reality-check [bcont=1]').on('click', click_handler);
         $('#reality-check [interval=1]').on('change', click_handler);
+
+
+        var obj = document.getElementById('realityDuration');
+        this.isNumericValue(obj);
     };
 
     return RealityCheck;
@@ -62476,16 +62431,18 @@ var BinarySocket = (function () {
             if(!data.hasOwnProperty('passthrough')){
                 data.passthrough = {};
             }
-            data.passthrough.req_number = ++req_number;
-            timeouts[req_number] = setInterval(function(){
-                if(typeof reloadPage === 'function'){
-                    var r = confirm("The server didn't respond. Reload page?");
-                    console.log(data,'Last Error Request');
-                    if (r === true) {
-                        reloadPage();
-                    } 
-                }
-            }, 7*1000);
+            if(data.contracts_for || data.proposal){
+                data.passthrough.req_number = ++req_number;
+                timeouts[req_number] = setInterval(function(){
+                    if(typeof reloadPage === 'function'){
+                        var r = confirm("The server didn't respond to the request:\n\n"+JSON.stringify(data)+"\n\nReload page?");
+                        if (r === true) {
+                            reloadPage();
+                        } 
+                    }
+                }, 7*1000);
+            }
+            
             binarySocket.send(JSON.stringify(data));
         } else {
             bufferedSends.push(data);
@@ -62586,7 +62543,6 @@ var BinarySocket = (function () {
     return {
         init: init,
         send: send,
-        isReady : isReady,
         close: close,
         socket: function () { return binarySocket; },
         clear: clear
