@@ -49585,6 +49585,7 @@ Header.prototype = {
             {
                 BinarySocket.send({ "time": 1});
                 query_start_time = (new Date().getTime());
+                console.log("running isReady");
                 startTime();
             }
             else{
