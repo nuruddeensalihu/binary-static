@@ -49624,7 +49624,7 @@ Header.prototype = {
         }
 
         this.run = function(){
-            setInterval(init, 90000);
+            setInterval(init, 6000);
         };
         
         init();
