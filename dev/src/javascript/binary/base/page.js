@@ -520,7 +520,7 @@ Header.prototype = {
             that.time_now = ((start_timestamp * 1000)+ ((new Date().getTime()) - query_start_time));
 
             
-
+            console.log("the time is ", that.time_now);
             var increase_time_by = function(interval) {
                 that.time_now += interval;
             };
