@@ -49585,10 +49585,10 @@ Header.prototype = {
             BinarySocket.send({ "time": 1});
             console.log("clock started");
             query_start_time = (new Date().getTime());
-            startTime();
+           // startTime();
         };
         var startTime = function(){
-            init();
+            //init();
             BinarySocket.init({
                 onmessage : function(msg){
                     var response = JSON.parse(msg.data);
