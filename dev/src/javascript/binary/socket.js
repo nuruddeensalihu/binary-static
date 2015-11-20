@@ -173,6 +173,7 @@ var BinarySocket = (function () {
         init: init,
         send: send,
         close: close,
+        isReady : isReady,
         socket: function () { return binarySocket; },
         clear: clear
     };
