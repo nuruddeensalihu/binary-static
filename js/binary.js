@@ -49584,10 +49584,14 @@ Header.prototype = {
         function init(){
             if(BinarySocket.isReady())
             {
-
                 BinarySocket.send({ "time": 1});
+                console.log("clock started");
                 query_start_time = (new Date().getTime());
+                startTime();
 
+            }
+            else{
+                that.start_clock();
             }
         }
         var startTime = function(){
@@ -49629,10 +49633,10 @@ Header.prototype = {
         }
 
         this.run = function(){
-            var time = setInterval(init, 30000);
+            setInterval(init, 30000);
         };
         
-        startTime();
+        init();
         this.run();
         this.clock_started = true;
 
