@@ -49582,17 +49582,17 @@ Header.prototype = {
         var query_start_time;
         var clock = $('#gmt-clock');
         var init = function(){
-            if(BinarySocket.isReady())
-            {
+         //   if(BinarySocket.isReady())
+          //  {
                 BinarySocket.send({ "time": 1});
                 console.log("clock started");
                 query_start_time = (new Date().getTime());
                 startTime();
 
-            }
-            else{
+           // }
+           // else{
                // that.start_clock();
-            }
+           // }
         }
         var startTime = function(){
             init();
