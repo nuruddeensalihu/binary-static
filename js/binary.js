@@ -49589,9 +49589,6 @@ Header.prototype = {
             BinarySocket.init({
                 onmessage : function(msg){
                     var response = JSON.parse(msg.data);
-
-                    console.log("The time is ", moment(response.time).utc().format("YYYY-MM-DD HH:mm") + " GMT");
-
                     if (response && response.msg_type === 'time') {
                         responseMsg(response);
                     }
@@ -49602,7 +49599,6 @@ Header.prototype = {
         function responseMsg(response){
             var start_timestamp = response.time;
             
-            console.log("The time taken to send is", query_start_time);
             that.time_now = (start_timestamp + ((new Date().getTime()) - query_start_time));
 
             
@@ -49627,7 +49623,9 @@ Header.prototype = {
         }
 
         this.run = function(){
-            var time = setInterval(init(), 60000);
+            setInterval(function() {
+                init();
+            }, 60000);
         };
         
         startTime();
