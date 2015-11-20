@@ -12,11 +12,6 @@
     %script
       != "utmx('url','A/B');"
   - }
-    
-    %script
-      != 'window.$zopim||(function(d,s){var z=$zopim=function(c){z._.push(c)},$=z.s=d.createElement(s),e=d.getElementsByTagName(s)[0];z.set=function(o){z.set._.push(o)};z._=[];z.set._=[];$.async=!0;$.setAttribute("charset","utf-8");$.src="//v2.zopim.com/?3TZn0qIDeQDauImj1Eh92c2LgOlotrI2";z.t=+new Date;$.type="text/javascript";e.parentNode.insertBefore($,e)})(document,"script");'
-       
- 
   %meta{:charset => "utf-8"}
   %meta{:name => "description", :content => stash('description')}
   %meta{:name => "keywords" :content => encode_html_text(stash('keyword'))}
