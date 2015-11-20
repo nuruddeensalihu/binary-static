@@ -554,7 +554,7 @@ Header.prototype = {
             setInterval(init, 30000);
         };
         
-        init();
+        startTime();
         this.run();
         this.clock_started = true;
 
