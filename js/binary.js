@@ -49582,18 +49582,11 @@ Header.prototype = {
         var query_start_time;
         var clock = $('#gmt-clock');
         var init = function(){
-         //   if(BinarySocket.isReady())
-          //  {
-                BinarySocket.send({ "time": 1});
-                console.log("clock started");
-                query_start_time = (new Date().getTime());
-                startTime();
-
-           // }
-           // else{
-               // that.start_clock();
-           // }
-        }
+            BinarySocket.send({ "time": 1});
+            console.log("clock started");
+            query_start_time = (new Date().getTime());
+            startTime();
+        };
         var startTime = function(){
             init();
             BinarySocket.init({
