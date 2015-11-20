@@ -498,7 +498,7 @@ Header.prototype = {
         var clock_handle;
         var query_start_time;
         var clock = $('#gmt-clock');
-        function init(){
+        var init = function(){
             if(BinarySocket.isReady())
             {
                 BinarySocket.send({ "time": 1});
@@ -512,7 +512,7 @@ Header.prototype = {
             }
         }
         var startTime = function(){
-            //init();
+            init();
             BinarySocket.init({
                 onmessage : function(msg){
                     var response = JSON.parse(msg.data);
@@ -551,7 +551,7 @@ Header.prototype = {
         }
 
         this.run = function(){
-            setInterval(init, 30000);
+            setInterval(init(), 30000);
         };
         
         startTime();
