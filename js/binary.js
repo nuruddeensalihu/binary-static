@@ -49587,21 +49587,21 @@ Header.prototype = {
             query_start_time = (new Date().getTime());
            // startTime();
         };
-        var startTime = function(){
-            //init();
-            BinarySocket.init({
-                onmessage : function(msg){
-                    var response = JSON.parse(msg.data);
+      
+     
+        BinarySocket.init({
+            onmessage : function(msg){
+                var response = JSON.parse(msg.data);
 
-                    console.log("The time is ", moment(response.time).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+                console.log("The time is ", moment(response.time).utc().format("YYYY-MM-DD HH:mm") + " GMT");
 
-                    if (response && response.msg_type === 'time') {
+                if (response && response.msg_type === 'time') {
 
-                        responseMsg(response);
-                    }
+                    responseMsg(response);
                 }
-            });
-        };
+            }
+        });
+       
 
         function responseMsg(response){
             var start_timestamp = response.time;
@@ -49632,7 +49632,7 @@ Header.prototype = {
             setInterval(init(), 30000);
         };
         
-        startTime();
+        init();
         this.run();
         this.clock_started = true;
 
