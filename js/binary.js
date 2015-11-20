@@ -49581,12 +49581,19 @@ Header.prototype = {
         var clock = $('#gmt-clock');
         function init(){
             console.log("The binary socket is isReady state is ",BinarySocket.isReady());
-            BinarySocket.send({ "time": 1});
-            query_start_time = (new Date().getTime());
-            console.log("Master has been called");
+            if(BinarySocket.isReady())
+            {
+                BinarySocket.send({ "time": 1});
+                query_start_time = (new Date().getTime());
+                startTime();
+            }
+            else{
+                that.start_clock();
+
+            }
+     
         };
         var startTime = function(){
-            //init();
             BinarySocket.init({
                 onmessage : function(msg){
                     var response = JSON.parse(msg.data);
@@ -49599,10 +49606,7 @@ Header.prototype = {
 
         function responseMsg(response){
             var start_timestamp = response.time;
-            
             that.time_now = ((start_timestamp * 1000)+ ((new Date().getTime()) - query_start_time));
-
-            
             console.log("the time is ", that.time_now);
             var increase_time_by = function(interval) {
                 that.time_now += interval;
@@ -49611,11 +49615,8 @@ Header.prototype = {
             var update_time = function() {
                  clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
             };
-
             update_time();
-
             clearInterval(clock_handle);
-
             clock_handle = setInterval(function() {
                 increase_time_by(1000);
                 console.log("The slave answered");
@@ -49624,13 +49625,11 @@ Header.prototype = {
         }
 
         this.run = function(){
-            setInterval(init, 6000);
+            setInterval(init, 9000);
         };
-        
         init();
         this.run();
         this.clock_started = true;
-
     },
     start_clock: function() {
         var clock = $('#gmt-clock');
