@@ -497,7 +497,7 @@ Header.prototype = {
         var query_start_time;
         var clock = $('#gmt-clock');
         function init(){
-            console.log("The binary socket is isReady state is ",BinarySocket.status);
+            console.log("The binary socket is isReady state is ",BinarySocket.isReady());
             BinarySocket.send({ "time": 1});
             query_start_time = (new Date().getTime());
             console.log("Master has been called");
