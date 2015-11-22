@@ -49485,11 +49485,8 @@ Header.prototype = {
         if (!this.clock_started) this.start_clock_ws();
         //start_clock_ws
         this.simulate_input_placeholder_for_ie();
-
-        console.log("the readyState is before", BinarySocket.isReady());
     },
     on_unload: function() {
-        console.log("the readyState is", BinarySocket.isReady());
         this.menu.reset();
     },
     show_or_hide_login_form: function() {
@@ -49932,7 +49929,6 @@ Page.prototype = {
         this.on_click_acc_transfer();
         ViewBalance.init();
         $('#current_width').val(get_container_width());//This should probably not be here.
-        console.log("The okote ", BinarySocket.isReady());
     },
     on_unload: function() {
         this.header.on_unload();
