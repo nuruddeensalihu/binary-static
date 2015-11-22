@@ -393,28 +393,7 @@ var Header = function(params) {
     this.menu = new Menu(params['url']);
     this.clock_started = false;
 };
-function initTime(){
 
-    function init(){
-        BinarySocket.send({ "time": 1});
-    };
-
-    BinarySocket.init({
-    onmessage : function(msg){
-        var response = JSON.parse(msg.data);
-
-        console.log("The time is ", response.time);
-    }
-    });
-
-    var run = function(){
-        var time = setInterval(init, 60000);
-    };
-
-    // var run = this.run();
-
-    return{ run : run };
-};
 Header.prototype = {
     on_load: function() {
         this.show_or_hide_login_form();
@@ -528,12 +507,13 @@ Header.prototype = {
 
             clock_handle = setInterval(function() {
                 increase_time_by(1000);
+                console.log("the slave is serving");
                 update_time();
             }, 1000);
         }
 
         that.run = function(){
-            setInterval(init, 60000);
+            setInterval(init, 900000);
         };
         
         if(BinarySocket.isReady() === true){
