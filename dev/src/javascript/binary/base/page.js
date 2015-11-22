@@ -499,18 +499,16 @@ Header.prototype = {
         var query_start_time;
         var clock = $('#gmt-clock');
 
-        var init = function(){
+        function init(){
             if(BinarySocket.isReady() === true){
                 BinarySocket.send({ "time": 1});
                 console.log("clock started");
                 query_start_time = (new Date().getTime());
             }else{
-                console.log("The other guy");
                 return that.start_clock();
             }
         };
       
-     
         BinarySocket.init({
             onmessage : function(msg){
                 var response = JSON.parse(msg.data);
@@ -523,7 +521,7 @@ Header.prototype = {
                 }
             }
         });
-    
+       
         function responseMsg(response){
             var start_timestamp = response.time;
             
@@ -550,13 +548,10 @@ Header.prototype = {
         }
 
         that.run = function(){
-            setInterval(init(), 60000);
+            setInterval(init, 60000);
         };
-        console.log("the init is " , init());
-        if(init())
-        {
-            return;
-        }
+        
+        init();
         that.run();
         this.clock_started = true;
 
