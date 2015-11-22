@@ -486,7 +486,7 @@ Header.prototype = {
             }else{
                 console.log("The other guy");
                 console.log("The ready state is",BinarySocket.isReady());
-                that.start_clock();
+                return that.start_clock();
             }
         };   
 
