@@ -477,8 +477,14 @@ Header.prototype = {
         var clock = $('#gmt-clock');
 
         function init(){
-            BinarySocket.send({ "time": 1});
-            query_start_time = (new Date().getTime());
+            try{
+                BinarySocket.send({ "time": 1});
+                query_start_time = (new Date().getTime());
+            }catch(err){
+                console.log(err);
+                that.start_clock();
+                return;
+            }
         };
       
         BinarySocket.init({
@@ -516,15 +522,12 @@ Header.prototype = {
             setInterval(init, 900000);
         };
         
-        try{
-            init();
-            that.run();
-            this.clock_started = true;
-        }
-        catch(err){
-            console.log(err);
-            that.start_clock();
-        }
+        
+        init();
+        that.run();
+        this.clock_started = true;
+        
+         
         return;
     },
     start_clock: function() {
