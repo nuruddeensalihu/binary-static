@@ -49589,7 +49589,7 @@ Header.prototype = {
                 query_start_time = (new Date().getTime());
             }else{
                 console.log("The other guy");
-                that.start_clock();
+                //that.start_clock();
             }
         };
       
@@ -49646,6 +49646,10 @@ Header.prototype = {
         var clock = $('#gmt-clock');
         if (clock.length === 0) {
             return;
+        }
+        if(BinarySocket.isReady() === true){
+            console.log("Its me master")
+            start_clock_ws();
         }
 
         var that = this;
