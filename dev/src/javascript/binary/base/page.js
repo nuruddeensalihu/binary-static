@@ -702,6 +702,7 @@ Contents.prototype = {
         if ($('.unbind_later').length > 0) {
             $('.unbind_later').off();
         }
+        console.log("the goadt ", BinarySocket.isReady());
     },
     activate_by_client_type: function() {
         $('.by_client_type').addClass('invisible');
