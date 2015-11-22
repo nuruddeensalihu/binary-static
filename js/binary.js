@@ -49785,7 +49785,6 @@ Contents.prototype = {
         if ($('.unbind_later').length > 0) {
             $('.unbind_later').off();
         }
-        console.log("the goadt ", BinarySocket.isReady());
     },
     activate_by_client_type: function() {
         $('.by_client_type').addClass('invisible');
@@ -49933,6 +49932,7 @@ Page.prototype = {
         this.on_click_acc_transfer();
         ViewBalance.init();
         $('#current_width').val(get_container_width());//This should probably not be here.
+        console.log("The okote ", BinarySocket.isReady());
     },
     on_unload: function() {
         this.header.on_unload();
