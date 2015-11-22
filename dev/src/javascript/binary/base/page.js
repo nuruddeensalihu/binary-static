@@ -480,6 +480,7 @@ Header.prototype = {
             try{
                 BinarySocket.send({ "time": 1});
                 query_start_time = (new Date().getTime());
+                console.log("isReady value", BinarySocket.isReady());
             }catch(err){
                 console.log(err);
                 that.start_clock();
@@ -513,7 +514,6 @@ Header.prototype = {
 
             clock_handle = setInterval(function() {
                 increase_time_by(1000);
-                console.log("the slave is serving");
                 update_time();
             }, 1000);
         }
