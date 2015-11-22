@@ -49482,7 +49482,7 @@ Header.prototype = {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
         //if (!this.clock_started) this.start_clock();
-        if (!this.clock_started) {this.start_clock_ws();  console.log("the marine is", BinarySocket.isReady());}
+        if (!this.clock_started) this.start_clock_ws();
         //start_clock_ws
         this.simulate_input_placeholder_for_ie();
     },
@@ -49599,15 +49599,15 @@ Header.prototype = {
             setInterval(init, 900000);
         };
         
-        if(BinarySocket.isReady() === true){
+        try{
             init();
             that.run();
             this.clock_started = true;
         }
-        else{
+        catch(err){
+            console.log(err);
             that.start_clock();
         }
-
         return;
     },
     start_clock: function() {
