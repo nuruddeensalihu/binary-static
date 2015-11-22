@@ -49487,6 +49487,7 @@ Header.prototype = {
         this.simulate_input_placeholder_for_ie();
     },
     on_unload: function() {
+        console.log("the readyState is", BinarySocket.isReady());
         this.menu.reset();
     },
     show_or_hide_login_form: function() {
@@ -49563,7 +49564,6 @@ Header.prototype = {
             try{
                 BinarySocket.send({ "time": 1});
                 query_start_time = (new Date().getTime());
-                console.log("isReady value", BinarySocket.isReady());
             }catch(err){
                 console.log(err);
                 that.start_clock();
