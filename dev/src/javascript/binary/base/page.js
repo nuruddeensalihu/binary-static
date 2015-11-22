@@ -393,7 +393,28 @@ var Header = function(params) {
     this.menu = new Menu(params['url']);
     this.clock_started = false;
 };
+function initTime(){
 
+    function init(){
+        BinarySocket.send({ "time": 1});
+    };
+
+    BinarySocket.init({
+    onmessage : function(msg){
+        var response = JSON.parse(msg.data);
+
+        console.log("The time is ", response.time);
+    }
+    });
+
+    var run = function(){
+        var time = setInterval(init, 60000);
+    };
+
+    // var run = this.run();
+
+    return{ run : run };
+};
 Header.prototype = {
     on_load: function() {
         this.show_or_hide_login_form();
@@ -478,18 +499,31 @@ Header.prototype = {
         var query_start_time;
         var clock = $('#gmt-clock');
 
-        function init(){
+        var init = function(){
             if(BinarySocket.isReady() === true){
                 BinarySocket.send({ "time": 1});
                 console.log("clock started");
                 query_start_time = (new Date().getTime());
             }else{
                 console.log("The other guy");
-                console.log("The ready state is",BinarySocket.isReady());
                 return that.start_clock();
             }
-        };   
+        };
+      
+     
+        BinarySocket.init({
+            onmessage : function(msg){
+                var response = JSON.parse(msg.data);
 
+                console.log("The time is ", moment(response.time).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+
+                if (response && response.msg_type === 'time') {
+
+                    responseMsg(response);
+                }
+            }
+        });
+    
         function responseMsg(response){
             var start_timestamp = response.time;
             
@@ -515,40 +549,22 @@ Header.prototype = {
             }, 1000);
         }
 
-        this.run = function(){
-            console.log("the master fired");
-            setInterval(init, 60000);
+        that.run = function(){
+            setInterval(init(), 60000);
         };
-        
-        console.log("Its here");
+        console.log("the init is " , init());
         if(init())
         {
             return;
         }
-        this.run();
+        that.run();
         this.clock_started = true;
-
-         BinarySocket.init({
-            onmessage : function(msg){
-                var response = JSON.parse(msg.data);
-                console.log("It fires here first");
-                if (response && response.msg_type === 'time') {
-
-                    responseMsg(response);
-                }
-            }
-        });
 
     },
     start_clock: function() {
         var clock = $('#gmt-clock');
         if (clock.length === 0) {
             return;
-        }
-        console.log("isready 1",BinarySocket.isReady());
-        if(BinarySocket.isReady() === true){
-            console.log("Its me master")
-            start_clock_ws();
         }
 
         var that = this;
