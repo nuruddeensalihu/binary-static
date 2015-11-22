@@ -49485,6 +49485,8 @@ Header.prototype = {
         if (!this.clock_started) this.start_clock_ws();
         //start_clock_ws
         this.simulate_input_placeholder_for_ie();
+
+        console.log("the readyState is before", BinarySocket.isReady());
     },
     on_unload: function() {
         console.log("the readyState is", BinarySocket.isReady());
