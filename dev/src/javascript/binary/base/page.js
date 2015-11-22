@@ -488,19 +488,7 @@ Header.prototype = {
                 console.log("The ready state is",BinarySocket.isReady());
                 that.start_clock();
             }
-        };
-      
-     
-        BinarySocket.init({
-            onmessage : function(msg){
-                var response = JSON.parse(msg.data);
-                if (response && response.msg_type === 'time') {
-
-                    responseMsg(response);
-                }
-            }
-        });
-       
+        };   
 
         function responseMsg(response){
             var start_timestamp = response.time;
@@ -535,6 +523,16 @@ Header.prototype = {
         init();
         this.run();
         this.clock_started = true;
+
+         BinarySocket.init({
+            onmessage : function(msg){
+                var response = JSON.parse(msg.data);
+                if (response && response.msg_type === 'time') {
+
+                    responseMsg(response);
+                }
+            }
+        });
 
     },
     start_clock: function() {
