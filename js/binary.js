@@ -49627,6 +49627,7 @@ Header.prototype = {
         if (clock.length === 0) {
             return;
         }
+        console.log("isready 1",BinarySocket.isReady());
         if(BinarySocket.isReady() === true){
             console.log("Its me master")
             start_clock_ws();
