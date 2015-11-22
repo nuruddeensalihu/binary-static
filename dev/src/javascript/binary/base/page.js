@@ -486,7 +486,7 @@ Header.prototype = {
             }else{
                 console.log("The other guy");
                 console.log("The ready state is",BinarySocket.isReady());
-                return that.start_clock();
+                that.start_clock();
             }
         };   
 
@@ -520,6 +520,7 @@ Header.prototype = {
             setInterval(init, 60000);
         };
         
+        console.log("Its here");
         init();
         this.run();
         this.clock_started = true;
@@ -527,6 +528,7 @@ Header.prototype = {
          BinarySocket.init({
             onmessage : function(msg){
                 var response = JSON.parse(msg.data);
+                console.log("It fires here first");
                 if (response && response.msg_type === 'time') {
 
                     responseMsg(response);
