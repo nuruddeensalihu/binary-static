@@ -1,0 +1,69 @@
+ start_clock_ws : function(){
+        //this.initTime();
+        //this.initTime.run();
+        var that = this;
+        var clock_handle;
+        var query_start_time;
+        var clock = $('#gmt-clock');
+
+        function init(){
+            if(socket.isReady() === true){
+                socket.send({ "time": 1});
+                console.log("clock started");
+                query_start_time = (new Date().getTime());
+            }else{
+                console.log("The other guy");
+                console.log("The ready state is",socket.isReady());
+                return that.start_clock();
+            }
+        };   
+
+        function responseMsg(response){
+            var start_timestamp = response.time;
+            
+            that.time_now = ((start_timestamp * 1000)+ ((new Date().getTime()) - query_start_time));
+            console.log("The time is now ", moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+
+            var increase_time_by = function(interval) {
+                that.time_now += interval;
+            };
+
+            var update_time = function() {
+                 clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+            };
+
+            update_time();
+
+            clearInterval(clock_handle);
+
+            clock_handle = setInterval(function() {
+                increase_time_by(1000);
+                console.log("the child called");
+                update_time();
+            }, 1000);
+        }
+
+        this.run = function(){
+            console.log("the parent fired");
+            setInterval(init, 60000);
+        };
+        
+        console.log("Its here");
+        if(init()){
+            return;
+        }
+        this.run();
+        this.clock_started = true;
+
+         socket.init({
+            onmessage : function(msg){
+                var response = JSON.parse(msg.data);
+                console.log("It fires here first");
+                if (response && response.msg_type === 'time') {
+
+                    responseMsg(response);
+                }
+            }
+        });
+
+    }
