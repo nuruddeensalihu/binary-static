@@ -399,7 +399,7 @@ Header.prototype = {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
         //if (!this.clock_started) this.start_clock();
-        if (!this.clock_started) this.start_clock_ws();
+        if (!this.clock_started) {this.start_clock_ws();  console.log("the marine is", BinarySocket.isReady());}
         //start_clock_ws
         this.simulate_input_placeholder_for_ie();
     },
@@ -522,7 +522,7 @@ Header.prototype = {
             this.clock_started = true;
         }
         else{
-            return that.start_clock();
+            that.start_clock();
         }
 
         return;
