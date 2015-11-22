@@ -49581,6 +49581,11 @@ Header.prototype = {
         var clock_handle;
         var query_start_time;
         var clock = $('#gmt-clock');
+
+        function init(){
+            BinarySocket.send({ "time": 1});
+            query_start_time = (new Date().getTime());
+        };
       
         BinarySocket.init({
             onmessage : function(msg){
@@ -49624,18 +49629,15 @@ Header.prototype = {
             setInterval(init, 60000);
         };
         
-        init();
-        that.run();
-        this.clock_started = true;
-
-        function init(){
-            if(BinarySocket.isReady() === true){
-                BinarySocket.send({ "time": 1});
-                query_start_time = (new Date().getTime());
-            }else{
-                return that.start_clock();
-            }
-        };
+        if(BinarySocket.isReady() === true){
+            init();
+            that.run();
+            this.clock_started = true;
+        }
+        else{
+            console.log("We are here");
+            return that.start_clock();
+        }
 
     },
     start_clock: function() {
