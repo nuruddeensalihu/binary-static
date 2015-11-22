@@ -398,9 +398,7 @@ Header.prototype = {
     on_load: function() {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
-        //if (!this.clock_started) this.start_clock();
-        if (!this.clock_started) this.start_clock_ws();
-        //start_clock_ws
+        if (!this.clock_started) this.start_clock();
         this.simulate_input_placeholder_for_ie();
     },
     on_unload: function() {
@@ -470,71 +468,12 @@ Header.prototype = {
 
         this.menu.register_dynamic_links();
     },
-    start_clock_ws : function(){
-        var that = this;
-        var clock_handle;
-        var query_start_time;
-        var clock = $('#gmt-clock');
-
-        function init(){
-            try{
-                BinarySocket.send({ "time": 1});
-                query_start_time = (new Date().getTime());
-            }catch(err){
-                console.log(err);
-                that.start_clock();
-                return;
-            }
-        };
-      
-        BinarySocket.init({
-            onmessage : function(msg){
-                var response = JSON.parse(msg.data);
-                if (response && response.msg_type === 'time') {
-                    responseMsg(response);
-                }
-            }
-        });
-        function responseMsg(response){
-            var start_timestamp = response.time;
-            
-            that.time_now = ((start_timestamp * 1000)+ ((new Date().getTime()) - query_start_time));
-            var increase_time_by = function(interval) {
-                that.time_now += interval;
-            };
-
-            var update_time = function() {
-                 clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
-            };
-
-            update_time();
-
-            clearInterval(clock_handle);
-
-            clock_handle = setInterval(function() {
-                increase_time_by(1000);
-                update_time();
-            }, 1000);
-        }
-
-        that.run = function(){
-            setInterval(init, 900000);
-        };
-        
-        
-        init();
-        that.run();
-        this.clock_started = true;
-        
-         
-        return;
-    },
     start_clock: function() {
         var clock = $('#gmt-clock');
         if (clock.length === 0) {
             return;
         }
-        
+
         var that = this;
         var clock_handle;
         var sync = function() {
@@ -844,7 +783,9 @@ Page.prototype = {
         this.record_affiliate_exposure();
         this.contents.on_load();
         this.on_click_acc_transfer();
-        ViewBalance.init();
+        if(getCookieItem('login')){
+            ViewBalance.init();
+        }
         $('#current_width').val(get_container_width());//This should probably not be here.
     },
     on_unload: function() {

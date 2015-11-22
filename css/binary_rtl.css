@@ -4808,6 +4808,7 @@ table .loss, table .lower {
   align-items: stretch;
   padding: 0;
   flex: 1 0 auto;
+  display: none;
 }
 #trading_socket_container #contract_prices_container .price_container > .col.row {
   flex: 1 0 auto;

@@ -49481,9 +49481,7 @@ Header.prototype = {
     on_load: function() {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
-        //if (!this.clock_started) this.start_clock();
-        if (!this.clock_started) this.start_clock_ws();
-        //start_clock_ws
+        if (!this.clock_started) this.start_clock();
         this.simulate_input_placeholder_for_ie();
     },
     on_unload: function() {
@@ -49553,71 +49551,12 @@ Header.prototype = {
 
         this.menu.register_dynamic_links();
     },
-    start_clock_ws : function(){
-        var that = this;
-        var clock_handle;
-        var query_start_time;
-        var clock = $('#gmt-clock');
-
-        function init(){
-            try{
-                BinarySocket.send({ "time": 1});
-                query_start_time = (new Date().getTime());
-            }catch(err){
-                console.log(err);
-                that.start_clock();
-                return;
-            }
-        };
-      
-        BinarySocket.init({
-            onmessage : function(msg){
-                var response = JSON.parse(msg.data);
-                if (response && response.msg_type === 'time') {
-                    responseMsg(response);
-                }
-            }
-        });
-        function responseMsg(response){
-            var start_timestamp = response.time;
-            
-            that.time_now = ((start_timestamp * 1000)+ ((new Date().getTime()) - query_start_time));
-            var increase_time_by = function(interval) {
-                that.time_now += interval;
-            };
-
-            var update_time = function() {
-                 clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
-            };
-
-            update_time();
-
-            clearInterval(clock_handle);
-
-            clock_handle = setInterval(function() {
-                increase_time_by(1000);
-                update_time();
-            }, 1000);
-        }
-
-        that.run = function(){
-            setInterval(init, 900000);
-        };
-        
-        
-        init();
-        that.run();
-        this.clock_started = true;
-        
-         
-        return;
-    },
     start_clock: function() {
         var clock = $('#gmt-clock');
         if (clock.length === 0) {
             return;
         }
-        
+
         var that = this;
         var clock_handle;
         var sync = function() {
@@ -49927,7 +49866,9 @@ Page.prototype = {
         this.record_affiliate_exposure();
         this.contents.on_load();
         this.on_click_acc_transfer();
-        ViewBalance.init();
+        if(getCookieItem('login')){
+            ViewBalance.init();
+        }
         $('#current_width').val(get_container_width());//This should probably not be here.
     },
     on_unload: function() {
@@ -51948,7 +51889,7 @@ pjax_config_page('rise_fall_table', function() {
 });
 
 pjax_config_page('portfolio|trade.cgi|statement|f_manager_statement|f_manager_history|' +
-    'f_profit_table|profit_table|trading|statementws|profit_tablews', function() {
+    'f_profit_table|profit_table|trading|legacy-statement|legacy-profittable', function() {
     return {
         onLoad: function() {
             BetSell.register();
@@ -58522,6 +58463,11 @@ onLoad.queue_for_url(function () {
     self_exclusion_date_picker();
     self_exclusion_validate_date();
 }, 'self_exclusion');
+;onLoad.queue_for_url(function() {
+    $('#statement-date').on('change', function() {
+        $('#submit-date').removeClass('invisible');
+    });
+}, 'legacy-statement');
 ;/*
  * This file contains the code related to loading of trading page bottom analysis
  * content. It will contain jquery so as to compatible with old code and less rewrite
@@ -61157,6 +61103,9 @@ var Price = (function () {
         }
         
         var container = document.getElementById('price_container_'+position);
+        if(!$(container).is(":visible")){
+            $(container).fadeIn(200);
+        }
 
         var h4 = container.getElementsByClassName('contract_heading')[0],
             amount = container.getElementsByClassName('contract_amount')[0],
@@ -61331,6 +61280,9 @@ function processMarketUnderlying() {
 function processContract(contracts) {
     'use strict';
 
+    document.getElementById('trading_socket_container').classList.add('show');
+    document.getElementById('trading_init_progress').style.display = 'none';
+
     Contract.setContracts(contracts);
 
     if(typeof contracts.contracts_for !== 'undefined'){
@@ -61487,7 +61439,7 @@ function processForgetProposals() {
     'use strict';
     showPriceOverlay();
     BinarySocket.send({forget_all: "proposal"});
-    Price.clearMapping();   
+    Price.clearMapping(); 
 }
 
 /*
@@ -61559,10 +61511,6 @@ function processProposal(response){
         hideOverlayContainer();
         Price.display(response, Contract.contractType()[Contract.form()]);
         hidePriceOverlay();
-        if(form_id===1){
-            document.getElementById('trading_socket_container').classList.add('show');
-            document.getElementById('trading_init_progress').style.display = 'none';
-        }
     }
 }
 
@@ -62447,16 +62395,18 @@ var BinarySocket = (function () {
             if(!data.hasOwnProperty('passthrough')){
                 data.passthrough = {};
             }
-            data.passthrough.req_number = ++req_number;
-            timeouts[req_number] = setInterval(function(){
-                if(typeof reloadPage === 'function'){
-                    var r = confirm("The server didn't respond. Reload page?");
-                    console.log(data,'Last Error Request');
-                    if (r === true) {
-                        reloadPage();
-                    } 
-                }
-            }, 7*1000);
+            if(data.contracts_for || data.proposal){
+                data.passthrough.req_number = ++req_number;
+                timeouts[req_number] = setInterval(function(){
+                    if(typeof reloadPage === 'function'){
+                        var r = confirm("The server didn't respond to the request:\n\n"+JSON.stringify(data)+"\n\nReload page?");
+                        if (r === true) {
+                            reloadPage();
+                        } 
+                    }
+                }, 7*1000);
+            }
+            
             binarySocket.send(JSON.stringify(data));
         } else {
             bufferedSends.push(data);
@@ -62557,7 +62507,6 @@ var BinarySocket = (function () {
     return {
         init: init,
         send: send,
-        isReady : isReady,
         close: close,
         socket: function () { return binarySocket; },
         clear: clear
@@ -62860,6 +62809,18 @@ var ProfitTableWS = (function () {
         if (!tableExist()) {
             ProfitTableUI.createEmptyTable().appendTo("#profit-table-ws-container");
             ProfitTableUI.updateProfitTable(getNextChunk());
+
+            // Show a message when the table is empty
+            if($('#profit-table tbody tr').length === 0) {
+                $('#profit-table tbody')
+                    .append($('<tr/>', {class: "flex-tr"})
+                        .append($('<td/>', {colspan: 7}) 
+                            .append($('<p/>', {class: "notice-msg center", text: text.localize("Your account has no trading activity.")})
+                            )
+                        )
+                    );
+            }
+
             Content.profitTableTranslation();
         }
     }
@@ -63116,6 +63077,18 @@ var ProfitTableUI = (function(){
         if (!tableExist()) {
             StatementUI.createEmptyStatementTable().appendTo("#statement-ws-container");
             StatementUI.updateStatementTable(getNextChunkStatement());
+
+            // Show a message when the table is empty
+            if($('#statement-table tbody tr').length === 0) {
+                $('#statement-table tbody')
+                    .append($('<tr/>', {class: "flex-tr"})
+                        .append($('<td/>', {colspan: 6})
+                            .append($('<p/>', {class: "notice-msg center", text: text.localize("Your account has no trading activity.")})
+                            )
+                        )
+                    );
+            }
+
             Content.statementTranslation();
         }
     }
@@ -63206,7 +63179,7 @@ var ProfitTableUI = (function(){
             Content.localize().textBalance
         ];
 
-        header[5] = header[5] + "(" + TUser.get().currency + ")";
+        header[5] = header[5] + (TUser.get().currency ? "(" + TUser.get().currency + ")" : "");
 
         var metadata = {
             id: tableID,
