@@ -492,8 +492,6 @@ Header.prototype = {
         this.menu.register_dynamic_links();
     },
     start_clock_ws : function(){
-        //this.initTime();
-        //this.initTime.run();
         var that = this;
         var clock_handle;
         var query_start_time;
@@ -512,13 +510,10 @@ Header.prototype = {
                 }
             }
         });
-       
         function responseMsg(response){
             var start_timestamp = response.time;
             
             that.time_now = ((start_timestamp * 1000)+ ((new Date().getTime()) - query_start_time));
-            console.log("The time is now ", moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
-
             var increase_time_by = function(interval) {
                 that.time_now += interval;
             };
@@ -533,7 +528,6 @@ Header.prototype = {
 
             clock_handle = setInterval(function() {
                 increase_time_by(1000);
-                console.log("the slave called");
                 update_time();
             }, 1000);
         }
@@ -548,19 +542,17 @@ Header.prototype = {
             this.clock_started = true;
         }
         else{
-            console.log("We are here");
             return that.start_clock();
         }
 
+        return;
     },
     start_clock: function() {
         var clock = $('#gmt-clock');
         if (clock.length === 0) {
             return;
         }
-        if(BinarySocket.isReady() === true){
-            return this.start_clock_ws();
-        }
+        
         var that = this;
         var clock_handle;
         var sync = function() {
