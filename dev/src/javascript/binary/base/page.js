@@ -521,7 +521,10 @@ Header.prototype = {
         };
         
         console.log("Its here");
-        init();
+        if(init())
+        {
+            return;
+        }
         this.run();
         this.clock_started = true;
 
