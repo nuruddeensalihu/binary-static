@@ -507,11 +507,7 @@ Header.prototype = {
         BinarySocket.init({
             onmessage : function(msg){
                 var response = JSON.parse(msg.data);
-
-                console.log("The time is ", moment(response.time).utc().format("YYYY-MM-DD HH:mm") + " GMT");
-
                 if (response && response.msg_type === 'time') {
-
                     responseMsg(response);
                 }
             }
@@ -562,7 +558,9 @@ Header.prototype = {
         if (clock.length === 0) {
             return;
         }
-
+        if(BinarySocket.isReady() === true){
+            return this.start_clock_ws();
+        }
         var that = this;
         var clock_handle;
         var sync = function() {
