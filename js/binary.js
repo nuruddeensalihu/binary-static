@@ -58489,7 +58489,7 @@ onLoad.queue_for_url(function () {
     var resetError = function(){
         //reset error to empty
         $("p.errorfield").each(function(ind,element){
-            console.log("the val", element.text());
+            console.log("the val", element);
             value.text("");
         });
     };
@@ -58499,8 +58499,8 @@ onLoad.queue_for_url(function () {
         resetError();
 
         $(":text").each(function(ind,element){
-            console.log("The variable is" , element.text());
-            if(!isNormalInteger(element.text()))
+            console.log("The variable is" , element);
+            if(!isNormalInteger(element))
             {
                 $("#error"+variable.id).text("Please enter an integer value");
                 isValid = false;
