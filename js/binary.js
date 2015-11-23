@@ -58470,12 +58470,12 @@ onLoad.queue_for_url(function () {
     var $form, $error;
 
     var init = function(){
-        $form   = $("#selfExclusion > form");
+      //  $form   = $("#selfExclusion > form");
 
         $("#self_exclusion_submit").on("click", function(e){
             e.preventDefault();
             e.stopPropagation();
-            SelfExlusionWS.validateForm($form);
+            SelfExlusionWS.validateForm();
             SelfExlusionWS.sendRequest();
         });
 
@@ -58494,7 +58494,7 @@ onLoad.queue_for_url(function () {
         var isValid = true;
         SelfExlusionWS.resetError();
 
-        $("input[type=text]", $form).each(function(variable){
+        $("#selfExclusion > input[type=text]").each(function(variable){
             console.log("The variable is" , variable);
             if(!isNormalInteger(variable))
             {
@@ -58505,6 +58505,8 @@ onLoad.queue_for_url(function () {
 
         if(!isValid)
             return false;
+
+
 
     };
     var populateForm = function(){
@@ -58581,7 +58583,7 @@ pjax_config_page("user/self_exclusionws", function() {
                 
             SelfExlusionWS.datePicker();
             SelfExlusionWS.populateForm();
-            SelfExlusionWS.validateDate();
+           // SelfExlusionWS.validateDate();
         
             SelfExlusionWS.init();
         }
