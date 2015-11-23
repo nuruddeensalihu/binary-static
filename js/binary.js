@@ -58467,13 +58467,40 @@ onLoad.queue_for_url(function () {
     
     "use strict";
 
-    var $form, $result;
+    var $form, $error;
 
     var init = function(){
+        $form   = $("#selfExclusion > form");
+
+
+        $form.find("button").on("click", function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            SelfExlusionWS.validateForm();
+            SelfExlusionWS.sendRequest();
+        });
 
     };
+    function isNormalInteger(str) {
+        return /^\+?\d+$/.test(str);
+    }
+    var resetError = function(){
+        //reset error to empty
+        $("#selfExclusion > div[class='errorfield']").each(function(value){
+            value.text() = '';
+        });
+    };
 
-    
+    var validateForm = function(){
+        SelfExlusionWS.resetError();
+
+        $("#selfExclusion > type['text']").each(function(variable){
+            console.log("The variable is" , variable);
+        });
+
+
+
+    }
     var sendRequest = function(){
 
     };
