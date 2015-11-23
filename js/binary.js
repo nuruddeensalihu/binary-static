@@ -58470,12 +58470,12 @@ onLoad.queue_for_url(function () {
     var $form, $error;
 
     var init = function(){
-      //  $form   = $("#selfExclusion > form");
+        $form   = $("#selfExclusion > form");
 
-        $("#self_exclusion_submit").on("click", function(e){
+        $form.find("button").on("click", function(e){
             e.preventDefault();
             e.stopPropagation();
-            SelfExlusionWS.validateForm();
+            SelfExlusionWS.validateForm($form);
             SelfExlusionWS.sendRequest();
         });
 
@@ -58490,11 +58490,11 @@ onLoad.queue_for_url(function () {
         });
     };
 
-    var validateForm = function($form){
+    var validateForm = function(frm){
         var isValid = true;
         SelfExlusionWS.resetError();
 
-        $("#selfExclusion > input[type=text]").each(function(variable){
+        $("input[type=text]", frm).each(function(variable){
             console.log("The variable is" , variable);
             if(!isNormalInteger(variable))
             {
