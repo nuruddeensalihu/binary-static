@@ -29,5 +29,5 @@ var self_exclusion_validate_date = function () {
 onLoad.queue_for_url(function () {
 // date picker for self exclusion
     //self_exclusion_date_picker();
-    //self_exclusion_validate_date();
+    self_exclusion_validate_date();
 }, 'self_exclusion');
