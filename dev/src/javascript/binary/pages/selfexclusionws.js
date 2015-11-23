@@ -23,9 +23,9 @@ var SelfExlusionWS = (function(){
     }
     var resetError = function(){
         //reset error to empty
-        $("p errorfield").each(function(value){
-            console.log("the val", value);
-            //value.text() = '';
+        $("p errorfield").each(function(ind,element){
+            console.log("the val", element.text());
+            value.text("");
         });
     };
 
@@ -33,9 +33,9 @@ var SelfExlusionWS = (function(){
         var isValid = true;
         resetError();
 
-        $(":text").each(function(variable){
-            console.log("The variable is" , variable);
-            if(!isNormalInteger(variable.val))
+        $(":text").each(function(ind,element){
+            console.log("The variable is" , element.text());
+            if(!isNormalInteger(element.text()))
             {
                 $("#error"+variable.id).text("Please enter an integer value");
                 isValid = false;
