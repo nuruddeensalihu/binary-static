@@ -58442,7 +58442,7 @@ onLoad.queue_for_url(initialize_pricing_table, 'pricing_table');
         var end_date = new Date();
         end_date.setFullYear(end_date.getFullYear() + 5);
 
-        var id = $('#EXCLUDEUNTILWS');
+        var id = $('#EXCLUDEUNTIL');
 
         id.datepicker({
             dateFormat: 'yy-mm-dd',
@@ -58455,7 +58455,7 @@ onLoad.queue_for_url(initialize_pricing_table, 'pricing_table');
     };
 
     var self_exclusion_validate_date = function () {
-        $('#selfExclusionWS').on('click', '#self_exclusion_submit', function () {
+        $('#selfExclusion').on('click', '#self_exclusion_submit', function () {
             return client_form.self_exclusion.validate_exclusion_date();
         });
     };
@@ -58500,7 +58500,7 @@ onLoad.queue_for_url(function () {
         var end_date = new Date();
         end_date.setFullYear(end_date.getFullYear() + 5);
 
-        var id = $('#EXCLUDEUNTIL');
+        var id = $('#EXCLUDEUNTILWS');
 
         id.datepicker({
             dateFormat: 'yy-mm-dd',
@@ -58513,7 +58513,7 @@ onLoad.queue_for_url(function () {
     };
 
     var validate_date = function () {
-        $('#selfExclusion').on('click', '#self_exclusion_submit', function () {
+        $('#selfExclusionWS').on('click', '#self_exclusion_submitWS', function () {
             return client_form.self_exclusion.validate_exclusion_date();
         });
     };

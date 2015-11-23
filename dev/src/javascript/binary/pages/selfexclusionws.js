@@ -25,7 +25,7 @@ var self_exlusionWS = (function(){
         var end_date = new Date();
         end_date.setFullYear(end_date.getFullYear() + 5);
 
-        var id = $('#EXCLUDEUNTIL');
+        var id = $('#EXCLUDEUNTILWS');
 
         id.datepicker({
             dateFormat: 'yy-mm-dd',
@@ -38,7 +38,7 @@ var self_exlusionWS = (function(){
     };
 
     var validate_date = function () {
-        $('#selfExclusion').on('click', '#self_exclusion_submit', function () {
+        $('#selfExclusionWS').on('click', '#self_exclusion_submitWS', function () {
             return client_form.self_exclusion.validate_exclusion_date();
         });
     };
