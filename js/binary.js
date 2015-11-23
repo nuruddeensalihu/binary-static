@@ -58472,11 +58472,11 @@ onLoad.queue_for_url(function () {
     var init = function(){
         $form   = $("#selfExclusion > form");
 
-        var r = $form.find("button").text();
+        var r = $form.find("#self_exclusion_submit").text();
         console.log("the button", r);
-        console.log("Its ", $form.find("button"));
+        console.log("Its ", $form.find("#self_exclusion_submit"));
 
-        $form.find("button").on("click", function(e){
+        $form.find("#self_exclusion_submit").on("click", function(e){
             e.preventDefault();
             e.stopPropagation();
             SelfExlusionWS.validateForm();
