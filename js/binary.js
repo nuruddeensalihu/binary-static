@@ -58494,7 +58494,7 @@ onLoad.queue_for_url(function () {
     var validateForm = function(){
         SelfExlusionWS.resetError();
 
-        $("#selfExclusion > type['text']").each(function(variable){
+        $("#selfExclusion > input[type='text']").each(function(variable){
             console.log("The variable is" , variable);
         });
 
