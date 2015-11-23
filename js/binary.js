@@ -58576,7 +58576,7 @@ pjax_config_page("user/self_exclusionws", function() {
             SelfExlusionWS.date_picker();
             SelfExlusionWS.validate_date();
         
-            //PasswordWS.init();
+            SelfExlusionWS.init();
         }
     };
 });;onLoad.queue_for_url(function() {
