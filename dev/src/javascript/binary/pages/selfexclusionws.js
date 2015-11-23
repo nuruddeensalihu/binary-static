@@ -1,4 +1,4 @@
-var SelfExlusionWS = (function(){
+var self_exlusionWS = (function(){
     
     "use strict";
 

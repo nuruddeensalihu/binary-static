@@ -58473,7 +58473,7 @@ onLoad.queue_for_url(function () {
     self_exclusion.self_exclusion_date_picker();
     self_exclusion.self_exclusion_validate_date();
 }, 'self_exclusion');
-;var SelfExlusionWS = (function(){
+;var self_exlusionWS = (function(){
     
     "use strict";
 
