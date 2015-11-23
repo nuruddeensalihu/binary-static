@@ -1,4 +1,4 @@
-var self_exlusionWS = (function(){
+var SelfExlusionWS = (function(){
     
     "use strict";
 
@@ -38,7 +38,7 @@ var self_exlusionWS = (function(){
     };
 
     var validate_date = function () {
-        $('#selfExclusionWS').on('click', '#self_exclusion_submitWS', function () {
+        $('#selfExclusion').on('click', '#self_exclusion_submit', function () {
             return client_form.self_exclusion.validate_exclusion_date();
         });
     };
@@ -78,8 +78,8 @@ pjax_config_page("user/self_exclusionws", function() {
            
             // date picker for self exclusion
                 
-            self_exlusionWS.date_picker();
-            self_exlusionWS.validate_date();
+            SelfExlusionWS.date_picker();
+            SelfExlusionWS.validate_date();
         
             //PasswordWS.init();
         }
