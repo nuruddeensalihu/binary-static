@@ -38,7 +38,7 @@ var SelfExlusionWS = (function(){
         $(":text").each(function(ind,element){
             if(!isNormalInteger($(element).val()) && $(element).val())
             {
-                if(!/EXCLUDEUNTIL/.test((element).attr("id")))
+                if(!/EXCLUDEUNTIL/.test($(element).attr("id")))
                 {
                     $("#error"+$(element).attr("id")).text("Please enter an integer value");
                     isValid = false;
