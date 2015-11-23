@@ -75,8 +75,9 @@ pjax_config_page("account/self_exclusionws", function() {
             });	*/	 
            
             // date picker for self exclusion
-            self_exclusion_date_picker();
-            self_exclusion_validate_date();
+                
+            self_exclusion.self_exclusion_date_picker();
+            self_exclusion.self_exclusion_validate_date();
         
             //PasswordWS.init();
         }
