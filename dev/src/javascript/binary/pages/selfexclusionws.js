@@ -33,7 +33,7 @@ var SelfExlusionWS = (function(){
         var isValid = true;
         resetError();
 
-        $("form > :text").each(function(variable){
+        $(":text").each(function(variable){
             console.log("The variable is" , variable.val());
             if(!isNormalInteger(variable.val()))
             {
