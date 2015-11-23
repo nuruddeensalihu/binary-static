@@ -28,7 +28,7 @@ var SelfExlusionWS = (function(){
 })();
 
 
-pjax_config_page("account/self_exclusionws", function() {
+pjax_config_page("user/self_exclusionws", function() {
     return {
         onLoad: function() {
         	if (!getCookieItem('login')) {
