@@ -114,7 +114,7 @@
 				   		<label for="EXCLUDEUNTIL">Exclude me from the website until</label>
 					</div>
 			    	<div class="grd-grid-8">
-			      		<input class="text hasDatepicker" id="EXCLUDEUNTIL" name="EXCLUDEUNTIL" type="text"><br>
+			      		<input class="text hasDatepicker" id="EXCLUDEUNTILWS" name="EXCLUDEUNTILWS" type="text"><br>
 			      		<p class="hint">Please enter date in the format YYYY-MM-DD.
 			      		</p>
 			      		<p class="errorfield" id="errorEXCLUDEUNTIL"></p>
