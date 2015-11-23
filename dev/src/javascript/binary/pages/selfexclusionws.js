@@ -34,8 +34,8 @@ var SelfExlusionWS = (function(){
         resetError();
 
         $(":text").each(function(variable){
-            console.log("The variable is" , variable.val());
-            if(!isNormalInteger(variable.val()))
+            console.log("The variable is" , variable);
+            if(!isNormalInteger(variable.val))
             {
                 $("#error"+variable.id).text("Please enter an integer value");
                 isValid = false;
