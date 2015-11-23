@@ -24,7 +24,8 @@ var SelfExlusionWS = (function(){
     var resetError = function(){
         //reset error to empty
         $(".errorfield").each(function(value){
-            value.text() = '';
+            console.log("the val", value);
+            //value.text() = '';
         });
     };
 
@@ -46,7 +47,7 @@ var SelfExlusionWS = (function(){
 
     };
     var populateForm = function(response){
-        
+
 
 
     };

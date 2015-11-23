@@ -58489,7 +58489,8 @@ onLoad.queue_for_url(function () {
     var resetError = function(){
         //reset error to empty
         $(".errorfield").each(function(value){
-            value.text() = '';
+            console.log("the val", value);
+            //value.text() = '';
         });
     };
 
@@ -58511,7 +58512,7 @@ onLoad.queue_for_url(function () {
 
     };
     var populateForm = function(response){
-        
+
 
 
     };
