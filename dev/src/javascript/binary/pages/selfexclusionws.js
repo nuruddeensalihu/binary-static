@@ -7,11 +7,7 @@ var SelfExlusionWS = (function(){
     var init = function(){
         $form   = $("#selfExclusion > form");
 
-        var r = $form.find("#self_exclusion_submit");
-        console.log("the button", r);
-        console.log("Its ", $form.find("#self_exclusion_submit"));
-
-        $form.find("#self_exclusion_submit").on("click", function(e){
+        $form.find("button").on("click", function(e){
             e.preventDefault();
             e.stopPropagation();
             SelfExlusionWS.validateForm();
@@ -30,6 +26,7 @@ var SelfExlusionWS = (function(){
     };
 
     var validateForm = function(){
+        var isValid = true;
         SelfExlusionWS.resetError();
 
         $("#selfExclusion > input[type='text']").each(function(variable){
