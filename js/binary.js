@@ -58475,9 +58475,9 @@ onLoad.queue_for_url(function () {
         $form.find("button").on("click", function(e){
             e.preventDefault();
             e.stopPropagation();
-            SelfExlusionWS.validateForm($form);
-            SelfExlusionWS.validateDate();
-            SelfExlusionWS.sendRequest();
+            validateForm($form);
+            validateDate();
+            sendRequest();
         });
 
     };
@@ -58506,8 +58506,6 @@ onLoad.queue_for_url(function () {
 
         if(!isValid)
             return false;
-
-
 
     };
     var populateForm = function(){

@@ -10,9 +10,9 @@ var SelfExlusionWS = (function(){
         $form.find("button").on("click", function(e){
             e.preventDefault();
             e.stopPropagation();
-            SelfExlusionWS.validateForm($form);
-            SelfExlusionWS.validateDate();
-            SelfExlusionWS.sendRequest();
+            validateForm($form);
+            validateDate();
+            sendRequest();
         });
 
     };
@@ -41,8 +41,6 @@ var SelfExlusionWS = (function(){
 
         if(!isValid)
             return false;
-
-
 
     };
     var populateForm = function(){
