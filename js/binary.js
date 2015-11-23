@@ -58552,6 +58552,7 @@ onLoad.queue_for_url(function () {
         datePicker : datePicker,
         validateDate : validateDate,
         populateForm : populateForm,
+        validateForm : validateForm,
         sendRequest: sendRequest,
         apiResponse: apiResponse
     };
