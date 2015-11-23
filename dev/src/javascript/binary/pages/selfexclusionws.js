@@ -37,8 +37,11 @@ var SelfExlusionWS = (function(){
         $(":text").each(function(ind,element){
             if(!isNormalInteger($(element).val()) && $(element).val())
             {
-                $("#error"+$(element).attr("id")).text("Please enter an integer value");
-                isValid = false;
+                if(!/EXCLUDEUNTIL/.test((element).attr("id")))
+                {
+                    $("#error"+$(element).attr("id")).text("Please enter an integer value");
+                    isValid = false;
+                }
             }
         });
 
@@ -56,7 +59,8 @@ var SelfExlusionWS = (function(){
     };
 
     var apiResponse = function(response){
-
+        var type = response.msg_type;
+        console.log("the response type is", type);
         if (type === "get_self_exclusion" || (type === "error" && "get_self_exclusion" in response.echo_req)){
             console.log("the log is",response.get_self_exclusion);
         }
@@ -117,7 +121,6 @@ pjax_config_page("user/self_exclusionws", function() {
                 onmessage: function(msg){
                     var response = JSON.parse(msg.data);
                     if (response) {
-                        var type = response.msg_type;
                         SelfExlusionWS.apiResponse(response);
                           
                     }
