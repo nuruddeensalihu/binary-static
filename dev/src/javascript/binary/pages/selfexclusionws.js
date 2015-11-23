@@ -25,7 +25,7 @@ var SelfExlusionWS = (function(){
         var end_date = new Date();
         end_date.setFullYear(end_date.getFullYear() + 5);
 
-        var id = $('#EXCLUDEUNTILWS');
+        var id = $('#EXCLUDEUNTIL');
 
         id.datepicker({
             dateFormat: 'yy-mm-dd',
