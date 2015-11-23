@@ -58481,6 +58481,7 @@ onLoad.queue_for_url(function () {
         });
 
         BinarySocket.send({"get_self_exclusion": 1});
+        populateForm();
 
     };
     function isNormalInteger(str) {
@@ -58499,10 +58500,8 @@ onLoad.queue_for_url(function () {
         resetError();
 
         $(":text").each(function(ind,element){
-            console.log("The variable is" , $(element).val());
-            if(!isNormalInteger($(element).val()))
+            if(!isNormalInteger($(element).val()) && $(element).val())
             {
-                console.log("element id is" , $(element).id);
                 $("#error"+$(element).attr("id")).text("Please enter an integer value");
                 isValid = false;
             }
@@ -58521,7 +58520,12 @@ onLoad.queue_for_url(function () {
 
     };
 
-    var apiResponse = function(){
+    var apiResponse = function(response){
+
+        if (type === "get_self_exclusion" || (type === "error" && "get_self_exclusion" in response.echo_req)){
+            console.log("the log is",response.get_self_exclusion);
+        }
+                   
 
     } ;
     var datePicker = function () {
@@ -58579,10 +58583,8 @@ pjax_config_page("user/self_exclusionws", function() {
                     var response = JSON.parse(msg.data);
                     if (response) {
                         var type = response.msg_type;
-                        if (type === "get_self_exclusion" || (type === "error" && "get_self_exclusion" in response.echo_req)){
-                            SelfExlusionWS.apiResponse(response);
-                        }
-                        
+                        SelfExlusionWS.apiResponse(response);
+                          
                     }
                 }
             });	
