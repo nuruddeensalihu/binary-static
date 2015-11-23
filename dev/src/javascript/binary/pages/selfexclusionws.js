@@ -25,7 +25,7 @@ var SelfExlusionWS = (function(){
         //reset error to empty
         $("p.errorfield").each(function(ind,element){
             console.log("the val", $(element).text());
-            element.text("");
+            $(element).text("");
         });
     };
 
