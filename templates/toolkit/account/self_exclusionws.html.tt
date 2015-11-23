@@ -115,7 +115,7 @@
 					</div>
 			    	<div class="grd-grid-8">
 			      		<input class="text hasDatepicker" id="EXCLUDEUNTIL" name="EXCLUDEUNTIL" type="text"><br>
-			      		<p class="hint">Please enter date in the format YYYY-MM-DD. %]
+			      		<p class="hint">Please enter date in the format YYYY-MM-DD.
 			      		</p>
 			      		<p class="errorfield" id="errorEXCLUDEUNTIL"></p>
 			    	</div>
@@ -136,7 +136,7 @@
 					</div>
 		        	<div class="grd-grid-8">
 		        		<span class="button">
-		        			<button class="button" id="self_exclusion_submit" name="submit" type="submit" value="Update Settings">[% l('Update Settings') %]</button>
+		        			<button class="button" id="self_exclusion_submit" name="submit" type="submit" value="Update Settings">Update Settings</button>
 		        		</span>
 		      		    <p class="errorfield" id="invalidinputfound">
 		       			</p>
