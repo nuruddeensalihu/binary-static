@@ -58476,6 +58476,7 @@ onLoad.queue_for_url(function () {
             e.preventDefault();
             e.stopPropagation();
             SelfExlusionWS.validateForm($form);
+            SelfExlusionWS.validateDate();
             SelfExlusionWS.sendRequest();
         });
 
@@ -58550,6 +58551,7 @@ onLoad.queue_for_url(function () {
         init: init,
         datePicker : datePicker,
         validateDate : validateDate,
+        populateForm : populateForm,
         sendRequest: sendRequest,
         apiResponse: apiResponse
     };

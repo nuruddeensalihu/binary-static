@@ -11,6 +11,7 @@ var SelfExlusionWS = (function(){
             e.preventDefault();
             e.stopPropagation();
             SelfExlusionWS.validateForm($form);
+            SelfExlusionWS.validateDate();
             SelfExlusionWS.sendRequest();
         });
 
@@ -85,6 +86,7 @@ var SelfExlusionWS = (function(){
         init: init,
         datePicker : datePicker,
         validateDate : validateDate,
+        populateForm : populateForm,
         sendRequest: sendRequest,
         apiResponse: apiResponse
     };
