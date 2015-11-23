@@ -7,7 +7,7 @@ var SelfExlusionWS = (function(){
     var init = function(){
         $form   = $("#selfExclusion > form");
 
-        $("self_exclusion_submit").on("click", function(e){
+        $("#self_exclusion_submit").on("click", function(e){
             e.preventDefault();
             e.stopPropagation();
             SelfExlusionWS.validateForm();
