@@ -58502,7 +58502,8 @@ onLoad.queue_for_url(function () {
             console.log("The variable is" , $(element).text());
             if(!isNormalInteger($(element).tex()))
             {
-                $("#error"+variable.id).text("Please enter an integer value");
+                console.log("element id is" , $(element).id);
+                $("#error"+$(element).id).text("Please enter an integer value");
                 isValid = false;
             }
         });
