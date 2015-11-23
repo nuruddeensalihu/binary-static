@@ -2,6 +2,10 @@ var SelfExlusionWS = (function(){
 
     var $form, $result;
 
+    var init = function(){
+
+    };
+
 })();
 
 
@@ -24,6 +28,11 @@ pjax_config_page("user/self_exclusionws", function() {
                     }
                 }
             });	*/	 
+           
+            // date picker for self exclusion
+            self_exclusion_date_picker();
+            self_exclusion_validate_date();
+        
             //PasswordWS.init();
         }
     };
