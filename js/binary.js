@@ -58540,8 +58540,8 @@ onLoad.queue_for_url(function () {
 
     return {
         init: init,
-        date_picker : date_picker,
-        validate_date : validate_date,
+        datePicker : datePicker,
+        validateDate : validateDate,
         sendRequest: sendRequest,
         apiResponse: apiResponse
     };
