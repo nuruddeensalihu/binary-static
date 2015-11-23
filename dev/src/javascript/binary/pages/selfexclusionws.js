@@ -7,6 +7,9 @@ var SelfExlusionWS = (function(){
     var init = function(){
         $form   = $("#selfExclusion > form");
 
+        var r = $form.find("button").text();
+        console.log("the button", r);
+        console.log("Its ", $form.find("button"));
 
         $form.find("button").on("click", function(e){
             e.preventDefault();
