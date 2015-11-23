@@ -10,7 +10,7 @@ var SelfExlusionWS = (function(){
         $("#self_exclusion_submit").on("click", function(e){
             e.preventDefault();
             e.stopPropagation();
-            SelfExlusionWS.validateForm();
+            SelfExlusionWS.validateForm($form);
             SelfExlusionWS.sendRequest();
         });
 
@@ -25,15 +25,21 @@ var SelfExlusionWS = (function(){
         });
     };
 
-    var validateForm = function(){
+    var validateForm = function($form){
         var isValid = true;
         SelfExlusionWS.resetError();
 
-        $("#selfExclusion > input[type=text]").each(function(variable){
+        $("input[type=text]", $form).each(function(variable){
             console.log("The variable is" , variable);
+            if(!isNormalInteger(variable))
+            {
+                $("#error"+variable.id).text("Please enter an integer value");
+                isValid = false;
+            }
         });
 
-
+        if(!isValid)
+            return false;
 
     };
     var populateForm = function(){
