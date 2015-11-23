@@ -1,4 +1,6 @@
 var SelfExlusionWS = (function(){
+    
+    "use strict";
 
     var $form, $result;
 

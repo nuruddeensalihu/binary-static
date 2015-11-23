@@ -58474,6 +58474,8 @@ onLoad.queue_for_url(function () {
     self_exclusion.self_exclusion_validate_date();
 }, 'self_exclusion');
 ;var SelfExlusionWS = (function(){
+    
+    "use strict";
 
     var $form, $result;
 
