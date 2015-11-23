@@ -58574,7 +58574,7 @@ pjax_config_page("user/self_exclusionws", function() {
             // date picker for self exclusion
                 
             SelfExlusionWS.datePicker();
-            self_exclusionws.populateForm()
+            SelfExlusionWS.populateForm()
             SelfExlusionWS.validateDate();
         
             SelfExlusionWS.init();
