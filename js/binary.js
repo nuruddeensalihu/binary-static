@@ -58472,7 +58472,7 @@ onLoad.queue_for_url(function () {
     var init = function(){
         $form   = $("#selfExclusion > form");
 
-        $form.find("button").on("click", function(e){
+        $("self_exclusion_submit").on("click", function(e){
             e.preventDefault();
             e.stopPropagation();
             SelfExlusionWS.validateForm();
@@ -58485,7 +58485,7 @@ onLoad.queue_for_url(function () {
     }
     var resetError = function(){
         //reset error to empty
-        $("#selfExclusion > div[class='errorfield']").each(function(value){
+        $(".errorfield").each(function(value){
             value.text() = '';
         });
     };
@@ -58494,13 +58494,16 @@ onLoad.queue_for_url(function () {
         var isValid = true;
         SelfExlusionWS.resetError();
 
-        $("#selfExclusion > input[type='text']").each(function(variable){
+        $("#selfExclusion > input[type=text]").each(function(variable){
             console.log("The variable is" , variable);
         });
 
 
 
-    }
+    };
+    var populateForm = function(){
+
+    };
     var sendRequest = function(){
 
     };
@@ -58508,7 +58511,7 @@ onLoad.queue_for_url(function () {
     var apiResponse = function(){
 
     } ;
-    var date_picker = function () {
+    var datePicker = function () {
         // 6 months from now
         var start_date = new Date();
         start_date.setMonth(start_date.getMonth() + 6);
@@ -58529,7 +58532,7 @@ onLoad.queue_for_url(function () {
         });
     };
 
-    var validate_date = function () {
+    var validateDate = function () {
         $('#selfExclusion').on('click', '#self_exclusion_submit', function () {
             return client_form.self_exclusion.validate_exclusion_date();
         });
@@ -58570,8 +58573,9 @@ pjax_config_page("user/self_exclusionws", function() {
            
             // date picker for self exclusion
                 
-            SelfExlusionWS.date_picker();
-            SelfExlusionWS.validate_date();
+            SelfExlusionWS.datePicker();
+            self_exclusionws.populateForm()
+            SelfExlusionWS.validateDate();
         
             SelfExlusionWS.init();
         }
