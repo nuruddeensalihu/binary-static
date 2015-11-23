@@ -15,6 +15,8 @@ var SelfExlusionWS = (function(){
             sendRequest();
         });
 
+        BinarySocket.send({"get_self_exclusion": 1});
+
     };
     function isNormalInteger(str) {
         return /^\+?\d+$/.test(str);
@@ -28,7 +30,7 @@ var SelfExlusionWS = (function(){
 
     var validateForm = function(frm){
         var isValid = true;
-        SelfExlusionWS.resetError();
+        resetError();
 
         $("input[type=text]", frm).each(function(variable){
             console.log("The variable is" , variable);
@@ -43,7 +45,9 @@ var SelfExlusionWS = (function(){
             return false;
 
     };
-    var populateForm = function(){
+    var populateForm = function(response){
+        
+
 
     };
     var sendRequest = function(){
@@ -102,24 +106,24 @@ pjax_config_page("user/self_exclusionws", function() {
                 window.location.href = page.url.url_for('login');
                 return;
             }
-            /*
+            
         	BinarySocket.init({
                 onmessage: function(msg){
                     var response = JSON.parse(msg.data);
                     if (response) {
                         var type = response.msg_type;
-                        if (type === "change_password" || (type === "error" && "change_password" in response.echo_req)){
-                            PasswordWS.apiResponse(response);
+                        if (type === "get_self_exclusion" || (type === "error" && "get_self_exclusion" in response.echo_req)){
+                            SelfExlusionWS.apiResponse(response);
                         }
+                        
                     }
                 }
-            });	*/	 
+            });	
            
             // date picker for self exclusion
                 
             SelfExlusionWS.datePicker();
             SelfExlusionWS.populateForm();
-           // SelfExlusionWS.validateDate();
         
             SelfExlusionWS.init();
         }
