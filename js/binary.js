@@ -58457,13 +58457,13 @@ var self_exclusion_validate_date = function () {
         return client_form.self_exclusion.validate_exclusion_date();
     });
 };
-
+/*
 onLoad.queue_for_url(function () {
 // date picker for self exclusion
     //self_exclusion_date_picker();
     //self_exclusion_validate_date();
 }, 'self_exclusion');
-;var SelfExlusionWS = (function(){
+*/;var SelfExlusionWS = (function(){
     
     "use strict";
 
