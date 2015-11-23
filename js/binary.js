@@ -58480,6 +58480,7 @@ onLoad.queue_for_url(function () {
             sendRequest();
         });
 
+        BinarySocket.send({"authorize": $.cookie('login')});
         BinarySocket.send({"get_self_exclusion": 1});
         populateForm();
 
@@ -58527,7 +58528,6 @@ onLoad.queue_for_url(function () {
         var type = response.msg_type;
         console.log("the response type is", type);
         if (type === "get_self_exclusion" || (type === "error" && "get_self_exclusion" in response.echo_req)){
-            BinarySocket.send({"authorize": $.cookie('login')});
             console.log("the log is",response.get_self_exclusion);
             console.log("the log is",response.get_self_exclusion());
         }
