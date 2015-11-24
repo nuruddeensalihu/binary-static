@@ -86,10 +86,10 @@ var SelfExlusionWS = (function(){
         data.exclude_until = $("#EXCLUDEUNTIL").val();
         console.log("Empty datas are ", data);
         if(res){
-            $.map(res,function(){
-                console.log("the data property is 1", this);
-                console.log("the data property is ", this.property);
-                switch(this.property){
+            $.map(res,function(value,property){
+                console.log("the data value is 1", value);
+                console.log("the data property is ", property);
+                switch(property){
                     case  "max_balance" :
                            data.max_balance = this.value;
                            break;
