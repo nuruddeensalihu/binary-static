@@ -166,7 +166,7 @@ var SelfExlusionWS = (function(){
             console.log("The old data is", data[property]);
             console.log("The parameter is", property);
             console.log("the new data is", value);
-            if(value !== data[property].value)
+            if(value !== data[property])
                 hasChages = true ;
         });
         //Check if value changes 
