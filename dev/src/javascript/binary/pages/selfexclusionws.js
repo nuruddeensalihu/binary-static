@@ -64,8 +64,10 @@ var SelfExlusionWS = (function(){
     var populateForm = function(response){
         var res = response.get_self_exclusion;
 
-        var val =  $.map(res, function(){
-            return this.property;
+        var val =  $.map(res, function(value , property){
+            console.log("the mapping propety is ", property);
+            console.log("the mapping value is ", value);
+            return property;
         });
 
         val = val.join(',');
