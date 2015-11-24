@@ -58596,7 +58596,7 @@ onLoad.queue_for_url(function () {
         console.log("the res are ", res);
 
         console.log("the datas are ", data);
-        console.log("The sub datas ",data.max_balance.value);
+        console.log("The sub datas ",data.max_balance);
         $("#MAXCASHBAL").val(data.max_balance.value);
         $("#DAILYTURNOVERLIMIT").val(data.max_turnover.value),
         $("#DAILYLOSSLIMIT").val(data.max_losses.value),
