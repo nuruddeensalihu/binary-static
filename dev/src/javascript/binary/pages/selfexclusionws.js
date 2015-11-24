@@ -91,34 +91,34 @@ var SelfExlusionWS = (function(){
                 console.log("the data property is ", property);
                 switch(property){
                     case  "max_balance" :
-                           data.max_balance = this.value;
+                           data.max_balance = value;
                            break;
                     case  "max_turnover" :
-                           data.max_turnover = this.value;
+                           data.max_turnover = value;
                            break;
                     case  "max_losses"   :
-                           data.max_losses = this.value;
+                           data.max_losses = value;
                            break;
                     case  "max_7day_turnover" :
-                           data.max_7day_turnover = this.value;
+                           data.max_7day_turnover = value;
                            break;
                     case  "max_7day_losses" :
-                           data.max_7day_losses = this.value;
+                           data.max_7day_losses = value;
                            break;
                     case   "max_30day_turnover" :
-                            data.max_30day_turnover = this.value;
+                            data.max_30day_turnover = value;
                             break;
                     case   "max_30day_losses" :
-                            data.max_30day_losses = this.value;
+                            data.max_30day_losses = value;
                             break;
                     case    "max_open_bets" :
-                             data.max_open_bets = this.value;
+                             data.max_open_bets = value;
                              break; 
                     case    "session_duration_limit"  :
-                             data.session_duration_limit = this.value;
+                             data.session_duration_limit = value;
                              break;
                     case    "exclude_until"   :
-                             data.exclude_until = this.value;
+                             data.exclude_until = value;
                              break;       
 
                 }
