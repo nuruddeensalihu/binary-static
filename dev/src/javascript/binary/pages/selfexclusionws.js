@@ -14,7 +14,7 @@ var SelfExlusionWS = (function(){
             if(!validateForm($form)){
                 return false;
             }
-            validateDate();
+            selfExclusion.self_exclusion_validate_date();
             BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "set_self_exclusion"}});
         });
 
@@ -271,7 +271,7 @@ pjax_config_page("user/self_exclusionws", function() {
                 
            // date picker for self exclusion
              selfExclusion.self_exclusion_date_picker();
-             selfExclusion.self_exclusion_validate_date();
+            // selfExclusion.self_exclusion_validate_date();
            // SelfExlusionWS.populateForm();
         
             SelfExlusionWS.init();
