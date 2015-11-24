@@ -43,9 +43,9 @@ var SelfExlusionWS = (function(){
     };
     var validateForm = function(frm){
         var isValid = true;
-        console.log("The first data is before clear ", $(MAXCASHBAL).val());
+       
         resetError();
-        console.log("The first data is after clear ", $(MAXCASHBAL).val());
+      
 
         $(":text").each(function(ind,element){
             if(!isNormalInteger($(element).val()) && $(element).val())
@@ -87,7 +87,10 @@ var SelfExlusionWS = (function(){
         val = val.join(',');
 
         //Reset form to empty.
+
+        console.log("The first data is before clear ", $(MAXCASHBAL).val());
         resetForm();
+        console.log("The first data is after clear ", $(MAXCASHBAL).val());
 
         console.log("map values test", val);
 
