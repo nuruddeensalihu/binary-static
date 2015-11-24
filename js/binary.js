@@ -49481,11 +49481,14 @@ Header.prototype = {
     on_load: function() {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
-        if (!this.clock_started) this.start_clock();
+        //if (!this.clock_started) this.start_clock();
+        if (!this.clock_started) this.start_clock_ws();
+        //start_clock_ws
         this.simulate_input_placeholder_for_ie();
     },
     on_unload: function() {
         this.menu.reset();
+        console("onHead on-Unload",BinarySocket.isReady());
     },
     show_or_hide_login_form: function() {
         if (this.user.is_logged_in && this.client.is_logged_in) {
@@ -49551,12 +49554,65 @@ Header.prototype = {
 
         this.menu.register_dynamic_links();
     },
+    start_clock_ws : function(){
+        var that = this;
+        var clock_handle;
+        var query_start_time;
+        var clock = $('#gmt-clock');
+
+        function init(){
+            BinarySocket.send({ "time": 1});
+            query_start_time = (new Date().getTime());  
+        };
+      
+        BinarySocket.init({
+            onmessage : function(msg){
+                var response = JSON.parse(msg.data);
+                if (response && response.msg_type === 'time') {
+                    responseMsg(response);
+                }
+            }
+        });
+        function responseMsg(response){
+            var start_timestamp = response.time;
+            
+            that.time_now = ((start_timestamp * 1000)+ ((new Date().getTime()) - query_start_time));
+            var increase_time_by = function(interval) {
+                that.time_now += interval;
+            };
+
+            var update_time = function() {
+                 clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+            };
+
+            update_time();
+
+            clearInterval(clock_handle);
+
+            clock_handle = setInterval(function() {
+                increase_time_by(1000);
+                update_time();
+            }, 1000);
+        }
+
+        that.run = function(){
+            setInterval(init, 900000);
+        };
+        
+        if(BinarySocket.isReady()){
+            init();
+            that.run();
+            this.clock_started = true;
+        }
+         
+        return;
+    },
     start_clock: function() {
         var clock = $('#gmt-clock');
         if (clock.length === 0) {
             return;
         }
-
+        
         var that = this;
         var clock_handle;
         var sync = function() {
@@ -49874,6 +49930,7 @@ Page.prototype = {
     on_unload: function() {
         this.header.on_unload();
         this.contents.on_unload();
+        console("OnPage on-Unload",BinarySocket.isReady());
     },
     on_change_language: function() {
         var that = this;
@@ -51888,7 +51945,7 @@ pjax_config_page('rise_fall_table', function() {
     };
 });
 
-pjax_config_page('portfoliows|portfolio|trade.cgi|statement|f_manager_statement|f_manager_history|' +
+pjax_config_page('portfolio|trade.cgi|statement|f_manager_statement|f_manager_history|' +
     'f_profit_table|profit_table|trading|legacy-statement|legacy-profittable', function() {
     return {
         onLoad: function() {
@@ -57570,258 +57627,6 @@ ClientForm.prototype = {
         $('#Email').disableSelection();
     }
 };
-;var SettingsDetailsWS = (function() {
-    "use strict";
-
-    var formID = '#frmPersonalDetails';
-    var frmBtn = formID + ' button',
-        RealAccElements = '.RealAcc',
-        errorClass = 'errorfield';
-    var fieldIDs = {
-        address1 : '#Address1',
-        address2 : '#Address2',
-        city     : '#City',
-        state    : '#State',
-        postcode : '#Postcode',
-        phone    : '#Phone'
-    };
-    var isValid;
-
-
-    var init = function() {
-        BinarySocket.send({"get_settings": "1"});
-    };
-
-    var getDetails = function(response) {
-        var data = response.get_settings;
-
-        // Check if it is a real account or not
-        var isReal = !(/VRT/.test($.cookie('loginid')));
-
-        $('#lblCountry').text(data.country);
-        $('#lblEmail').text(data.email);
-
-        if(!isReal){ // Virtual Account
-            $(RealAccElements).remove();
-        } 
-        else { // Real Account
-            BinarySocket.send({"authorize": $.cookie('login')});
-            $('#lblBirthDate').text(moment.utc(new Date(data.date_of_birth * 1000)).format("YYYY-MM-DD"));
-            $(fieldIDs.address1).val(data.address_line_1);
-            $(fieldIDs.address2).val(data.address_line_2);
-            $(fieldIDs.city).val(data.address_city);
-
-            // Generate states list
-            var residence = $.cookie('residence');
-            BinarySocket.send({"states_list": residence, "passthrough": {"value": data.address_state}});
-            
-            $(fieldIDs.postcode).val(data.address_postcode);
-            $(fieldIDs.phone).val(data.phone);
-
-            $(RealAccElements).removeClass('hidden');
-
-            $(frmBtn).click(function(e){
-                e.preventDefault();
-                e.stopPropagation();
-                return setDetails();
-            });
-        }
-
-        $(formID).removeClass('hidden');
-    };
-
-    var setFullName = function(response) {
-        $('#lblName').text(response.authorize.fullname);
-    };
-
-    var populateStates = function(response) {
-        $(fieldIDs.state).empty();
-        var defaultValue = response.echo_req.passthrough.value;
-        var states = response.states_list;
-        if(states.length > 0) {
-            for(var i = 0; i < states.length; i++){
-                $(fieldIDs.state).append($('<option/>', {value: states[i].value, text: states[i].text}));
-            }
-            // set Current value
-            $(fieldIDs.state).val(defaultValue);
-        }
-        else {
-            $(fieldIDs.state).replaceWith($('<input/>', {id: 'State', type: 'text', maxlength: '35', value: defaultValue}));
-        }
-    };
-
-    var formValidate = function() {
-        clearError();
-        isValid = true;
-
-        var address1 = $(fieldIDs.address1).val().trim(),
-            address2 = $(fieldIDs.address2).val().trim(),
-            city     = $(fieldIDs.city).val().trim(),
-            state    = $(fieldIDs.state).val().trim(),
-            postcode = $(fieldIDs.postcode).val().trim(),
-            phone    = $(fieldIDs.phone).val().trim();
-        
-        var letters = Content.localize().textLetters,
-            numbers = Content.localize().textNumbers,
-            space   = Content.localize().textSpace,
-            period  = Content.localize().textPeriod,
-            comma   = Content.localize().textComma;
-        
-        // address 1
-        if(!isRequiredError(fieldIDs.address1) && !(/^[a-zA-Z0-9\s\,\.\-\/\(\)#']+$/).test(address1)) {
-            showError(fieldIDs.address1, Content.errorMessage('reg', [letters, numbers, space, period, comma, '- / ( ) # \'']));
-        }
-
-        // address line 2
-        if(!(/^[a-zA-Z0-9\s\,\.\-\/\(\)#']*$/).test(address2)) {
-            showError(fieldIDs.address2, Content.errorMessage('reg', [letters, numbers, space, period, comma, '- / ( ) # \'']));
-        }
-
-        // town/city
-        if(!isRequiredError(fieldIDs.city) && !(/^[a-zA-Z\s\-']+$/).test(city)) {
-            showError(fieldIDs.city, Content.errorMessage('reg', [letters, space, '- \'']));
-        }
-
-        // state
-        if(!isRequiredError(fieldIDs.state) && !(/^[a-zA-Z\s\-']+$/).test(state)) {
-            showError(fieldIDs.state, Content.errorMessage('reg', [letters, space, '- \'']));
-        }
-
-        // postcode
-        if(!isRequiredError(fieldIDs.postcode) && !isCountError(fieldIDs.postcode, 4, 20) && !(/(^[a-zA-Z0-9\s\-\/]+$)/).test(postcode)) {
-            showError(fieldIDs.postcode, Content.errorMessage('reg', [letters, numbers, space, '- /']));
-        }
-
-        // telephone
-        if(!isCountError(fieldIDs.phone, 6, 20) && !(/^(|\+?[0-9\s\-]+)$/).test(phone)) {
-            showError(fieldIDs.phone, Content.errorMessage('reg', [numbers, space, '-']));
-        }
-
-        if(isValid) {
-            return {
-                address1 : address1,
-                address2 : address2,
-                city     : city,
-                state    : state,
-                postcode : postcode,
-                phone    : phone
-            };
-        }
-        else {
-            return false;
-        }
-    };
-
-    var isRequiredError = function(fieldID) {
-        if(!(/.+/).test($(fieldID).val().trim())){
-            showError(fieldID, Content.errorMessage('req'));
-            return true;
-        } else {
-            return false;
-        }
-    };
-
-    var isCountError = function(fieldID, min, max) {
-        var fieldValue = $(fieldID).val().trim();
-        if((fieldValue.length > 0 && fieldValue.length < min) || fieldValue.length > max) {
-            showError(fieldID, Content.errorMessage('range', '(' + min + '-' + max + ')'));
-            return true;
-        } else {
-            return false;
-        }
-    };
-
-    var showError = function(fieldID, errMsg) {
-        $(fieldID).after($('<p/>', {class: errorClass, text: errMsg}));
-        isValid = false;
-    };
-
-    var clearError = function(fieldID) {
-        $(fieldID ? fieldID : formID + ' .' + errorClass).remove();
-    };
-
-    var setDetails = function() {
-        var formData = formValidate();
-        if(!formData)
-            return false;
-
-        BinarySocket.send({
-            "set_settings"    : 1,
-            "address_line_1"  : formData.address1,
-            "address_line_2"  : formData.address2,
-            "address_city"    : formData.city,
-            "address_state"   : formData.state,
-            "address_postcode": formData.postcode,
-            "phone"           : formData.phone
-        });
-    };
-
-    var setDetailsResponse = function(response) {
-        var isError = response.set_settings !== 1;
-        $('#formMessage').css('display', '')
-            .attr('class', isError ? 'errorfield' : 'success-msg')
-            .html(text.localize(isError ? 'Sorry, an error occurred while processing your account.' : '<ul class="checked"><li>Your settings have been updated successfully.</li></ul>'))
-            .delay(3000)
-            .fadeOut(1000);
-    };
-   
-
-    return {
-        init: init,
-        getDetails: getDetails,
-        setDetails: setDetails,
-        setDetailsResponse: setDetailsResponse,
-        setFullName: setFullName,
-        populateStates: populateStates
-    };
-}());
-
-
-
-pjax_config_page("settings/detailsws", function() {
-    return {
-        onLoad: function() {
-            if (!$.cookie('login')) {
-                window.location.href = page.url.url_for('login');
-                return;
-            }
-
-            BinarySocket.init({
-                onmessage: function(msg) {
-                    var response = JSON.parse(msg.data);
-                    if (response) {
-                        var type = response.msg_type;
-                        switch(type){
-                            case "get_settings":
-                                SettingsDetailsWS.getDetails(response);
-                                break;
-                            case "set_settings":
-                                SettingsDetailsWS.setDetailsResponse(response);
-                                break;
-                            case "authorize":
-                                SettingsDetailsWS.setFullName(response);
-                                break;
-                            case "states_list":
-                                SettingsDetailsWS.populateStates(response);
-                                break;
-                            case "error":
-                                $('#formMessage').attr('class', 'errorfield').text(response.error.message);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    else {
-                        console.log('some error occured');
-                    }
-                }
-            });
-
-            Content.populate();
-            SettingsDetailsWS.init();
-        }
-    };
-});
 ;var sidebar_scroll = function(elm_selector) {
     elm_selector.on('click', '#sidebar-nav li', function() {
         var clicked_li = $(this);
@@ -58395,205 +58200,6 @@ $(function() {
       active: false
     });
 });
-;var PortfolioWS =  (function() {
-
-    'use strict';
-
-    var pageLanguage = page.language();
-    if(!pageLanguage) pageLanguage = "EN";
-
-    var rowTemplate;
-    var retry;
-
-    var init = function() {
-        // get the row template and then discard the node as it has served its purpose
-        rowTemplate = $("#portfolio-dynamic tr:first")[0].outerHTML;
-        $("#portfolio-dynamic tr:first").remove();
-        BinarySocket.send({"balance":1});
-    };
-
-
-    /**
-     * Show balance
-    **/
-    var updateBalance = function(data) {
-        $("span[data-id='balance']").text(data.balance.currency + ' ' + addComma(parseFloat(data.balance.balance)));
-        if(parseFloat(data.balance.balance, 10) > 0) {
-            $("#if-balance-zero").remove();
-        }
-        BinarySocket.send({"portfolio":1});
-    };
-    
-    /**
-     * Updates portfolio table
-    **/
-    var updatePortfolio = function(data) {
-
-        /**
-         * Check for error
-        **/
-        if("error" in data) {
-            throw new Error("Trying to get portfolio data, we got this error", data.error);
-        }
-
-        /**
-         * no contracts
-        **/
-        if(0 === data.portfolio.contracts.length) {
-            $("#portfolio-table").remove();
-            $("#portfolio-no-contract").removeClass("dynamic");
-            return true;
-        }
-
-        /**
-         * User has at least one contract
-        **/
-
-        $("#portfolio-no-contract").remove();
-        var contracts = '';
-        var sumPurchase = 0.0;
-        var currency;
-        $.each(data.portfolio.contracts, function(ci, c) {
-            sumPurchase += parseFloat(c.buy_price, 10);
-            currency = c.currency;
-            contracts += rowTemplate
-            .split("!transaction_id!").join(c.transaction_id)
-            .split("!contract_id!").join(c.contract_id)
-            .split("!longcode!").join(c.longcode)
-            .split("!currency!").join(c.currency)
-            .split("!buy_price!").join(addComma(parseFloat(c.buy_price)));
-        });
-
-        // contracts is ready to be added to the dom
-        $("#portfolio-dynamic").replaceWith(trans(contracts));
-
-        // update footer area data
-        sumPurchase = sumPurchase.toFixed(2);
-        $("#cost-of-open-positions").text(currency + ' ' + addComma(parseFloat(sumPurchase)));
-
-        // request "proposal_open_contract"
-        BinarySocket.send({"proposal_open_contract":1});
-
-        // ready to show portfolio table
-        $("#trading_init_progress").remove();
-        $("#portfolio-content").removeClass("dynamic");
-
-    };
-
-    var updateIndicative = function(data) {
-
-        var $td = $("tr[data-contract_id='"+data.proposal_open_contract.contract_id+"'] td.indicative");
-        var old_indicative = $td.find('strong').text();
-        old_indicative = parseFloat(old_indicative, 2);
-        if(isNaN(old_indicative)) old_indicative = 0.0;
-
-        var new_indicative = parseFloat(data.proposal_open_contract.bid_price, 2);
-        if(isNaN(new_indicative)) new_indicative = 0.0;
-
-        if(data.proposal_open_contract.is_valid_to_sell != 1) {
-            $td.html(data.proposal_open_contract.currency+' <strong class="indicative_price">'+data.proposal_open_contract.bid_price+'</strong><span>'+text.localize('Resale not offered')+'</span>').addClass("no_resale");
-        } else {
-            $td.removeClass("no_resale");
-
-            if(old_indicative > new_indicative) {
-                $td.html(data.proposal_open_contract.currency+' <strong class="indicative_price price_moved_down">'+data.proposal_open_contract.bid_price+'</strong>');
-            } else if(old_indicative < new_indicative) {
-                $td.html(data.proposal_open_contract.currency+' <strong class="indicative_price price_moved_up">'+data.proposal_open_contract.bid_price+'</strong>');
-            }            
-        }
-
-        var indicative_sum = 0, indicative_price = 0, up_down;
-        $("strong.indicative_price").each(function() {
-            indicative_price = $(this).text();
-            indicative_price = parseFloat(indicative_price, 2);
-            if(!isNaN(indicative_price)) {
-                indicative_sum += indicative_price;
-            }
-        });
-
-        indicative_sum = indicative_sum.toFixed(2);
-
-        $("#value-of-open-positions").text('USD ' + addComma(parseFloat(indicative_sum)));
-
-    };
-
-
-    /*** utility functions ***/
-
-    // Dynamic text
-    var dTexts = ["view", "indicative"];
-
-    /**
-     * In the dynamic parts we have strings to include
-     * For instance, in portfolio table, we have a 'View' button
-     * for each contract.
-    **/
-    var trans = function(str) {
-        var placeholder;
-        for(var i = 0, l = dTexts.length; i < l; i++) {
-            placeholder = ":"+dTexts[i]+":";
-            if(-1 === str.indexOf(placeholder)) continue;
-            str = str.split(placeholder).join(text.localize(dTexts[i]));
-        }
-        return str;
-    };
- 
-    return {
-        init: init,
-        updateBalance: updateBalance,
-        updatePortfolio: updatePortfolio,
-        updateIndicative: updateIndicative
-    };
-
-})();
-
-pjax_config_page("user/portfoliows", function() {
-    return {
-        onLoad: function() {
-            if (!getCookieItem('login')) {
-                window.location.href = page.url.url_for('login');
-                return;
-            }
-            BinarySocket.init({
-
-                onmessage: function(msg){
-
-                    try {
-                        response  = JSON.parse(msg.data);
-                        if("object" !== typeof response || !("msg_type" in response)) {
-                            throw new Error("Response from WS API is not well formatted.");
-                        }
-                    } catch(e) {
-                        throw new Error("Response from WS API is not well formatted.");
-                    }
-
-                    var msg_type = response.msg_type;
-            
-                    switch(msg_type) {
-
-                        case "balance":
-                            PortfolioWS.updateBalance(response);
-                            break;
-
-                        case "portfolio":
-                            PortfolioWS.updatePortfolio(response);
-                            break;
-
-                        case "proposal_open_contract":
-                            PortfolioWS.updateIndicative(response);
-                            break;
-
-                        default:
-                            throw new Error("No method exits to handle api message of type '" + msg_type + "'.");
-
-                    }
-
-                }
-            });      
-            PortfolioWS.init();
-        }
-    };
-});
 ;function currencyConvertorCalculator()
 {
     var currencyto = document.getElementById('currencyto');
@@ -58914,287 +58520,7 @@ onLoad.queue_for_url(function () {
     self_exclusion_date_picker();
     self_exclusion_validate_date();
 }, 'self_exclusion');
-;var SelfExlusionWS = (function(){
-    
-    "use strict";
-
-    var $form;
-    var data = {};
-
-    var init = function(){
-        $form   = $("#selfExclusion");
-
-        $form.find("button").on("click", function(e){
-            e.preventDefault();
-            e.stopPropagation();
-            if(!validateForm($form)){
-                return false;
-            }
-            validateDate();
-            BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "set_self_exclusion"}});
-        });
-
-        BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "get_self_exclusion"}});
-
-    };
-    function isNormalInteger(str) {
-        return /^\+?\d+$/.test(str);
-    }
-    var resetError = function(){
-        //reset error to empty
-        $("p.errorfield").each(function(ind,element){
-
-            $(element).text("");
-        });
-    };
-    var resetForm = function(){
-        $(":text").each(function(ind,element){
-            if(!isNormalInteger($(element).val()) && $(element).val())
-            {
-                if(!/EXCLUDEUNTIL/.test($(element).attr("id")))
-                {
-                    $(element).val("");
-                }
-            }
-        });
-
-    };
-    var validateForm = function(frm){
-        var isValid = true;
-       
-        resetError();
-      
-
-        $(":text").each(function(ind,element){
-            if(!isNormalInteger($(element).val()) && $(element).val())
-            {
-                if(!/EXCLUDEUNTIL/.test($(element).attr("id")))
-                {
-                    $("#error"+$(element).attr("id")).text("Please enter an integer value");
-                    isValid = false;
-                }
-            }
-        });
-
-        if(!isValid)
-            return false;
-
-    };
-    var isAuthorized =  function(response){
-        if(response.echo_req.passthrough){
-            var option= response.echo_req.passthrough.value ;
-
-            switch(option){
-                case   "get_self_exclusion" :
-                        BinarySocket.send({"get_self_exclusion": 1});
-                        break;
-                case   "set_self_exclusion" :
-                        sendRequest();
-                        break;                   
-            }
-        }
-        /*
-        console.log("The response echo is", response.echo_req.passthrough);
-        if(typeof response.echo_req.passthrough.value !== 'undefined'){
-            var option= response.echo_req.passthrough.value ;
-
-            switch(option){
-                case   "get_self_exclusion" :
-                        BinarySocket.send({"get_self_exclusion": 1});
-                        break;
-                case   "set_self_exclusion" :
-                        sendRequest();
-                        break;                   
-            }
-        }
-        */
-   
-    };
-    var validateDate = function(){
-        return client_form.self_exclusion.validate_exclusion_date();
-    };
-
-    var populateForm = function(response){
-        var res = response.get_self_exclusion;
-
-        //Reset form to empty.
-        //resetForm();
-
-        data.max_balance = $("#MAXCASHBAL").val();
-        data.max_turnover = $("#DAILYTURNOVERLIMIT").val();
-        data.max_losses = $("#DAILYLOSSLIMIT").val();
-        data.max_7day_turnover = $("#7DAYTURNOVERLIMIT").val();
-        data.max_7day_losses = $("#7DAYLOSSLIMIT").val();
-        data.max_30day_turnover = $("#30DAYTURNOVERLIMIT").val();
-        data.max_30day_losses = $("#30DAYLOSSLIMIT").val();
-        data.max_open_bets = $("#MAXOPENPOS").val();
-        data.session_duration_limit =  $("#SESSIONDURATION").val();
-        data.exclude_until = $("#EXCLUDEUNTIL").val();
-
-        if(res){
-            $.map(res,function(value,property){
-
-                switch(property){
-                    case  "max_balance" :
-                           data.max_balance = value;
-                           break;
-                    case  "max_turnover" :
-                           data.max_turnover = value;
-                           break;
-                    case  "max_losses"   :
-                           data.max_losses = value;
-                           break;
-                    case  "max_7day_turnover" :
-                           data.max_7day_turnover = value;
-                           break;
-                    case  "max_7day_losses" :
-                           data.max_7day_losses = value;
-                           break;
-                    case   "max_30day_turnover" :
-                            data.max_30day_turnover = value;
-                            break;
-                    case   "max_30day_losses" :
-                            data.max_30day_losses = value;
-                            break;
-                    case   "max_open_bets" :
-                            data.max_open_bets = value;
-                            break; 
-                    case   "session_duration_limit"  :
-                            data.session_duration_limit = value;
-                            break;
-                    case   "exclude_until"   :
-                            data.exclude_until = value;
-                            break;       
-
-                }
-
-            });
-            
-        }
-         //Bind our data here
-        $("#MAXCASHBAL").val(data.max_balance);
-        $("#DAILYTURNOVERLIMIT").val(data.max_turnover),
-        $("#DAILYLOSSLIMIT").val(data.max_losses),
-        $("#7DAYTURNOVERLIMIT").val(data.max_7day_turnover),
-        $("#7DAYLOSSLIMIT").val(data.max_7day_losses),
-        $("#30DAYTURNOVERLIMIT").val(data.max_30day_turnover),
-        $("#30DAYLOSSLIMIT").val(data.max_30day_losses),
-        $("#MAXOPENPOS").val(data.max_open_bets),
-        $("#SESSIONDURATION").val(data.session_duration_limit),
-        $("#EXCLUDEUNTIL").val(data.exclude_until)
-
-    };
-    var sendRequest = function(){
-
-        var hasChages  = false;
-        var newData = {
-            "max_balance"  : $("#MAXCASHBAL").val(),
-            "max_turnover" : $("#DAILYTURNOVERLIMIT").val(),
-            "max_losses" : $("#DAILYLOSSLIMIT").val(),
-            "max_7day_turnover" : $("#7DAYTURNOVERLIMIT").val(),
-            "max_7day_losses" : $("#7DAYLOSSLIMIT").val(),
-            "max_30day_turnover" : $("#30DAYTURNOVERLIMIT").val(),
-            "max_30day_losses" : $("#30DAYLOSSLIMIT").val(),
-            "max_open_bets": $("#MAXOPENPOS").val(),
-            "session_duration_limit" :  $("#SESSIONDURATION").val(),
-            "exclude_until" : $("#EXCLUDEUNTIL").val()
-        };
-
-        //Check if value changes
-        $.map(newData , function(value, property){
-            if(value !== data[property])
-                hasChages = true ;
-        }); 
-        if(!hasChages){
-            $("#invalidinputfound").text("Please provide at least one self-exclusion setting");
-            return false;
-        }
-
-        //Send our request , updating page.
-        BinarySocket.send(
-            {
-              "set_self_exclusion": 1,
-              "max_balance": parseInt(newData.max_balance),
-              "max_turnover": parseInt(newData.max_turnover),
-              "max_losses": parseInt(newData.max_losses),
-              "max_7day_turnover": parseInt(newData.max_7day_turnover),
-              "max_7day_losses": parseInt(newData.max_7day_losses),
-              "max_30day_turnover": parseInt(newData.max_30day_turnover),
-              "max_30day_losses": parseInt(newData.max_30day_losses),
-              "max_open_bets": parseInt(newData.max_open_bets),
-              "session_duration_limit": parseInt(newData.session_duration_limit),
-              "exclude_until": newData.exclude_until
-            });
-
-        return true;
-
-    };
-    var responseMessage = function(response){
-        //msg_type: "error"
-        if(response.msg_type === "error"){
-            $("#invalidinputfound").text("Operation failed");
-            console.log("Find the issue in the object : ", response.echo_req);
-            return false;
-        }
-
-        window.location.href = window.location.href;
-    };
-    var apiResponse = function(response){
-        var type = response.msg_type;
-        if (type === "get_self_exclusion" || (type === "error" && "get_self_exclusion" in response.echo_req)){
-            populateForm(response);
-        }else if(type === "set_self_exclusion" || (type === "error" && "set_self_exclusion" in response.echo_req))
-        {
-            responseMessage(response);
-        }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
-        {
-            isAuthorized(response);
-        }
-
-    } ;
-
-    return {
-        init: init,
-        apiResponse: apiResponse,
-        populateForm : populateForm
-    };
-
-
-
-})();
-
-
-pjax_config_page("user/self_exclusionws", function() {
-    return {
-        onLoad: function() {
-        	if (!getCookieItem('login')) {
-                window.location.href = page.url.url_for('login');
-                return;
-            }
-             // Check if it is a real account or not
-            if((/VRT/.test($.cookie('loginid')))){
-                window.location.href = ("/");
-            }
-
-        	BinarySocket.init({
-                onmessage: function(msg){
-                    var response = JSON.parse(msg.data);
-                    if (response) {
-                        SelfExlusionWS.apiResponse(response);
-                          
-                    }
-                }
-            });	
-           
-            // date picker for self exclusion
-                
-           // date picker for self exclusion
-            Exclusion.self_exclusion_date_picker();
-           
-            SelfExlusionWS.init();
-        }
-    };
-});;onLoad.queue_for_url(function() {
+;onLoad.queue_for_url(function() {
     $('#statement-date').on('change', function() {
         $('#submit-date').removeClass('invisible');
     });
@@ -60367,13 +59693,6 @@ function reloadPage(){
 
     location.reload();
 }
-
-function addComma(num){
-    if (num % 1 !== 0) {
-        num = num.toFixed(2);
-    }
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
 ;var Content = (function () {
     'use strict';
 
@@ -60448,45 +59767,13 @@ function addComma(num){
             textSalePrice: text.localize('Sale Price'),
             textProfitLoss: text.localize('Profit/Loss'),
             textTotalProfitLoss: text.localize('Total Profit/Loss'),
-            textLimits: text.localize('Trading and Withdrawal Limits'),
-            textItem: text.localize('Item'),
-            textLimit: text.localize('Limit'),
-            textMaxOpenPosition: text.localize('Maximum number of open positions'),
-            textMaxOpenPositionTooltip: text.localize('Represents the maximum number of outstanding contracts in your portfolio. Each line in your portfolio counts for one open position. Once the maximum is reached, you will not be able to open new positions without closing an existing position first.'),
-            textMaxAccBalance: text.localize('Maximum account cash balance'),
-            textMaxAccBalanceTooltip: text.localize('Represents the maximum amount of cash that you may hold in your account.  If the maximum is reached, you will be asked to withdraw funds.'),
-            textMaxDailyTurnover: text.localize('Maximum daily turnover'),
-            textMaxDailyTurnoverTooltip: text.localize('Represents the maximum volume of contracts that you may purchase in any given trading day.'),
-            textMaxAggregate: text.localize('Maximum aggregate payouts on open positions'),
-            textMaxAggregateTooltip: text.localize('Presents the maximum aggregate payouts on outstanding contracts in your portfolio. If the maximum is attained, you may not purchase additional contracts without first closing out existing positions.'),
-            textTradingLimits: text.localize('Trading Limits'),
-            textWithdrawalTitle: text.localize('Withdrawal Limits'),
-            textWithdrawalLimits: text.localize('Your withdrawal limit is EUR'),
-            textCurrencyEquivalent: text.localize('or equivalent in other currency'),
-            textWithrawalAmount: text.localize('You have already withdrawn the equivalent of EUR'),
-            textYour: text.localize('Your'),
-            textDayWithdrawalLimit: text.localize('day withdrawal limit is currently EUR'),
-            textAuthenticatedWithdrawal: text.localize('Your account is fully authenticated and your withdrawal limits have been lifted.'),
-            textAggregateOverLast: text.localize('in aggregate over the last'),
-            textWithdrawalForEntireDuration: text.localize('Your withdrawal limit for the entire duration of the account is currently: EUR'),
-            textInAggregateOverLifetime: text.localize('in aggregate over the lifetime of your account.'),
-            textNotAllowedToWithdraw: text.localize('Therefore you may not withdraw any additional funds.'),
-            textCurrentMaxWithdrawal: text.localize('Therefore your current immediate maximum withdrawal (subject to your account having sufficient funds) is EUR'),
             textBuyPrice: text.localize('Buy price'),
             textFinalPrice: text.localize('Final price'),
             textLoss: text.localize('Loss'),
             textProfit: text.localize('Profit'),
             textFormMatchesDiffers: text.localize('Matches/Differs'),
             textFormEvenOdd: text.localize('Even/Odd'),
-            textFormOverUnder: text.localize('Over/Under'),
-            textMessageRequired: text.localize('This field is required.'),
-            textMessageCountLimit: text.localize('You should enter between %LIMIT% characters.'), // %LIMIT% should be replaced by a range. sample: (6-20)
-            textMessageJustAllowed: text.localize('Only %ALLOWED% are allowed.'), // %ALLOWED% should be replaced by values including: letters, numbers, space, period, ...
-            textLetters: text.localize('letters'),
-            textNumbers: text.localize('numbers'),
-            textSpace: text.localize('space'),
-            textPeriod: text.localize('period'),
-            textComma: text.localize('comma')
+            textFormOverUnder: text.localize('Over/Under')
         };
 
         var starTime = document.getElementById('start_time_label');
@@ -60632,45 +59919,11 @@ function addComma(num){
         titleElement.textContent = localize.textProfitTable;
     };
 
-    var limitsTranslation = function(){
-        var titleElement = document.getElementById("limits-title").firstElementChild;
-        titleElement.textContent = localize.textLimits;
-        
-        var tradingLimits = document.getElementById("trading-limits");
-        tradingLimits.textContent = TUser.get().loginid + " - " + localize.textTradingLimits;
-        
-        var withdrawalTitle = document.getElementById("withdrawal-title");
-        withdrawalTitle.textContent = TUser.get().loginid + " - " + localize.textWithdrawalTitle;
-    };
-
-    var errorMessage = function(messageType, param){
-        var msg = "",
-            separator = ', ';
-        switch(messageType){
-            case 'req':
-                msg = localize.textMessageRequired;
-                break;
-            case 'reg':
-                if(param)
-                    msg = localize.textMessageJustAllowed.replace('%ALLOWED%', param.join(separator));
-                break;
-            case 'range':
-                if(param)
-                    msg = localize.textMessageCountLimit.replace('%LIMIT%', param);
-                break;
-            default:
-                break;
-        }
-        return msg;
-    };
-
     return {
         localize: function () { return localize; },
         populate: populate,
         statementTranslation: statementTranslation,
-        profitTableTranslation: profitTableTranslation,
-        limitsTranslation: limitsTranslation,
-        errorMessage: errorMessage
+        profitTableTranslation: profitTableTranslation
     };
 
 })();
@@ -61113,15 +60366,9 @@ var Durations = (function(){
             amountElement.datepicker({
                 minDate: tomorrow,
                 onSelect: function(value) {
-                    var dayDiff;
-                    if($('#duration_amount').val()){
-                        dayDiff = $('#duration_amount').val();
-                    }
-                    else{
-                        var date = new Date(value);
-                        var today = new Date();
-                        dayDiff = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
-                    }                    
+                    var date = new Date(value);
+                    var today = new Date();
+                    var dayDiff = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
                     amountElement.val(dayDiff);
                     amountElement.trigger('change');
                 }
@@ -61203,12 +60450,12 @@ var Durations = (function(){
 
     var selectEndDate = function(end_date){
         var expiry_time = document.getElementById('expiry_time');
-        $('#expiry_date').val(end_date);
         if(moment(end_date).isAfter(moment(),'day')){
             Durations.setTime('');
             StartDates.setNow();
             expiry_time.hide();
             var date_start = StartDates.node();
+
             processTradingTimesRequest(end_date);
         }
         else{
@@ -61216,7 +60463,6 @@ var Durations = (function(){
             expiry_time.show();
             processPriceRequest();
         }
-
         sessionStorage.setItem('end_date',end_date);
         Barriers.display();
     };
@@ -61225,7 +60471,7 @@ var Durations = (function(){
         display: displayDurations,
         displayEndTime: displayEndTime,
         populate: durationPopulate,
-        setTime: function(time){ $('#expiry_time').val(time); expiry_time = time; },
+        setTime: function(time){ expiry_time = time; },
         getTime: function(){ return expiry_time; },
         processTradingTimesAnswer: processTradingTimesAnswer,
         trading_times: function(){ return trading_times; },
@@ -61245,76 +60491,6 @@ var Durations = (function(){
  */
 var TradingEvents = (function () {
     'use strict';
-
-
-    var onStartDateChange = function(value){
-
-        if(!value || !$('#date_start').find('option[value='+value+']').length){
-            return 0;
-        }
-        $('#date_start').val(value);
-
-        var make_price_request = 1;
-        if (value === 'now') {
-            Durations.display('spot');
-            sessionStorage.removeItem('date_start');
-        } else {
-            make_price_request = -1;
-            var end_time = moment(value*1000).utc().add(15,'minutes');
-            Durations.setTime(end_time.format("hh:mm"));
-            Durations.selectEndDate(end_time.format("YYYY-MM-DD"));
-
-            Durations.display('forward');
-            sessionStorage.setItem('date_start', value);
-        }
-
-        return make_price_request;
-    };
-
-    var onExpiryTypeChange = function(value){
-        
-        if(!value || !$('#expiry_type').find('option[value='+value+']').length){
-            value = 'duration';
-        }
-
-        $('#expiry_type').val(value);
-
-        sessionStorage.setItem('expiry_type',value);
-        var make_price_request = 0;
-        if(value === 'endtime'){
-            Durations.displayEndTime();
-            if(sessionStorage.getItem('end_date')){
-                Durations.selectEndDate(sessionStorage.getItem('end_date'));
-                make_price_request = -1;
-            }
-        }
-        else{
-            Durations.display();
-            if(sessionStorage.getItem('duration_units')){
-                TradingEvents.onDurationUnitChange(sessionStorage.getItem('duration_units'));
-            }
-            if(sessionStorage.getItem('duration_amount') && sessionStorage.getItem('duration_amount') > $('#duration_minimum').text()){
-                $('#duration_amount').val(sessionStorage.getItem('duration_amount'));
-            }
-            make_price_request = 1;
-        }
-
-        return make_price_request;
-    };
-
-    var onDurationUnitChange = function(value){
-
-        if(!value || !$('#duration_units').find('option[value='+value+']').length){
-            return 0;
-        }
-        $('#duration_units').val(value);
-
-        sessionStorage.setItem('duration_units',value);
-        Durations.select_unit(value);
-        Durations.populate();
-
-        return 1;
-    };
 
     var initiate = function () {
         /*
@@ -61423,7 +60599,8 @@ var TradingEvents = (function () {
         var expiryTypeElement = document.getElementById('expiry_type');
         if (expiryTypeElement) {
             expiryTypeElement.addEventListener('change', function(e) {
-                onExpiryTypeChange(e.target.value);
+                sessionStorage.setItem('expiry_type',e.target.value);
+                Durations.displayEndTime();
                 processPriceRequest();
             });
         }
@@ -61434,8 +60611,11 @@ var TradingEvents = (function () {
         var durationUnitElement = document.getElementById('duration_units');
         if (durationUnitElement) {
             durationUnitElement.addEventListener('change', function (e) {
-                onDurationUnitChange(e.target.value);
+                sessionStorage.setItem('duration_units',e.target.value);
+                Durations.select_unit(e.target.value);
+                Durations.populate();
                 processPriceRequest();
+                sessionStorage.setItem('duration_amount',document.getElementById('duration_amount').value);
             });
         }
 
@@ -61482,10 +60662,13 @@ var TradingEvents = (function () {
         var dateStartElement = StartDates.node();
         if (dateStartElement) {
             dateStartElement.addEventListener('change', function (e) {
-                var r = onStartDateChange(e.target.value);
-                if(r>=0){
-                    processPriceRequest();
+                if (e.target && e.target.value === 'now') {
+                    Durations.display('spot');
+                } else {
+                    Durations.display('forward');
+                    sessionStorage.setItem('date_start', e.target.value);
                 }
+                processPriceRequest();
             });
         }
 
@@ -61784,10 +60967,7 @@ var TradingEvents = (function () {
     };
 
     return {
-        init: initiate,
-        onStartDateChange: onStartDateChange,
-        onExpiryTypeChange: onExpiryTypeChange,
-        onDurationUnitChange: onDurationUnitChange
+        init: initiate
     };
 })();
 
@@ -61839,7 +61019,8 @@ var Message = (function () {
         process: process
     };
 
-})();;/*
+})();
+;/*
  * Price object handles all the functions we need to display prices
  *
  * We create Price proposal that we need to send to server to get price,
@@ -61912,7 +61093,7 @@ var Price = (function () {
             var endTime2 = Durations.getTime();
             if(!endTime2){
                 var trading_times = Durations.trading_times();
-                if(trading_times.hasOwnProperty(endDate2) && typeof trading_times[endDate2][underlying.value] === 'object' && trading_times[endDate2][underlying.value].length  && trading_times[endDate2][underlying.value][0]!=='--'){
+                if(trading_times.hasOwnProperty(endDate2) && typeof trading_times[endDate2][underlying.value] === 'string'){
                     endTime2 = trading_times[endDate2][underlying.value];
                 }
             }
@@ -62144,8 +61325,6 @@ function processMarketUnderlying() {
     Tick.clean();
     
     updateWarmChart();
-
-    BinarySocket.clearTimeouts();
     
     Contract.getContracts(underlying);
 
@@ -62201,32 +61380,51 @@ function processContract(contracts) {
 }
 
 function processContractForm() {
-    
     Contract.details(sessionStorage.getItem('formname'));
 
     StartDates.display();
 
+    var forward = 0;
+    if($('#date_start:visible') && sessionStorage.getItem('date_start') && moment(sessionStorage.getItem('date_start')*1000).isAfter(moment(),'minutes')){
+        selectOption(sessionStorage.getItem('date_start'), document.getElementById('date_start'));
+        forward = 1;
+    }
+
     displayPrediction();
 
-    displaySpreads(); 
-
-    var r1;
-    if(StartDates.displayed() && sessionStorage.getItem('date_start')){
-        r1 = TradingEvents.onStartDateChange(sessionStorage.getItem('date_start'));
-        if(!r1) Durations.display();
+    displaySpreads();  
+ 
+    if(sessionStorage.getItem('amount')){
+        document.getElementById('amount').value = sessionStorage.getItem('amount');       
     }
-    else{
-        Durations.display();
-    } 
 
-    var expiry_type = sessionStorage.getItem('expiry_type') ? sessionStorage.getItem('expiry_type') : 'duration';
-    var make_price_request = TradingEvents.onExpiryTypeChange(expiry_type);
+    if(sessionStorage.getItem('amount_type')){
+        selectOption(sessionStorage.getItem('amount_type'), document.getElementById('amount_type'));
+    }
+    Durations.display();
+    var no_price_request;
+    if(sessionStorage.getItem('expiry_type')==='endtime'){
+        var is_selected = selectOption('endtime', document.getElementById('expiry_type'));
+        if(is_selected){
+            Durations.displayEndTime();
+            if(sessionStorage.getItem('end_date') && moment(sessionStorage.getItem('end_date')).isAfter(moment())){
+                $( "#expiry_date" ).datepicker( "setDate", sessionStorage.getItem('end_date') );
+                Durations.selectEndDate(sessionStorage.getItem('end_date'));
+                no_price_request = 1;
+            }
+        }
+    }
+    if(!no_price_request){
+        if(sessionStorage.getItem('duration_units')){
+            selectOption(sessionStorage.getItem('duration_units'), document.getElementById('duration_units'));
+        }
+        Durations.populate();
+        if(sessionStorage.getItem('duration_amount')){
+            document.getElementById('duration_amount').value = sessionStorage.getItem('duration_amount');       
+        }
+    }
 
-    if(sessionStorage.getItem('amount')) $('#amount').val(sessionStorage.getItem('amount'));
-    if(sessionStorage.getItem('amount_type')) selectOption(sessionStorage.getItem('amount_type'),document.getElementById('amount_type'));
-    if(sessionStorage.getItem('currency')) selectOption(sessionStorage.getItem('currency'),document.getElementById('currency'));
-
-    if(make_price_request >= 0){
+    if(!no_price_request){
         processPriceRequest();
     }
 }
@@ -62385,8 +61583,8 @@ function processTradingTimesRequest(date){
 }
 
 function processTradingTimes(response){
+    var trading_times = Durations.trading_times();
     Durations.processTradingTimesAnswer(response);
-
     processPriceRequest();
 }
 ;/*
@@ -62587,7 +61785,6 @@ var StartDates = (function(){
     'use strict';
 
     var hasNow = 0;
-    var displayed = 0;
 
     var compareStartDate = function(a,b) {
         if (a.date < b.date)
@@ -62636,7 +61833,7 @@ var StartDates = (function(){
                 var b = moment.unix(start_date.close).utc();
 
                 var ROUNDING = 5 * 60 * 1000;
-                var start = moment.utc();
+                var start = moment();
 
                 if(moment(start).isAfter(moment(a))){
                     a = start;
@@ -62645,20 +61842,16 @@ var StartDates = (function(){
                 a = moment(Math.ceil((+a) / ROUNDING) * ROUNDING).utc();
 
                 while(a.isBefore(b)) {
-                    if(a.unix()-start.unix()>5*60){
-                        option = document.createElement('option');
-                        option.setAttribute('value', a.utc().unix());
-                        content = document.createTextNode(a.format('HH:mm ddd'));
-                        option.appendChild(content);
-                        fragment.appendChild(option);
-                    } 
+                    option = document.createElement('option');
+                    option.setAttribute('value', a.utc().unix());
+                    content = document.createTextNode(a.format('HH:mm ddd'));
+                    option.appendChild(content);
+                    fragment.appendChild(option);
                     a.add(5, 'minutes');
                 }
             });
             target.appendChild(fragment);
-            displayed = 1;
         } else {
-            displayed = 0;
             document.getElementById('date_start_row').style.display = 'none';
         }
     };
@@ -62673,8 +61866,7 @@ var StartDates = (function(){
     return {
         display: displayStartDates,
         node: getElement,
-        setNow: setNow,
-        displayed: function(){ return displayed; }
+        setNow: setNow
     };
 
 })();
@@ -63123,42 +62315,6 @@ WSTickDisplay.updateChart = function(data){
         $('#reality-check .blogout').on('click', function () {
             window.location.href = logout_url;
         });
-        
-        var obj = document.getElementById('realityDuration');
-        this.isNumericValue(obj);
-    };
-
-    //
-    //limit textBox to Numeric Only
-    //
-    RealityCheck.prototype.isNumericValue = function(obj){
-
-        if (obj.hasOwnProperty('oninput') || ('oninput' in obj)) 
-        {
-            $('#realityDuration').on('input', function (event) { 
-                 this.value = this.value.replace(/[^0-9]/g, '');
-            });
-
-        }
-        /*
-        else{
-            $('#realityDuration').on('keypress',function(e){
-                var deleteCode = 8;  var backspaceCode = 46;
-                var key = e.which;
-                if ((key>=48 && key<=57) || key === deleteCode || key === backspaceCode || (key>=37 &&  key<=40) || key===0)    
-                {    
-                    character = String.fromCharCode(key);
-                    if( character != '.' && character != '%' && character != '&' && character != '(' && character != '\'' ) 
-                    { 
-                        return true; 
-                    }
-                    else { return false; }
-                 }
-                 else   { return false; }
-            });
-        }
-        */
-
     };
 
     // On session start we need to ask for the reality-check interval.
@@ -63218,10 +62374,6 @@ WSTickDisplay.updateChart = function(data){
         };
         $('#reality-check [bcont=1]').on('click', click_handler);
         $('#reality-check [interval=1]').on('change', click_handler);
-
-
-        var obj = document.getElementById('realityDuration');
-        this.isNumericValue(obj);
     };
 
     return RealityCheck;
@@ -63267,7 +62419,7 @@ var BinarySocket = (function () {
     var clearTimeouts = function(){
         for(var k in timeouts){
             if(timeouts.hasOwnProperty(k)){
-                clearTimeout(timeouts[k]);
+                clearInterval(timeouts[k]);
                 delete timeouts[k];
             }
         }
@@ -63300,16 +62452,14 @@ var BinarySocket = (function () {
             if(!data.hasOwnProperty('passthrough')){
                 data.passthrough = {};
             }
-            // temporary check
             if(data.contracts_for || data.proposal){
                 data.passthrough.req_number = ++req_number;
-                timeouts[req_number] = setTimeout(function(){
-                    if(typeof reloadPage === 'function' && data.contracts_for){
-                        alert("The server didn't respond to the request:\n\n"+JSON.stringify(data)+"\n\n");
-                        reloadPage();
-                    }
-                    else{
-                        $('.price_container').hide();
+                timeouts[req_number] = setInterval(function(){
+                    if(typeof reloadPage === 'function'){
+                        var r = confirm("The server didn't respond to the request:\n\n"+JSON.stringify(data)+"\n\nReload page?");
+                        if (r === true) {
+                            reloadPage();
+                        } 
                     }
                 }, 7*1000);
             }
@@ -63414,10 +62564,10 @@ var BinarySocket = (function () {
     return {
         init: init,
         send: send,
+        isReady : isReady,
         close: close,
         socket: function () { return binarySocket; },
-        clear: clear,
-        clearTimeouts: clearTimeouts
+        clear: clear
     };
 
 })();
@@ -63625,142 +62775,6 @@ var Table = (function(){
         overwriteTableBody: overwriteTableBody,
         clearTableBody: clearTableBody,
         appendTableBody: appendTableBody
-    };
-}());
-;pjax_config_page("limitws", function(){
-    return {
-        onLoad: function() {
-            BinarySocket.init({
-                onmessage: function(msg){
-                    var response = JSON.parse(msg.data);
-
-                    if (response) {
-                        var type = response.msg_type;
-                        if (type === 'get_limits'){
-                            LimitsWS.limitsHandler(response);
-                        }
-                    }
-                }
-            });
-            Content.populate();
-            LimitsWS.init();
-        },
-        onUnload: function(){
-            LimitsWS.clean();
-        }
-    };
-});
-;var LimitsData = (function(){
-    "use strict";
-
-    function getLimits(opts){
-        var req = {get_limits: 1};
-        if(opts){ 
-            $.extend(true, req, opts);    
-        }
-
-        BinarySocket.send(req);
-    }
-
-    return {
-        getLimits: getLimits
-    };
-}());
-;var LimitsWS = (function(){
-    "use strict";
-
-    function limitsHandler(response){
-        var limits = response.get_limits;
-        Content.limitsTranslation();
-        LimitsUI.fillLimitsTable(limits);
-
-        var equivalent = " (" + Content.localize().textCurrencyEquivalent + ").";
-
-        var withdrawal_limit = document.getElementById("withdrawal-limit");
-        var already_withdraw = document.getElementById("already-withdraw");
-        var withdrawal_limit_aggregate = document.getElementById("withdrawal-limit-aggregate");
-
-        if(limits['lifetime_limit'] === 99999999) {
-            withdrawal_limit.textContent = Content.localize().textAuthenticatedWithdrawal;
-        } else if(limits['num_of_days_limit'] === limits['lifetime_limit']) {
-            withdrawal_limit.textContent = Content.localize().textWithdrawalLimits + " " + addComma(limits['num_of_days_limit']) + equivalent;
-            already_withdraw.textContent = Content.localize().textWithrawalAmount + " " + addComma(limits["withdrawal_since_inception_monetary"]) + ".";
-        } else {
-            withdrawal_limit.textContent = Content.localize().textYour + " " + limits['num_of_days'] + " " + Content.localize().textDayWithdrawalLimit + " " + addComma(limits['num_of_days_limit']) + equivalent;
-            already_withdraw.textContent = Content.localize().textWithrawalAmount + " " + limits['withdrawal_for_x_days_monetary'] + " " + Content.localize().textAggregateOverLast + " " + limits['num_of_days'] + " " + Content.localize().textDurationDays;
-            if(limits["lifetime_limit"] < 99999999) {
-                withdrawal_limit_aggregate.textContent = Content.localize().textWithdrawalForEntireDuration + " " + addComma(limits["lifetime_limit"]) + equivalent;
-                document.getElementById("already-withdraw-aggregate").textContent = Content.localize().textWithrawalAmount + " " + addComma(limits["withdrawal_since_inception_monetary"]) + " " + Content.localize().textInAggregateOverLifetime;
-            }
-            if(limits['remainder'] === 0) {
-                withdrawal_limit_aggregate.textContent = Content.localize().textNotAllowedToWithdraw;
-            } else if (limits['remainder'] !== 0) {
-                withdrawal_limit_aggregate.textContent = Content.localize().textCurrentMaxWithdrawal + " " + addComma(limits['remainder']) + equivalent;
-            }
-
-        }
-    }
-
-    function initTable(){
-        $(".error-msg").text("");
-        LimitsUI.clearTableContent();
-    }
-
-    function initPage(){
-        LimitsData.getLimits();
-    }
-
-    return {
-        limitsHandler: limitsHandler,
-        clean: initTable,
-        init: initPage
-    };
-}());
-;var LimitsUI = (function(){
-    "use strict";
-
-    function fillLimitsTable(limits){
-        var open_positions = addComma(limits['open_positions']);
-        var account_balance = addComma(limits['account_balance']);
-        var daily_turnover = addComma(limits['daily_turnover']);
-        var payout = addComma(limits['payout']);
-
-        document.getElementById('item').textContent = Content.localize().textItem;
-        
-        var currency = TUser.get().currency;
-        var limit = document.getElementById('limit');
-        if (currency === "") {
-            limit.textContent = Content.localize().textLimit;
-        } else {
-            limit.textContent = Content.localize().textLimit + " (" + currency + ")";
-        }
-        $('#max-open-position').prepend(Content.localize().textMaxOpenPosition);
-        document.getElementById('max-open-position-tooltip').setAttribute('title', Content.localize().textMaxOpenPositionTooltip);
-        document.getElementById('open-positions').textContent = open_positions;
-        
-        $('#max-acc-balance').prepend(Content.localize().textMaxAccBalance);
-        document.getElementById('max-acc-balance-tooltip').setAttribute('title', Content.localize().textMaxAccBalanceTooltip);
-        document.getElementById('account-balance').textContent = account_balance;
-        
-        $('#max-daily-turnover').prepend(Content.localize().textMaxDailyTurnover);
-        document.getElementById('max-daily-turnover-tooltip').setAttribute('title', Content.localize().textMaxDailyTurnoverTooltip);
-        document.getElementById('daily-turnover').textContent = daily_turnover;
-        
-        $('#max-aggregate').prepend(Content.localize().textMaxAggregate);
-        document.getElementById('max-aggregate-tooltip').setAttribute('title', Content.localize().textMaxAggregateTooltip);
-        document.getElementById('payout').textContent = payout;
-    }
-
-    function clearTableContent(){
-        Table.clearTableBody(tableID);
-        $("#limits-title>tfoot").hide();
-    }
-
-    
-    
-    return {
-        clearTableContent: clearTableContent,
-        fillLimitsTable: fillLimitsTable
     };
 }());
 ;

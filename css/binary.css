@@ -4649,35 +4649,6 @@ table .loss, table .lower {
   }
 }
 
-a.dynamic, span.dynamic, div.dynamic, p.dynamic, button.dynamic, table.dynamic {
-  display: none !important;
-}
-
-#portfolio {
-  min-height: 300px;
-}
-#portfolio td {
-  padding: 10px 30px;
-}
-#portfolio td.indicative, #portfolio td.purchase {
-  white-space: nowrap;
-}
-#portfolio td.indicative.no_resale {
-  color: lightgray;
-}
-#portfolio td.indicative.no_resale span {
-  font-size: 8px;
-  display: block;
-  margin-top: -11px;
-}
-#portfolio th {
-  padding: 10px 30px;
-  text-align: left;
-}
-#portfolio th.details {
-  width: 45%;
-}
-
 /* static pages */
 @keyframes spinning {
   from {
@@ -5515,16 +5486,6 @@ a.dynamic, span.dynamic, div.dynamic, p.dynamic, button.dynamic, table.dynamic {
       -ms-flex: 2 1 100px;
           flex: 2 1 100px;
   padding-right: 20px;
-}
-
-#limits-ws-container .item.flex-tr-child img {
-  margin-left: 5px;
-}
-#limits-ws-container thead {
-  text-align: left;
-}
-#limits-ws-container td {
-  padding: 3px 8px;
 }
 
 /* Language based rules */
