@@ -71,6 +71,7 @@ var SelfExlusionWS = (function(){
         data.max_open_bets = $("#MAXOPENPOS").val(),
         data.session_duration_limit =  $("#SESSIONDURATION").val(),
         data.exclude_until = $("#EXCLUDEUNTIL").val();
+        console.log("Empty datas are ", data);
         if(res){
             $.map(res,function(){
 
