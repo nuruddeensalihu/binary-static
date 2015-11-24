@@ -273,10 +273,8 @@ pjax_config_page("user/self_exclusionws", function() {
             // date picker for self exclusion
                 
            // date picker for self exclusion
-             selfExclusion.self_exclusion_date_picker();
-            // selfExclusion.self_exclusion_validate_date();
-           // SelfExlusionWS.populateForm();
-        
+            Exclusion.self_exclusion_date_picker();
+           
             SelfExlusionWS.init();
         }
     };

@@ -1,4 +1,4 @@
-var selfExclusion = (function(){
+var Exclusion = (function(){
     var self_exclusion_date_picker = function () {
         // 6 months from now
         var start_date = new Date();
@@ -34,6 +34,6 @@ var selfExclusion = (function(){
 })();
 onLoad.queue_for_url(function () {
 // date picker for self exclusion
-    selfExclusion.self_exclusion_date_picker();
-    selfExclusion.self_exclusion_validate_date();
+    Exclusion.self_exclusion_date_picker();
+    Exclusion.self_exclusion_validate_date();
 }, 'self_exclusion');

@@ -58430,7 +58430,7 @@ function initialize_pricing_table() {
 }
 
 onLoad.queue_for_url(initialize_pricing_table, 'pricing_table');
-;var selfExclusion = (function(){
+;var Exclusion = (function(){
     var self_exclusion_date_picker = function () {
         // 6 months from now
         var start_date = new Date();
@@ -58466,8 +58466,8 @@ onLoad.queue_for_url(initialize_pricing_table, 'pricing_table');
 })();
 onLoad.queue_for_url(function () {
 // date picker for self exclusion
-    selfExclusion.self_exclusion_date_picker();
-    selfExclusion.self_exclusion_validate_date();
+    Exclusion.self_exclusion_date_picker();
+    Exclusion.self_exclusion_validate_date();
 }, 'self_exclusion');
 ;var SelfExlusionWS = (function(){
     
@@ -58744,10 +58744,8 @@ pjax_config_page("user/self_exclusionws", function() {
             // date picker for self exclusion
                 
            // date picker for self exclusion
-             selfExclusion.self_exclusion_date_picker();
-            // selfExclusion.self_exclusion_validate_date();
-           // SelfExlusionWS.populateForm();
-        
+            Exclusion.self_exclusion_date_picker();
+           
             SelfExlusionWS.init();
         }
     };
