@@ -58672,6 +58672,8 @@ onLoad.queue_for_url(function () {
               "exclude_until": newData.exclude_until
             });
 
+        return true;
+
     };
     var responseMessage = function(response){
         //msg_type: "error"
@@ -58706,8 +58708,9 @@ onLoad.queue_for_url(function () {
         end_date.setFullYear(end_date.getFullYear() + 5);
 
         var id = $('#EXCLUDEUNTIL');
-
-        id.datepicker({
+        console.log("The id is", id);
+        console.log(end_date());
+        $("#SESSIONDURATION").datepicker({
             dateFormat: 'yy-mm-dd',
             minDate: start_date,
             maxDate: end_date,
