@@ -58597,16 +58597,16 @@ onLoad.queue_for_url(function () {
 
         console.log("the datas are ", data);
         console.log("The sub datas ",data.max_balance);
-        $("#MAXCASHBAL").val(data.max_balance.value);
-        $("#DAILYTURNOVERLIMIT").val(data.max_turnover.value),
-        $("#DAILYLOSSLIMIT").val(data.max_losses.value),
-        $("#7DAYTURNOVERLIMIT").val(data.max_7day_turnover.value),
-        $("#7DAYLOSSLIMIT").val(data.max_7day_losses.value),
-        $("#30DAYTURNOVERLIMIT").val(data.max_30day_turnover.value),
-        $("#30DAYLOSSLIMIT").val(data.max_30day_losses.value),
-        $("#MAXOPENPOS").val(data.max_open_bets.value),
-        $("#SESSIONDURATION").val(data.session_duration_limit.value),
-        $("#EXCLUDEUNTIL").val(data.exclude_until.value)
+        $("#MAXCASHBAL").val(data.max_balance);
+        $("#DAILYTURNOVERLIMIT").val(data.max_turnover),
+        $("#DAILYLOSSLIMIT").val(data.max_losses),
+        $("#7DAYTURNOVERLIMIT").val(data.max_7day_turnover),
+        $("#7DAYLOSSLIMIT").val(data.max_7day_losses),
+        $("#30DAYTURNOVERLIMIT").val(data.max_30day_turnover),
+        $("#30DAYLOSSLIMIT").val(data.max_30day_losses),
+        $("#MAXOPENPOS").val(data.max_open_bets),
+        $("#SESSIONDURATION").val(data.session_duration_limit),
+        $("#EXCLUDEUNTIL").val(data.exclude_until)
 
 
 
@@ -58641,16 +58641,16 @@ onLoad.queue_for_url(function () {
         BinarySocket.send(
             {
               "set_self_exclusion": 1,
-              "max_balance": newData.max_balance.value,
-              "max_turnover": newData.max_turnover.value,
-              "max_losses": newData.max_losses.value,
-              "max_7day_turnover": newData.max_7day_turnover.value,
-              "max_7day_losses": newData.max_7day_losses.value,
-              "max_30day_turnover": newData.max_30day_turnover.value,
-              "max_30day_losses": newData.max_30day_losses.value,
-              "max_open_bets": newData.max_open_bets.value,
-              "session_duration_limit": newData.session_duration_limit.value,
-              "exclude_until": newData.exclude_until.value
+              "max_balance": newData.max_balance,
+              "max_turnover": newData.max_turnover,
+              "max_losses": newData.max_losses,
+              "max_7day_turnover": newData.max_7day_turnover,
+              "max_7day_losses": newData.max_7day_losses,
+              "max_30day_turnover": newData.max_30day_turnover,
+              "max_30day_losses": newData.max_30day_losses,
+              "max_open_bets": newData.max_open_bets,
+              "session_duration_limit": newData.session_duration_limit,
+              "exclude_until": newData.exclude_until
             });
 
     };
