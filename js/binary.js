@@ -58494,7 +58494,18 @@ onLoad.queue_for_url(function () {
             $(element).text("");
         });
     };
+    var resetForm = function(){
+        $(":text").each(function(ind,element){
+            if(!isNormalInteger($(element).val()) && $(element).val())
+            {
+                if(!/EXCLUDEUNTIL/.test($(element).attr("id")))
+                {
+                    $(element).text("");
+                }
+            }
+        });
 
+    };
     var validateForm = function(frm){
         var isValid = true;
         resetError();
@@ -58526,6 +58537,7 @@ onLoad.queue_for_url(function () {
        }
         
     };
+
     var populateForm = function(response){
         var res = response.get_self_exclusion;
 
@@ -58536,6 +58548,9 @@ onLoad.queue_for_url(function () {
         });
 
         val = val.join(',');
+
+        //Reset form to empty.
+        resetForm();
 
         console.log("map values test", val);
 
