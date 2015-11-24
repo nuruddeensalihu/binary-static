@@ -58528,11 +58528,13 @@ onLoad.queue_for_url(function () {
 
     };
     var isAuthorized =  function(response){
+        if(!response.echo_req.passthrough){
+            console.log("the error should be here")
+        }
+        console.log("The response echo is", response.echo_req.passthrough);
         if(typeof response.echo_req.passthrough.value !== 'undefined'){
             var option= response.echo_req.passthrough.value ;
 
-            console.log("the option value is" , option);
-            console.log("the response for option is", response);
             switch(option){
                 case   "get_self_exclusion" :
                         BinarySocket.send({"get_self_exclusion": 1});
@@ -58548,21 +58550,10 @@ onLoad.queue_for_url(function () {
     var populateForm = function(response){
         var res = response.get_self_exclusion;
 
-        var val =  $.map(res, function(value , property){
-            console.log("the mapping propety is ", property);
-            console.log("the mapping value is ", value);
-            return property;
-        });
-
-        val = val.join(',');
-
         //Reset form to empty.
-
         console.log("The first data is before clear ", $(MAXCASHBAL).val());
         resetForm();
         console.log("The first data is after clear ", $(MAXCASHBAL).val());
-
-        console.log("map values test", val);
 
         data.max_balance = $("#MAXCASHBAL").val();
         data.max_turnover = $("#DAILYTURNOVERLIMIT").val();
@@ -58574,11 +58565,10 @@ onLoad.queue_for_url(function () {
         data.max_open_bets = $("#MAXOPENPOS").val();
         data.session_duration_limit =  $("#SESSIONDURATION").val();
         data.exclude_until = $("#EXCLUDEUNTIL").val();
-        console.log("Empty datas are ", data);
+
         if(res){
             $.map(res,function(value,property){
-                console.log("the data value is 1", value);
-                console.log("the data property is ", property);
+
                 switch(property){
                     case  "max_balance" :
                            data.max_balance = value;
@@ -58601,15 +58591,15 @@ onLoad.queue_for_url(function () {
                     case   "max_30day_losses" :
                             data.max_30day_losses = value;
                             break;
-                    case    "max_open_bets" :
-                             data.max_open_bets = value;
-                             break; 
-                    case    "session_duration_limit"  :
-                             data.session_duration_limit = value;
-                             break;
-                    case    "exclude_until"   :
-                             data.exclude_until = value;
-                             break;       
+                    case   "max_open_bets" :
+                            data.max_open_bets = value;
+                            break; 
+                    case   "session_duration_limit"  :
+                            data.session_duration_limit = value;
+                            break;
+                    case   "exclude_until"   :
+                            data.exclude_until = value;
+                            break;       
 
                 }
 
@@ -58617,11 +58607,6 @@ onLoad.queue_for_url(function () {
             
         }
          //Bind our data here
-
-        console.log("the res are ", res);
-
-        console.log("the datas are ", data);
-        console.log("The sub datas ",data.max_balance);
         $("#MAXCASHBAL").val(data.max_balance);
         $("#DAILYTURNOVERLIMIT").val(data.max_turnover),
         $("#DAILYLOSSLIMIT").val(data.max_losses),
@@ -58632,8 +58617,6 @@ onLoad.queue_for_url(function () {
         $("#MAXOPENPOS").val(data.max_open_bets),
         $("#SESSIONDURATION").val(data.session_duration_limit),
         $("#EXCLUDEUNTIL").val(data.exclude_until)
-
-
 
     };
     var sendRequest = function(){
@@ -58652,21 +58635,17 @@ onLoad.queue_for_url(function () {
             "exclude_until" : $("#EXCLUDEUNTIL").val()
         };
 
+        //Check if value changes
         $.map(newData , function(value, property){
-            console.log("the whole data is ", data);
-            console.log("The old data is", data[property]);
-            console.log("The parameter is", property);
-            console.log("the new data is", value);
             if(value !== data[property])
                 hasChages = true ;
-        });
-        //Check if value changes 
-        
+        }); 
         if(!hasChages){
             $("#invalidinputfound").text("Please provide at least one self-exclusion setting");
             return false;
         }
-        console.log("The newdata to be sent is ", newData);
+
+        //Send our request , updating page.
         BinarySocket.send(
             {
               "set_self_exclusion": 1,
@@ -58689,19 +58668,15 @@ onLoad.queue_for_url(function () {
             $("#invalidinputfound").text("Operation failed");
             return false;
         }
-        console.log("The responseMessage is ", response);
 
+        window.location.href = window.location.href;
     };
     var apiResponse = function(response){
         var type = response.msg_type;
-        console.log("the response type is", type);
-        console.log("the response itself is ", response);
         if (type === "get_self_exclusion" || (type === "error" && "get_self_exclusion" in response.echo_req)){
-            console.log("the log is",response.get_self_exclusion);
             populateForm(response);
         }else if(type === "set_self_exclusion" || (type === "error" && "set_self_exclusion" in response.echo_req))
         {
-            console.log("the res is ",response.set_self_exclusion);
             responseMessage(response);
         }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
         {
