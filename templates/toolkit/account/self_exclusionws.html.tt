@@ -114,7 +114,7 @@
 				   		<label for="EXCLUDEUNTIL">[% l('Exclude me from the website until') %]</label>
 					</div>
 			    	<div class="grd-grid-8">
-			      		<input class="text hasDatepicker" id="EXCLUDEUNTIL" name="EXCLUDEUNTIL" type="text"><br>
+			      		<input class=" text" id="EXCLUDEUNTIL" name="EXCLUDEUNTIL" type="text"><br>
 			      		<p class="hint">[% l('Please enter date in the format YYYY-MM-DD.') %]
 			      		</p>
 			      		<p class="errorfield" id="errorEXCLUDEUNTIL"></p>
