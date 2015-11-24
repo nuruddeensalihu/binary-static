@@ -58514,7 +58514,7 @@ onLoad.queue_for_url(function () {
             return false;
 
     };
-    isAuthorized =  function(response){
+    var isAuthorized =  function(response){
        var option = response.echo_req.passthrough.value;
        switch(option){
         case   "get_self_exclusion" :
@@ -58656,7 +58656,7 @@ onLoad.queue_for_url(function () {
             responseMessage(response);
         }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
         {
-            SelfExlusionWS.isAuthorized(response);
+            isAuthorized(response);
         }
                    
 
@@ -58693,7 +58693,6 @@ onLoad.queue_for_url(function () {
         datePicker : datePicker,
         apiResponse: apiResponse,
         populateForm : populateForm,
-        isAuthorized : isAuthorized
     };
 
 

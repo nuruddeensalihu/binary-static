@@ -49,7 +49,7 @@ var SelfExlusionWS = (function(){
             return false;
 
     };
-    isAuthorized =  function(response){
+    var isAuthorized =  function(response){
        var option = response.echo_req.passthrough.value;
        switch(option){
         case   "get_self_exclusion" :
@@ -191,7 +191,7 @@ var SelfExlusionWS = (function(){
             responseMessage(response);
         }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
         {
-            SelfExlusionWS.isAuthorized(response);
+            isAuthorized(response);
         }
                    
 
@@ -228,7 +228,6 @@ var SelfExlusionWS = (function(){
         datePicker : datePicker,
         apiResponse: apiResponse,
         populateForm : populateForm,
-        isAuthorized : isAuthorized
     };
 
 
