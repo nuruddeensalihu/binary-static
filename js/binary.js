@@ -58485,7 +58485,7 @@ onLoad.queue_for_url(function () {
             if(!validateForm($form)){
                 return false;
             }
-            client_form.self_exclusion.validate_exclusion_date();
+            validateDate();
             BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "set_self_exclusion"}});
         });
 
@@ -58564,6 +58564,9 @@ onLoad.queue_for_url(function () {
         }
         */
    
+    };
+    var validateDate = function(){
+        return client_form.self_exclusion.validate_exclusion_date();
     };
 
     var populateForm = function(response){

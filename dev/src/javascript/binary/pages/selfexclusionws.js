@@ -14,7 +14,7 @@ var SelfExlusionWS = (function(){
             if(!validateForm($form)){
                 return false;
             }
-            client_form.self_exclusion.validate_exclusion_date();
+            validateDate();
             BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "set_self_exclusion"}});
         });
 
@@ -93,6 +93,9 @@ var SelfExlusionWS = (function(){
         }
         */
    
+    };
+    var validateDate = function(){
+        return client_form.self_exclusion.validate_exclusion_date();
     };
 
     var populateForm = function(response){
