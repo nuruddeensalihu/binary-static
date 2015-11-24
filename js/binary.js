@@ -58627,7 +58627,9 @@ onLoad.queue_for_url(function () {
             "exclude_until" : $("#EXCLUDEUNTIL").val()
         };
 
-        $.map(newData , function(property, value){
+        $.map(newData , function(value, property){
+            console.log("The old data is", data[property].value);
+            console.log("the new data is", value);
             if(value !== data[property].value)
                 hasChages = true ;
         });
