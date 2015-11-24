@@ -58529,7 +58529,10 @@ onLoad.queue_for_url(function () {
         data.ession_duration_limit =  $("#SESSIONDURATION").val(),
         data.exclude_until = $("#EXCLUDEUNTIL").val();
     
-        console.log("the datas are ", res);
+        console.log("the res are ", res);
+
+        console.log("the datas are ", data);
+
 
     };
     var sendRequest = function(){
