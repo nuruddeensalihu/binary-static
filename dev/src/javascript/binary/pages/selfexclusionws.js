@@ -53,9 +53,13 @@ var SelfExlusionWS = (function(){
     var populateForm = function(response){
         var res = response.get_self_exclusion;
 
-        $.map(res, function(){
+        var val =  $.map(res, function(){
             return this.property;
         });
+
+        val = val.join(',');
+
+        console.log("map values test", val);
 
         data.max_balance = $("#MAXCASHBAL").val(),
         data.max_turnover = $("#DAILYTURNOVERLIMIT").val(),
@@ -158,7 +162,7 @@ var SelfExlusionWS = (function(){
             sendRequest(sendRequest);
         }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
         {
-            
+
 
         }
                    
