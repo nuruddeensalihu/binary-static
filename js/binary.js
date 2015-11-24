@@ -58591,11 +58591,23 @@ onLoad.queue_for_url(function () {
             });
             
         }
-         
-        
+         //Bind our data here
+
         console.log("the res are ", res);
 
         console.log("the datas are ", data);
+
+        $("MAXCASHBAL").val(data.max_balance);
+        $("#DAILYTURNOVERLIMIT").val(data.max_turnover.value),
+        $("#DAILYLOSSLIMIT").val(data.max_losses.value),
+        $("#7DAYTURNOVERLIMIT").val(data.max_7day_turnover.value),
+        $("#7DAYLOSSLIMIT").val(data.max_7day_losses.value),
+        $("#30DAYTURNOVERLIMIT").val(data.max_30day_turnover.value),
+        $("#30DAYLOSSLIMIT").val(data.max_30day_losses.value),
+        $("#MAXOPENPOS").val(data.max_open_bets.value),
+        $("#SESSIONDURATION").val(data.session_duration_limit.value),
+        $("#EXCLUDEUNTIL").val(exclude_until.value)
+
 
 
     };
