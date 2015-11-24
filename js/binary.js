@@ -58430,38 +58430,44 @@ function initialize_pricing_table() {
 }
 
 onLoad.queue_for_url(initialize_pricing_table, 'pricing_table');
-;
-var self_exclusion_date_picker = function () {
-    // 6 months from now
-    var start_date = new Date();
-    start_date.setMonth(start_date.getMonth() + 6);
+;var selfExclusion = (function(){
+    var self_exclusion_date_picker = function () {
+        // 6 months from now
+        var start_date = new Date();
+        start_date.setMonth(start_date.getMonth() + 6);
 
-    // 5 years from now
-    var end_date = new Date();
-    end_date.setFullYear(end_date.getFullYear() + 5);
+        // 5 years from now
+        var end_date = new Date();
+        end_date.setFullYear(end_date.getFullYear() + 5);
 
-    var id = $('#EXCLUDEUNTIL');
+        var id = $('#EXCLUDEUNTIL');
 
-    id.datepicker({
-        dateFormat: 'yy-mm-dd',
-        minDate: start_date,
-        maxDate: end_date,
-        onSelect: function(dateText, inst) {
-            id.attr("value", dateText);
-        },
-    });
-};
+        id.datepicker({
+            dateFormat: 'yy-mm-dd',
+            minDate: start_date,
+            maxDate: end_date,
+            onSelect: function(dateText, inst) {
+                id.attr("value", dateText);
+            },
+        });
+    };
 
-var self_exclusion_validate_date = function () {
-    $('#selfExclusion').on('click', '#self_exclusion_submit', function () {
-        return client_form.self_exclusion.validate_exclusion_date();
-    });
-};
+    var self_exclusion_validate_date = function () {
+        $('#selfExclusion').on('click', '#self_exclusion_submit', function () {
+            return client_form.self_exclusion.validate_exclusion_date();
+        });
+    };
 
+    return{
+        self_exclusion_validate_date : self_exclusion_validate_date,
+        self_exclusion_date_picker :self_exclusion_date_picker
+    };
+
+})();
 onLoad.queue_for_url(function () {
 // date picker for self exclusion
-    self_exclusion_date_picker();
-    self_exclusion_validate_date();
+    selfExclusion.self_exclusion_date_picker();
+    selfExclusion.self_exclusion_validate_date();
 }, 'self_exclusion');
 ;var SelfExlusionWS = (function(){
     
@@ -58698,38 +58704,11 @@ onLoad.queue_for_url(function () {
         }
 
     } ;
-    var datePicker = function () {
-        // 6 months from now
-        var start_date = new Date();
-        start_date.setMonth(start_date.getMonth() + 6);
-
-        // 5 years from now
-        var end_date = new Date();
-        end_date.setFullYear(end_date.getFullYear() + 5);
-
-        var id = $("#EXCLUDEUNTIL");
-        console.log("The id is", id);
-        id.datepicker({
-            dateFormat: 'yy-mm-dd',
-            minDate: start_date,
-            maxDate: end_date,
-            onSelect: function(dateText, inst) {
-                id.attr("value", dateText);
-            },
-        });
-    };
-
-    var validateDate = function () {
-        $('#selfExclusion').on('click', '#self_exclusion_submit', function () {
-            return client_form.self_exclusion.validate_exclusion_date();
-        });
-    };
 
     return {
         init: init,
-        datePicker : datePicker,
         apiResponse: apiResponse,
-        populateForm : populateForm,
+        populateForm : populateForm
     };
 
 
@@ -58761,7 +58740,9 @@ pjax_config_page("user/self_exclusionws", function() {
            
             // date picker for self exclusion
                 
-            SelfExlusionWS.datePicker();
+           // date picker for self exclusion
+             selfExclusion.self_exclusion_date_picker();
+             selfExclusion.self_exclusion_validate_date();
            // SelfExlusionWS.populateForm();
         
             SelfExlusionWS.init();
