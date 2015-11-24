@@ -58529,6 +58529,8 @@ onLoad.queue_for_url(function () {
     };
     var isAuthorized =  function(response){
        var option = response.echo_req.passthrough.value;
+       console.log("the option value is" , option);
+       console.log("the response for option is", response);
        switch(option){
         case   "get_self_exclusion" :
                 BinarySocket.send({"get_self_exclusion": 1});
