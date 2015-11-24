@@ -58667,21 +58667,25 @@ onLoad.queue_for_url(function () {
         BinarySocket.send(
             {
               "set_self_exclusion": 1,
-              "max_balance": newData.max_balance,
-              "max_turnover": newData.max_turnover,
-              "max_losses": newData.max_losses,
-              "max_7day_turnover": newData.max_7day_turnover,
-              "max_7day_losses": newData.max_7day_losses,
-              "max_30day_turnover": newData.max_30day_turnover,
-              "max_30day_losses": newData.max_30day_losses,
-              "max_open_bets": newData.max_open_bets,
-              "session_duration_limit": newData.session_duration_limit,
+              "max_balance": parseInt(newData.max_balance),
+              "max_turnover": parseInt(newData.max_turnover),
+              "max_losses": parseInt(newData.max_losses),
+              "max_7day_turnover": parseInt(newData.max_7day_turnover),
+              "max_7day_losses": parseInt(newData.max_7day_losses),
+              "max_30day_turnover": parseInt(newData.max_30day_turnover),
+              "max_30day_losses": parseInt(newData.max_30day_losses),
+              "max_open_bets": parseInt(newData.max_open_bets),
+              "session_duration_limit": parseInt(newData.session_duration_limit),
               "exclude_until": newData.exclude_until
             });
 
     };
     var responseMessage = function(response){
         //msg_type: "error"
+        if(response.msg_type === "error"){
+            $("#invalidinputfound").text("Operation failed");
+            return false;
+        }
         console.log("The responseMessage is ", response);
 
     };
@@ -58747,7 +58751,11 @@ pjax_config_page("user/self_exclusionws", function() {
                 window.location.href = page.url.url_for('login');
                 return;
             }
-            
+             // Check if it is a real account or not
+            if((/VRT/.test($.cookie('loginid')))){
+                window.location.href = ("/");
+            }
+
         	BinarySocket.init({
                 onmessage: function(msg){
                     var response = JSON.parse(msg.data);
