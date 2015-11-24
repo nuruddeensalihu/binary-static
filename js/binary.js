@@ -58606,7 +58606,7 @@ onLoad.queue_for_url(function () {
         $("#30DAYLOSSLIMIT").val(data.max_30day_losses.value),
         $("#MAXOPENPOS").val(data.max_open_bets.value),
         $("#SESSIONDURATION").val(data.session_duration_limit.value),
-        $("#EXCLUDEUNTIL").val(exclude_until.value)
+        $("#EXCLUDEUNTIL").val(data.exclude_until.value)
 
 
 
