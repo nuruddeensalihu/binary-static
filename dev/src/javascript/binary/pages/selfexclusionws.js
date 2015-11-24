@@ -244,7 +244,7 @@ var SelfExlusionWS = (function(){
 
         var id = $('#EXCLUDEUNTIL');
         console.log("The id is", id);
-        console.log(end_date());
+        console.log("end date is",end_date);
         $("#SESSIONDURATION").datepicker({
             dateFormat: 'yy-mm-dd',
             minDate: start_date,
