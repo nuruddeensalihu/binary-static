@@ -65,9 +65,19 @@ var SelfExlusionWS = (function(){
 
     };
     var isAuthorized =  function(response){
-        if(!response.echo_req.passthrough){
-            console.log("the error should be here")
+        if(response.echo_req.passthrough){
+            var option= response.echo_req.passthrough.value ;
+
+            switch(option){
+                case   "get_self_exclusion" :
+                        BinarySocket.send({"get_self_exclusion": 1});
+                        break;
+                case   "set_self_exclusion" :
+                        sendRequest();
+                        break;                   
+            }
         }
+        /*
         console.log("The response echo is", response.echo_req.passthrough);
         if(typeof response.echo_req.passthrough.value !== 'undefined'){
             var option= response.echo_req.passthrough.value ;
@@ -81,6 +91,7 @@ var SelfExlusionWS = (function(){
                         break;                   
             }
         }
+        */
    
     };
 
@@ -88,9 +99,7 @@ var SelfExlusionWS = (function(){
         var res = response.get_self_exclusion;
 
         //Reset form to empty.
-        console.log("The first data is before clear ", $(MAXCASHBAL).val());
-        resetForm();
-        console.log("The first data is after clear ", $(MAXCASHBAL).val());
+        //resetForm();
 
         data.max_balance = $("#MAXCASHBAL").val();
         data.max_turnover = $("#DAILYTURNOVERLIMIT").val();

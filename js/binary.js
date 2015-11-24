@@ -58457,13 +58457,13 @@ var self_exclusion_validate_date = function () {
         return client_form.self_exclusion.validate_exclusion_date();
     });
 };
-/*
+
 onLoad.queue_for_url(function () {
 // date picker for self exclusion
-    //self_exclusion_date_picker();
-    //self_exclusion_validate_date();
+    self_exclusion_date_picker();
+    self_exclusion_validate_date();
 }, 'self_exclusion');
-*/;var SelfExlusionWS = (function(){
+;var SelfExlusionWS = (function(){
     
     "use strict";
 
@@ -58530,9 +58530,19 @@ onLoad.queue_for_url(function () {
 
     };
     var isAuthorized =  function(response){
-        if(!response.echo_req.passthrough){
-            console.log("the error should be here")
+        if(response.echo_req.passthrough){
+            var option= response.echo_req.passthrough.value ;
+
+            switch(option){
+                case   "get_self_exclusion" :
+                        BinarySocket.send({"get_self_exclusion": 1});
+                        break;
+                case   "set_self_exclusion" :
+                        sendRequest();
+                        break;                   
+            }
         }
+        /*
         console.log("The response echo is", response.echo_req.passthrough);
         if(typeof response.echo_req.passthrough.value !== 'undefined'){
             var option= response.echo_req.passthrough.value ;
@@ -58546,6 +58556,7 @@ onLoad.queue_for_url(function () {
                         break;                   
             }
         }
+        */
    
     };
 
@@ -58553,9 +58564,7 @@ onLoad.queue_for_url(function () {
         var res = response.get_self_exclusion;
 
         //Reset form to empty.
-        console.log("The first data is before clear ", $(MAXCASHBAL).val());
-        resetForm();
-        console.log("The first data is after clear ", $(MAXCASHBAL).val());
+        //resetForm();
 
         data.max_balance = $("#MAXCASHBAL").val();
         data.max_turnover = $("#DAILYTURNOVERLIMIT").val();
