@@ -163,7 +163,8 @@ var SelfExlusionWS = (function(){
         };
 
         $.map(newData , function(value, property){
-            console.log("The old data is", data[property].value);
+            console.log("The old data is", data[property]);
+            console.log("The parameter is", property);
             console.log("the new data is", value);
             if(value !== data[property].value)
                 hasChages = true ;
