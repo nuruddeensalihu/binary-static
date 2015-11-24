@@ -13,11 +13,10 @@ var SelfExlusionWS = (function(){
             e.stopPropagation();
             validateForm($form);
             validateDate();
-            sendRequest();
+            BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "set_self_exclusion"}});
         });
 
-        BinarySocket.send({"authorize": $.cookie('login')});
-        BinarySocket.send({"get_self_exclusion": 1});
+        BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "get_self_exclusion"}});
 
     };
     function isNormalInteger(str) {
@@ -50,6 +49,18 @@ var SelfExlusionWS = (function(){
             return false;
 
     };
+    isAuthorized =  function(response){
+       var option = response.echo_req.passthrough.value;
+       switch(option){
+        case   "get_self_exclusion" :
+                BinarySocket.send({"get_self_exclusion": 1});
+                break;
+        case   "set_self_exclusion" :
+                sendRequest();
+                break;                   
+       }
+        
+    };
     var populateForm = function(response){
         var res = response.get_self_exclusion;
 
@@ -61,20 +72,21 @@ var SelfExlusionWS = (function(){
 
         console.log("map values test", val);
 
-        data.max_balance = $("#MAXCASHBAL").val(),
-        data.max_turnover = $("#DAILYTURNOVERLIMIT").val(),
-        data.max_losses = $("#DAILYLOSSLIMIT").val(),
-        data.max_7day_turnover = $("#7DAYTURNOVERLIMIT").val(),
-        data.max_7day_losses = $("#7DAYLOSSLIMIT").val(),
-        data.max_30day_turnover = $("#30DAYTURNOVERLIMIT").val(),
-        data.max_30day_losses = $("#30DAYLOSSLIMIT").val(),
-        data.max_open_bets = $("#MAXOPENPOS").val(),
-        data.session_duration_limit =  $("#SESSIONDURATION").val(),
+        data.max_balance = $("#MAXCASHBAL").val();
+        data.max_turnover = $("#DAILYTURNOVERLIMIT").val();
+        data.max_losses = $("#DAILYLOSSLIMIT").val();
+        data.max_7day_turnover = $("#7DAYTURNOVERLIMIT").val();
+        data.max_7day_losses = $("#7DAYLOSSLIMIT").val();
+        data.max_30day_turnover = $("#30DAYTURNOVERLIMIT").val();
+        data.max_30day_losses = $("#30DAYLOSSLIMIT").val();
+        data.max_open_bets = $("#MAXOPENPOS").val();
+        data.session_duration_limit =  $("#SESSIONDURATION").val();
         data.exclude_until = $("#EXCLUDEUNTIL").val();
         console.log("Empty datas are ", data);
         if(res){
             $.map(res,function(){
-
+                console.log("the data property is 1", this);
+                console.log("the data property is ", this.property);
                 switch(this.property){
                     case  "max_balance" :
                            data.max_balance = this.value;
@@ -120,37 +132,53 @@ var SelfExlusionWS = (function(){
 
 
     };
-    var sendRequest = function(response){
+    var sendRequest = function(){
 
-        var max_balance = $("#MAXCASHBAL").val(),
-            max_turnover = $("#DAILYTURNOVERLIMIT").val(),
-            max_losses = $("#DAILYLOSSLIMIT").val(),
-            max_7day_turnover = $("#7DAYTURNOVERLIMIT").val(),
-            max_7day_losses = $("#7DAYLOSSLIMIT").val(),
-            max_30day_turnover = $("#30DAYTURNOVERLIMIT").val(),
-            max_30day_losses = $("#30DAYLOSSLIMIT").val(),
-            max_open_bets = $("#MAXOPENPOS").val(),
-            session_duration_limit =  $("#SESSIONDURATION").val(),
-            exclude_until = $("#EXCLUDEUNTIL").val();
+        var hasChages  = false;
+        var newData = {
+            "max_balance"  : $("#MAXCASHBAL").val(),
+            "max_turnover" : $("#DAILYTURNOVERLIMIT").val(),
+            "max_losses " : $("#DAILYLOSSLIMIT").val(),
+            "max_7day_turnover" : $("#7DAYTURNOVERLIMIT").val(),
+            "max_7day_losses" : $("#7DAYLOSSLIMIT").val(),
+            "max_30day_turnover" : $("#30DAYTURNOVERLIMIT").val(),
+            "max_30day_losses" : $("#30DAYLOSSLIMIT").val(),
+            "max_open_bets ": $("#MAXOPENPOS").val(),
+            "session_duration_limit" :  $("#SESSIONDURATION").val(),
+            "exclude_until" : $("#EXCLUDEUNTIL").val()
+        };
 
+        $.map(newData , function(property, value){
+            if(value !== data[property].value)
+                hasChages = true ;
+        });
+        //Check if value changes 
+        
+        if(!hasChages){
+            $("#invalidinputfound").text("Please provide at least one self-exclusion setting");
+            return false;
+        }
+        
         BinarySocket.send(
             {
               "set_self_exclusion": 1,
-              "max_balance": 100000,
-              "max_turnover": 1000,
-              "max_losses": 100000,
-              "max_7day_turnover": 1000,
-              "max_7day_losses": 100000,
-              "max_30day_turnover": 1000,
-              "max_30day_losses": 100000,
-              "max_open_bets": 1000,
-              "session_duration_limit": 3600,
-              "exclude_until": "2020-01-01"
-            }
-        );
+              "max_balance": newData.max_balance.value,
+              "max_turnover": newData.max_turnover.value,
+              "max_losses": newData.max_losses.value,
+              "max_7day_turnover": newData.max_7day_turnover.value,
+              "max_7day_losses": newData.max_7day_losses.value,
+              "max_30day_turnover": newData.max_30day_turnover.value,
+              "max_30day_losses": newData.max_30day_losses.value,
+              "max_open_bets": newData.max_open_bets.value,
+              "session_duration_limit": newData.session_duration_limit.value,
+              "exclude_until": newData.exclude_until.value
+            });
 
     };
+    var responseMessage = function(response){
+        console.log("The responseMessage is ", response);
 
+    };
     var apiResponse = function(response){
         var type = response.msg_type;
         console.log("the response type is", type);
@@ -160,11 +188,10 @@ var SelfExlusionWS = (function(){
         }else if(type === "set_self_exclusion" || (type === "error" && "set_self_exclusion" in response.echo_req))
         {
             console.log("the res is ",response.set_self_exclusion);
-            sendRequest(sendRequest);
+            responseMessage(response);
         }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
         {
-
-
+            isAuthorized(response);
         }
                    
 
@@ -199,11 +226,8 @@ var SelfExlusionWS = (function(){
     return {
         init: init,
         datePicker : datePicker,
-        validateDate : validateDate,
-        populateForm : populateForm,
-        validateForm : validateForm,
-        sendRequest: sendRequest,
-        apiResponse: apiResponse
+        apiResponse: apiResponse,
+        populateForm : populateForm
     };
 
 

@@ -11,7 +11,7 @@
 						<label for="MAXCASHBAL">Maximum account cash balance</label>
 					</div>
 					<div class="grd-grid-8">
-						<input class=" text" id="MAXCASHBAL" name="MAXCASHBAL" type="text">
+						<input class="text" id="MAXCASHBAL" name="MAXCASHBAL" type="text">
 					    <br>
 					    <p class="hint">Once this limit is reached, you may no longer deposit.</p>
 					    <p class="errorfield" id="errorMAXCASHBAL"></p>
