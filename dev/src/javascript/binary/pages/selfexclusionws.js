@@ -35,7 +35,7 @@ var SelfExlusionWS = (function(){
             {
                 if(!/EXCLUDEUNTIL/.test($(element).attr("id")))
                 {
-                    $(element).text("");
+                    $(element).val("");
                 }
             }
         });
@@ -43,7 +43,9 @@ var SelfExlusionWS = (function(){
     };
     var validateForm = function(frm){
         var isValid = true;
+        console.log("The first data is before clear ", $(MAXCASHBAL).val());
         resetError();
+        console.log("The first data is after clear ", $(MAXCASHBAL).val());
 
         $(":text").each(function(ind,element){
             if(!isNormalInteger($(element).val()) && $(element).val())
@@ -226,7 +228,7 @@ var SelfExlusionWS = (function(){
         {
             isAuthorized(response);
         }
-        
+
     } ;
     var datePicker = function () {
         // 6 months from now
