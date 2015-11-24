@@ -58528,7 +58528,7 @@ onLoad.queue_for_url(function () {
 
     };
     var isAuthorized =  function(response){
-       var option = response.echo_req.passthrough.value;
+       var option = response.echo_req.passthrough.value === 'undefined' ? null  : 'nn';
        console.log("the option value is" , option);
        console.log("the response for option is", response);
        switch(option){
@@ -58663,7 +58663,7 @@ onLoad.queue_for_url(function () {
             $("#invalidinputfound").text("Please provide at least one self-exclusion setting");
             return false;
         }
-        
+        console.log("The newdata to be sent is ", newData);
         BinarySocket.send(
             {
               "set_self_exclusion": 1,
@@ -58681,6 +58681,7 @@ onLoad.queue_for_url(function () {
 
     };
     var responseMessage = function(response){
+        //msg_type: "error"
         console.log("The responseMessage is ", response);
 
     };
