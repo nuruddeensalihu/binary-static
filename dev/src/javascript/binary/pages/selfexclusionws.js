@@ -11,7 +11,9 @@ var SelfExlusionWS = (function(){
         $form.find("button").on("click", function(e){
             e.preventDefault();
             e.stopPropagation();
-            validateForm($form);
+            if(!validateForm($form)){
+                return false;
+            }
             validateDate();
             BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "set_self_exclusion"}});
         });
@@ -201,6 +203,7 @@ var SelfExlusionWS = (function(){
         //msg_type: "error"
         if(response.msg_type === "error"){
             $("#invalidinputfound").text("Operation failed");
+            console.log("Find the issue in the object : ", response.echo_req);
             return false;
         }
 
