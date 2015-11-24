@@ -58518,16 +58518,61 @@ onLoad.queue_for_url(function () {
     var populateForm = function(response){
         var res = response.get_self_exclusion;
 
+        $.map(res, function(){
+            return this.property;
+        });
+
         data.max_balance = $("#MAXCASHBAL").val(),
         data.max_turnover = $("#DAILYTURNOVERLIMIT").val(),
         data.max_losses = $("#DAILYLOSSLIMIT").val(),
         data.max_7day_turnover = $("#7DAYTURNOVERLIMIT").val(),
         data.max_7day_losses = $("#7DAYLOSSLIMIT").val(),
-        data.ax_30day_turnover = $("#30DAYTURNOVERLIMIT").val(),
+        data.max_30day_turnover = $("#30DAYTURNOVERLIMIT").val(),
         data.max_30day_losses = $("#30DAYLOSSLIMIT").val(),
         data.max_open_bets = $("#MAXOPENPOS").val(),
-        data.ession_duration_limit =  $("#SESSIONDURATION").val(),
+        data.session_duration_limit =  $("#SESSIONDURATION").val(),
         data.exclude_until = $("#EXCLUDEUNTIL").val();
+        if(res){
+            $.map(res,function(){
+
+                switch(this.property){
+                    case  "max_balance" :
+                           data.max_balance = this.value;
+                           break;
+                    case  "max_turnover" :
+                           data.max_turnover = this.value;
+                           break;
+                    case  "max_losses"   :
+                           data.max_losses = this.value;
+                           break;
+                    case  "max_7day_turnover" :
+                           data.max_7day_turnover = this.value;
+                           break;
+                    case  "max_7day_losses" :
+                           data.max_7day_losses = this.value;
+                           break;
+                    case   "max_30day_turnover" :
+                            data.max_30day_turnover = this.value;
+                            break;
+                    case   "max_30day_losses" :
+                            data.max_30day_losses = this.value;
+                            break;
+                    case    "max_open_bets" :
+                             data.max_open_bets = this.value;
+                             break; 
+                    case    "session_duration_limit"  :
+                             data.session_duration_limit = this.value;
+                             break;
+                    case    "exclude_until"   :
+                             data.exclude_until = this.value;
+                             break;       
+
+                }
+
+            });
+            
+        }
+         
     
         console.log("the res are ", res);
 
@@ -58535,7 +58580,7 @@ onLoad.queue_for_url(function () {
 
 
     };
-    var sendRequest = function(){
+    var sendRequest = function(response){
 
         var max_balance = $("#MAXCASHBAL").val(),
             max_turnover = $("#DAILYTURNOVERLIMIT").val(),
@@ -58571,12 +58616,14 @@ onLoad.queue_for_url(function () {
         console.log("the response type is", type);
         if (type === "get_self_exclusion" || (type === "error" && "get_self_exclusion" in response.echo_req)){
             console.log("the log is",response.get_self_exclusion);
-            populateForm();
+            populateForm(response);
         }else if(type === "set_self_exclusion" || (type === "error" && "set_self_exclusion" in response.echo_req))
         {
             console.log("the res is ",response.set_self_exclusion);
+            sendRequest(sendRequest);
         }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
         {
+            
 
         }
                    
