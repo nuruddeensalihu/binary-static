@@ -113,7 +113,7 @@ var SelfExlusionWS = (function(){
             
         }
          
-    
+        
         console.log("the res are ", res);
 
         console.log("the datas are ", data);
@@ -232,7 +232,7 @@ pjax_config_page("user/self_exclusionws", function() {
             // date picker for self exclusion
                 
             SelfExlusionWS.datePicker();
-            SelfExlusionWS.populateForm();
+           // SelfExlusionWS.populateForm();
         
             SelfExlusionWS.init();
         }
