@@ -131,8 +131,8 @@ var SelfExlusionWS = (function(){
         console.log("the res are ", res);
 
         console.log("the datas are ", data);
-
-        $("MAXCASHBAL").val(data.max_balance);
+        console.log("The sub datas ",data.max_balance.value);
+        $("#MAXCASHBAL").val(data.max_balance.value);
         $("#DAILYTURNOVERLIMIT").val(data.max_turnover.value),
         $("#DAILYLOSSLIMIT").val(data.max_losses.value),
         $("#7DAYTURNOVERLIMIT").val(data.max_7day_turnover.value),
