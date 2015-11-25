@@ -58976,6 +58976,7 @@ onLoad.queue_for_url(function () {
 
         var lolg = validateDate();
         console.log("The validate is ", lolg);
+        console.log("isValid is ", isValid);
 
         if(validateDate() === true){
             console.log("suppose to be here");
