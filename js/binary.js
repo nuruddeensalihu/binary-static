@@ -58981,12 +58981,12 @@ onLoad.queue_for_url(function () {
             console.log("suppose to be here");
         }
 
-        if(!validateDate()){
+        if(validateDate() === false){
             console.log("The date is not valid");
             isValid = false;
         }
 
-        if(!isValid){
+        if(isValid === false){
             return false;
         }
 

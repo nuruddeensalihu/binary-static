@@ -54,17 +54,18 @@ var SelfExlusionWS = (function(){
 
         var lolg = validateDate();
         console.log("The validate is ", lolg);
+        console.log("isValid is ", isValid);
 
         if(validateDate() === true){
             console.log("suppose to be here");
         }
 
-        if(!validateDate()){
+        if(validateDate() === false){
             console.log("The date is not valid");
             isValid = false;
         }
 
-        if(!isValid){
+        if(isValid === false){
             return false;
         }
 
