@@ -51,8 +51,10 @@ var SelfExlusionWS = (function(){
             }
         });
 
-        if(!validateDate())
+        if(!validateDate()){
+            console.log("The date is not valid");
             isValid = false;
+        }
 
         if(!isValid)
             return false;
