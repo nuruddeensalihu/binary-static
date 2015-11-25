@@ -405,7 +405,7 @@ Header.prototype = {
     },
     on_unload: function() {
         this.menu.reset();
-        console("onHead on-Unload",BinarySocket.isReady());
+        console.log("onHead on-Unload",BinarySocket.isReady());
     },
     show_or_hide_login_form: function() {
         if (this.user.is_logged_in && this.client.is_logged_in) {
@@ -847,7 +847,7 @@ Page.prototype = {
     on_unload: function() {
         this.header.on_unload();
         this.contents.on_unload();
-        console("OnPage on-Unload",BinarySocket.isReady());
+        console.log("OnPage on-Unload",BinarySocket.isReady());
     },
     on_change_language: function() {
         var that = this;
