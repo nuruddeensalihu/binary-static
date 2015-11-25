@@ -405,7 +405,7 @@ Header.prototype = {
     },
     on_unload: function() {
         this.menu.reset();
-        console.log("onHead on-Unload",BinarySocket.isReady());
+        if (!this.clock_started) this.start_clock_ws();
     },
     show_or_hide_login_form: function() {
         if (this.user.is_logged_in && this.client.is_logged_in) {
@@ -517,6 +517,7 @@ Header.prototype = {
         };
         
         if(BinarySocket.isReady()){
+            console.log("Time Started");
             init();
             that.run();
             this.clock_started = true;
@@ -847,7 +848,6 @@ Page.prototype = {
     on_unload: function() {
         this.header.on_unload();
         this.contents.on_unload();
-        console.log("OnPage on-Unload",BinarySocket.isReady());
     },
     on_change_language: function() {
         var that = this;
