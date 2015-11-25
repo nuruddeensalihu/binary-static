@@ -58584,7 +58584,7 @@ pjax_config_page("user/portfoliows", function() {
                             break;
 
                         default:
-                            // msg_type is not what PortfolioWS handles, so ignore it.
+                            throw new Error("No method exits to handle api message of type '" + msg_type + "'.");
 
                     }
 
@@ -60623,16 +60623,7 @@ var Durations = (function(){
     var expiry_time = '';
     var has_end_date = 0;
 
-    var displayDurations = function() {
-
-        var startType;
-        if(sessionStorage.getItem('date_start') && StartDates.displayed() && moment(sessionStorage.getItem('date_start')*1000).isAfter(moment()) ){
-            startType = 'forward';
-        }
-        else {
-            startType = 'spot';
-        }
-
+    var displayDurations = function(startType) {
         var durations = Contract.durations();
         if (durations === false) {
             document.getElementById('expiry_row').style.display = 'none';
@@ -60985,16 +60976,17 @@ var TradingEvents = (function () {
 
         var make_price_request = 1;
         if (value === 'now') {
+            Durations.display('spot');
             sessionStorage.removeItem('date_start');
         } else {
             make_price_request = -1;
             var end_time = moment(value*1000).utc().add(15,'minutes');
             Durations.setTime(end_time.format("hh:mm"));
             Durations.selectEndDate(end_time.format("YYYY-MM-DD"));
+
+            Durations.display('forward');
             sessionStorage.setItem('date_start', value);
         }
-
-        Durations.display();
 
         return make_price_request;
     };
@@ -62851,6 +62843,21 @@ WSTickDisplay.updateChart = function(data){
         $('#reality-check .blogout').on('click', function () {
             window.location.href = logout_url;
         });
+        
+        var obj = document.getElementById('realityDuration');
+        this.isNumericValue(obj);
+    };
+    //
+    //limit textBox to Numeric Only
+    //
+    RealityCheck.prototype.isNumericValue = function(obj){
+
+        if (obj.hasOwnProperty('oninput') || ('oninput' in obj)) 
+        {
+            $('#realityDuration').on('input', function (event) { 
+                 this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        }
     };
 
     // On session start we need to ask for the reality-check interval.
@@ -62910,6 +62917,10 @@ WSTickDisplay.updateChart = function(data){
         };
         $('#reality-check [bcont=1]').on('click', click_handler);
         $('#reality-check [interval=1]').on('change', click_handler);
+
+
+        var obj = document.getElementById('realityDuration');
+        this.isNumericValue(obj);
     };
 
     return RealityCheck;
