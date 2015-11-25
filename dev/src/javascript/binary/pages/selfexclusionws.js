@@ -52,13 +52,21 @@ var SelfExlusionWS = (function(){
             }
         });
 
+        var lolg = validateDate();
+        console.log("The validate is ", lolg);
+
+        if(validateDate() === true){
+            console.log("suppose to be here");
+        }
+
         if(!validateDate()){
             console.log("The date is not valid");
             isValid = false;
         }
 
-        if(!isValid)
+        if(!isValid){
             return false;
+        }
 
     };
     var isAuthorized =  function(response){
