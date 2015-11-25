@@ -70,7 +70,7 @@ var SelfExlusionWS = (function(){
             $("#invalidinputfound").text(errorMsg);
             return false;
         }
-        
+
         if(response.echo_req.passthrough){
             var option= response.echo_req.passthrough.value ;
 
@@ -245,6 +245,7 @@ var SelfExlusionWS = (function(){
     };
     var apiResponse = function(response){
         var type = response.msg_type;
+        console.log("The response is ", response);
         if (type === "get_self_exclusion" || (type === "error" && "get_self_exclusion" in response.echo_req)){
             populateForm(response);
         }else if(type === "set_self_exclusion" || (type === "error" && "set_self_exclusion" in response.echo_req))
