@@ -45,6 +45,7 @@ var SelfExlusionWS = (function(){
             {
                 if(!/EXCLUDEUNTIL/.test($(element).attr("id")))
                 {
+                    console.log("We are rather here");
                     $("#error"+$(element).attr("id")).text(text.localize("Please enter an integer value"));
                     isValid = false;
                 }
