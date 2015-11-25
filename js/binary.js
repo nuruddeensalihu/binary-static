@@ -58933,7 +58933,7 @@ onLoad.queue_for_url(function () {
         $form.find("button").on("click", function(e){
             e.preventDefault();
             e.stopPropagation();
-            if(!validateForm($form)){
+            if(validateForm($form) === false){
                 return false;
             }
             BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "set_self_exclusion"}});
@@ -58988,6 +58988,7 @@ onLoad.queue_for_url(function () {
         }
 
         if(isValid === false){
+            console.log("Its comes here");
             return false;
         }
 
