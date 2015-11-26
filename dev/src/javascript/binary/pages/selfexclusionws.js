@@ -45,33 +45,25 @@ var SelfExlusionWS = (function(){
             {
                 if(!/EXCLUDEUNTIL/.test($(element).attr("id")))
                 {
-                    console.log("We are rather here");
                     $("#error"+$(element).attr("id")).text(text.localize("Please enter an integer value"));
                     isValid = false;
                 }
             }
         });
 
-        var lolg = validateDate();
-        console.log("The validate is ", lolg);
-        console.log("isValid is ", isValid);
-
-        if(validateDate() === true){
-            console.log("suppose to be here");
-        }
 
         if(validateDate() === false){
-            console.log("The date is not valid");
             isValid = false;
         }
 
         if(isValid === false){
-            console.log("Its comes here");
+
             return false;
         }
 
     };
     var isAuthorized =  function(response){
+        /*
 
         if("error" in response) {
 
@@ -80,9 +72,8 @@ var SelfExlusionWS = (function(){
             }
             console.log("issue with authorization");
 
-            $("#invalidinputfound").text(errorMsg);
             return false;
-        }
+        }*/
 
         if(response.echo_req.passthrough){
             var option= response.echo_req.passthrough.value ;
@@ -96,21 +87,6 @@ var SelfExlusionWS = (function(){
                         break;                   
             }
         }
-        /*
-        console.log("The response echo is", response.echo_req.passthrough);
-        if(typeof response.echo_req.passthrough.value !== 'undefined'){
-            var option= response.echo_req.passthrough.value ;
-
-            switch(option){
-                case   "get_self_exclusion" :
-                        BinarySocket.send({"get_self_exclusion": 1});
-                        break;
-                case   "set_self_exclusion" :
-                        sendRequest();
-                        break;                   
-            }
-        }
-        */
    
     };
     var validateDate = function(){
@@ -258,7 +234,7 @@ var SelfExlusionWS = (function(){
     };
     var apiResponse = function(response){
         var type = response.msg_type;
-        console.log("The response is ", response);
+    
         if (type === "get_self_exclusion" || (type === "error" && "get_self_exclusion" in response.echo_req)){
             populateForm(response);
         }else if(type === "set_self_exclusion" || (type === "error" && "set_self_exclusion" in response.echo_req))
@@ -306,7 +282,8 @@ pjax_config_page("user/self_exclusionws", function() {
                 
            // date picker for self exclusion
             Exclusion.self_exclusion_date_picker();
-           
+
+            //init commands
             SelfExlusionWS.init();
         }
     };
