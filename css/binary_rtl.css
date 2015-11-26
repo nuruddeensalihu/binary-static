@@ -4495,10 +4495,6 @@ table .loss, table .lower {
 .timeline .event .event-body {
   padding: 12px;
 }
-.timeline .event .event-body .egr-logo {
-  max-height: 103px;
-  max-width: 99px;
-}
 .timeline .event.featured .header {
   background: #e98024;
   color: #F2F2F2;
