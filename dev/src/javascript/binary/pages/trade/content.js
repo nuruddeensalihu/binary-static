@@ -110,12 +110,7 @@ var Content = (function () {
             textNumbers: text.localize('numbers'),
             textSpace: text.localize('space'),
             textPeriod: text.localize('period'),
-            textComma: text.localize('comma'),
-            textAsset: text.localize('Asset'),
-            textOpens: text.localize('Opens'),
-            textCloses: text.localize('Closes'),
-            textSettles: text.localize('Settles'),
-            textUpcomingEvents: text.localize('Upcoming Events')
+            textComma: text.localize('comma')
         };
 
         var starTime = document.getElementById('start_time_label');
