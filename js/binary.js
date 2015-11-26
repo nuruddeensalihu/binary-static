@@ -49556,25 +49556,50 @@ Header.prototype = {
     start_clock_ws : function(){
         var that = this;
         var clock_handle;
-        var query_start_time;
+        // var query_start_time;
         var clock = $('#gmt-clock');
 
-        function init(){
-            BinarySocket.send({ "time": 1});
-            query_start_time = (new Date().getTime());  
+        var init = function(){
+            var passThrough = moment.utc().unix();
+            console.log("the time is",passthrough);
+            BinarySocket.send({ "time": 1, passthrough: {"time": passthrough}});
+            //query_start_time = (new Date().getTime());  
         }
         BinarySocket.init({
             onmessage : function(msg){
                 var response = JSON.parse(msg.data);
                 if (response && response.msg_type === 'time') {
-                    responseMsg(response);
+                    //responseMsg(response);
+                    console.log("the reponse passthrough is ",response.passthrough.client_time);
+                    var start_timestamp = response.time;
+                    var delay =moment().diff(moment(response.passthrough.client_time),'seconds');
+                    console.log("The delay is",delay);
+                    console.log("The delay in seconds is", moment.unix(delay,'seconds'));
+                    that.time = moment.unix(start_timestamp*1000).add(delay,'seconds');
+
+                    console.log("The time is now", that.time)
+                    //that.time_now = ((start_timestamp * 1000)+ ((new Date().getTime()) - response.passThrough.t));
+                    var increase_time_by = function(interval) {
+                        that.time_now += interval;
+                    };
+                    var update_time = function() {
+                         clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+                    };
+                    update_time();
+
+                    clearInterval(clock_handle);
+
+                    clock_handle = setInterval(function() {
+                        increase_time_by(1000);
+                        update_time();
+                    }, 1000);
                 }
             }
         });
         function responseMsg(response){
             var start_timestamp = response.time;
             
-            that.time_now = ((start_timestamp * 1000)+ ((new Date().getTime()) - query_start_time));
+            that.time_now = ((start_timestamp * 1000)+ ((new Date().getTime()) - response.passThrough.t));
             var increase_time_by = function(interval) {
                 that.time_now += interval;
             };
