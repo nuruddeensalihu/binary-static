@@ -477,27 +477,18 @@ Header.prototype = {
         var clock = $('#gmt-clock');
         
 
-        function init(){
+        var init = function(){
             var client_time = moment.utc().unix();
             BinarySocket.send({ "time": 1,"passthrough":{"client_time" : client_time}});
-        }
-        function sleep(delay) {
-            var start = new Date().getTime();
-            while (new Date().getTime() < start + delay);
-        }
+        };
         BinarySocket.init({
                 onmessage : function(msg){
-                    sleep(5000);
                     var response = JSON.parse(msg.data);
                     if (response && response.msg_type === 'time') {
-
                     var start_timestamp = response.time;
                     var pass = response.echo_req.passthrough.client_time;
                     that.time_now = ((start_timestamp * 1000) + (moment.utc().unix() - pass));
-                    
-                    console.log("The time before is ", pass);
-                    console.log("The time now is", moment.utc().unix());
-                    console.log("The diff is", (moment.utc().unix() - pass));
+                     
                     var increase_time_by = function(interval) {
                         that.time_now += interval;
                         that.tim += interval;
