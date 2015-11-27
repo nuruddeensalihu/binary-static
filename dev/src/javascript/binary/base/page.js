@@ -498,7 +498,7 @@ Header.prototype = {
             var pass = response.echo_req.passthrough.client_time;
             var delay = moment().diff(pass,'seconds');
             console.log("The delay is", delay);
-            that.tim = ((start_timestamp * 1000) + (moment.utc().unix() - pass));
+            that.tim = moment(start_timestamp * 1000).add(moment().diff(pass));
             that.time_now = ((start_timestamp * 1000)+ ((new Date().getTime()) - query_start_time));
              
             var increase_time_by = function(interval) {
