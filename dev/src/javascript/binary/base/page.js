@@ -479,49 +479,36 @@ Header.prototype = {
 
         function init(){
             var client_time = moment.utc().unix();
-            console.log("the client time is ", client_time);
             BinarySocket.send({ "time": 1,"passthrough":{"client_time" : client_time}});
-            query_start_time = (new Date().getTime());
-            console.log("The real time is", query_start_time);  
         }
         BinarySocket.init({
-            onmessage : function(msg){
-                var response = JSON.parse(msg.data);
-                if (response && response.msg_type === 'time') {
-                    responseMsg(response);
+                onmessage : function(msg){
+                    var response = JSON.parse(msg.data);
+                    if (response && response.msg_type === 'time') {
+
+                    var start_timestamp = response.time;
+                    var pass = response.echo_req.passthrough.client_time;
+                    that.time_now = ((start_timestamp * 1000) + (moment.utc().unix() - pass));
+                     
+                    var increase_time_by = function(interval) {
+                        that.time_now += interval;
+                        that.tim += interval;
+                    };
+                    var update_time = function() {
+                         clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+                    };
+                    update_time();
+
+                    clearInterval(clock_handle);
+
+                    clock_handle = setInterval(function() {
+                        increase_time_by(1000);
+                        update_time();
+                    }, 1000);
                 }
             }
         });
-        function responseMsg(response){
-            var start_timestamp = response.time;
-            console.log("the response is",response);
-            var pass = response.echo_req.passthrough.client_time;
 
-            console.log("The moment is",moment.utc().unix() );
-            console.log("The time pass is ", pass);
-            console.log("The diff is", (moment.utc().unix() - pass));
-            console.log("The startstamp is", start_timestamp);
-
-            that.tim = ((start_timestamp * 1000) + (moment.utc().unix() - pass));
-            that.time_now = ((start_timestamp * 1000)+ ((new Date().getTime()) - query_start_time));
-             
-            var increase_time_by = function(interval) {
-                that.time_now += interval;
-                that.tim += interval;
-            };
-            var update_time = function() {
-                 clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
-                 console.log("The time is now",moment(that.tim).utc().format("YYYY-MM-DD HH:mm") + " GMT");
-            };
-            update_time();
-
-            clearInterval(clock_handle);
-
-            clock_handle = setInterval(function() {
-                increase_time_by(1000);
-                update_time();
-            }, 1000);
-        }
         that.run = function(){
             setInterval(init, 900000);
         };
