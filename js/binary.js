@@ -49563,7 +49563,6 @@ Header.prototype = {
         function init(){
             var client_time = moment.utc().unix();
             BinarySocket.send({ "time": 1,"passthrough":{"client_time" : client_time}});
-            sleep(5000);
         }
         function sleep(delay) {
             var start = new Date().getTime();
@@ -49571,6 +49570,7 @@ Header.prototype = {
         }
         BinarySocket.init({
                 onmessage : function(msg){
+                    sleep(5000);
                     var response = JSON.parse(msg.data);
                     if (response && response.msg_type === 'time') {
 
