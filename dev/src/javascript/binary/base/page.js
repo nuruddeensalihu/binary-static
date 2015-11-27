@@ -480,7 +480,7 @@ Header.prototype = {
         function init(){
             var client_time = moment.utc().unix();
             console.log("the client time is ", client_time);
-            BinarySocket.send({ "time": 1,"passthrough":{"client_time" : "client_time"}});
+            BinarySocket.send({ "time": 1,"passthrough":{"client_time" : client_time}});
             query_start_time = (new Date().getTime());  
         }
         BinarySocket.init({
@@ -494,7 +494,7 @@ Header.prototype = {
         function responseMsg(response){
             var start_timestamp = response.time;
             console.log("the response is",response);
-            var pass = response.passthrough.client_time;
+            var pass = response.echo_req.passthrough.client_time;
             var passthroughTime = moment(pass,'seconds');
             console.log("The pass in seconds is ", passthroughTime);
             var delay = moment().diff(passthroughTime,'seconds');
