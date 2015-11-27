@@ -497,6 +497,11 @@ Header.prototype = {
             console.log("the response is",response);
             var pass = response.echo_req.passthrough.client_time;
 
+            console.log("The moment is",moment.utc().unix() );
+            console.log("The time pass is ", pass);
+            console.log("The diff is", (moment.utc().unix() - pass));
+            console.log("The startstamp is", start_timestamp);
+
             that.tim = ((start_timestamp * 1000) + (moment.utc().unix() - pass));
             that.time_now = ((start_timestamp * 1000)+ ((new Date().getTime()) - query_start_time));
              
