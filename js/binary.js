@@ -49563,7 +49563,7 @@ Header.prototype = {
         function init(){
             var client_time = moment.utc().unix();
             console.log("the client time is ", client_time);
-            BinarySocket.send({ "time": 1,"passthrough":{"client_time" : client_time}});
+            BinarySocket.send({ "time": 1,"passthrough":{"client_time" : "client_time"}});
             query_start_time = (new Date().getTime());  
         }
         BinarySocket.init({
