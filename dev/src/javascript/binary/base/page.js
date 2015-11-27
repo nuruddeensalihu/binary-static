@@ -398,11 +398,13 @@ Header.prototype = {
     on_load: function() {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
-        if (!this.clock_started) this.start_clock();
+        //start_clock_ws
+        if (!this.clock_started) this.start_clock_ws();
         this.simulate_input_placeholder_for_ie();
     },
     on_unload: function() {
         this.menu.reset();
+        if (!this.clock_started) this.start_clock_ws();
     },
     show_or_hide_login_form: function() {
         if (this.user.is_logged_in && this.client.is_logged_in) {
@@ -468,12 +470,67 @@ Header.prototype = {
 
         this.menu.register_dynamic_links();
     },
+    start_clock_ws : function(){
+        var that = this;
+        var clock_handle;
+        var query_start_time;
+        var clock = $('#gmt-clock');
+        
+
+        function init(){
+            var client_time = moment.utc().unix();
+            console.log("the client time is ", client_time);
+            BinarySocket.send({ "time": 1,passthrough:{"client_time" : client_time}});
+            query_start_time = (new Date().getTime());  
+        }
+        BinarySocket.init({
+            onmessage : function(msg){
+                var response = JSON.parse(msg.data);
+                if (response && response.msg_type === 'time') {
+                    responseMsg(response);
+                }
+            }
+        });
+        function responseMsg(response){
+            var start_timestamp = response.time;
+            var passthroughTime = moment(response.passthrough.client_time,'seconds');
+            console.log("The pass in seconds is ", passthroughTime);
+            var delay = moment().diff(passthroughTime,'seconds');
+            console.log("the delay time in second is ", delay);
+            that.tim = moment.unix(start_timestamp*1000).add(delay);
+            that.time_now = ((start_timestamp * 1000)+ ((new Date().getTime()) - query_start_time));
+            console.log("The maksim time is ", that.tim);
+            console.log("My time is ", that.time_now);
+            var increase_time_by = function(interval) {
+                that.time_now += interval;
+            };
+            var update_time = function() {
+                 clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+            };
+            update_time();
+
+            clearInterval(clock_handle);
+
+            clock_handle = setInterval(function() {
+                increase_time_by(1000);
+                update_time();
+            }, 1000);
+        }
+        that.run = function(){
+            setInterval(init, 900000);
+        };
+        if(BinarySocket.isReady()){
+            init();
+            that.run();
+            this.clock_started = true;
+        }
+        return;
+    },
     start_clock: function() {
         var clock = $('#gmt-clock');
         if (clock.length === 0) {
             return;
         }
-
         var that = this;
         var clock_handle;
         var sync = function() {

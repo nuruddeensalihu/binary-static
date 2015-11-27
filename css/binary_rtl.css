@@ -4667,26 +4667,6 @@ a.dynamic, span.dynamic, div.dynamic, p.dynamic, button.dynamic, table.dynamic {
   width: 45%;
 }
 
-#trading-times th.flex-tr-child {
-  line-height: 30px;
-}
-#trading-times th.submarket-name {
-  border-bottom: 1px solid #44484C !important;
-  text-align: center !important;
-}
-#trading-times th.asset {
-  width: 24%;
-}
-#trading-times th.opens, #trading-times th.closes, #trading-times th.settles {
-  width: 12%;
-}
-#trading-times th.upcomingevents {
-  width: 40%;
-}
-#trading-times td.asset {
-  font-weight: 700;
-}
-
 /* static pages */
 @keyframes spinning {
   from {
