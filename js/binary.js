@@ -49560,21 +49560,22 @@ Header.prototype = {
         var clock = $('#gmt-clock');
         
 
-        var init = function(){
-            var client_time = moment.utc().unix();
-            BinarySocket.send({ "time": 1,"passthrough":{"client_time" : client_time}});
-        };
+        function init(){
+            BinarySocket.send({ "time": 1,"passthrough":{"client_time" :  moment.utc().unix()}});
+        }
         BinarySocket.init({
-                onmessage : function(msg){
-                    var response = JSON.parse(msg.data);
-                    if (response && response.msg_type === 'time') {
+            onmessage : function(msg){
+                var response = JSON.parse(msg.data);
+                
+                if (response && response.msg_type === 'time') {
+
                     var start_timestamp = response.time;
                     var pass = response.echo_req.passthrough.client_time;
+
                     that.time_now = ((start_timestamp * 1000) + (moment.utc().unix() - pass));
                      
                     var increase_time_by = function(interval) {
                         that.time_now += interval;
-                        that.tim += interval;
                     };
                     var update_time = function() {
                          clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
