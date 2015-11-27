@@ -505,9 +505,11 @@ Header.prototype = {
             console.log("My time is ", that.time_now);
             var increase_time_by = function(interval) {
                 that.time_now += interval;
+                that.tim += interval;
             };
             var update_time = function() {
                  clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+                 console.log("The time is now",moment(that.tim).utc().format("YYYY-MM-DD HH:mm") + " GMT");
             };
             update_time();
 
