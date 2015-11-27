@@ -4495,6 +4495,9 @@ table .loss, table .lower {
   border: 1px solid #F2F2F2;
   padding: 12px;
 }
+.timeline .event .event-body .egr-logo {
+  float: right;
+}
 .timeline .event.featured .header {
   background: #e98024;
   color: #F2F2F2;
