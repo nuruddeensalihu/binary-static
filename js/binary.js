@@ -49580,7 +49580,7 @@ Header.prototype = {
             var pass = response.echo_req.passthrough.client_time;
             var delay = moment().diff(pass,'seconds');
             console.log("The delay is", delay);
-            that.tim = moment.unix(start_timestamp*1000).add(delay);
+            that.tim = moment.unix(start_timestamp*1000).add(moment.utc().unix() - pass);
             that.time_now = ((start_timestamp * 1000)+ ((new Date().getTime()) - query_start_time));
              
             var increase_time_by = function(interval) {
