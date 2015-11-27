@@ -495,14 +495,7 @@ Header.prototype = {
             var start_timestamp = response.time;
             console.log("the response is",response);
             var pass = response.echo_req.passthrough.client_time;
-            var passthroughTime = moment(pass,'seconds');
-            console.log("The pass in seconds is ", passthroughTime);
-            var delay = moment().diff(passthroughTime,'seconds');
-            console.log("the delay time in second is ", delay);
-            that.tim = moment.unix(start_timestamp*1000).add(delay);
-            that.time_now = ((start_timestamp * 1000)+ ((new Date().getTime()) - query_start_time));
-            console.log("The maksim time is ", that.tim);
-            console.log("My time is ", that.time_now);
+            that.tim = moment.unix(start_timestamp*1000).add(moment().diff(moment(pass),'seconds'),'seconds');
             var increase_time_by = function(interval) {
                 that.time_now += interval;
                 that.tim += interval;
