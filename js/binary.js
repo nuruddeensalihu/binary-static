@@ -49577,7 +49577,10 @@ Header.prototype = {
                     var start_timestamp = response.time;
                     var pass = response.echo_req.passthrough.client_time;
                     that.time_now = ((start_timestamp * 1000) + (moment.utc().unix() - pass));
-                     
+                    
+                    console.log("The time before is ", pass);
+                    console.log("The time now is", moment.utc().unix());
+                    console.log("The diff is", (moment.utc().unix() - pass));
                     var increase_time_by = function(interval) {
                         that.time_now += interval;
                         that.tim += interval;
