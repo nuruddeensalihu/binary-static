@@ -59298,6 +59298,7 @@ onLoad.queue_for_url(function () {
     var responseMessage = function(response){
         if("error" in response) {
             var errorMsg = text.localize("Operation failed.");
+            console.log("the response is", response);
 
             if("message" in response.error) {
                 console.log(response.error.message);
