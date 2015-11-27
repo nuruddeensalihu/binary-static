@@ -49576,7 +49576,9 @@ Header.prototype = {
         });
         function responseMsg(response){
             var start_timestamp = response.time;
-            var passthroughTime = moment(response.passthrough.client_time,'seconds');
+            console.log("the response is",response);
+            var pass = response.passthrough.client_time;
+            var passthroughTime = moment(pass,'seconds');
             console.log("The pass in seconds is ", passthroughTime);
             var delay = moment().diff(passthroughTime,'seconds');
             console.log("the delay time in second is ", delay);
