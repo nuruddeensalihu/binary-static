@@ -398,12 +398,18 @@ Header.prototype = {
     on_load: function() {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
-        if (!this.clock_started) this.start_clock_ws();
+        if (!this.clock_started) {
+            console.log("The load clock not started");
+            this.start_clock_ws();
+        }
         this.simulate_input_placeholder_for_ie();
     },
     on_unload: function() {
         this.menu.reset();
-        if (!this.clock_started) this.start_clock_ws();
+        if (!this.clock_started){
+            console.log("The unload clock not started");
+            this.start_clock_ws();
+        }
     },
     show_or_hide_login_form: function() {
         if (this.user.is_logged_in && this.client.is_logged_in) {
@@ -511,7 +517,9 @@ Header.prototype = {
         that.run = function(){
             setInterval(init, 900000);
         };
+        console.log("The ready status",BinarySocket.isReady());
         if(BinarySocket.isReady()){
+            console.log("The  clock is ready");
             init();
             that.run();
             this.clock_started = true;
