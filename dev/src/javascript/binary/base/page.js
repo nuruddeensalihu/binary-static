@@ -518,7 +518,7 @@ Header.prototype = {
             setInterval(init, 900000);
         };
         console.log("The ready status",BinarySocket.isReady());
-        if(BinarySocket.isReady()){
+        if(BinarySocket.isReady() === true){
             console.log("The  clock is ready");
             init();
             that.run();
