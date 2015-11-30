@@ -9,6 +9,8 @@
     .grd-grid-4.grd-grid-mobile-12 
       .grd-row-padding
         %h1= l("Contact us")
+
+      - my $selected_language = stash->{language};
       .grd-row-padding
         - my $faq_url = "https://binary.desk.com/customer/" . lc($selected_language) . "/portal/articles";
       .grd-row-padding
