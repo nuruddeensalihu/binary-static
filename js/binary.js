@@ -49083,14 +49083,13 @@ SubMarket.prototype = {
 })();
 ;var text;
 
-window.onfocus = function () { 
-    console.log("the tab has returned");
-}; 
+$(window).focus(function() {
+    console.log("The tab has returned");
+});
 
-window.onblur = function () { 
-  console.log("the tab has changed");
-}; 
-
+$(window).blur(function() {
+    console.log("the tab has changed");
+});
 var gtm_data_layer_info = function() {
     var gtm_data_layer_info = [];
     $('.gtm_data_layer').each(function() {
