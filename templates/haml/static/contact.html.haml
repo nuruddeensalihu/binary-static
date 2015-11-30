@@ -15,7 +15,7 @@
       .grd-row-padding
         %p.no-para-margin= l('Our Customer service opening hours are:')
       .grd-row-padding
-        %span= l('Monday – Friday: 24 Hours')
+        %p.no-para-margin= l('Monday – Friday: 24 Hours')
     .grd-grid-5.grd-grid-mobile-12
       .grd-row-padding
         %h1
@@ -45,7 +45,7 @@
               %option{:value => $tollfree}= $_
             - }
       .grd-row-padding
-        %span#display_cs_telephone.grd-grid-7.grd-prefix-4.grd-no-gutter.grd-grid-mobile-12.grd-prefix-mobile-0
+        %p#display_cs_telephone.no-para-margin.grd-grid-7.grd-prefix-4.grd-no-gutter.grd-grid-mobile-12.grd-prefix-mobile-0
           = $default_number
       .grd-row-padding
         %p.no-para-margin= l('All calls are recorded for training and monitoring purposes')
