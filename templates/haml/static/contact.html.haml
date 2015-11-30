@@ -11,8 +11,8 @@
         %h1= l("Contact us")
 
       - my $selected_language = stash->{language};
-      .grd-row-padding
-        - my $faq_url = "https://binary.desk.com/customer/" . lc($selected_language) . "/portal/articles";
+      
+      - my $faq_url = "https://binary.desk.com/customer/" . lc($selected_language) . "/portal/articles";
       .grd-row-padding
         %p.no-para-margin!= l("You'll find answers to most of your questions on the <a href='[_1]' target='_blank'>FAQ</a> page.", $faq_url)
       .grd-row-padding  
@@ -26,7 +26,6 @@
         %h1
       .grd-row-padding
       .grd-row-padding
-      .grd-row-padding 
         %p!= l("Email: <span id='cs_contact_eaddress'></span>")
       .grd-row-padding
       .grd-row-padding
