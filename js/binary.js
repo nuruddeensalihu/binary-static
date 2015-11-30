@@ -49928,10 +49928,10 @@ Page.prototype = {
         this.header.on_unload();
         this.contents.on_unload();
     },
-    onblur:function(){
+    on_blur:function(){
         console.log("user leave the page now");
     },
-    onfocus:function(){
+    on_focus:function(){
         console.log("user returned");
     },
     on_change_language: function() {
