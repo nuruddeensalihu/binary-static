@@ -49481,13 +49481,11 @@ Header.prototype = {
     on_load: function() {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
-        //start_clock_ws
-        if (!this.clock_started) this.start_clock_ws();
+        if (!this.clock_started) this.start_clock();
         this.simulate_input_placeholder_for_ie();
     },
     on_unload: function() {
         this.menu.reset();
-        if (!this.clock_started) this.start_clock_ws();
     },
     show_or_hide_login_form: function() {
         if (this.user.is_logged_in && this.client.is_logged_in) {
@@ -49553,60 +49551,12 @@ Header.prototype = {
 
         this.menu.register_dynamic_links();
     },
-    start_clock_ws : function(){
-        var that = this;
-        var clock_handle;
-        var query_start_time;
-        var clock = $('#gmt-clock');
-        
-
-        function init(){
-            BinarySocket.send({ "time": 1,"passthrough":{"client_time" :  moment.utc().unix()}});
-        }
-        BinarySocket.init({
-            onmessage : function(msg){
-                var response = JSON.parse(msg.data);
-                
-                if (response && response.msg_type === 'time') {
-
-                    var start_timestamp = response.time;
-                    var pass = response.echo_req.passthrough.client_time;
-
-                    that.time_now = ((start_timestamp * 1000) + (moment.utc().unix() - pass));
-                     
-                    var increase_time_by = function(interval) {
-                        that.time_now += interval;
-                    };
-                    var update_time = function() {
-                         clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
-                    };
-                    update_time();
-
-                    clearInterval(clock_handle);
-
-                    clock_handle = setInterval(function() {
-                        increase_time_by(1000);
-                        update_time();
-                    }, 1000);
-                }
-            }
-        });
-
-        that.run = function(){
-            setInterval(init, 900000);
-        };
-        if(BinarySocket.isReady()){
-            init();
-            that.run();
-            this.clock_started = true;
-        }
-        return;
-    },
     start_clock: function() {
         var clock = $('#gmt-clock');
         if (clock.length === 0) {
             return;
         }
+
         var that = this;
         var clock_handle;
         var sync = function() {
@@ -58924,6 +58874,167 @@ function initialize_pricing_table() {
 }
 
 onLoad.queue_for_url(initialize_pricing_table, 'pricing_table');
+;var TradingTimesWS = (function() {
+    "use strict";
+
+    var $date      = $('#trading-date');
+    var $container = $('#trading-times');
+    var columns    = ['Asset', 'Opens', 'Closes', 'Settles', 'UpcomingEvents'];
+
+
+    var init = function() {
+        showLoadingImage($container);
+        sendRequest('today');
+
+        $date.val(moment.utc(new Date()).format('YYYY-MM-DD'));
+        $date.datepicker({minDate: 0, maxDate: '+1y', dateFormat: 'yy-mm-dd', autoSize: true});
+        $date.change(function() {
+            $container.empty();
+            showLoadingImage($container);
+            sendRequest();
+        });
+    };
+
+    var sendRequest = function(date) {
+        BinarySocket.send({"trading_times": (date ? date : $date.val())});
+    };
+
+    var populateTable = function(response) {
+        $('#errorMsg').addClass('hidden');
+
+        var markets = response.trading_times.markets;
+
+        var $ul = $('<ul/>');
+        var $contents = $('<div/>');
+
+        for(var m = 0; m < markets.length; m++) {
+            var tabID = 'tradingtimes-' + markets[m].name.toLowerCase();
+
+            // tabs
+            $ul.append($('<li/>', {class: 'ja-hide'}).append($('<a/>', {href: '#' + tabID, text: markets[m].name, id: 'outline'})));
+
+            // contents
+            var $market = $('<div/>', {id: tabID});
+            $market.append(createMarketTables(markets[m]));
+            $contents.append($market);
+        }
+
+        $container
+            .empty()
+            .append($ul)
+            .append($('<div/>', {class: 'grd-row-padding'}))
+            .append($contents.children());
+
+        $container.tabs('destroy').tabs();
+    };
+
+    var createMarketTables = function(market) {
+        var $marketTables = $('<div/>');
+
+        // submarkets of this market
+        var submarkets = market.submarkets;
+        for(var s = 0; s < submarkets.length; s++) {
+            // just show "Major Pairs" when the language is JA
+            if(page.language().toLowerCase() === 'ja' && submarkets[s].name !== '主要ペア'){
+                continue;
+            }
+
+            // submarket table
+            var $submarketTable = createEmptyTable(market.name + '-' + s);
+
+            // submarket name
+            $submarketTable.find('thead').prepend(createSubmarketHeader(submarkets[s].name));
+
+            // symbols of this submarket
+            var symbols = submarkets[s].symbols;
+            for(var sy = 0; sy < symbols.length; sy++) {
+                $submarketTable.find('tbody').append(createSubmarketTableRow(market.name, submarkets[s].name, symbols[sy]));
+            }
+
+            $marketTables.append($submarketTable);
+        }
+
+        return $marketTables;
+    };
+
+    var createSubmarketHeader = function(submarketName) {
+        return $('<tr/>', {class: 'flex-tr'})
+            .append($('<th/>', {class: 'flex-tr-child submarket-name', colspan: columns.length, text: submarketName}));
+    };
+
+    var createSubmarketTableRow = function(marketName, submarketName, symbol) {
+        var $tableRow = Table.createFlexTableRow(
+            [
+                symbol.name,
+                '', // Opens
+                '', // Closes
+                symbol.times.settlement,
+                ''  // UpcomingEvents
+            ], 
+            columns, 
+            "data"
+        );
+
+        $tableRow.children('.opens').html(symbol.times.open.join('<br />'));
+        $tableRow.children('.closes').html(symbol.times.close.join('<br />'));
+        $tableRow.children('.upcomingevents').html(createEventsText(symbol.events));
+
+        return $tableRow;
+    };
+
+    var createEventsText = function(events) {
+        var result = '';
+        for(var i = 0; i < events.length; i++) {
+            result += (i > 0 ? '<br />' : '') + events[i].descrip + ': ' + events[i].dates;
+        }
+        return result;
+    };
+
+    var createEmptyTable = function(tableID) {
+        var header = [
+            Content.localize().textAsset,
+            Content.localize().textOpens,
+            Content.localize().textCloses,
+            Content.localize().textSettles,
+            Content.localize().textUpcomingEvents
+        ];
+
+        var metadata = {
+            id: tableID,
+            cols: columns
+        };
+
+        return Table.createFlexTable([], metadata, header);
+    };
+
+
+    return {
+        init: init,
+        populateTable: populateTable
+    };
+}());
+
+
+
+pjax_config_page("resources/trading_timesws", function() {
+    return {
+        onLoad: function() {
+            BinarySocket.init({
+                onmessage: function(msg) {
+                    var response = JSON.parse(msg.data);
+                    if (response) {
+                        if (response.msg_type === "trading_times") {
+                            TradingTimesWS.populateTable(response);
+                        }
+                    }
+                }
+            });
+
+            Content.populate();
+            TradingTimesWS.init();
+        }
+    };
+});
 ;
 var self_exclusion_date_picker = function () {
     // 6 months from now
@@ -60249,7 +60360,12 @@ function addComma(num){
             textNumbers: text.localize('numbers'),
             textSpace: text.localize('space'),
             textPeriod: text.localize('period'),
-            textComma: text.localize('comma')
+            textComma: text.localize('comma'),
+            textAsset: text.localize('Asset'),
+            textOpens: text.localize('Opens'),
+            textCloses: text.localize('Closes'),
+            textSettles: text.localize('Settles'),
+            textUpcomingEvents: text.localize('Upcoming Events')
         };
 
         var starTime = document.getElementById('start_time_label');
@@ -63145,7 +63261,6 @@ var BinarySocket = (function () {
     return {
         init: init,
         send: send,
-        isReady : isReady,
         close: close,
         socket: function () { return binarySocket; },
         clear: clear,
