@@ -63,13 +63,11 @@
         .hr-line
 
   .grd-grid-12.grd-parent.static_full 
-    .grd-grid-3.grd-hide-mobile
-    .grd-grid-4.grd-grid-mobile-12 
-      %h1= l("Company addresses")
-
-  .grd-grid-12.grd-parent.static_full 
     .grd-grid-2.grd-hide-mobile
     .grd-grid-4.grd-grid-mobile-12 
+      .grd-row-padding
+        %h1= l("Company addresses")
+
       .grd-row-padding
         %p.no-para-margin.address-heading= l('Malta')
             %p.no-para-margin= l('Binary (Europe) Ltd, Mompalao Building, Suite 2, Tower Road, Msida MSD1825') 
