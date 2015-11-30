@@ -2040,9 +2040,6 @@ abbr {
 .contact-content p.no-para-margin {
   margin: 0;
 }
-.contact-content .hr-line {
-  border-bottom: 1px solid #dedede;
-}
 
 .batch_transaction_total {
   text-align: right;
