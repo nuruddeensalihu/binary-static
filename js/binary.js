@@ -49083,13 +49083,6 @@ SubMarket.prototype = {
 })();
 ;var text;
 
-$(window).focus(function() {
-    console.log("The tab has returned");
-});
-
-$(window).blur(function() {
-    console.log("the tab has changed");
-});
 var gtm_data_layer_info = function() {
     var gtm_data_layer_info = [];
     $('.gtm_data_layer').each(function() {
@@ -49926,10 +49919,20 @@ Page.prototype = {
         this.record_affiliate_exposure();
         this.contents.on_load();
         this.on_click_acc_transfer();
+        this.on_windows();
         if(getCookieItem('login')){
             ViewBalance.init();
         }
         $('#current_width').val(get_container_width());//This should probably not be here.
+    },
+    on_windows : function(){
+        $(window).focus(function() {
+            console.log("The tab has returned");
+        });
+
+        $(window).blur(function() {
+            console.log("the tab has changed");
+        });
     },
     on_unload: function() {
         this.header.on_unload();
