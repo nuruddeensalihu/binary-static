@@ -399,7 +399,6 @@ Header.prototype = {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
         if (!this.clock_started) {
-            console.log("The load clock not started");
             this.start_clock_ws();
         }
         this.simulate_input_placeholder_for_ie();
@@ -407,7 +406,6 @@ Header.prototype = {
     on_unload: function() {
         this.menu.reset();
         if (!this.clock_started){
-            console.log("The unload clock not started");
             this.start_clock_ws();
         }
     },
@@ -517,9 +515,7 @@ Header.prototype = {
         that.run = function(){
             setInterval(init, 900000);
         };
-        console.log("The ready status",BinarySocket.isReady());
         if(BinarySocket.isReady() === true){
-            console.log("The  clock is ready");
             init();
             that.run();
             this.clock_started = true;
@@ -848,6 +844,12 @@ Page.prototype = {
     on_unload: function() {
         this.header.on_unload();
         this.contents.on_unload();
+    },
+    onblur:function(){
+        console.log("user leave the page now");
+    },
+    onfocus:function(){
+        console.log("user returned");
     },
     on_change_language: function() {
         var that = this;
