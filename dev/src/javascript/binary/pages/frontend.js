@@ -285,6 +285,13 @@ var on_click_signup = function() {
     });
 };
 
+function check_login_hide_signup() {
+    if (page.client.is_logged_in) {
+        $('#open-account').remove();
+        $('#stretch').removeClass('grd-grid-7 grd-grid-mobile-12 grd-grid-phablet-12');
+    }
+}
+
 pjax_config_page('/$|/home', function() {
     return {
         onLoad: function() {
@@ -292,6 +299,7 @@ pjax_config_page('/$|/home', function() {
             on_click_signup();
             get_residence_list();
             get_ticker();
+            check_login_hide_signup();
         }
     };
 });
