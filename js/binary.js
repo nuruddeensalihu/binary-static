@@ -58102,13 +58102,6 @@ var on_click_signup = function() {
     });
 };
 
-function check_login_hide_signup() {
-    if (page.client.is_logged_in) {
-        $('#open-account').remove();
-        $('#stretch').removeClass('grd-grid-7 grd-grid-mobile-12 grd-grid-phablet-12');
-    }
-}
-
 pjax_config_page('/$|/home', function() {
     return {
         onLoad: function() {
@@ -58116,7 +58109,6 @@ pjax_config_page('/$|/home', function() {
             on_click_signup();
             get_residence_list();
             get_ticker();
-            check_login_hide_signup();
         }
     };
 });
@@ -63018,6 +63010,21 @@ WSTickDisplay.updateChart = function(data){
         $('#reality-check .blogout').on('click', function () {
             window.location.href = logout_url;
         });
+        
+        var obj = document.getElementById('realityDuration');
+        this.isNumericValue(obj);
+    };
+    //
+    //limit textBox to Numeric Only
+    //
+    RealityCheck.prototype.isNumericValue = function(obj){
+
+        if (obj.hasOwnProperty('oninput') || ('oninput' in obj)) 
+        {
+            $('#realityDuration').on('input', function (event) { 
+                 this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        }
     };
 
     // On session start we need to ask for the reality-check interval.
@@ -63077,6 +63084,10 @@ WSTickDisplay.updateChart = function(data){
         };
         $('#reality-check [bcont=1]').on('click', click_handler);
         $('#reality-check [interval=1]').on('change', click_handler);
+
+
+        var obj = document.getElementById('realityDuration');
+        this.isNumericValue(obj);
     };
 
     return RealityCheck;
