@@ -5446,6 +5446,7 @@ body .calls_recording {
 }
 body .contactus_time {
   display: none;
+  font-style: italic;
 }
 
 body.EN .calls_recording {
@@ -5595,11 +5596,9 @@ body.RU #trading_socket_container .contract_heading {
 }
 body.RU .calls_recording {
   display: inline !important;
-  font-style: italic;
 }
 body.RU .contactus_time {
   display: inline !important;
-  font-style: italic;
 }
 
 body.DE #legal-tab li.tm-li-2 {
