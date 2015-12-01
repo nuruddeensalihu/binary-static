@@ -2043,6 +2043,9 @@ abbr {
 .contact-content .hr-line {
   border-bottom: 1px solid #dedede;
 }
+.contact-content .grd-hide-mobile {
+  display: none !important;
+}
 
 .batch_transaction_total {
   text-align: right;
