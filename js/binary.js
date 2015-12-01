@@ -59829,7 +59829,7 @@ function getContractCategoryTree(elements){
             ['endsinout',
             'staysinout']
         ],
-        'asian',
+        // 'asian',
         ['digits',
             ['matchdiff',
             'evenodd',
@@ -63118,13 +63118,18 @@ var BinarySocket = (function () {
     'use strict';
 
     var binarySocket,
-        socketUrl = "wss://"+window.location.host+"/websockets/v3",
         bufferedSends = [],
         manualClosed = false,
         events = {},
         authorized = false,
         timeouts = {},
-        req_number = 0;
+        req_number = 0,
+        socketUrl;
+        if(window.location.host == 'www.binary.com'){
+          socketUrl = "wss://ws.binaryws.com/websockets/v3";
+        } else{
+          socketUrl = "wss://"+window.location.host+"/websockets/v3";
+        }
 
     if (page.language()) {
         socketUrl += '?l=' + page.language();
@@ -63179,7 +63184,7 @@ var BinarySocket = (function () {
                     }
                 }, 7*1000);
             }
-            
+
             binarySocket.send(JSON.stringify(data));
         } else {
             bufferedSends.push(data);
@@ -63201,7 +63206,7 @@ var BinarySocket = (function () {
         if(isClose()){
             binarySocket = new WebSocket(socketUrl);
         }
-        
+
         binarySocket.onopen = function (){
 
             var loginToken = getCookieItem('login');
