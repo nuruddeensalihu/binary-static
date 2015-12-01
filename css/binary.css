@@ -5566,6 +5566,7 @@ a.dynamic, span.dynamic, div.dynamic, p.dynamic, button.dynamic, table.dynamic {
 /*Japan Language */
 body .calls_recording {
   display: none;
+  font-style: italic;
 }
 body .contactus_time {
   display: none;
