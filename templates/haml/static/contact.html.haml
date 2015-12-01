@@ -22,10 +22,10 @@
       .grd-row-padding.grd-hide-mobile
       .grd-row-padding.grd-hide-mobile
       .grd-row-padding
-        %p.no-para-margin!= l("<span class='grd-grid-4 grd-no-gutter'>Email: </span><span id='cs_contact_eaddress' class='grd-grid-7 grd-no-gutter'></span>")
+        %span.no-para-margin!= l("<span class='grd-grid-4 grd-no-gutter'>Email: </span><span id='cs_contact_eaddress' class='grd-grid-7 grd-no-gutter'></span>")
       .grd-row-padding.grd-hide-mobile  
       .grd-row-padding
-        %p.no-para-margin
+        %span.no-para-margin
           %label.grd-grid-4.grd-grid-mobile-12.grd-no-gutter= l('Telephone:')
           - my $contact_number = customer_support_telephone();
           - my $tollfree_number = customer_support_tollfree();
@@ -46,7 +46,7 @@
               - my $tollfree = $tollfree_number->{$_};
               %option{:value => $tollfree}= $_
             - }
-          %p#display_cs_telephone.grd-grid-7.grd-prefix-4.grd-no-gutter.grd-grid-mobile-12.grd-prefix-mobile-0.grd-row-padding.grd-grid-mobile-12
+          %span#display_cs_telephone.grd-grid-7.grd-prefix-4.grd-no-gutter.grd-grid-mobile-12.grd-prefix-mobile-0.grd-row-padding.grd-grid-mobile-12
             = $default_number
       .grd-row-padding
         %span.no-para-margin.calls_recording= l('All calls are recorded for training and monitoring purposes')
