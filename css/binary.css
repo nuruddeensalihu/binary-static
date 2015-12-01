@@ -2052,6 +2052,9 @@ abbr {
 .contact-content .hr-line {
   border-bottom: 1px solid #dedede;
 }
+.contact-content .opening_hours {
+  font-weight: bold;
+}
 @media screen and (max-width: 480px) {
   .contact-content .grd-hide-mobile {
     display: none !important;
@@ -5568,11 +5571,18 @@ body .contactus_time {
   display: none;
   font-style: italic;
 }
+body .opening_hours {
+  display: none;
+  font-weight: bold;
+}
 
 body.EN .calls_recording {
   display: inline !important;
 }
 body.EN .contactus_time {
+  display: inline !important;
+}
+body.EN .opening_hours {
   display: inline !important;
 }
 
@@ -5666,6 +5676,9 @@ body.ID .calls_recording {
 body.ID .contactus_time {
   display: inline !important;
 }
+body.ID .opening_hours {
+  display: inline !important;
+}
 body.ID .regulatory-logo {
   display: none !important;
 }
@@ -5718,6 +5731,9 @@ body.RU .calls_recording {
   display: inline !important;
 }
 body.RU .contactus_time {
+  display: inline !important;
+}
+body.RU .opening_hours {
   display: inline !important;
 }
 
