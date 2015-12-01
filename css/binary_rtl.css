@@ -2047,6 +2047,11 @@ abbr {
   .contact-content .grd-hide-mobile {
     display: none !important;
   }
+  .contact-content .grd-grid-mobile-12 {
+    float: left;
+    direction: ltr;
+    padding: 0 10px;
+  }
 }
 
 .batch_transaction_total {
