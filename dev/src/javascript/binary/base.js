@@ -227,6 +227,8 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
 
             var cloc = $('#gmt-clock');
 
+            var cl = page.Header.start_clock();
+
             console.log("The current time is before * 1000", gmt);
 
             gmt = moment(curr_time * 1000).utc().format("YYYY-MM-DD HH:mm:ss") + " GMT";
@@ -239,6 +241,6 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
                 
 
         });
-        
+
     });
 }
