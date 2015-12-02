@@ -49589,7 +49589,7 @@ Header.prototype = {
                 var inter =0;
                 var increase_time_by = function(interval) {
                     that.time_now += interval;
-                    inter = inter + interval;
+                    inter = inter + inter;
                     console.log("The intervals are" , inter);
                 };
 
@@ -49607,9 +49607,9 @@ Header.prototype = {
                 }, 1000);
             });
         };
-        clearInterval(clock_refresh);
+       // clearInterval(clock_refresh());
         sync();
-        var clock_refresh = setInterval(function() {
+        setInterval(function() {
                                 sync();
                             }, 900000);
 
@@ -50502,13 +50502,25 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         });
 
         LocalStore.set('active_loginid', match);
+        if (typeof document.webkitHidden !== 'undefined') {
+            if (document.addEventListener) {
+                //document.addEventListener("webkitvisibilitychange", toggleStreaming, false);
+                console.log("tab chaged");
+            }
+        } else if (typeof document.hidden !== 'undefined') {
+            if (document.addEventListener) {
+                //document.addEventListener("visibilitychange", toggleStreaming);
+                console.log("tabs here ");
+            }
+        }
 
+        /*
         $(window).focus(function() {
             var curr_time = (new Date().getTime());
             var gmt = moment(curr_time).utc().format("YYYY-MM-DD HH:mm:ss") + " GMT";
 
             var cloc = $('#gmt-clock');
-
+            var hd = new Header
             var cl =  page.header.start_clock();
 
             console.log("The current time is before * 1000", gmt);
@@ -50523,6 +50535,7 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
                 
 
         });
+        */
 
     });
 }
