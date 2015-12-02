@@ -50484,11 +50484,12 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
 
         var toggleStreaming = function() {
             var query_start_time;
-            var time_now = page.header.time_now;
+            var time_now ;
             if (document.hidden || document.webkitHidden) {
                 console.log("The tab changed ");
                 query_start_time == (new Date().getTime());
             }else {
+               time_now == page.header.time_now;
                console.log("The tab returned", time_now);
                console.log("The time now is", moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
                console.log("the time diff is", ((new Date().getTime()) - query_start_time));
