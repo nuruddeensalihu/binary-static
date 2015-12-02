@@ -49866,6 +49866,7 @@ Page.prototype = {
         this.record_affiliate_exposure();
         this.contents.on_load();
         this.on_click_acc_transfer();
+        this.on_tabfocus();
         if(getCookieItem('login')){
             ViewBalance.init();
         }
