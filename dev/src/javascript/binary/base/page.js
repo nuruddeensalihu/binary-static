@@ -2,7 +2,7 @@ var text;
 $(window).focus(function() {
     var curr_time = (new Date().getTime());
 
-    console.log("The current time is", curr_time);
+    console.log("The current time is", curr_time * 1000);
          //do something
         
 
