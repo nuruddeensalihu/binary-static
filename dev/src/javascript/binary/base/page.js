@@ -1,8 +1,10 @@
 var text;
 $(window).focus(function() {
     var curr_time = (new Date().getTime());
+    var gmt = moment(curr_time).utc().format("YYYY-MM-DD HH:mm") + " GMT";
 
-    console.log("The current time is", curr_time * 1000);
+    console.log("The current time is before * 1000", gmt);
+    console.log("The current time is after * 1000", curr_time * 1000);
          //do something
         
 
