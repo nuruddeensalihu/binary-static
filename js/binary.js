@@ -49586,8 +49586,11 @@ Header.prototype = {
                 //ping time = roundtrip time / 2
                 //roundtrip time = time at start of request - time after response.
                 that.time_now = (start_timestamp * 1000) + (((new Date().getTime()) - query_start_time)/2);
+                var inter 
                 var increase_time_by = function(interval) {
                     that.time_now += interval;
+                    inter = inter + inter;
+                    console.log("The intervals are" , inter);
                 };
 
                 var update_time = function() {
