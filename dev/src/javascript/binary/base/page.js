@@ -524,7 +524,7 @@ Header.prototype = {
                 }, 1000);
             });
         };
-        clearInterval(clock_refresh());
+        clearInterval(clock_refresh);
         sync();
         var clock_refresh = setInterval(function() {
                                 sync();
