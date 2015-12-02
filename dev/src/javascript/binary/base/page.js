@@ -506,7 +506,7 @@ Header.prototype = {
                 var inter =0;
                 var increase_time_by = function(interval) {
                     that.time_now += interval;
-                    inter = inter + inter;
+                    inter = inter + interval;
                     console.log("The intervals are" , inter);
                 };
 
@@ -524,11 +524,11 @@ Header.prototype = {
                 }, 1000);
             });
         };
-
+        clearInterval(clock_refresh());
         sync();
-        setInterval(function() {
-            sync();
-        }, 900000);
+        var clock_refresh = setInterval(function() {
+                                sync();
+                            }, 900000);
 
         this.clock_started = true;
         return;
