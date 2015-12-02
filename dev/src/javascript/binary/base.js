@@ -223,12 +223,8 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
 
         var toggleStreaming = function() {
             if (document.hidden || document.webkitHidden) {
-              // BetForm.spot.clear();
-             //  BetPrice.streaming.stop();
-             //  BetPrice.order_form.hide_buy_button();
                 console.log("We get you ");
-            } else {
-               //BetPrice.streaming.start();
+            }else {
                console.log("We get him");
             }
         };

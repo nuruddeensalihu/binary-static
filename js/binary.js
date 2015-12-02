@@ -49082,25 +49082,7 @@ SubMarket.prototype = {
     };
 })();
 ;var text;
-/*
-$(window).focus(function() {
-    var curr_time = (new Date().getTime());
-    var gmt = moment(curr_time).utc().format("YYYY-MM-DD HH:mm:ss") + " GMT";
 
-    var cloc = $('#gmt-clock');
-
-    console.log("The current time is before * 1000", gmt);
-
-    gmt = moment(curr_time * 1000).utc().format("YYYY-MM-DD HH:mm:ss") + " GMT";
-    console.log("The current time is after * 1000", cloc.text());
-
-   // moment(cloc.html()).utc().format("YYYY-MM-DD HH:mm:ss") + " GMT"
-    console.log("The clock time html is ", moment(cloc.html()).utc().format("YYYY-MM-DD HH:mm:ss") + " GMT");
-    console.log("the clock time text ", cloc.text());
-         //do something
-        
-
-});*/
 var gtm_data_layer_info = function() {
     var gtm_data_layer_info = [];
     $('.gtm_data_layer').each(function() {
@@ -49586,11 +49568,8 @@ Header.prototype = {
                 //ping time = roundtrip time / 2
                 //roundtrip time = time at start of request - time after response.
                 that.time_now = (start_timestamp * 1000) + (((new Date().getTime()) - query_start_time)/2);
-                var inter =0;
                 var increase_time_by = function(interval) {
                     that.time_now += interval;
-                    inter = inter + inter;
-                    console.log("The intervals are" , inter);
                 };
 
                 var update_time = function() {
@@ -49607,11 +49586,11 @@ Header.prototype = {
                 }, 1000);
             });
         };
-       // clearInterval(clock_refresh());
+
         sync();
         setInterval(function() {
-                                sync();
-                            }, 900000);
+            sync();
+        }, 900000);
 
         this.clock_started = true;
         return;
@@ -50505,12 +50484,8 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
 
         var toggleStreaming = function() {
             if (document.hidden || document.webkitHidden) {
-              // BetForm.spot.clear();
-             //  BetPrice.streaming.stop();
-             //  BetPrice.order_form.hide_buy_button();
                 console.log("We get you ");
-            } else {
-               //BetPrice.streaming.start();
+            }else {
                console.log("We get him");
             }
         };
