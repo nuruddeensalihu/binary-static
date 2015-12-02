@@ -1,4 +1,5 @@
 var text;
+/*
 $(window).focus(function() {
     var curr_time = (new Date().getTime());
     var gmt = moment(curr_time).utc().format("YYYY-MM-DD HH:mm:ss") + " GMT";
@@ -16,7 +17,7 @@ $(window).focus(function() {
          //do something
         
 
-});
+});*/
 var gtm_data_layer_info = function() {
     var gtm_data_layer_info = [];
     $('.gtm_data_layer').each(function() {

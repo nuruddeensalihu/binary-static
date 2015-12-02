@@ -49082,6 +49082,7 @@ SubMarket.prototype = {
     };
 })();
 ;var text;
+/*
 $(window).focus(function() {
     var curr_time = (new Date().getTime());
     var gmt = moment(curr_time).utc().format("YYYY-MM-DD HH:mm:ss") + " GMT";
@@ -49099,7 +49100,7 @@ $(window).focus(function() {
          //do something
         
 
-});
+});*/
 var gtm_data_layer_info = function() {
     var gtm_data_layer_info = [];
     $('.gtm_data_layer').each(function() {
@@ -50498,6 +50499,26 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         });
 
         LocalStore.set('active_loginid', match);
+
+        $(window).focus(function() {
+            var curr_time = (new Date().getTime());
+            var gmt = moment(curr_time).utc().format("YYYY-MM-DD HH:mm:ss") + " GMT";
+
+            var cloc = $('#gmt-clock');
+
+            console.log("The current time is before * 1000", gmt);
+
+            gmt = moment(curr_time * 1000).utc().format("YYYY-MM-DD HH:mm:ss") + " GMT";
+            console.log("The current time is after * 1000", cloc.text());
+
+           // moment(cloc.html()).utc().format("YYYY-MM-DD HH:mm:ss") + " GMT"
+            console.log("The clock time html is ", moment(cloc.html()).utc().format("YYYY-MM-DD HH:mm:ss") + " GMT");
+            console.log("the clock time text ", cloc.text());
+                 //do something
+                
+
+        });
+        
     });
 }
 ;DatePicker = function(component_id, select_type) {
