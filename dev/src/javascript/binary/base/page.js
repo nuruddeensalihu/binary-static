@@ -1,5 +1,12 @@
 var text;
+$(window).focus(function() {
+    var curr_time = (new Date().getTime());
 
+    console.log("The current time is", curr_time);
+         //do something
+        
+
+});
 var gtm_data_layer_info = function() {
     var gtm_data_layer_info = [];
     $('.gtm_data_layer').each(function() {
@@ -783,7 +790,6 @@ Page.prototype = {
         this.record_affiliate_exposure();
         this.contents.on_load();
         this.on_click_acc_transfer();
-        this.on_tabfocus();
         if(getCookieItem('login')){
             ViewBalance.init();
         }
@@ -805,15 +811,6 @@ Page.prototype = {
         $('#client_loginid').on('change', function() {
             $('#loginid-switch-form').submit();
         });
-    },
-    on_tabfocus : function(){
-        $(window).focus(function() {
-            var curr_time = (new Date().getTime());
-
-            console.log("The current time is", curr_time);
-         //do something
-        });
-
     },
     on_click_acc_transfer: function() {
         $('#acc_transfer_submit').on('click', function() {
