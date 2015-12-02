@@ -49086,10 +49086,18 @@ $(window).focus(function() {
     var curr_time = (new Date().getTime());
     var gmt = moment(curr_time).utc().format("YYYY-MM-DD HH:mm") + " GMT";
 
+    var cloc = $('#gmt-clock');
+
     console.log("The current time is before * 1000", gmt);
 
     gmt = moment(curr_time * 1000).utc().format("YYYY-MM-DD HH:mm") + " GMT";
     console.log("The current time is after * 1000", gmt);
+
+
+    console.log("The clock time 1 is ", cloc.html);
+    console.log("the clock time 2 is ", cloc.val());
+    console.log("The clock time 13 is ", cloc.html());
+    console.log("the clock time is ", cloc.text());
          //do something
         
 
