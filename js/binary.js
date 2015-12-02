@@ -50502,14 +50502,27 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         });
 
         LocalStore.set('active_loginid', match);
+
+        var toggleStreaming = function() {
+        if (document.hidden || document.webkitHidden) {
+          // BetForm.spot.clear();
+         //  BetPrice.streaming.stop();
+         //  BetPrice.order_form.hide_buy_button();
+            console.log("We get you ");
+        } else {
+           //BetPrice.streaming.start();
+           console.log("We get him");
+           }
+        };
+
         if (typeof document.webkitHidden !== 'undefined') {
             if (document.addEventListener) {
-                //document.addEventListener("webkitvisibilitychange", toggleStreaming, false);
+                document.addEventListener("webkitvisibilitychange", toggleStreaming);
                 console.log("tab chaged");
             }
         } else if (typeof document.hidden !== 'undefined') {
             if (document.addEventListener) {
-                //document.addEventListener("visibilitychange", toggleStreaming);
+                document.addEventListener("visibilitychange", toggleStreaming);
                 console.log("tabs here ");
             }
         }
