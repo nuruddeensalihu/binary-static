@@ -233,7 +233,7 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
                time_now = ( time_now) + (((new Date().getTime()) - query_start_time))
                $('#gmt-clock').html(moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
                var tm = moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT";
-                console.log("The new time now is", tm);
+               console.log("The new time now is", tm);
             }
         };
 
