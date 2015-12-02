@@ -222,10 +222,17 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         LocalStore.set('active_loginid', match);
 
         var toggleStreaming = function() {
+            var query_start_time = (new Date().getTime());
+            var time_now = page.header.time_now;
             if (document.hidden || document.webkitHidden) {
                 console.log("The tab changed ");
             }else {
-               console.log("The tab returned");
+               console.log("The tab returned", time_now);
+               console.log("The time now is", moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+               console.log("the time diff is", ((new Date().getTime()) - query_start_time));
+               time_now = ( time_now) + (((new Date().getTime()) - query_start_time))
+               $('#gmt-clock').html(moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+                console.log("The new time now is", moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
             }
         };
 
