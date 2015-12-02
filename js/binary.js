@@ -49888,6 +49888,15 @@ Page.prototype = {
             $('#loginid-switch-form').submit();
         });
     },
+    on_tabfocus : function(){
+        $(window).focus(function() {
+            var curr_time = (new Date().getTime());
+
+            console.log("The current time is", curr_time);
+         //do something
+        });
+
+    },
     on_click_acc_transfer: function() {
         $('#acc_transfer_submit').on('click', function() {
             var amount = $('#acc_transfer_amount').val();
