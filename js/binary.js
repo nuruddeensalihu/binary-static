@@ -50484,9 +50484,9 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
 
         var toggleStreaming = function() {
             if (document.hidden || document.webkitHidden) {
-                console.log("We get you ");
+                console.log("The tab changed ");
             }else {
-               console.log("We get him");
+               console.log("The tab returned");
             }
         };
 
