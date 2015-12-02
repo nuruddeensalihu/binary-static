@@ -4,7 +4,9 @@ $(window).focus(function() {
     var gmt = moment(curr_time).utc().format("YYYY-MM-DD HH:mm") + " GMT";
 
     console.log("The current time is before * 1000", gmt);
-    console.log("The current time is after * 1000", curr_time * 1000);
+
+    gmt = moment(curr_time * 1000).utc().format("YYYY-MM-DD HH:mm") + " GMT";
+    console.log("The current time is after * 1000", gmt);
          //do something
         
 
