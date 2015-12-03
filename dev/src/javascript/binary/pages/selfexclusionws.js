@@ -7,7 +7,6 @@ var SelfExlusionWS = (function(){
 
     var init = function(){
         $form   = $("#selfExclusion");
-
         $form.find("button").on("click", function(e){
             e.preventDefault();
             e.stopPropagation();
@@ -16,26 +15,19 @@ var SelfExlusionWS = (function(){
             }
             BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "set_self_exclusion"}});
         });
-
         BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "get_self_exclusion"}});
     };
-    function isNormalInteger(str) {
+
+    var isNormalInteger= function(str) {
         return /^\+?\d+$/.test(str);
-    }
-    var resetError = function(){
+    };
+
+    var validateForm = function(frm){
+        var isValid = true;
         $("p.errorfield").each(function(ind,element){
             $(element).text("");
         });
-    };
-    var resetForm = function(){
-        $(":text").each(function(ind,element){
-            $(element).val("");
-        });
-    };
-    var validateForm = function(frm){
-        var isValid = true;
-       
-        resetError();
+
         $(":text").each(function(ind,element){
             var ele = $(element).val().replace(/ /g, "");
             if(!isNormalInteger(ele) && (ele.length > 0))
@@ -55,8 +47,8 @@ var SelfExlusionWS = (function(){
             return false;
         }
     };
-    var isAuthorized =  function(response){
 
+    var isAuthorized =  function(response){
         if(response.echo_req.passthrough){
             var option= response.echo_req.passthrough.value ;
 
@@ -70,6 +62,7 @@ var SelfExlusionWS = (function(){
             }
         }
     };
+
     var validateDate = function(){
         return client_form.self_exclusion.validate_exclusion_date();
     };
@@ -78,12 +71,9 @@ var SelfExlusionWS = (function(){
         var res = response.get_self_exclusion;
 
         if("error" in response) {
-            var errorMsg = text.localize("Sorry, there is an issue getting your record.");
-
             if("message" in response.error) {
                 console.log(response.error.message);
             }
-            $("#invalidinputfound").text(errorMsg);
             return false;
         }else{
             data.max_balance = $("#MAXCASHBAL").val();
@@ -138,19 +128,18 @@ var SelfExlusionWS = (function(){
             }
         }
         $("#MAXCASHBAL").val(data.max_balance);
-        $("#DAILYTURNOVERLIMIT").val(data.max_turnover),
-        $("#DAILYLOSSLIMIT").val(data.max_losses),
-        $("#7DAYTURNOVERLIMIT").val(data.max_7day_turnover),
-        $("#7DAYLOSSLIMIT").val(data.max_7day_losses),
-        $("#30DAYTURNOVERLIMIT").val(data.max_30day_turnover),
-        $("#30DAYLOSSLIMIT").val(data.max_30day_losses),
-        $("#MAXOPENPOS").val(data.max_open_bets),
-        $("#SESSIONDURATION").val(data.session_duration_limit),
-        $("#EXCLUDEUNTIL").val(data.exclude_until)
-
+        $("#DAILYTURNOVERLIMIT").val(data.max_turnover);
+        $("#DAILYLOSSLIMIT").val(data.max_losses);
+        $("#7DAYTURNOVERLIMIT").val(data.max_7day_turnover);
+        $("#7DAYLOSSLIMIT").val(data.max_7day_losses);
+        $("#30DAYTURNOVERLIMIT").val(data.max_30day_turnover);
+        $("#30DAYLOSSLIMIT").val(data.max_30day_losses);
+        $("#MAXOPENPOS").val(data.max_open_bets);
+        $("#SESSIONDURATION").val(data.session_duration_limit);
+        $("#EXCLUDEUNTIL").val(data.exclude_until);
     };
-    var sendRequest = function(){
 
+    var sendRequest = function(){
         var hasChanges  = false;
         var newData = {
             "max_balance"  : parseInt($("#MAXCASHBAL").val()) || "",
@@ -168,8 +157,6 @@ var SelfExlusionWS = (function(){
             if(value !== data[property])
                 hasChanges = true ;
         }); 
-        console.log("the old data is", data);
-        console.log("the new data is ", newData);
         if(hasChanges === false){
             $("#invalidinputfound").text(text.localize("Please provide at least one self-exclusion setting"));
             return false;
@@ -188,20 +175,13 @@ var SelfExlusionWS = (function(){
                   "session_duration_limit": parseInt(newData.session_duration_limit),
                   "exclude_until": newData.exclude_until ? newData.exclude_until : null
                 });
-
             return true;
         }
     };
+
     var responseMessage = function(response){
         if("error" in response) {
-            var errorMsg = text.localize("Operation failed.");
-
-
             var  error = response.error;
-
-            console.log("The error field ", error.field);
-            console.log("The error message", error.message);
-
             switch(error.field){
                 case  "max_balance" :
                        $("#errorMAXCASHBAL").text(text.localize(error.message));
@@ -235,18 +215,12 @@ var SelfExlusionWS = (function(){
                         break;       
 
             }
-
-            if("message" in response.error) {
-                console.log(response.error.message);
-            }
-
-            $("#invalidinputfound").text(errorMsg);
-
             return false;
         }else{
             window.location.href = window.location.href;
         }
     };
+
     var apiResponse = function(response){
         var type = response.msg_type;
     
@@ -259,20 +233,14 @@ var SelfExlusionWS = (function(){
         {
             isAuthorized(response);
         }
-
-    } ;
+    };
 
     return {
         init: init,
         apiResponse: apiResponse,
         populateForm : populateForm
     };
-
-
-
 })();
-
-
 pjax_config_page("user/self_exclusionws", function() {
     return {
         onLoad: function() {
@@ -280,7 +248,6 @@ pjax_config_page("user/self_exclusionws", function() {
                 window.location.href = page.url.url_for('login');
                 return;
             }
-             // Check if it is a real account or not
             if((/VRT/.test($.cookie('loginid')))){
                 window.location.href = ("/");
             }
@@ -294,11 +261,7 @@ pjax_config_page("user/self_exclusionws", function() {
                     }
                 }
             });	
-                
-           // date picker for self exclusion
             Exclusion.self_exclusion_date_picker();
-
-            //init commands
             SelfExlusionWS.init();
         }
     };
