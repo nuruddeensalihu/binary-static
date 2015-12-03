@@ -223,6 +223,7 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         
         var query_start_time;
         var time_now ;
+        var gmtclock = $('#gmt-clock');
         var toggleStreaming = function() {
 
             if (document.hidden || document.webkitHidden) {
@@ -237,8 +238,8 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
                 console.log("The time now is", moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
                 console.log("the time diff is", ((new Date().getTime()) - query_start_time));
                 time_now = ( time_now) + (((new Date().getTime()) - query_start_time));
-                $('#gmt-clock').html(moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
-                console.log("#gmt-clock", $('#gmt-clock').html());
+                gmtclock.html(moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+                console.log("#gmt-clock", gmtclock.html());
                 var tm = moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT";
                 console.log("The new time now is", tm);
             }
