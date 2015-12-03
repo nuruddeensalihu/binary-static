@@ -227,10 +227,10 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         var tabChanged = function() {
 
             if (document.hidden || document.webkitHidden) {
-                query_start_time = (new Date().getTime());
+                query_start_time = page.header.time_now;
             }else {
                 time_now = page.header.time_now;
-                time_now = ( time_now) + (((new Date().getTime()) - time_now));
+                time_now = ( time_now) + ((moment.utc().unix() - query_start_time));
                 page.header.time_now = time_now;
             }
         };
