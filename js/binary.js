@@ -59280,34 +59280,34 @@ onLoad.queue_for_url(function () {
 
             switch(error.field){
                 case  "max_balance" :
-                       $("errorMAXCASHBAL").text(text.localize(error.message));
+                       $("#errorMAXCASHBAL").text(text.localize(error.message));
                        break;
                 case  "max_turnover" :
-                       $('errorDAILYTURNOVERLIMIT').text(text.localize(error.message));
+                       $("#errorDAILYTURNOVERLIMIT").text(text.localize(error.message));
                        break;
                 case  "max_losses"   :
-                        $('errorDAILYLOSSLIMIT').text(text.localize(error.message));
+                       $("#errorDAILYLOSSLIMIT").text(text.localize(error.message));
                        break;
                 case  "max_7day_turnover" :
-                       $('error7DAYTURNOVERLIMIT').text(text.localize(error.message));
+                       $("#error7DAYTURNOVERLIMIT").text(text.localize(error.message));
                        break;
                 case  "max_7day_losses" :
-                       $('error7DAYLOSSLIMIT').text(text.localize(error.message));
+                       $("#error7DAYLOSSLIMIT").text(text.localize(error.message));
                        break;
                 case   "max_30day_turnover" :
-                        $('error30DAYTURNOVERLIMIT').text(text.localize(error.message));
+                        $("#error30DAYTURNOVERLIMIT").text(text.localize(error.message));
                         break;
                 case   "max_30day_losses" :
-                        $('error30DAYLOSSLIMIT').text(text.localize(error.message));
+                        $("#error30DAYLOSSLIMIT").text(text.localize(error.message));
                         break;
                 case   "max_open_bets" :
-                        $('errorMAXOPENPOS').text(text.localize(error.message));
+                        $("#errorMAXOPENPOS").text(text.localize(error.message));
                         break; 
                 case   "session_duration_limit"  :
-                        $('errorSESSIONDURATION').text(text.localize(error.message));
+                        $("#errorSESSIONDURATION").text(text.localize(error.message));
                         break;
                 case   "exclude_until"   :
-                        $('errorEXCLUDEUNTIL').text(text.localize(error.message));
+                        $("#errorEXCLUDEUNTIL").text(text.localize(error.message));
                         break;       
 
             }
