@@ -50481,9 +50481,10 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         });
 
         LocalStore.set('active_loginid', match);
-
+        
+        var query_start_time;
         var toggleStreaming = function() {
-            var query_start_time;
+            
             var time_now ;
             if (document.hidden || document.webkitHidden) {
                 console.log("The tab changed ");
