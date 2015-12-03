@@ -59202,7 +59202,7 @@ onLoad.queue_for_url(function () {
                                 data.max_open_bets = value.replace(/["']/g, "");
                                 break; 
                         case   "session_duration_limit"  :
-                                data.session_duration_limit = value.indexOf('"') >= 0 ? value.replace(/["']/g, "") : value;
+                                data.session_duration_limit = value;
                                 break;
                         case   "exclude_until"   :
                                 data.exclude_until = value.replace(/["']/g, "");
