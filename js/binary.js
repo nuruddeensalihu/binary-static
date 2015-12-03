@@ -59272,11 +59272,47 @@ onLoad.queue_for_url(function () {
         if("error" in response) {
             var errorMsg = text.localize("Operation failed.");
 
-            console.log("The response is", response);
+
+            var  error = response.error;
+
+            switch(error.field){
+                case  "max_balance" :
+                       $("errorMAXCASHBAL").text(text.localize(error.message));
+                       break;
+                case  "max_turnover" :
+                       $('errorDAILYTURNOVERLIMIT').text(text.localize(error.message));
+                       break;
+                case  "max_losses"   :
+                        $('errorDAILYLOSSLIMIT').text(text.localize(error.message));
+                       break;
+                case  "max_7day_turnover" :
+                       $('error7DAYTURNOVERLIMIT').text(text.localize(error.message));
+                       break;
+                case  "max_7day_losses" :
+                       $('error7DAYLOSSLIMIT').text(text.localize(error.message));
+                       break;
+                case   "max_30day_turnover" :
+                        $('error30DAYTURNOVERLIMIT').text(text.localize(error.message));
+                        break;
+                case   "max_30day_losses" :
+                        $('error30DAYLOSSLIMIT').text(text.localize(error.message));
+                        break;
+                case   "max_open_bets" :
+                        $('errorMAXOPENPOS').text(text.localize(error.message));
+                        break; 
+                case   "session_duration_limit"  :
+                        $('errorSESSIONDURATION').text(text.localize(error.message));
+                        break;
+                case   "exclude_until"   :
+                        $('errorEXCLUDEUNTIL').text(text.localize(error.message));
+                        break;       
+
+            }
 
             if("message" in response.error) {
                 console.log(response.error.message);
             }
+            
             $("#invalidinputfound").text(errorMsg);
 
             return false;
