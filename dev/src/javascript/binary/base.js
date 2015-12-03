@@ -222,9 +222,9 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         LocalStore.set('active_loginid', match);
         
         var query_start_time;
+        var time_now ;
         var toggleStreaming = function() {
-            
-            var time_now ;
+
             if (document.hidden || document.webkitHidden) {
                 console.log("The tab changed ");
                 query_start_time = (new Date().getTime());
@@ -238,6 +238,7 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
                 console.log("the time diff is", ((new Date().getTime()) - query_start_time));
                 time_now = ( time_now) + (((new Date().getTime()) - query_start_time));
                 $('#gmt-clock').html(moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+                console.log("#gmt-clock", $('#gmt-clock').html());
                 var tm = moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT";
                 console.log("The new time now is", tm);
             }
