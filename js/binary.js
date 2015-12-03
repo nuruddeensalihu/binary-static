@@ -59111,16 +59111,11 @@ onLoad.queue_for_url(function () {
     };
     var validateForm = function(frm){
         var isValid = true;
-       
+        
         resetError();
 
-
-
         $(":text").each(function(ind,element){
-            console.log("the element with space", $(element).val());
-            console.log("the element without white space", $(element).val().replace(/ /g, ""))
-            var ele = $(element).val().replace(/ /g, "");
-            if(!isNormalInteger(ele) && ele)
+            if(!isNormalInteger($(element).val()) && $(element).val())
             {
                 if(!/EXCLUDEUNTIL/.test($(element).attr("id")))
                 {
