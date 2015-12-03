@@ -226,7 +226,8 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
             var time_now ;
             if (document.hidden || document.webkitHidden) {
                 console.log("The tab changed ");
-                query_start_time = new Date().getTime();
+                query_start_time = (new Date().getTime());
+                console.log("The query is ", query_start_time);
             }else {
                 console.log("query_start_time is", query_start_time);
                 console.log("Time now is ", (new Date().getTime()));
