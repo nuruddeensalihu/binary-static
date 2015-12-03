@@ -50497,7 +50497,7 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
                 time_now = page.header.time_now;
                 console.log("The tab returned", time_now);
                 console.log("The time now is", moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
-                conole.log("The starttime is ", query_start_time);
+                console.log("The starttime is ", query_start_time);
                 console.log("The time is", moment.utc().unix());
                 console.log("the time diff is", (moment.utc().unix() - query_start_time));
                 time_now = ( time_now) + (moment.utc().unix() - query_start_time);
