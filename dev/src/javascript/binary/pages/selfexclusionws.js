@@ -180,8 +180,10 @@ var SelfExlusionWS = (function(){
             "max_30day_losses" : $("#30DAYLOSSLIMIT").val(),
             "max_open_bets": $("#MAXOPENPOS").val(),
             "session_duration_limit" :  $("#SESSIONDURATION").val(),
-            "exclude_until" : $("#EXCLUDEUNTIL").val()
+            "exclude_until" : $("#EXCLUDEUNTIL").val() ? $("#EXCLUDEUNTIL").val() : null
         };
+
+        console.log("the new data is", newData);
 
         $.map(newData , function(value, property){
             if(value !== data[property])
