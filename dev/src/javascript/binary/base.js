@@ -240,7 +240,7 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
                 time_now = ( time_now) + (((new Date().getTime()) - query_start_time));
                 var tm = moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT";
                 console.log("The new time now is", tm);
-                page.header.time_now = time_now;
+               // page.header.time_now = time_now;
                 console.log("#gmt-clock", gmtclock.html());
                
             }
