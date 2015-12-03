@@ -59094,7 +59094,6 @@ onLoad.queue_for_url(function () {
         });
 
         BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "get_self_exclusion"}});
-
     };
     function isNormalInteger(str) {
         return /^\+?\d+$/.test(str);
@@ -59113,7 +59112,6 @@ onLoad.queue_for_url(function () {
         var isValid = true;
        
         resetError();
-
         $(":text").each(function(ind,element){
             if(!isNormalInteger($(element).val()) && $(element).val())
             {
@@ -59133,7 +59131,6 @@ onLoad.queue_for_url(function () {
 
             return false;
         }
-
     };
     var isAuthorized =  function(response){
 
@@ -59149,6 +59146,7 @@ onLoad.queue_for_url(function () {
                         break;                   
             }
         }
+   
     };
     var validateDate = function(){
         return client_form.self_exclusion.validate_exclusion_date();
@@ -59157,7 +59155,6 @@ onLoad.queue_for_url(function () {
     var populateForm = function(response){
         var res = response.get_self_exclusion;
 
-        //resetForm();
         if("error" in response) {
             var errorMsg = text.localize("Sorry, there is an issue getting your record.");
 
@@ -59166,67 +59163,69 @@ onLoad.queue_for_url(function () {
             }
             $("#invalidinputfound").text(errorMsg);
             return false;
-        }else{
-            data.max_balance = $("#MAXCASHBAL").val();
-            data.max_turnover = $("#DAILYTURNOVERLIMIT").val();
-            data.max_losses = $("#DAILYLOSSLIMIT").val();
-            data.max_7day_turnover = $("#7DAYTURNOVERLIMIT").val();
-            data.max_7day_losses = $("#7DAYLOSSLIMIT").val();
-            data.max_30day_turnover = $("#30DAYTURNOVERLIMIT").val();
-            data.max_30day_losses = $("#30DAYLOSSLIMIT").val();
-            data.max_open_bets = $("#MAXOPENPOS").val();
-            data.session_duration_limit =  $("#SESSIONDURATION").val();
-            data.exclude_until = $("#EXCLUDEUNTIL").val();
-
-            if(res){
-                $.map(res,function(value,property){
-
-                    switch(property){
-                        case  "max_balance" :
-                               data.max_balance = value;
-                               break;
-                        case  "max_turnover" :
-                               data.max_turnover = value;
-                               break;
-                        case  "max_losses"   :
-                               data.max_losses = value;
-                               break;
-                        case  "max_7day_turnover" :
-                               data.max_7day_turnover = value;
-                               break;
-                        case  "max_7day_losses" :
-                               data.max_7day_losses = value;
-                               break;
-                        case   "max_30day_turnover" :
-                                data.max_30day_turnover = value;
-                                break;
-                        case   "max_30day_losses" :
-                                data.max_30day_losses = value;
-                                break;
-                        case   "max_open_bets" :
-                                data.max_open_bets = value;
-                                break; 
-                        case   "session_duration_limit"  :
-                                data.session_duration_limit = value;
-                                break;
-                        case   "exclude_until"   :
-                                data.exclude_until = value;
-                                break;       
-
-                    }
-                });
-            }
-            $("#MAXCASHBAL").val(data.max_balance);
-            $("#DAILYTURNOVERLIMIT").val(data.max_turnover),
-            $("#DAILYLOSSLIMIT").val(data.max_losses),
-            $("#7DAYTURNOVERLIMIT").val(data.max_7day_turnover),
-            $("#7DAYLOSSLIMIT").val(data.max_7day_losses),
-            $("#30DAYTURNOVERLIMIT").val(data.max_30day_turnover),
-            $("#30DAYLOSSLIMIT").val(data.max_30day_losses),
-            $("#MAXOPENPOS").val(data.max_open_bets),
-            $("#SESSIONDURATION").val(data.session_duration_limit),
-            $("#EXCLUDEUNTIL").val(data.exclude_until)
         }
+
+        data.max_balance = $("#MAXCASHBAL").val();
+        data.max_turnover = $("#DAILYTURNOVERLIMIT").val();
+        data.max_losses = $("#DAILYLOSSLIMIT").val();
+        data.max_7day_turnover = $("#7DAYTURNOVERLIMIT").val();
+        data.max_7day_losses = $("#7DAYLOSSLIMIT").val();
+        data.max_30day_turnover = $("#30DAYTURNOVERLIMIT").val();
+        data.max_30day_losses = $("#30DAYLOSSLIMIT").val();
+        data.max_open_bets = $("#MAXOPENPOS").val();
+        data.session_duration_limit =  $("#SESSIONDURATION").val();
+        data.exclude_until = $("#EXCLUDEUNTIL").val();
+
+        if(res){
+            $.map(res,function(value,property){
+
+                switch(property){
+                    case  "max_balance" :
+                           data.max_balance = value;
+                           break;
+                    case  "max_turnover" :
+                           data.max_turnover = value;
+                           break;
+                    case  "max_losses"   :
+                           data.max_losses = value;
+                           break;
+                    case  "max_7day_turnover" :
+                           data.max_7day_turnover = value;
+                           break;
+                    case  "max_7day_losses" :
+                           data.max_7day_losses = value;
+                           break;
+                    case   "max_30day_turnover" :
+                            data.max_30day_turnover = value;
+                            break;
+                    case   "max_30day_losses" :
+                            data.max_30day_losses = value;
+                            break;
+                    case   "max_open_bets" :
+                            data.max_open_bets = value;
+                            break; 
+                    case   "session_duration_limit"  :
+                            data.session_duration_limit = value;
+                            break;
+                    case   "exclude_until"   :
+                            data.exclude_until = value;
+                            break;       
+
+                }
+
+            });
+            
+        }
+        $("#MAXCASHBAL").val(data.max_balance);
+        $("#DAILYTURNOVERLIMIT").val(data.max_turnover),
+        $("#DAILYLOSSLIMIT").val(data.max_losses),
+        $("#7DAYTURNOVERLIMIT").val(data.max_7day_turnover),
+        $("#7DAYLOSSLIMIT").val(data.max_7day_losses),
+        $("#30DAYTURNOVERLIMIT").val(data.max_30day_turnover),
+        $("#30DAYLOSSLIMIT").val(data.max_30day_losses),
+        $("#MAXOPENPOS").val(data.max_open_bets),
+        $("#SESSIONDURATION").val(data.session_duration_limit),
+        $("#EXCLUDEUNTIL").val(data.exclude_until)
 
     };
     var sendRequest = function(){
@@ -59244,16 +59243,15 @@ onLoad.queue_for_url(function () {
             "session_duration_limit" :  $("#SESSIONDURATION").val(),
             "exclude_until" : $("#EXCLUDEUNTIL").val()
         };
+
         $.map(newData , function(value, property){
             if(value !== data[property])
                 hasChages = true ;
         }); 
-
-        if(hasChages === false){
+        if(!hasChages){
             $("#invalidinputfound").text(text.localize("Please provide at least one self-exclusion setting"));
             return false;
         }else{
-            console.log("The data", newData);
             BinarySocket.send(
                 {
                   "set_self_exclusion": 1,
@@ -59270,7 +59268,8 @@ onLoad.queue_for_url(function () {
                 });
 
             return true;
-       }
+        }
+
     };
     var responseMessage = function(response){
         if("error" in response) {
@@ -59299,7 +59298,7 @@ onLoad.queue_for_url(function () {
             isAuthorized(response);
         }
 
-    };
+    } ;
 
     return {
         init: init,
