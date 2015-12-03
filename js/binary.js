@@ -59249,12 +59249,13 @@ onLoad.queue_for_url(function () {
             "session_duration_limit" :  $("#SESSIONDURATION").val(),
             "exclude_until" : $("#EXCLUDEUNTIL").val()
         };
+        console.log("the newData is ", newData);
+        console.log("The old data is ", data);
         $.map(newData , function(value, property){
             if(value.replace(/["']/g, "") !== data[property].replace(/["']/g, ""))
                 hasChages = true ;
         }); 
-        console.log("the newData is ", newData);
-        console.log("The old data is ", data);
+       
         if(hasChages === false){
             $("#invalidinputfound").text(text.localize("Please provide at least one self-exclusion setting"));
             return false;
