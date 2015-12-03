@@ -50487,7 +50487,7 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
             var time_now ;
             if (document.hidden || document.webkitHidden) {
                 console.log("The tab changed ");
-                query_start_time == (new Date().getTime());
+                query_start_time = (new Date().getTime());
             }else {
                time_now = page.header.time_now;
                console.log("The tab returned", time_now);
