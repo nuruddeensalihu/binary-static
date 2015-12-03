@@ -59250,7 +59250,7 @@ onLoad.queue_for_url(function () {
             "exclude_until" : $("#EXCLUDEUNTIL").val()
         };
         $.map(newData , function(value, property){
-            if(value !== data[property] && value !== "")
+            if(value.replace(/["']/g, "") !== data[property].replace(/["']/g, ""))
                 hasChages = true ;
         }); 
         console.log("the newData is ", newData);
