@@ -18,13 +18,11 @@ var SelfExlusionWS = (function(){
         });
 
         BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "get_self_exclusion"}});
-
     };
     function isNormalInteger(str) {
         return /^\+?\d+$/.test(str);
     }
     var resetError = function(){
-        //reset error to empty
         $("p.errorfield").each(function(ind,element){
             $(element).text("");
         });
@@ -36,10 +34,9 @@ var SelfExlusionWS = (function(){
     };
     var validateForm = function(frm){
         var isValid = true;
-       
+
         resetError();
-      
-        //Validate number/integer textboxes
+
         $(":text").each(function(ind,element){
             if(!isNormalInteger($(element).val()) && $(element).val())
             {
@@ -50,7 +47,6 @@ var SelfExlusionWS = (function(){
                 }
             }
         });
-
 
         if(validateDate() === false){
             isValid = false;
@@ -95,11 +91,8 @@ var SelfExlusionWS = (function(){
 
     var populateForm = function(response){
         var res = response.get_self_exclusion;
-
-        //Reset form to empty.
         //resetForm();
 
-        //check for error in response
         if("error" in response) {
             var errorMsg = text.localize("Sorry, there is an issue getting your record.");
 
@@ -161,7 +154,7 @@ var SelfExlusionWS = (function(){
             });
             
         }
-         //Bind our data here
+
         $("#MAXCASHBAL").val(data.max_balance);
         $("#DAILYTURNOVERLIMIT").val(data.max_turnover),
         $("#DAILYLOSSLIMIT").val(data.max_losses),
@@ -190,7 +183,6 @@ var SelfExlusionWS = (function(){
             "exclude_until" : $("#EXCLUDEUNTIL").val()
         };
 
-        //Check if value changes
         $.map(newData , function(value, property){
             if(value !== data[property])
                 hasChages = true ;
@@ -199,8 +191,6 @@ var SelfExlusionWS = (function(){
             $("#invalidinputfound").text(text.localize("Please provide at least one self-exclusion setting"));
             return false;
         }
-
-        //Send our request , updating page.
         BinarySocket.send(
             {
               "set_self_exclusion": 1,
@@ -222,7 +212,6 @@ var SelfExlusionWS = (function(){
     var responseMessage = function(response){
         if("error" in response) {
             var errorMsg = text.localize("Operation failed.");
-            console.log("the response is", response);
 
             if("message" in response.error) {
                 console.log(response.error.message);
