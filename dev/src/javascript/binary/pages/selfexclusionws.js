@@ -102,34 +102,34 @@ var SelfExlusionWS = (function(){
 
                     switch(property){
                         case  "max_balance" :
-                               data.max_balance = value.replace(/["']/g, "");
+                               data.max_balance = parseInt(value);
                                break;
                         case  "max_turnover" :
-                               data.max_turnover = value.replace(/["']/g, "");
+                               data.max_turnover = parseInt(value);
                                break;
                         case  "max_losses"   :
-                               data.max_losses = value.replace(/["']/g, "");
+                               data.max_losses = parseInt(value);
                                break;
                         case  "max_7day_turnover" :
-                               data.max_7day_turnover = value.replace(/["']/g, "");
+                               data.max_7day_turnover = parseInt(value);
                                break;
                         case  "max_7day_losses" :
-                               data.max_7day_losses = value.replace(/["']/g, "");
+                               data.max_7day_losses = parseInt(value);
                                break;
                         case   "max_30day_turnover" :
-                                data.max_30day_turnover = value.replace(/["']/g, "");
+                                data.max_30day_turnover = parseInt(value);
                                 break;
                         case   "max_30day_losses" :
-                                data.max_30day_losses = value.replace(/["']/g, "");
+                                data.max_30day_losses = parseInt(value);
                                 break;
                         case   "max_open_bets" :
-                                data.max_open_bets = value.replace(/["']/g, "");
+                                data.max_open_bets = parseInt(value);
                                 break; 
                         case   "session_duration_limit"  :
-                                data.session_duration_limit = value;
+                                data.session_duration_limit = parseInt(value);
                                 break;
                         case   "exclude_until"   :
-                                data.exclude_until = value.replace(/["']/g, "");
+                                data.exclude_until = value;
                                 break;       
 
                     }
@@ -153,15 +153,15 @@ var SelfExlusionWS = (function(){
 
         var hasChanges  = false;
         var newData = {
-            "max_balance"  : $("#MAXCASHBAL").val().replace(/ /g, ""),
-            "max_turnover" : $("#DAILYTURNOVERLIMIT").val().replace(/ /g, ""),
-            "max_losses" : $("#DAILYLOSSLIMIT").val().replace(/ /g, ""),
-            "max_7day_turnover" : $("#7DAYTURNOVERLIMIT").val().replace(/ /g, ""),
-            "max_7day_losses" : $("#7DAYLOSSLIMIT").val().replace(/ /g, ""),
-            "max_30day_turnover" : $("#30DAYTURNOVERLIMIT").val().replace(/ /g, ""),
-            "max_30day_losses" : $("#30DAYLOSSLIMIT").val().replace(/ /g, ""),
-            "max_open_bets": $("#MAXOPENPOS").val().replace(/ /g, ""),
-            "session_duration_limit" :  $("#SESSIONDURATION").val().replace(/ /g, ""),
+            "max_balance"  : parseInt($("#MAXCASHBAL").val()),
+            "max_turnover" : parseInt($("#DAILYTURNOVERLIMIT").val()),
+            "max_losses" : parseInt($("#DAILYLOSSLIMIT").val()),
+            "max_7day_turnover" : parseInt($("#7DAYTURNOVERLIMIT").val()),
+            "max_7day_losses" : parseInt($("#7DAYLOSSLIMIT").val()),
+            "max_30day_turnover" : parseInt($("#30DAYTURNOVERLIMIT").val()),
+            "max_30day_losses" : parseInt($("#30DAYLOSSLIMIT").val()),
+            "max_open_bets": parseInt($("#MAXOPENPOS").val()),
+            "session_duration_limit" :  parseInt($("#SESSIONDURATION").val()),
             "exclude_until" : $("#EXCLUDEUNTIL").val()
         };
         $.map(newData , function(value, property){
