@@ -183,8 +183,6 @@ var SelfExlusionWS = (function(){
             "exclude_until" : $("#EXCLUDEUNTIL").val() ? $("#EXCLUDEUNTIL").val() : null
         };
 
-        console.log("the new data is", newData);
-
         $.map(newData , function(value, property){
             if(value !== data[property])
                 hasChages = true ;
@@ -193,6 +191,8 @@ var SelfExlusionWS = (function(){
             $("#invalidinputfound").text(text.localize("Please provide at least one self-exclusion setting"));
             return false;
         }
+        console.log("the new data is", newData);
+        
         BinarySocket.send(
             {
               "set_self_exclusion": 1,
