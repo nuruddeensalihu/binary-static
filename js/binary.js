@@ -59246,7 +59246,7 @@ onLoad.queue_for_url(function () {
             if(value !== data[property])
                 hasChages = true ;
         }); 
-        if(!hasChages){
+        if(hasChages === false){
             $("#invalidinputfound").text(text.localize("Please provide at least one self-exclusion setting"));
             return false;
         }else{
