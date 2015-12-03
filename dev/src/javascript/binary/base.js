@@ -224,55 +224,26 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         var query_start_time;
         var time_now ;
         var gmtclock = $('#gmt-clock');
-        var toggleStreaming = function() {
+        var tabChanged = function() {
 
             if (document.hidden || document.webkitHidden) {
                 query_start_time = (new Date().getTime());
             }else {
                 time_now = page.header.time_now;
-                console.log("the time diff is", ((new Date().getTime()) - query_start_time));
-                time_now = ( time_now) + (((new Date().getTime()) - query_start_time));
-
-                var tm = moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT";
-                console.log("The new time now is", tm);
+                time_now = ( time_now) + (((new Date().getTime()) - query_start_time) /2);
                 page.header.time_now = time_now;
             }
         };
 
         if (typeof document.webkitHidden !== 'undefined') {
             if (document.addEventListener) {
-                document.addEventListener("webkitvisibilitychange", toggleStreaming);
-                console.log("tab chaged");
+                document.addEventListener("webkitvisibilitychange", tabChanged);
             }
         } else if (typeof document.hidden !== 'undefined') {
             if (document.addEventListener) {
-                document.addEventListener("visibilitychange", toggleStreaming);
-                console.log("tabs here ");
+                document.addEventListener("visibilitychange", tabChanged);
             }
         }
-
-        /*
-        $(window).focus(function() {
-            var curr_time = (new Date().getTime());
-            var gmt = moment(curr_time).utc().format("YYYY-MM-DD HH:mm:ss") + " GMT";
-
-            var cloc = $('#gmt-clock');
-            var hd = new Header
-            var cl =  page.header.start_clock();
-
-            console.log("The current time is before * 1000", gmt);
-
-            gmt = moment(curr_time * 1000).utc().format("YYYY-MM-DD HH:mm:ss") + " GMT";
-            console.log("The current time is after * 1000", cloc.text());
-
-           // moment(cloc.html()).utc().format("YYYY-MM-DD HH:mm:ss") + " GMT"
-            console.log("The clock time html is ", moment(cloc.html()).utc().format("YYYY-MM-DD HH:mm:ss") + " GMT");
-            console.log("the clock time text ", cloc.text());
-                 //do something
-                
-
-        });
-        */
 
     });
 }
