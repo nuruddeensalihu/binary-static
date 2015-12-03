@@ -59290,6 +59290,7 @@ onLoad.queue_for_url(function () {
             var errorMsg = text.localize("Operation failed.");
 
             if("message" in response.error) {
+                console.log("the response is ", response);
                 console.log(response.error.message);
             }
             $("#invalidinputfound").text(errorMsg);
