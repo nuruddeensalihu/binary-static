@@ -50487,16 +50487,18 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
             var time_now ;
             if (document.hidden || document.webkitHidden) {
                 console.log("The tab changed ");
-                query_start_time = (new Date().getTime());
+                query_start_time = new Date().getTime();
             }else {
-               time_now = page.header.time_now;
-               console.log("The tab returned", time_now);
-               console.log("The time now is", moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
-               console.log("the time diff is", ((new Date().getTime()) - query_start_time));
-               time_now = ( time_now) + (((new Date().getTime()) - query_start_time))
-               $('#gmt-clock').html(moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
-               var tm = moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT";
-               console.log("The new time now is", tm);
+                console.log("query_start_time is", query_start_time);
+                console.log("Time now is ", (new Date().getTime()));
+                time_now = page.header.time_now;
+                console.log("The tab returned", time_now);
+                console.log("The time now is", moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+                console.log("the time diff is", ((new Date().getTime()) - query_start_time));
+                time_now = ( time_now) + (((new Date().getTime()) - query_start_time));
+                $('#gmt-clock').html(moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+                var tm = moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT";
+                console.log("The new time now is", tm);
             }
         };
 
