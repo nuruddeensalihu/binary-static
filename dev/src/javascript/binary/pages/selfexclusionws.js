@@ -37,7 +37,7 @@ var SelfExlusionWS = (function(){
        
         resetError();
         $(":text").each(function(ind,element){
-            var ele = $(element).val();
+            var ele = $(element).val().replace(/ /g, "");
             if(!isNormalInteger(ele) && (ele.length > 0))
             {
                 if(!/EXCLUDEUNTIL/.test($(element).attr("id")))
@@ -151,7 +151,7 @@ var SelfExlusionWS = (function(){
     };
     var sendRequest = function(){
 
-        var hasChages  = false;
+        var hasChanges  = false;
         var newData = {
             "max_balance"  : $("#MAXCASHBAL").val().replace(/ /g, ""),
             "max_turnover" : $("#DAILYTURNOVERLIMIT").val().replace(/ /g, ""),
@@ -166,11 +166,11 @@ var SelfExlusionWS = (function(){
         };
         $.map(newData , function(value, property){
             if(value !== data[property])
-                hasChages = true ;
+                hasChanges = true ;
         }); 
         console.log("the old data is", data);
         console.log("the new data is ", newData);
-        if(hasChages === false){
+        if(hasChanges === false){
             $("#invalidinputfound").text(text.localize("Please provide at least one self-exclusion setting"));
             return false;
         }else{
