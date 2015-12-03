@@ -59229,14 +59229,14 @@ onLoad.queue_for_url(function () {
 
         var hasChanges  = false;
         var newData = {
-            "max_balance"  : parseInt($("#MAXCASHBAL").val()),
-            "max_turnover" : parseInt($("#DAILYTURNOVERLIMIT").val()),
-            "max_losses" : parseInt($("#DAILYLOSSLIMIT").val()),
-            "max_7day_turnover" : parseInt($("#7DAYTURNOVERLIMIT").val()),
-            "max_7day_losses" : parseInt($("#7DAYLOSSLIMIT").val()),
-            "max_30day_turnover" : parseInt($("#30DAYTURNOVERLIMIT").val()),
-            "max_30day_losses" : parseInt($("#30DAYLOSSLIMIT").val()),
-            "max_open_bets": parseInt($("#MAXOPENPOS").val()),
+            "max_balance"  : parseInt($("#MAXCASHBAL").val()) || "",
+            "max_turnover" : parseInt($("#DAILYTURNOVERLIMIT").val()) || "",
+            "max_losses" : parseInt($("#DAILYLOSSLIMIT").val()) || "" ,
+            "max_7day_turnover" : parseInt($("#7DAYTURNOVERLIMIT").val()) || "",
+            "max_7day_losses" : parseInt($("#7DAYLOSSLIMIT").val()) || "",
+            "max_30day_turnover" : parseInt($("#30DAYTURNOVERLIMIT").val()) || "",
+            "max_30day_losses" : parseInt($("#30DAYLOSSLIMIT").val()) || "",
+            "max_open_bets": parseInt($("#MAXOPENPOS").val()) || "" ,
             "session_duration_limit" :  parseInt($("#SESSIONDURATION").val()),
             "exclude_until" : $("#EXCLUDEUNTIL").val()
         };
