@@ -230,7 +230,7 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
                 query_start_time = (new Date().getTime());
             }else {
                 time_now = page.header.time_now;
-                time_now = ( time_now) + (((new Date().getTime()) - query_start_time) /2);
+                time_now = ( time_now) + (((new Date().getTime()) - query_start_time));
                 page.header.time_now = time_now;
             }
         };
