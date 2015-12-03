@@ -59113,7 +59113,8 @@ onLoad.queue_for_url(function () {
        
         resetError();
         $(":text").each(function(ind,element){
-            if(!isNormalInteger($(element).val()) && $(element).val())
+            var ele = $(element).val();
+            if(!isNormalInteger(ele) && (ele.length > 0))
             {
                 if(!/EXCLUDEUNTIL/.test($(element).attr("id")))
                 {
@@ -59122,11 +59123,9 @@ onLoad.queue_for_url(function () {
                 }
             }
         });
-
         if(validateDate() === false){
             isValid = false;
         }
-
         if(isValid === false){
 
             return false;
@@ -59146,7 +59145,6 @@ onLoad.queue_for_url(function () {
                         break;                   
             }
         }
-   
     };
     var validateDate = function(){
         return client_form.self_exclusion.validate_exclusion_date();
@@ -59231,15 +59229,15 @@ onLoad.queue_for_url(function () {
 
         var hasChages  = false;
         var newData = {
-            "max_balance"  : $("#MAXCASHBAL").val(),
-            "max_turnover" : $("#DAILYTURNOVERLIMIT").val(),
-            "max_losses" : $("#DAILYLOSSLIMIT").val(),
-            "max_7day_turnover" : $("#7DAYTURNOVERLIMIT").val(),
-            "max_7day_losses" : $("#7DAYLOSSLIMIT").val(),
-            "max_30day_turnover" : $("#30DAYTURNOVERLIMIT").val(),
-            "max_30day_losses" : $("#30DAYLOSSLIMIT").val(),
-            "max_open_bets": $("#MAXOPENPOS").val(),
-            "session_duration_limit" :  $("#SESSIONDURATION").val(),
+            "max_balance"  : $("#MAXCASHBAL").val().replace(/ /g, ""),
+            "max_turnover" : $("#DAILYTURNOVERLIMIT").val().replace(/ /g, ""),
+            "max_losses" : $("#DAILYLOSSLIMIT").val().replace(/ /g, ""),
+            "max_7day_turnover" : $("#7DAYTURNOVERLIMIT").val().replace(/ /g, ""),
+            "max_7day_losses" : $("#7DAYLOSSLIMIT").val().replace(/ /g, ""),
+            "max_30day_turnover" : $("#30DAYTURNOVERLIMIT").val().replace(/ /g, ""),
+            "max_30day_losses" : $("#30DAYLOSSLIMIT").val().replace(/ /g, ""),
+            "max_open_bets": $("#MAXOPENPOS").val().replace(/ /g, ""),
+            "session_duration_limit" :  $("#SESSIONDURATION").val().replace(/ /g, ""),
             "exclude_until" : $("#EXCLUDEUNTIL").val()
         };
         $.map(newData , function(value, property){
