@@ -238,6 +238,8 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
                 console.log("The time now is", moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
                 console.log("the time diff is", ((new Date().getTime()) - query_start_time));
                 time_now = ( time_now) + (((new Date().getTime()) - query_start_time));
+                gmtclock.text('');
+                gmtclock.val(moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
                 gmtclock.html(moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
                 console.log("#gmt-clock", gmtclock.html());
                 var tm = moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT";
