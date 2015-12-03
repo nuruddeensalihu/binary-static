@@ -228,19 +228,19 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
 
             if (document.hidden || document.webkitHidden) {
                 console.log("The tab changed ");
-                query_start_time = (new Date().getTime());
+                query_start_time = moment.utc().unix();
                 console.log("The query is ", query_start_time);
             }else {
                 console.log("query_start_time is", query_start_time);
-                console.log("Time now is ", (new Date().getTime()));
+                console.log("Time now is ", moment.utc().unix());
                 time_now = page.header.time_now;
                 console.log("The tab returned", time_now);
                 console.log("The time now is", moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
-                console.log("the time diff is", ((new Date().getTime()) - query_start_time));
-                time_now = ( time_now) + (((new Date().getTime()) - query_start_time));
+                console.log("the time diff is", (moment.utc().unix() - query_start_time));
+                time_now = ( time_now) + (moment.utc().unix() - query_start_time);
                 var tm = moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT";
                 console.log("The new time now is", tm);
-               // page.header.time_now = time_now;
+                page.header.time_now = time_now;
                 console.log("#gmt-clock", gmtclock.html());
                
             }
