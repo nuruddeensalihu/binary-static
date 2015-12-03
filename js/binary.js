@@ -59241,7 +59241,7 @@ onLoad.queue_for_url(function () {
             "exclude_until" : $("#EXCLUDEUNTIL").val()
         };
         $.map(newData , function(value, property){
-            if(value.replace(/["']/g, "") !== data[property])
+            if(value !== data[property])
                 hasChanges = true ;
         }); 
         console.log("the old data is", data);
