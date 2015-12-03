@@ -59275,6 +59275,9 @@ onLoad.queue_for_url(function () {
 
             var  error = response.error;
 
+            console.log("The error field ", error.field);
+            console.log("The error message", error.message);
+
             switch(error.field){
                 case  "max_balance" :
                        $("errorMAXCASHBAL").text(text.localize(error.message));
@@ -59312,7 +59315,7 @@ onLoad.queue_for_url(function () {
             if("message" in response.error) {
                 console.log(response.error.message);
             }
-            
+
             $("#invalidinputfound").text(errorMsg);
 
             return false;
