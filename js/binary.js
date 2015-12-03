@@ -59253,7 +59253,7 @@ onLoad.queue_for_url(function () {
             $("#invalidinputfound").text(text.localize("Please provide at least one self-exclusion setting"));
             return false;
         }else{
-            console.log("The response", response);
+            console.log("The data", newData);
             BinarySocket.send(
                 {
                   "set_self_exclusion": 1,
