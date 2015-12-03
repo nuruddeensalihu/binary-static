@@ -59238,19 +59238,19 @@ onLoad.queue_for_url(function () {
 
         var hasChages  = false;
         var newData = {
-            "max_balance"  : $("#MAXCASHBAL").val() ? $("#MAXCASHBAL").val() : null,
-            "max_turnover" : $("#DAILYTURNOVERLIMIT").val() ? $("#DAILYTURNOVERLIMIT").val() : null,
-            "max_losses" : $("#DAILYLOSSLIMIT").val() ? $("#DAILYLOSSLIMIT").val() : null,
-            "max_7day_turnover" : $("#7DAYTURNOVERLIMIT").val() ? $("#7DAYTURNOVERLIMIT").val() : null,
-            "max_7day_losses" : $("#7DAYLOSSLIMIT").val() ? $("#7DAYLOSSLIMIT").val() : null ,
-            "max_30day_turnover" : $("#30DAYTURNOVERLIMIT").val() ? $("#30DAYTURNOVERLIMIT").val() : null,
-            "max_30day_losses" : $("#30DAYLOSSLIMIT").val() ? $("#30DAYLOSSLIMIT").val() : null,
-            "max_open_bets": $("#MAXOPENPOS").val() ? $("#MAXOPENPOS").val() : null,
-            "session_duration_limit" :  $("#SESSIONDURATION").val() ? $("#SESSIONDURATION").val() : null,
+            "max_balance"  : $("#MAXCASHBAL").val(),
+            "max_turnover" : $("#DAILYTURNOVERLIMIT").val(),
+            "max_losses" : $("#DAILYLOSSLIMIT").val(),
+            "max_7day_turnover" : $("#7DAYTURNOVERLIMIT").val(),
+            "max_7day_losses" : $("#7DAYLOSSLIMIT").val() ,
+            "max_30day_turnover" : $("#30DAYTURNOVERLIMIT").val(),
+            "max_30day_losses" : $("#30DAYLOSSLIMIT").val(),
+            "max_open_bets": $("#MAXOPENPOS").val(),
+            "session_duration_limit" :  $("#SESSIONDURATION").val(),
             "exclude_until" : $("#EXCLUDEUNTIL").val()
         };
         $.map(newData , function(value, property){
-            if(value !== data[property])
+            if(value !== data[property] && value !== "")
                 hasChages = true ;
         }); 
         console.log("the newData is ", newData);
