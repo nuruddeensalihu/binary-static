@@ -50491,8 +50491,7 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
                 query_start_time = (new Date().getTime());
             }else {
                 time_now = page.header.time_now;
-                console.log("moment is",moment(time_now).utc().format("YYYY-MM-DD HH:mm:ss") + " GMT");
-                time_now = ( time_now) + (((new Date().getTime()) - query_start_time));
+                time_now = ( time_now) + (((new Date().getTime()) - time_now));
                 page.header.time_now = time_now;
             }
         };
