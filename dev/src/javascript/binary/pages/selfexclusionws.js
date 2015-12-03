@@ -38,13 +38,8 @@ var SelfExlusionWS = (function(){
        
         resetError();
 
-
-
         $(":text").each(function(ind,element){
-            console.log("the element with space", $(element).val());
-            console.log("the element without white space",$(element).val().replace(/ /g, "") );
-            var ele = $(element).val().replace(/ /g, "");
-            if(!isNormalInteger(ele) && ele)
+            if(!isNormalInteger($(element).val()) && $(element).val())
             {
                 if(!/EXCLUDEUNTIL/.test($(element).attr("id")))
                 {
@@ -112,34 +107,34 @@ var SelfExlusionWS = (function(){
 
                     switch(property){
                         case  "max_balance" :
-                               data.max_balance = value.replace(/["']/g, "");
+                               data.max_balance = value;
                                break;
                         case  "max_turnover" :
                                data.max_turnover = value;
                                break;
                         case  "max_losses"   :
-                               data.max_losses = value.replace(/["']/g, "");
+                               data.max_losses = value;
                                break;
                         case  "max_7day_turnover" :
-                               data.max_7day_turnover = value.replace(/["']/g, "");
+                               data.max_7day_turnover = value;
                                break;
                         case  "max_7day_losses" :
-                               data.max_7day_losses = value.replace(/["']/g, "");
+                               data.max_7day_losses = value;
                                break;
                         case   "max_30day_turnover" :
-                                data.max_30day_turnover = value.replace(/["']/g, "");
+                                data.max_30day_turnover = value;
                                 break;
                         case   "max_30day_losses" :
-                                data.max_30day_losses = value.replace(/["']/g, "");
+                                data.max_30day_losses = value;
                                 break;
                         case   "max_open_bets" :
-                                data.max_open_bets = value.replace(/["']/g, "");
+                                data.max_open_bets = value;
                                 break; 
                         case   "session_duration_limit"  :
-                                data.session_duration_limit = value.replace(/["']/g, "");
+                                data.session_duration_limit = value;
                                 break;
                         case   "exclude_until"   :
-                                data.exclude_until = value.replace(/["']/g, "");
+                                data.exclude_until = value;
                                 break;       
 
                     }
@@ -166,20 +161,18 @@ var SelfExlusionWS = (function(){
             "max_turnover" : $("#DAILYTURNOVERLIMIT").val(),
             "max_losses" : $("#DAILYLOSSLIMIT").val(),
             "max_7day_turnover" : $("#7DAYTURNOVERLIMIT").val(),
-            "max_7day_losses" : $("#7DAYLOSSLIMIT").val() ,
+            "max_7day_losses" : $("#7DAYLOSSLIMIT").val(),
             "max_30day_turnover" : $("#30DAYTURNOVERLIMIT").val(),
             "max_30day_losses" : $("#30DAYLOSSLIMIT").val(),
             "max_open_bets": $("#MAXOPENPOS").val(),
             "session_duration_limit" :  $("#SESSIONDURATION").val(),
             "exclude_until" : $("#EXCLUDEUNTIL").val()
         };
-        console.log("the newData is ", newData);
-        console.log("The old data is ", data);
         $.map(newData , function(value, property){
-            if(value.replace(/["']/g, "") !== data[property])
+            if(value !== data[property])
                 hasChages = true ;
         }); 
-       
+
         if(hasChages === false){
             $("#invalidinputfound").text(text.localize("Please provide at least one self-exclusion setting"));
             return false;
