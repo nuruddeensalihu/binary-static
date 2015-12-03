@@ -241,7 +241,7 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
 
                 var tm = moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT";
                 console.log("The new time now is", tm);
-                page.header.time_now = tm;
+                page.header.time_now = time_now;
                 gmtclock.text('');
                 gmtclock.text(moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
                 gmtclock.html(moment(time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
