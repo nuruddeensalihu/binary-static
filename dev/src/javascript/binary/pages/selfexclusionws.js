@@ -177,7 +177,8 @@ var SelfExlusionWS = (function(){
             if(value !== data[property])
                 hasChages = true ;
         }); 
-
+        console.log("the newData is ", newData);
+        console.log("The old data is ", data);
         if(hasChages === false){
             $("#invalidinputfound").text(text.localize("Please provide at least one self-exclusion setting"));
             return false;
