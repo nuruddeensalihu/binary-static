@@ -59094,6 +59094,7 @@ onLoad.queue_for_url(function () {
         });
 
         BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "get_self_exclusion"}});
+
     };
     function isNormalInteger(str) {
         return /^\+?\d+$/.test(str);
@@ -59110,7 +59111,7 @@ onLoad.queue_for_url(function () {
     };
     var validateForm = function(frm){
         var isValid = true;
-
+       
         resetError();
 
         $(":text").each(function(ind,element){
@@ -59135,17 +59136,6 @@ onLoad.queue_for_url(function () {
 
     };
     var isAuthorized =  function(response){
-        /*
-
-        if("error" in response) {
-
-            if("message" in response.error) {
-                console.log(response.error.message);
-            }
-            console.log("issue with authorization");
-
-            return false;
-        }*/
 
         if(response.echo_req.passthrough){
             var option= response.echo_req.passthrough.value ;
@@ -59159,7 +59149,6 @@ onLoad.queue_for_url(function () {
                         break;                   
             }
         }
-   
     };
     var validateDate = function(){
         return client_form.self_exclusion.validate_exclusion_date();
@@ -59167,6 +59156,7 @@ onLoad.queue_for_url(function () {
 
     var populateForm = function(response){
         var res = response.get_self_exclusion;
+
         //resetForm();
 
         if("error" in response) {
@@ -59230,7 +59220,6 @@ onLoad.queue_for_url(function () {
             });
             
         }
-
         $("#MAXCASHBAL").val(data.max_balance);
         $("#DAILYTURNOVERLIMIT").val(data.max_turnover),
         $("#DAILYLOSSLIMIT").val(data.max_losses),
@@ -59256,9 +59245,8 @@ onLoad.queue_for_url(function () {
             "max_30day_losses" : $("#30DAYLOSSLIMIT").val(),
             "max_open_bets": $("#MAXOPENPOS").val(),
             "session_duration_limit" :  $("#SESSIONDURATION").val(),
-            "exclude_until" : $("#EXCLUDEUNTIL").val() ? $("#EXCLUDEUNTIL").val() : null
+            "exclude_until" : $("#EXCLUDEUNTIL").val()
         };
-
         $.map(newData , function(value, property){
             if(value !== data[property])
                 hasChages = true ;
@@ -59267,8 +59255,7 @@ onLoad.queue_for_url(function () {
             $("#invalidinputfound").text(text.localize("Please provide at least one self-exclusion setting"));
             return false;
         }
-        console.log("the new data is", newData);
-        
+        console.log("The response", response);
         BinarySocket.send(
             {
               "set_self_exclusion": 1,
@@ -59281,7 +59268,7 @@ onLoad.queue_for_url(function () {
               "max_30day_losses": parseInt(newData.max_30day_losses),
               "max_open_bets": parseInt(newData.max_open_bets),
               "session_duration_limit": parseInt(newData.session_duration_limit),
-              "exclude_until": newData.exclude_until
+              "exclude_until": newData.exclude_until ? newData.exclude_until : null
             });
 
         return true;
@@ -59292,7 +59279,6 @@ onLoad.queue_for_url(function () {
             var errorMsg = text.localize("Operation failed.");
 
             if("message" in response.error) {
-                console.log("the response is ", response);
                 console.log(response.error.message);
             }
             $("#invalidinputfound").text(errorMsg);
