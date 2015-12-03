@@ -59251,28 +59251,29 @@ onLoad.queue_for_url(function () {
             if(value !== data[property])
                 hasChages = true ;
         }); 
+        
         if(hasChages === false){
             $("#invalidinputfound").text(text.localize("Please provide at least one self-exclusion setting"));
             return false;
-        }
-        console.log("The response", response);
-        BinarySocket.send(
-            {
-              "set_self_exclusion": 1,
-              "max_balance": parseInt(newData.max_balance),
-              "max_turnover": parseInt(newData.max_turnover),
-              "max_losses": parseInt(newData.max_losses),
-              "max_7day_turnover": parseInt(newData.max_7day_turnover),
-              "max_7day_losses": parseInt(newData.max_7day_losses),
-              "max_30day_turnover": parseInt(newData.max_30day_turnover),
-              "max_30day_losses": parseInt(newData.max_30day_losses),
-              "max_open_bets": parseInt(newData.max_open_bets),
-              "session_duration_limit": parseInt(newData.session_duration_limit),
-              "exclude_until": newData.exclude_until ? newData.exclude_until : null
-            });
+        }else{
+            console.log("The response", response);
+            BinarySocket.send(
+                {
+                  "set_self_exclusion": 1,
+                  "max_balance": parseInt(newData.max_balance),
+                  "max_turnover": parseInt(newData.max_turnover),
+                  "max_losses": parseInt(newData.max_losses),
+                  "max_7day_turnover": parseInt(newData.max_7day_turnover),
+                  "max_7day_losses": parseInt(newData.max_7day_losses),
+                  "max_30day_turnover": parseInt(newData.max_30day_turnover),
+                  "max_30day_losses": parseInt(newData.max_30day_losses),
+                  "max_open_bets": parseInt(newData.max_open_bets),
+                  "session_duration_limit": parseInt(newData.session_duration_limit),
+                  "exclude_until": newData.exclude_until ? newData.exclude_until : null
+                });
 
-        return true;
-
+            return true;
+       }
     };
     var responseMessage = function(response){
         if("error" in response) {
