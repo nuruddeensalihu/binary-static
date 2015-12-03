@@ -59188,34 +59188,34 @@ onLoad.queue_for_url(function () {
 
                     switch(property){
                         case  "max_balance" :
-                               data.max_balance = value;
+                               data.max_balance = value.replace(/["']/g, "");
                                break;
                         case  "max_turnover" :
                                data.max_turnover = value;
                                break;
                         case  "max_losses"   :
-                               data.max_losses = value;
+                               data.max_losses = value.replace(/["']/g, "");
                                break;
                         case  "max_7day_turnover" :
-                               data.max_7day_turnover = value;
+                               data.max_7day_turnover = value.replace(/["']/g, "");
                                break;
                         case  "max_7day_losses" :
-                               data.max_7day_losses = value;
+                               data.max_7day_losses = value.replace(/["']/g, "");
                                break;
                         case   "max_30day_turnover" :
-                                data.max_30day_turnover = value;
+                                data.max_30day_turnover = value.replace(/["']/g, "");
                                 break;
                         case   "max_30day_losses" :
-                                data.max_30day_losses = value;
+                                data.max_30day_losses = value.replace(/["']/g, "");
                                 break;
                         case   "max_open_bets" :
-                                data.max_open_bets = value;
+                                data.max_open_bets = value.replace(/["']/g, "");
                                 break; 
                         case   "session_duration_limit"  :
-                                data.session_duration_limit = value;
+                                data.session_duration_limit = value.replace(/["']/g, "");
                                 break;
                         case   "exclude_until"   :
-                                data.exclude_until = value;
+                                data.exclude_until = value.replace(/["']/g, "");
                                 break;       
 
                     }
@@ -59252,7 +59252,7 @@ onLoad.queue_for_url(function () {
         console.log("the newData is ", newData);
         console.log("The old data is ", data);
         $.map(newData , function(value, property){
-            if(value.replace(/["']/g, "") !== data[property].replace(/["']/g, ""))
+            if(value.replace(/["']/g, "") !== data[property])
                 hasChages = true ;
         }); 
        
