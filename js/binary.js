@@ -57608,7 +57608,12 @@ ClientForm.prototype = {
                 var date_regex = /^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
                 var error_element_errorEXCLUDEUNTIL = clearInputErrorField('errorEXCLUDEUNTIL');
 
-                if (exclusion_date && (date_regex.test($('#EXCLUDEUNTIL').val()) === true) ) {
+                if (exclusion_date) {
+
+                    if(date_regex.test($('#EXCLUDEUNTIL').val()) === true){
+                        error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please select a valid date");
+                        return false;
+                    }
             
                     exclusion_date = new Date(exclusion_date);
                     // self exclusion date must >= 6 month from now
@@ -57626,10 +57631,6 @@ ClientForm.prototype = {
                         return false;
                     }
 
-                }
-                else{
-                    error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please select a valid date");
-                    return false;
                 }
 
                 return true;
