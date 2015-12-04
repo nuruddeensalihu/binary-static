@@ -109,12 +109,8 @@ ClientForm.prototype = {
                 var exclusion_date = $('#EXCLUDEUNTIL').val();
                 var date_regex = /^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
 
-                if (exclusion_date) {
-                    if(!(date_regex.test($('#EXCLUDEUNTIL').val())))
-                    {
-                        error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please select a valid date");
-                        return false;
-                    }
+                if (exclusion_date && (date_regex.test($('#EXCLUDEUNTIL').val()) === true) ) {
+                    
                     var error_element_errorEXCLUDEUNTIL = clearInputErrorField('errorEXCLUDEUNTIL');
 
                     exclusion_date = new Date(exclusion_date);
@@ -133,6 +129,10 @@ ClientForm.prototype = {
                         return false;
                     }
 
+                }
+                else{
+                    error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please select a valid date");
+                    return false;
                 }
 
                 return true;
