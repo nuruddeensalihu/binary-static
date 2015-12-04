@@ -117,14 +117,15 @@ ClientForm.prototype = {
                     var six_month_date = new Date();
                     six_month_date.setMonth(six_month_date.getMonth() + 6);
 
-                    if (exclusion_date < six_month_date) {
-                        error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please enter a date that is at least 6 months from now.");
-                        return false ;
-                    }
                     if(!(date_regex.test(exclusion_date)))
                     {
                         return false;
                         error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please select a valid date");
+                    }
+
+                    if (exclusion_date < six_month_date) {
+                        error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please enter a date that is at least 6 months from now.");
+                        return false ;
                     }
 
                     if (confirm(text.localize("When you click 'Ok' you will be excluded from trading on the site until the selected date.")) === true) {
