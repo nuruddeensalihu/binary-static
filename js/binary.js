@@ -59373,6 +59373,8 @@ onLoad.queue_for_url(function () {
             if(value !== data[property])
                 hasChanges = true ;
         }); 
+        console.log("The old datas are", data);
+        console.log("the newdatas are", newData);
         if(hasChanges === false){
             $("#invalidinputfound").text(text.localize("Please provide at least one self-exclusion setting"));
             return false;
