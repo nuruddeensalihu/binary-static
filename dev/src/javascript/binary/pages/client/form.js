@@ -112,7 +112,7 @@ ClientForm.prototype = {
 
                 if (exclusion_date) {
 
-                    if(date_regex.test($('#EXCLUDEUNTIL').val()) === true){
+                    if(date_regex.test($('#EXCLUDEUNTIL').val()) === false){
                         error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please select a valid date");
                         return false;
                     }
