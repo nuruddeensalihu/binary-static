@@ -2056,6 +2056,9 @@ abbr {
   .contact-content .grd-grid-2 .grd-hide-mobile {
     display: none !important;
   }
+  .contact-content .grd-hide-mobile {
+    display: none !important;
+  }
   .contact-content .grd-grid-mobile-12 {
     width: 100%;
   }
