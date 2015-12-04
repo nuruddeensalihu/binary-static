@@ -107,6 +107,7 @@ ClientForm.prototype = {
             },
             validate_exclusion_date: function() {
                 var exclusion_date = $('#EXCLUDEUNTIL').val();
+                var date_regex = /^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
 
                 if (exclusion_date) {
                     var error_element_errorEXCLUDEUNTIL = clearInputErrorField('errorEXCLUDEUNTIL');
@@ -119,6 +120,11 @@ ClientForm.prototype = {
                     if (exclusion_date < six_month_date) {
                         error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please enter a date that is at least 6 months from now.");
                         return false ;
+                    }
+                    if(!(date_regex.test(exclusion_date)))
+                    {
+                        return false;
+                        error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please select a valid date");
                     }
 
                     if (confirm(text.localize("When you click 'Ok' you will be excluded from trading on the site until the selected date.")) === true) {
