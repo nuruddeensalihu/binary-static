@@ -292,12 +292,6 @@ function check_login_hide_signup() {
     }
 }
 
-function hide_if_logged_in() {
-    if (page.client.is_logged_in) {
-        $('.client_logged_out').remove();
-    }
-}
-
 pjax_config_page('/$|/home', function() {
     return {
         onLoad: function() {
@@ -315,7 +309,6 @@ pjax_config_page('/why-us', function() {
         onLoad: function() {
             var whyus = $('.why-us');
             sidebar_scroll(whyus);
-            hide_if_logged_in();
         },
         onUnload: function() {
             $(window).off('scroll');
