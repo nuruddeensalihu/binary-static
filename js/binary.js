@@ -57608,18 +57608,17 @@ ClientForm.prototype = {
                 var date_regex = /^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
 
                 if (exclusion_date) {
+                    if(!(date_regex.test($('#EXCLUDEUNTIL').val())))
+                    {
+                        error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please select a valid date");
+                        return false;
+                    }
                     var error_element_errorEXCLUDEUNTIL = clearInputErrorField('errorEXCLUDEUNTIL');
 
                     exclusion_date = new Date(exclusion_date);
                     // self exclusion date must >= 6 month from now
                     var six_month_date = new Date();
                     six_month_date.setMonth(six_month_date.getMonth() + 6);
-
-                    if(!(date_regex.test(exclusion_date)))
-                    {
-                        return false;
-                        error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please select a valid date");
-                    }
 
                     if (exclusion_date < six_month_date) {
                         error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please enter a date that is at least 6 months from now.");
