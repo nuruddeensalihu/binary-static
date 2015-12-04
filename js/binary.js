@@ -59011,6 +59011,7 @@ function initialize_pricing_table() {
     select_underlying_change();
     select_strike_type();
     expiry_date_picker();
+    $("#from_expiry").keydown(false);
 }
 
 onLoad.queue_for_url(initialize_pricing_table, 'pricing_table');
@@ -59373,8 +59374,6 @@ onLoad.queue_for_url(function () {
             if(value !== data[property])
                 hasChanges = true ;
         }); 
-        console.log("The old datas are", data);
-        console.log("the newdatas are", newData);
         if(hasChanges === false){
             $("#invalidinputfound").text(text.localize("Please provide at least one self-exclusion setting"));
             return false;
