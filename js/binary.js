@@ -59366,7 +59366,7 @@ onLoad.queue_for_url(function () {
             "max_30day_turnover" : parseInt($("#30DAYTURNOVERLIMIT").val()) || "",
             "max_30day_losses" : parseInt($("#30DAYLOSSLIMIT").val()) || "",
             "max_open_bets": parseInt($("#MAXOPENPOS").val()) || "" ,
-            "session_duration_limit" :  parseInt($("#SESSIONDURATION").val() || ""),
+            "session_duration_limit" :  parseInt($("#SESSIONDURATION").val()) || "",
             "exclude_until" : $("#EXCLUDEUNTIL").val()
         };
         $.map(newData , function(value, property){
