@@ -101,6 +101,7 @@
     "src/javascript/binary/pages/trade/user.js",
     "src/javascript/binary/reality-check.js",
     "src/javascript/binary/socket.js",
+    "src/javascript/binary/static/cashier/paymentagent_withdrawws.js",
     "src/javascript/binary/static/common/button.js",
     "src/javascript/binary/static/common/common_data.js",
     "src/javascript/binary/static/common/string_util.js",
