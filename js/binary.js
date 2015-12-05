@@ -50485,15 +50485,13 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         var start_time;
         var time_now ;
         var gmtclock = $('#gmt-clock');
-        var delay ;
         var tabChanged = function() {
 
             if (document.hidden || document.webkitHidden) {
                 start_time = page.header.time_now;
             }else {
                 time_now = page.header.time_now;
-                delay = ((new Date().getTime() - start_time));
-                time_now = ( time_now) + delay;
+                time_now = ( time_now) + ((new Date().getTime() - time_now));
                 page.header.time_now = time_now;
             }
         };
