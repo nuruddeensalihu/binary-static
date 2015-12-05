@@ -221,11 +221,8 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
 
         LocalStore.set('active_loginid', match);
         
-        var start_time;
         var time_now ;
-        var gmtclock = $('#gmt-clock');
         var tabChanged = function() {
-
             if ((document.hidden ===false) || (document.webkitHidden === false)) {
                 time_now = page.header.time_now;
                 time_now = ( time_now) + ((new Date().getTime() - time_now));
