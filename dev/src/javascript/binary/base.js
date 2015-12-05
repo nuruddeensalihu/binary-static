@@ -226,9 +226,7 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         var gmtclock = $('#gmt-clock');
         var tabChanged = function() {
 
-            if (document.hidden || document.webkitHidden) {
-                start_time = page.header.time_now;
-            }else {
+            if ((document.hidden ===false) || (document.webkitHidden === false)) {
                 time_now = page.header.time_now;
                 time_now = ( time_now) + ((new Date().getTime() - time_now));
                 page.header.time_now = time_now;
