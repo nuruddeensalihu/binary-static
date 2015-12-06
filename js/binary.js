@@ -50487,8 +50487,8 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
 
             if (document.hidden || document.webkitHidden) {
                 start_time = new Date().getTime();
-            }else {
                 time_now = page.header.time_now;
+            }else {
                 time_now = ( time_now) + ((new Date().getTime() - start_time));
                 page.header.time_now = time_now;
             }
