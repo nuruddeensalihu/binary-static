@@ -50482,11 +50482,14 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
 
         LocalStore.set('active_loginid', match);
         
-        var time_now ;
+        var start_time;
         var tabChanged = function() {
-            if ((document.hidden ===false) || (document.webkitHidden === false)) {
+
+            if (document.hidden || document.webkitHidden) {
+                start_time = new Date().getTime();
+            }else {
                 time_now = page.header.time_now;
-                time_now = ( time_now) + ((new Date().getTime() - time_now));
+                time_now = ( time_now) + ((new Date().getTime() - start_time));
                 page.header.time_now = time_now;
             }
         };
