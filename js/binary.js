@@ -49723,6 +49723,7 @@ Contents.prototype = {
         if ($('.unbind_later').length > 0) {
             $('.unbind_later').off();
         }
+        console.log("the bee quuen", BinarySocket.isReady());
     },
 
      start_clock_ws : function(){
@@ -50316,6 +50317,7 @@ $(function(){
     $(document).ajaxSuccess(function () {
         var contents = new Contents(page.client, page.user);
         contents.on_load();
+        console.log("the datasource", BinarySocket.isReady());
     });
 });
 

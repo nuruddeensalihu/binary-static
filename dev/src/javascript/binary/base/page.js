@@ -640,6 +640,7 @@ Contents.prototype = {
         if ($('.unbind_later').length > 0) {
             $('.unbind_later').off();
         }
+        console.log("the bee quuen", BinarySocket.isReady());
     },
 
      start_clock_ws : function(){
