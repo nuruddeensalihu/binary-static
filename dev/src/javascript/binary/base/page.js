@@ -404,9 +404,10 @@ Header.prototype = {
     },
     on_unload: function() {
         this.menu.reset();
+        /*
         if (!clock_started){
             this.start_clock_ws();
-        }
+        }*/
     },
     show_or_hide_login_form: function() {
         if (this.user.is_logged_in && this.client.is_logged_in) {
