@@ -49563,8 +49563,7 @@ Header.prototype = {
 
         function init(){
             clock_started = true;
-            query_start_time = moment().valueOf();
-            BinarySocket.send({ "time": 1});
+            BinarySocket.send({ "time": 1,"passthrough":{"client_time" :  moment().valueOf()}});
         }
 
         BinarySocket.init({
@@ -49574,9 +49573,9 @@ Header.prototype = {
                 if (response && response.msg_type === 'time') {
 
                     var start_timestamp = response.time;
-                    var pass = query_start_time;
+                    var pass = response.echo_req.passthrough.client_time;
 
-                    that.time_now = ((start_timestamp * 1000) + (moment.valueOf() - pass));
+                    that.time_now = ((start_timestamp * 1000) + (moment().valueOf() - pass));
                      
                     var increase_time_by = function(interval) {
                         that.time_now += interval;
