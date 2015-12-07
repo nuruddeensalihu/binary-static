@@ -678,7 +678,7 @@ Contents.prototype = {
         this.init_draggable();
         console.log("The WS is now", BinarySocket.isReady());
         if (!clock_started) {
-            this.start_clock_ws();
+            Header.start_clock_ws();
         }
     },
     on_unload: function() {
