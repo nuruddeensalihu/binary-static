@@ -106,6 +106,7 @@
     "src/javascript/binary/static/common/common_data.js",
     "src/javascript/binary/static/common/string_util.js",
     "src/javascript/binary/static/common/table.js",
+    "src/javascript/binary/static/common/validation.js",
     "src/javascript/binary/static/limits.js",
     "src/javascript/binary/static/limits/limits.data.js",
     "src/javascript/binary/static/limits/limits.init.js",
@@ -118,7 +119,13 @@
     "src/javascript/binary/static/statement/statement.data.js",
     "src/javascript/binary/static/statement/statement.init.js",
     "src/javascript/binary/static/statement/statement.ui.js",
+    "src/javascript/binary/static/verify_email.js",
+    "src/javascript/binary/static/verify_email/verify_email.data.js",
+    "src/javascript/binary/static/verify_email/verify_email.init.js",
     "src/javascript/binary/static/viewbalance/viewbalance.init.js",
     "src/javascript/binary/static/viewbalance/viewbalance.ui.js",
+    "src/javascript/binary/static/virtual_acc_opening.js",
+    "src/javascript/binary/static/virtual_acc_opening/virtual_acc_opening.data.js",
+    "src/javascript/binary/static/virtual_acc_opening/virtual_acc_opening.ui.js",
     "src/javascript/binary/utility.js"
 ]

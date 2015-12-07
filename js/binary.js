@@ -49082,7 +49082,7 @@ SubMarket.prototype = {
     };
 })();
 ;var text;
-
+var clock_started = false;
 var gtm_data_layer_info = function() {
     var gtm_data_layer_info = [];
     $('.gtm_data_layer').each(function() {
@@ -49474,18 +49474,22 @@ var Header = function(params) {
     this.client = params['client'];
     this.settings = params['settings'];
     this.menu = new Menu(params['url']);
-    this.clock_started = false;
 };
 
 Header.prototype = {
     on_load: function() {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
-        if (!this.clock_started) this.start_clock();
+        if (!clock_started) {
+            this.start_clock_ws();
+        }
         this.simulate_input_placeholder_for_ie();
     },
     on_unload: function() {
         this.menu.reset();
+        if (!clock_started){
+            this.start_clock_ws();
+        }
     },
     show_or_hide_login_form: function() {
         if (this.user.is_logged_in && this.client.is_logged_in) {
@@ -49551,12 +49555,60 @@ Header.prototype = {
 
         this.menu.register_dynamic_links();
     },
+    start_clock_ws : function(){
+        var that = this;
+        var clock_handle;
+        var query_start_time;
+        var clock = $('#gmt-clock');
+
+        function init(){
+            clock_started = true;
+            BinarySocket.send({ "time": 1,"passthrough":{"client_time" :  moment().valueOf()}});
+        }
+
+        BinarySocket.init({
+            onmessage : function(msg){
+                var response = JSON.parse(msg.data);
+
+                if (response && response.msg_type === 'time') {
+
+                    var start_timestamp = response.time;
+                    var pass = response.echo_req.passthrough.client_time;
+
+                    that.time_now = ((start_timestamp * 1000) + (moment().valueOf() - pass));
+                     
+                    var increase_time_by = function(interval) {
+                        that.time_now += interval;
+                    };
+                    var update_time = function() {
+                         clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+                    };
+                    update_time();
+
+                    clearInterval(clock_handle);
+
+                    clock_handle = setInterval(function() {
+                        increase_time_by(1000);
+                        update_time();
+                    }, 1000);
+                }
+            }
+        });
+
+        that.run = function(){
+            setInterval(init, 900000);
+        };
+        if(BinarySocket.isReady() === true){
+            init();
+            that.run();
+        }
+        return;
+    },
     start_clock: function() {
         var clock = $('#gmt-clock');
         if (clock.length === 0) {
             return;
         }
-
         var that = this;
         var clock_handle;
         var sync = function() {
@@ -49592,7 +49644,7 @@ Header.prototype = {
             sync();
         }, 900000);
 
-        this.clock_started = true;
+        clock_started = true;
         return;
     },
 };
@@ -50467,7 +50519,7 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         // So, fall back to a more basic solution.
         var match = document.cookie.match(/\bloginid=(\w+)/);
         match = match ? match[1] : '';
-        
+
         $(window).on('storage', function (jq_event) {
             if (jq_event.originalEvent.key !== 'active_loginid') return;
             if (jq_event.originalEvent.newValue === match) return;
@@ -50481,30 +50533,6 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         });
 
         LocalStore.set('active_loginid', match);
-        
-        var start_time;
-        var tabChanged = function() {
-
-            if (document.hidden || document.webkitHidden) {
-                start_time = moment().valueOf();
-                time_now = page.header.time_now;
-                console.log("The moment time is ",moment().valueOf());
-            }else {
-                time_now = (time_now + (moment().valueOf() - start_time));
-                page.header.time_now = time_now;
-            }
-        };
-
-        if (typeof document.webkitHidden !== 'undefined') {
-            if (document.addEventListener) {
-                document.addEventListener("webkitvisibilitychange", tabChanged);
-            }
-        } else if (typeof document.hidden !== 'undefined') {
-            if (document.addEventListener) {
-                document.addEventListener("visibilitychange", tabChanged);
-            }
-        }
-
     });
 }
 ;DatePicker = function(component_id, select_type) {
@@ -60515,16 +60543,27 @@ function addComma(num){
             textMessageRequired: text.localize('This field is required.'),
             textMessageCountLimit: text.localize('You should enter between %LIMIT% characters.'), // %LIMIT% should be replaced by a range. sample: (6-20)
             textMessageJustAllowed: text.localize('Only %ALLOWED% are allowed.'), // %ALLOWED% should be replaced by values including: letters, numbers, space, period, ...
+            textMessageValid: text.localize('Please submit a valid %FIELD%.'), // %FIELD% should be replaced by values such as Email address
             textLetters: text.localize('letters'),
             textNumbers: text.localize('numbers'),
             textSpace: text.localize('space'),
             textPeriod: text.localize('period'),
             textComma: text.localize('comma'),
+            textPassword: text.localize('password'),
+            textPasswordsNotMatching: text.localize('The two passwords that you entered do not match.'),
+            textEmailAddress: text.localize('Email address'),
+            textRepeatPassword: text.localize('re-enter password'),
+            textResidence: text.localize('country of residence'),
+            textTokenMissing: text.localize('Verification token is missing. Click on the verification link sent to your Email and make sure you are not already logged in.'),
+            textDetails: text.localize('details'),
+            textCreateNewAccount: text.localize('create new account'),
+            textDuplicatedEmail: text.localize('Your provided email address is already in use by another Login ID'),
             textAsset: text.localize('Asset'),
             textOpens: text.localize('Opens'),
             textCloses: text.localize('Closes'),
             textSettles: text.localize('Settles'),
-            textUpcomingEvents: text.localize('Upcoming Events')
+            textUpcomingEvents: text.localize('Upcoming Events'),
+            textEmailSent: text.localize('Please check your Email for the next step.')
         };
 
         var starTime = document.getElementById('start_time_label');
@@ -60695,6 +60734,10 @@ function addComma(num){
             case 'range':
                 if(param)
                     msg = localize.textMessageCountLimit.replace('%LIMIT%', param);
+                break;
+            case 'valid':
+                if(param)
+                    msg = localize.textMessageValid.replace('%FIELD%', param);
                 break;
             default:
                 break;
@@ -63169,21 +63212,6 @@ WSTickDisplay.updateChart = function(data){
         $('#reality-check .blogout').on('click', function () {
             window.location.href = logout_url;
         });
-        
-        var obj = document.getElementById('realityDuration');
-        this.isNumericValue(obj);
-    };
-    //
-    //limit textBox to Numeric Only
-    //
-    RealityCheck.prototype.isNumericValue = function(obj){
-
-        if (obj.hasOwnProperty('oninput') || ('oninput' in obj)) 
-        {
-            $('#realityDuration').on('input', function (event) { 
-                 this.value = this.value.replace(/[^0-9]/g, '');
-            });
-        }
     };
 
     // On session start we need to ask for the reality-check interval.
@@ -63243,10 +63271,6 @@ WSTickDisplay.updateChart = function(data){
         };
         $('#reality-check [bcont=1]').on('click', click_handler);
         $('#reality-check [interval=1]').on('change', click_handler);
-
-
-        var obj = document.getElementById('realityDuration');
-        this.isNumericValue(obj);
     };
 
     return RealityCheck;
@@ -63444,6 +63468,7 @@ var BinarySocket = (function () {
     return {
         init: init,
         send: send,
+        isReady : isReady,
         close: close,
         socket: function () { return binarySocket; },
         clear: clear,
@@ -63928,7 +63953,97 @@ var Table = (function(){
         appendTableBody: appendTableBody
     };
 }());
-;pjax_config_page("limitws", function(){
+;var Validate = (function(){
+
+	//give DOM element of error to display
+	function displayErrorMessage(error){
+        error.setAttribute('style', 'display:block');
+    }
+
+    //give DOM element or error to hide
+    function hideErrorMessage(error){
+    	error.setAttribute('style', 'display:none');
+    }
+
+    //check validity of email
+    function validateEmail(mail) {
+
+        if (/^\w+([\+\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)){  
+        
+            return true;
+        }  
+        
+        return false;
+    }
+
+    //give error message for invalid email, needs DOM element of error and value of email
+    function errorMessageEmail(email, error) {
+        if (email === "") {
+            error.textContent = Content.errorMessage('req');
+            displayErrorMessage(error);
+            return true;
+
+        } else if (!validateEmail(email)) {
+            error.textContent = Content.errorMessage('valid', Content.localize().textEmailAddress);
+            displayErrorMessage(error);
+            return true;
+
+        }
+        hideErrorMessage(error);
+        return false;
+    }
+
+    //give error message for invalid password, needs value of password, repeat of password, and DOM element of error
+    function errorMessagePassword(password, rPassword, error, rError) {
+        if (!/^.+$/.test(password)) {
+            hideErrorMessage(rError);
+            error.textContent = Content.errorMessage('req');
+            displayErrorMessage(error);
+
+        	if (!/^.+$/.test(rPassword)) {
+	            rError.textContent = Content.errorMessage('req');
+	            displayErrorMessage(rError);
+
+	            return false;
+
+	        }
+            return false;
+
+        } else if (password !== rPassword) {
+            hideErrorMessage(error);
+            rError.textContent = Content.localize().textPasswordsNotMatching;
+            displayErrorMessage(rError);
+
+            return false;
+
+        } else if (!/^[^-~\s]+$/.test(password)) {
+            hideErrorMessage(rError);
+            error.textContent = Content.errorMessage('valid', Content.localize().textPassword);
+            displayErrorMessage(error);
+
+            return false;
+
+        } else if (password.length < 6 || password.length > 25) {
+            hideErrorMessage(rError);
+            error.textContent = Content.errorMessage('range', '6-25 ' + Content.localize().textPassword);
+            displayErrorMessage(error);
+
+            return false;
+
+        }
+		hideErrorMessage(error);
+        hideErrorMessage(rError);
+        return true;
+
+    }
+
+	return {
+		displayErrorMessage: displayErrorMessage,
+        hideErrorMessage: hideErrorMessage,
+        errorMessageEmail: errorMessageEmail,
+        errorMessagePassword: errorMessagePassword
+    };
+}());;pjax_config_page("limitws", function(){
     return {
         onLoad: function() {
             BinarySocket.init({
@@ -64587,6 +64702,65 @@ var ProfitTableUI = (function(){
         updateStatementTable: updateStatementTable
     };
 }());
+;if(document.getElementById('btn-verify-email')) {
+
+    document.getElementById('btn-verify-email').addEventListener('click', function(evt){
+    	evt.preventDefault();
+    	var email = document.getElementById('email').value;
+    	var error = document.getElementsByClassName('error-message')[0];
+        Content.populate();
+
+    	if(!Validate.errorMessageEmail(email, error)) {
+    		error.textContent = "";
+    		error.setAttribute('style', 'display:none');
+
+    		BinarySocket.init({
+		        onmessage: function(msg){
+		            var response = JSON.parse(msg.data);
+
+		            if (response) {
+		                var type = response.msg_type;
+		                if (type === 'verify_email'){
+		                    VerifyEmailWS.emailHandler(error);
+		                }
+		            }
+		        }
+		    });
+		    VerifyEmailWS.init(email);
+    	}
+    });
+}
+        
+;var VerifyEmailData = (function(){
+    "use strict";
+
+    function getEmail(email){
+        var req = {verify_email: email};
+
+        BinarySocket.send(req);
+    }
+
+    return {
+        getEmail: getEmail
+    };
+}());
+;var VerifyEmailWS = (function(){
+    "use strict";
+
+    function emailHandler(error) {
+    	error.textContent = Content.localize().textEmailSent;
+    	error.setAttribute('style', 'display:block');
+    }
+
+    function initPage(email){
+        VerifyEmailData.getEmail(email);
+    }
+
+    return {
+    	emailHandler: emailHandler,
+        init: initPage
+    };
+}());
 ;
 var ViewBalance = (function () {
     function init(){
@@ -64613,6 +64787,129 @@ var ViewBalanceUI = (function(){
 
     return {
         updateBalances: updateBalances
+    };
+}());
+;pjax_config_page("virtualws", function(){
+	
+	return {
+		onLoad: function() {
+        	get_residence_list();
+        	Content.populate();
+
+			var form = document.getElementById('virtual-form');
+			var errorEmail = document.getElementById('error-email');
+
+		    VirtualAccOpeningUI.setLabel();
+
+			if (form) {
+
+				$('#virtual-form').submit( function(evt) {
+					evt.preventDefault();
+					Validate.hideErrorMessage(errorEmail);
+
+					var email = document.getElementById('email').value,
+				    	residence = document.getElementById('residence').value,
+				    	password = document.getElementById('password').value,
+						rPassword = document.getElementById('r-password').value;
+
+					if (VirtualAccOpeningUI.checkPassword(password, rPassword)) {
+						
+						BinarySocket.init({
+					        onmessage: function(msg){
+					            var response = JSON.parse(msg.data);
+
+					            if (response) {
+					                var type = response.msg_type;
+					                var error = response.error;
+
+					                if (type === 'new_account_virtual' && !error){
+
+					                    form.setAttribute('action', '/login');
+										form.setAttribute('method', 'POST');
+
+										$('#virtual-form').unbind('submit');
+										form.submit();
+
+					                } else if (type === 'error' || error){
+					                	if (/email address is already in use/.test(error.message)) {
+				                			errorEmail.textContent = Content.localize().textDuplicatedEmail;
+				                		} else if (/required/.test(error.message)) {
+				                			errorEmail.textContent = Content.localize().textTokenMissing;
+				                		} else { 
+				                			errorEmail.textContent = Content.errorMessage('valid', Content.localize().textEmailAddress);
+				                		}
+				                		Validate.displayErrorMessage(errorEmail);
+					                }
+					            }
+					        }
+					    });
+
+					    VirtualAccOpeningData.getDetails(email, password, residence);
+					}
+					
+				});
+			}
+		}
+	};
+});
+;var VirtualAccOpeningData = (function(){
+    "use strict";
+
+    function getDetails(email, password, residence){
+        var req = {
+                    new_account_virtual: 1, 
+                    email: email, 
+                    client_password: password, 
+                    residence: residence, 
+                    verification_code: $.cookie('verify_token')
+                };
+
+        BinarySocket.send(req);
+    }
+
+    return {
+        getDetails: getDetails
+    };
+}());
+;var VirtualAccOpeningUI = (function(){
+    "use strict";
+
+    function setLabel(){
+
+        var labels = document.getElementsByTagName('LABEL');
+        for (var i = 0; i < labels.length; i++) {
+            if (labels[i].htmlFor !== '') {
+                var elem = document.getElementById(labels[i].htmlFor);
+                if (elem)
+                    elem.label = labels[i];         
+            }
+        }
+
+        var details = document.getElementById('details'),
+            email = document.getElementById('email'),
+            btn_submit = document.getElementById('btn_submit'),
+            residence = document.getElementById('residence'),
+            password = document.getElementById('password'),
+            rPassword = document.getElementById('r-password');
+
+        details.textContent = StringUtil.toTitleCase(Content.localize().textDetails);
+        email.label.innerHTML = StringUtil.toTitleCase(Content.localize().textEmailAddress);
+        password.label.innerHTML = StringUtil.toTitleCase(Content.localize().textPassword);
+        rPassword.label.innerHTML = StringUtil.toTitleCase(Content.localize().textRepeatPassword);
+        residence.label.innerHTML = StringUtil.toTitleCase(Content.localize().textResidence);
+        btn_submit.textContent = StringUtil.toTitleCase(Content.localize().textCreateNewAccount);
+    }
+
+    function checkPassword(password, rPassword){
+        var errorPassword = document.getElementById('error-password'),
+            errorRPassword = document.getElementById('error-r-password');
+
+        return Validate.errorMessagePassword(password, rPassword, errorPassword, errorRPassword);
+    }
+
+    return {
+        setLabel: setLabel,
+        checkPassword: checkPassword
     };
 }());
 ;//////////////////////////////////////////////////////////////////
