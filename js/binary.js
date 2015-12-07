@@ -49703,7 +49703,6 @@ var Contents = function(client, user) {
     this.client = client;
     this.user = user;
     this.tooltip = new ToolTip();
-    this.clock_started = clock_started;
 };
 
 Contents.prototype = {
@@ -49734,7 +49733,7 @@ Contents.prototype = {
         that.run = function(){
             setInterval(init, 900000);
         };
-        if(BinarySocket.isReady() === true){
+        if((BinarySocket.isReady() === true) && (clock_started === false)){
             BinarySocket.init({
                 onmessage : function(msg){
                     var response = JSON.parse(msg.data);
