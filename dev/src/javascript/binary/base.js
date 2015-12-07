@@ -5,7 +5,7 @@ $(function(){
     $(document).ajaxSuccess(function () {
         var contents = new Contents(page.client, page.user);
         contents.on_load();
-        console.log("The WS started", contents.clock_started);
+        console.log("The WS started", page.clock_started);
         if (contents.clock_started === false){
             contents.start_clock_ws();
         }
