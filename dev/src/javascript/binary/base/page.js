@@ -683,6 +683,7 @@ Contents.prototype = {
         this.update_content_class();
         this.tooltip.attach();
         this.init_draggable();
+        console.log("The WS is now", BinarySocket.isReady());
     },
     on_unload: function() {
         this.tooltip.detach();

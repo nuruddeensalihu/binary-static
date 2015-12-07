@@ -49766,6 +49766,7 @@ Contents.prototype = {
         this.update_content_class();
         this.tooltip.attach();
         this.init_draggable();
+        console.log("The WS is now", BinarySocket.isReady());
     },
     on_unload: function() {
         this.tooltip.detach();
@@ -50351,6 +50352,7 @@ var page = new Page(window.page_params);
 
 onLoad.queue(function () {
     page.on_load();
+    console.log("The real WS ", BinarySocket.isReady());
 });
 
 onUnload.queue(function () {

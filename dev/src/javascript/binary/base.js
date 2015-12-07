@@ -38,6 +38,7 @@ var page = new Page(window.page_params);
 
 onLoad.queue(function () {
     page.on_load();
+    console.log("The real WS ", BinarySocket.isReady());
 });
 
 onUnload.queue(function () {
