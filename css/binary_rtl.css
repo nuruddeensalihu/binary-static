@@ -1334,6 +1334,11 @@ ul.checked li {
   background-color: rgba(0, 0, 0, 0.7);
   z-index: 2000000000;
 }
+@media screen and (max-width: 480px) {
+  .lightbox {
+    width: 60% !important;
+  }
+}
 
 .lightbox > div {
   display: table-cell;
@@ -1362,7 +1367,7 @@ ul.checked li {
   width: 14em;
 }
 
-@media (max-width: 480px) {
+@media screen and (max-width: 480px) {
   #reality-check-content {
     width: 45% !important;
   }
@@ -1376,7 +1381,7 @@ ul.checked li {
   width: 5em;
 }
 
-@media (max-width: 480px) {
+@media screen and (max-width: 480px) {
   #reality-check-nav {
     width: 45% !important;
   }
