@@ -50481,29 +50481,6 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         });
 
         LocalStore.set('active_loginid', match);
-        
-        var start_time;
-        var tabChanged = function() {
-
-            if (document.hidden || document.webkitHidden) {
-                start_time = new Date().getTime();
-                time_now = page.header.time_now;
-            }else {
-                time_now = ( time_now) + ((new Date().getTime() - start_time));
-                page.header.time_now = time_now;
-            }
-        };
-
-        if (typeof document.webkitHidden !== 'undefined') {
-            if (document.addEventListener) {
-                document.addEventListener("webkitvisibilitychange", tabChanged);
-            }
-        } else if (typeof document.hidden !== 'undefined') {
-            if (document.addEventListener) {
-                document.addEventListener("visibilitychange", tabChanged);
-            }
-        }
-
     });
 }
 ;DatePicker = function(component_id, select_type) {
@@ -63168,21 +63145,6 @@ WSTickDisplay.updateChart = function(data){
         $('#reality-check .blogout').on('click', function () {
             window.location.href = logout_url;
         });
-        
-        var obj = document.getElementById('realityDuration');
-        this.isNumericValue(obj);
-    };
-    //
-    //limit textBox to Numeric Only
-    //
-    RealityCheck.prototype.isNumericValue = function(obj){
-
-        if (obj.hasOwnProperty('oninput') || ('oninput' in obj)) 
-        {
-            $('#realityDuration').on('input', function (event) { 
-                 this.value = this.value.replace(/[^0-9]/g, '');
-            });
-        }
     };
 
     // On session start we need to ask for the reality-check interval.
@@ -63242,10 +63204,6 @@ WSTickDisplay.updateChart = function(data){
         };
         $('#reality-check [bcont=1]').on('click', click_handler);
         $('#reality-check [interval=1]').on('change', click_handler);
-
-
-        var obj = document.getElementById('realityDuration');
-        this.isNumericValue(obj);
     };
 
     return RealityCheck;

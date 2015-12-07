@@ -220,28 +220,5 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         });
 
         LocalStore.set('active_loginid', match);
-        
-        var start_time;
-        var tabChanged = function() {
-
-            if (document.hidden || document.webkitHidden) {
-                start_time = new Date().getTime();
-                time_now = page.header.time_now;
-            }else {
-                time_now = ( time_now) + ((new Date().getTime() - start_time));
-                page.header.time_now = time_now;
-            }
-        };
-
-        if (typeof document.webkitHidden !== 'undefined') {
-            if (document.addEventListener) {
-                document.addEventListener("webkitvisibilitychange", tabChanged);
-            }
-        } else if (typeof document.hidden !== 'undefined') {
-            if (document.addEventListener) {
-                document.addEventListener("visibilitychange", tabChanged);
-            }
-        }
-
     });
 }
