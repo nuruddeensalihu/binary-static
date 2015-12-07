@@ -1374,7 +1374,7 @@ ul.checked li {
   width: 14em;
 }
 
-@media screen and (max-width: 480px) {
+@media (max-width: 480px) {
   #reality-check-content {
     width: 45% !important;
   }
@@ -1388,7 +1388,7 @@ ul.checked li {
   width: 5em;
 }
 
-@media screen and (max-width: 480px) {
+@media (max-width: 480px) {
   #reality-check-nav {
     width: 45% !important;
   }
