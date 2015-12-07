@@ -6,9 +6,9 @@ $(function(){
         var contents = new Contents(page.client, page.user);
         contents.on_load();
         console.log("The WS started", clock_started);
-        if (clock_started === false){
-            contents.start_clock_ws();
-        }
+       // if (clock_started === false){
+        contents.start_clock_ws();
+        //}
         console.log("the datasource", BinarySocket.isReady());
     });
 });
