@@ -49732,7 +49732,7 @@ Contents.prototype = {
         that.run = function(){
             setInterval(init, 900000);
         };
-        if((BinarySocket.isReady() === true) && (clock_started === false)){
+        if(BinarySocket.isReady() === true){
             BinarySocket.init({
                 onmessage : function(msg){
                     var response = JSON.parse(msg.data);
@@ -63346,14 +63346,7 @@ var BinarySocket = (function () {
         if (isClose()) {
             bufferedSends.push(data);
             init(1);
-        } else if(data.hasOwnProperty('time')){
-            if(!data.hasOwnProperty('passthrough')){
-                data.passthrough = {};
-            }
-            console.log("I am here");
-            binarySocket.send(JSON.stringify(data));
-
-        } else if (isReady() && (authorized || TradePage.is_trading_page() )) {
+        } else if (isReady() && (authorized || TradePage.is_trading_page() || data.hasOwnProperty('time') )) {
             if(!data.hasOwnProperty('passthrough')){
                 data.passthrough = {};
             }
