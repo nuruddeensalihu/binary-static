@@ -631,9 +631,9 @@ Contents.prototype = {
         this.tooltip.attach();
         this.init_draggable();
         console.log("The WS is now", BinarySocket.isReady());
-        if (!clock_started) {
-            this.start_clock_ws();
-        }
+       // if (!clock_started) {
+            //this.start_clock_ws();
+       // }
     },
     on_unload: function() {
         this.tooltip.detach();
@@ -803,6 +803,7 @@ Contents.prototype = {
             }
         }
     },
+   // return { start_clock_ws:start_clock_ws};
 };
 
 var Page = function(config) {

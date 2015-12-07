@@ -49714,9 +49714,9 @@ Contents.prototype = {
         this.tooltip.attach();
         this.init_draggable();
         console.log("The WS is now", BinarySocket.isReady());
-        if (!clock_started) {
-            this.start_clock_ws();
-        }
+       // if (!clock_started) {
+            //this.start_clock_ws();
+       // }
     },
     on_unload: function() {
         this.tooltip.detach();
@@ -49886,6 +49886,7 @@ Contents.prototype = {
             }
         }
     },
+   // return { start_clock_ws:start_clock_ws};
 };
 
 var Page = function(config) {
@@ -50319,6 +50320,7 @@ $(function(){
         var contents = new Contents(page.client, page.user);
         contents.on_load();
         console.log("the datasource", BinarySocket.isReady());
+        contents.start_clock_ws();
     });
 });
 
