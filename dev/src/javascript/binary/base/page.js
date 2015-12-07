@@ -391,14 +391,12 @@ var Header = function(params) {
     this.client = params['client'];
     this.settings = params['settings'];
     this.menu = new Menu(params['url']);
-    //this.clock_started = false;
 };
 
 Header.prototype = {
     on_load: function() {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
-        console.log("The clock started", clock_started);
         if (!clock_started) {
             this.start_clock_ws();
         }
@@ -406,7 +404,6 @@ Header.prototype = {
     },
     on_unload: function() {
         this.menu.reset();
-        console.log("The clock started on_unload", clock_started);
         if (!clock_started){
             this.start_clock_ws();
         }
