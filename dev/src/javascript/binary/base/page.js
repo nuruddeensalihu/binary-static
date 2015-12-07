@@ -397,17 +397,10 @@ Header.prototype = {
     on_load: function() {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
-        if (!clock_started) {
-            this.start_clock_ws();
-        }
         this.simulate_input_placeholder_for_ie();
     },
     on_unload: function() {
         this.menu.reset();
-        /*
-        if (!clock_started){
-            this.start_clock_ws();
-        }*/
     },
     show_or_hide_login_form: function() {
         if (this.user.is_logged_in && this.client.is_logged_in) {
@@ -684,6 +677,9 @@ Contents.prototype = {
         this.tooltip.attach();
         this.init_draggable();
         console.log("The WS is now", BinarySocket.isReady());
+        if (!clock_started) {
+            this.start_clock_ws();
+        }
     },
     on_unload: function() {
         this.tooltip.detach();
@@ -839,7 +835,6 @@ Page.prototype = {
             ViewBalance.init();
         }
         $('#current_width').val(get_container_width());//This should probably not be here.
-        console.log("The WS is", BinarySocket.isReady());
     },
     on_unload: function() {
         this.header.on_unload();
