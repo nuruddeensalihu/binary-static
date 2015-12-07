@@ -50488,7 +50488,8 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
             if (document.hidden || document.webkitHidden) {
                 start_time = new Date().getTime();
                 time_now = page.header.time_now;
-                console.log("The moment time is ",moment.utc().unix() + ',' (new Date().getTime()));
+                console.log("The moment time is ",moment.utc().unix());
+                console.log("the date time is ", (new Date().getTime()));
             }else {
                 time_now = ( time_now) + ((new Date().getTime() - start_time));
                 page.header.time_now = time_now;
