@@ -49594,7 +49594,7 @@ Header.prototype = {
             init();
             that.run();
         }
-        return;
+        return{ start_clock_ws : start_clock_ws};
     },
     start_clock: function() {
         var clock = $('#gmt-clock');
