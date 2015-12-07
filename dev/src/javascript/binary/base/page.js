@@ -398,16 +398,16 @@ Header.prototype = {
     on_load: function() {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
-        console.log("The clock started", this.clock_started);
-        if (!this.clock_started) {
+        console.log("The clock started", clock_started);
+        if (!clock_started) {
             this.start_clock_ws();
         }
         this.simulate_input_placeholder_for_ie();
     },
     on_unload: function() {
         this.menu.reset();
-        console.log("The clock started on_unload", this.clock_started);
-        if (!this.clock_started){
+        console.log("The clock started on_unload", clock_started);
+        if (!clock_started){
             this.start_clock_ws();
         }
     },
@@ -482,7 +482,7 @@ Header.prototype = {
         var clock = $('#gmt-clock');
 
         function init(){
-            this.clock_started = true;
+            clock_started = true;
             BinarySocket.send({ "time": 1,"passthrough":{"client_time" :  moment.utc().unix()}});
         }
 
@@ -564,7 +564,7 @@ Header.prototype = {
             sync();
         }, 900000);
 
-        this.clock_started = true;
+        clock_started = true;
         return;
     },
 };
