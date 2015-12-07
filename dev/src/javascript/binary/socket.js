@@ -181,7 +181,6 @@ var BinarySocket = (function () {
     return {
         init: init,
         send: send,
-        isReady : isReady,
         close: close,
         socket: function () { return binarySocket; },
         clear: clear,

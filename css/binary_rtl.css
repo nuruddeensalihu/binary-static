@@ -1362,12 +1362,24 @@ ul.checked li {
   width: 14em;
 }
 
+@media screen and (max-width: 480px) {
+  #reality-check-content {
+    width: 45% !important;
+  }
+}
+
 #reality-check-nav, #balances-nav {
   margin-top: 1em;
 }
 #reality-check-nav span:nth-child(2), #balances-nav span:nth-child(2) {
   display: inline-block;
   width: 5em;
+}
+
+@media screen and (max-width: 480px) {
+  #reality-check-nav {
+    width: 45% !important;
+  }
 }
 
 #tooltip {
