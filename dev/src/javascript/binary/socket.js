@@ -59,8 +59,7 @@ var BinarySocket = (function () {
     };
 
     var send = function(data) {
-        console.log("The data is ", data);
-        console.log("the data has time", data.hasOwnProperty('time'));
+      
         if (isClose()) {
             bufferedSends.push(data);
             init(1);
