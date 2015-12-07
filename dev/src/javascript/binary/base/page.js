@@ -482,40 +482,38 @@ Header.prototype = {
             clock_started = true;
             BinarySocket.send({ "time": 1,"passthrough":{"client_time" :  moment().valueOf()}});
         }
-
-        BinarySocket.init({
-            onmessage : function(msg){
-                var response = JSON.parse(msg.data);
-
-                if (response && response.msg_type === 'time') {
-
-                    var start_timestamp = response.time;
-                    var pass = response.echo_req.passthrough.client_time;
-
-                    that.time_now = ((start_timestamp * 1000) + (moment().valueOf() - pass));
-                     
-                    var increase_time_by = function(interval) {
-                        that.time_now += interval;
-                    };
-                    var update_time = function() {
-                         clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
-                    };
-                    update_time();
-
-                    clearInterval(clock_handle);
-
-                    clock_handle = setInterval(function() {
-                        increase_time_by(1000);
-                        update_time();
-                    }, 1000);
-                }
-            }
-        });
-
         that.run = function(){
             setInterval(init, 900000);
         };
         if(BinarySocket.isReady() === true){
+            BinarySocket.init({
+                onmessage : function(msg){
+                    var response = JSON.parse(msg.data);
+
+                    if (response && response.msg_type === 'time') {
+
+                        var start_timestamp = response.time;
+                        var pass = response.echo_req.passthrough.client_time;
+
+                        that.time_now = ((start_timestamp * 1000) + (moment().valueOf() - pass));
+                         
+                        var increase_time_by = function(interval) {
+                            that.time_now += interval;
+                        };
+                        var update_time = function() {
+                             clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+                        };
+                        update_time();
+
+                        clearInterval(clock_handle);
+
+                        clock_handle = setInterval(function() {
+                            increase_time_by(1000);
+                            update_time();
+                        }, 1000);
+                    }
+                }
+            });
             init();
             that.run();
         }
@@ -839,7 +837,6 @@ Page.prototype = {
             ViewBalance.init();
         }
         $('#current_width').val(get_container_width());//This should probably not be here.
-        console.log("The WS state is", BinarySocket.isReady());
     },
     on_unload: function() {
         this.header.on_unload();
