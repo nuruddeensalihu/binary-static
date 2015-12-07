@@ -398,6 +398,7 @@ Header.prototype = {
     on_load: function() {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
+        console.log("The clock started", this.clock_started);
         if (!this.clock_started) {
             this.start_clock_ws();
         }
@@ -405,6 +406,7 @@ Header.prototype = {
     },
     on_unload: function() {
         this.menu.reset();
+        console.log("The clock started on_unload", this.clock_started);
         if (!this.clock_started){
             this.start_clock_ws();
         }
