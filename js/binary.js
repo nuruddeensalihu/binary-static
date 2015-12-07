@@ -63352,6 +63352,7 @@ var BinarySocket = (function () {
             if(!data.hasOwnProperty('passthrough')){
                 data.passthrough = {};
             }
+            console.log("I am here");
             binarySocket.send(JSON.stringify(data));
 
         } else if (isReady() && (authorized || TradePage.is_trading_page() )) {
