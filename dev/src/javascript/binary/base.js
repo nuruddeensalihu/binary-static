@@ -206,7 +206,7 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         // So, fall back to a more basic solution.
         var match = document.cookie.match(/\bloginid=(\w+)/);
         match = match ? match[1] : '';
-
+        
         $(window).on('storage', function (jq_event) {
             if (jq_event.originalEvent.key !== 'active_loginid') return;
             if (jq_event.originalEvent.newValue === match) return;
@@ -227,6 +227,7 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
             if (document.hidden || document.webkitHidden) {
                 start_time = new Date().getTime();
                 time_now = page.header.time_now;
+                console.log("The moment time is ",moment.utc().unix() + ',' (new Date().getTime()));
             }else {
                 time_now = ( time_now) + ((new Date().getTime() - start_time));
                 page.header.time_now = time_now;
