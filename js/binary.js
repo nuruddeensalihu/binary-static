@@ -63350,7 +63350,7 @@ var BinarySocket = (function () {
     };
 
     var send = function(data) {
-
+        console.log("The data is ", data);
         if (isClose()) {
             bufferedSends.push(data);
             init(1);
