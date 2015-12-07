@@ -49564,6 +49564,7 @@ Header.prototype = {
         function init(){
             clock_started = true;
             BinarySocket.send({ "time": 1,"passthrough":{"client_time" :  moment().valueOf()}});
+            console.log("The times are ", (new Date().getTime()) + ',' + moment().valueOf());
         }
 
         BinarySocket.init({
@@ -49574,7 +49575,9 @@ Header.prototype = {
 
                     var start_timestamp = response.time;
                     var pass = response.echo_req.passthrough.client_time;
+                    console.log("The client_time is", pass);
                     var delay = (moment().valueOf() - pass);
+
 
                     that.time_now = ((start_timestamp * 1000) + delay);
                      
