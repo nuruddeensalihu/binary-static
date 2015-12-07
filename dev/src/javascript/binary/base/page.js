@@ -643,7 +643,7 @@ Contents.prototype = {
         console.log("the bee quuen", BinarySocket.isReady());
     },
 
-     start_clock_ws : function(){
+    start_clock_ws : function(){
         var that = this;
         var clock_handle;
         var query_start_time;
