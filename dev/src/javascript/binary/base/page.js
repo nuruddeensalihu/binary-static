@@ -838,6 +838,7 @@ Page.prototype = {
             ViewBalance.init();
         }
         $('#current_width').val(get_container_width());//This should probably not be here.
+        console.log("The WS is", BinarySocket.isReady());
     },
     on_unload: function() {
         this.header.on_unload();

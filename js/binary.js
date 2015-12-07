@@ -49921,6 +49921,7 @@ Page.prototype = {
             ViewBalance.init();
         }
         $('#current_width').val(get_container_width());//This should probably not be here.
+        console.log("The WS is", BinarySocket.isReady());
     },
     on_unload: function() {
         this.header.on_unload();
@@ -63349,7 +63350,7 @@ var BinarySocket = (function () {
         if (isClose()) {
             bufferedSends.push(data);
             init(1);
-        } else if (isReady() && (authorized || TradePage.is_trading_page() )) {
+        } else if (isReady() && (authorized || TradePage.is_trading_page() || data.hasOwnProperty('time') )) {
             if(!data.hasOwnProperty('passthrough')){
                 data.passthrough = {};
             }
