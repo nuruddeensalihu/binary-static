@@ -49921,6 +49921,7 @@ Page.prototype = {
             ViewBalance.init();
         }
         $('#current_width').val(get_container_width());//This should probably not be here.
+        console.log("the header", BinarySocket.isReady());
     },
     on_unload: function() {
         this.header.on_unload();
@@ -50318,7 +50319,6 @@ $(function(){
         var contents = new Contents(page.client, page.user);
         contents.on_load();
         console.log("the datasource", BinarySocket.isReady());
-        Contents.start_clock_ws();
     });
 });
 

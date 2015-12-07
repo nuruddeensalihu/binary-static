@@ -6,7 +6,6 @@ $(function(){
         var contents = new Contents(page.client, page.user);
         contents.on_load();
         console.log("the datasource", BinarySocket.isReady());
-        Contents.start_clock_ws();
     });
 });
 
