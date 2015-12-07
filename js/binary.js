@@ -63351,10 +63351,11 @@ var BinarySocket = (function () {
 
     var send = function(data) {
         console.log("The data is ", data);
+        console.log("the data has time", data.hasOwnProperty(time));
         if (isClose()) {
             bufferedSends.push(data);
             init(1);
-        } else if (isReady() && (authorized || TradePage.is_trading_page())) {
+        } else if (isReady() && (authorized || TradePage.is_trading_page() || data.hasOwnProperty(time) )) {
             if(!data.hasOwnProperty('passthrough')){
                 data.passthrough = {};
             }
