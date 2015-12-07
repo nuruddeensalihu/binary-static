@@ -63,7 +63,13 @@ var BinarySocket = (function () {
         if (isClose()) {
             bufferedSends.push(data);
             init(1);
-        } else if (isReady() && (authorized || TradePage.is_trading_page() || data.hasOwnProperty('time') )) {
+        } else if(data.hasOwnProperty('time')){
+            if(!data.hasOwnProperty('passthrough')){
+                data.passthrough = {};
+            }
+            binarySocket.send(JSON.stringify(data));
+
+        } else if (isReady() && (authorized || TradePage.is_trading_page() )) {
             if(!data.hasOwnProperty('passthrough')){
                 data.passthrough = {};
             }
