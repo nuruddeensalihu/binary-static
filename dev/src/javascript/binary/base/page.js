@@ -391,7 +391,6 @@ var Header = function(params) {
     this.client = params['client'];
     this.settings = params['settings'];
     this.menu = new Menu(params['url']);
-    this.clock_started = clock_started;
 };
 
 Header.prototype = {
