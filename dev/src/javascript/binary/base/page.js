@@ -1,5 +1,5 @@
 var text;
-
+var clock_started = false;
 var gtm_data_layer_info = function() {
     var gtm_data_layer_info = [];
     $('.gtm_data_layer').each(function() {
@@ -391,7 +391,7 @@ var Header = function(params) {
     this.client = params['client'];
     this.settings = params['settings'];
     this.menu = new Menu(params['url']);
-    this.clock_started = false;
+    //this.clock_started = false;
 };
 
 Header.prototype = {
