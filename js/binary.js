@@ -49732,7 +49732,7 @@ Contents.prototype = {
         that.run = function(){
             setInterval(init, 900000);
         };
-        if(BinarySocket.isReady() === true){
+        if((BinarySocket.isReady() === true) && (clock_started === false)){
             BinarySocket.init({
                 onmessage : function(msg){
                     var response = JSON.parse(msg.data);
