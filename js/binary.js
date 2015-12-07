@@ -49082,7 +49082,7 @@ SubMarket.prototype = {
     };
 })();
 ;var text;
-var clock_started = false;
+
 var gtm_data_layer_info = function() {
     var gtm_data_layer_info = [];
     $('.gtm_data_layer').each(function() {
@@ -49474,22 +49474,18 @@ var Header = function(params) {
     this.client = params['client'];
     this.settings = params['settings'];
     this.menu = new Menu(params['url']);
+    this.clock_started = false;
 };
 
 Header.prototype = {
     on_load: function() {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
-        if (!clock_started) {
-            this.start_clock_ws();
-        }
+        if (!this.clock_started) this.start_clock();
         this.simulate_input_placeholder_for_ie();
     },
     on_unload: function() {
         this.menu.reset();
-        if (!clock_started){
-            this.start_clock_ws();
-        }
     },
     show_or_hide_login_form: function() {
         if (this.user.is_logged_in && this.client.is_logged_in) {
@@ -49555,60 +49551,12 @@ Header.prototype = {
 
         this.menu.register_dynamic_links();
     },
-    start_clock_ws : function(){
-        var that = this;
-        var clock_handle;
-        var query_start_time;
-        var clock = $('#gmt-clock');
-
-        function init(){
-            clock_started = true;
-            BinarySocket.send({ "time": 1,"passthrough":{"client_time" :  moment.utc().unix()}});
-        }
-
-        BinarySocket.init({
-            onmessage : function(msg){
-                var response = JSON.parse(msg.data);
-
-                if (response && response.msg_type === 'time') {
-
-                    var start_timestamp = response.time;
-                    var pass = response.echo_req.passthrough.client_time;
-
-                    that.time_now = ((start_timestamp * 1000) + (moment.utc().unix() - pass));
-                     
-                    var increase_time_by = function(interval) {
-                        that.time_now += interval;
-                    };
-                    var update_time = function() {
-                         clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
-                    };
-                    update_time();
-
-                    clearInterval(clock_handle);
-
-                    clock_handle = setInterval(function() {
-                        increase_time_by(1000);
-                        update_time();
-                    }, 1000);
-                }
-            }
-        });
-
-        that.run = function(){
-            setInterval(init, 900000);
-        };
-        if(BinarySocket.isReady() === true){
-            init();
-            that.run();
-        }
-        return;
-    },
     start_clock: function() {
         var clock = $('#gmt-clock');
         if (clock.length === 0) {
             return;
         }
+
         var that = this;
         var clock_handle;
         var sync = function() {
@@ -49644,7 +49592,7 @@ Header.prototype = {
             sync();
         }, 900000);
 
-        clock_started = true;
+        this.clock_started = true;
         return;
     },
 };
@@ -50533,6 +50481,29 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         });
 
         LocalStore.set('active_loginid', match);
+        
+        var start_time;
+        var tabChanged = function() {
+
+            if (document.hidden || document.webkitHidden) {
+                start_time = new Date().getTime();
+                time_now = page.header.time_now;
+            }else {
+                time_now = ( time_now) + ((new Date().getTime() - start_time));
+                page.header.time_now = time_now;
+            }
+        };
+
+        if (typeof document.webkitHidden !== 'undefined') {
+            if (document.addEventListener) {
+                document.addEventListener("webkitvisibilitychange", tabChanged);
+            }
+        } else if (typeof document.hidden !== 'undefined') {
+            if (document.addEventListener) {
+                document.addEventListener("visibilitychange", tabChanged);
+            }
+        }
+
     });
 }
 ;DatePicker = function(component_id, select_type) {
@@ -63197,6 +63168,21 @@ WSTickDisplay.updateChart = function(data){
         $('#reality-check .blogout').on('click', function () {
             window.location.href = logout_url;
         });
+        
+        var obj = document.getElementById('realityDuration');
+        this.isNumericValue(obj);
+    };
+    //
+    //limit textBox to Numeric Only
+    //
+    RealityCheck.prototype.isNumericValue = function(obj){
+
+        if (obj.hasOwnProperty('oninput') || ('oninput' in obj)) 
+        {
+            $('#realityDuration').on('input', function (event) { 
+                 this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        }
     };
 
     // On session start we need to ask for the reality-check interval.
@@ -63256,6 +63242,10 @@ WSTickDisplay.updateChart = function(data){
         };
         $('#reality-check [bcont=1]').on('click', click_handler);
         $('#reality-check [interval=1]').on('change', click_handler);
+
+
+        var obj = document.getElementById('realityDuration');
+        this.isNumericValue(obj);
     };
 
     return RealityCheck;
@@ -63453,7 +63443,6 @@ var BinarySocket = (function () {
     return {
         init: init,
         send: send,
-        isReady : isReady,
         close: close,
         socket: function () { return binarySocket; },
         clear: clear,
