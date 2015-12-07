@@ -5,8 +5,11 @@ $(function(){
     $(document).ajaxSuccess(function () {
         var contents = new Contents(page.client, page.user);
         contents.on_load();
+        console.log("The WS started", Header.clock_started);
+        if (Header.clock_started === false){
+            Header.start_clock_ws();
+        }
         console.log("the datasource", BinarySocket.isReady());
-        contents.start_clock_ws();
     });
 });
 
