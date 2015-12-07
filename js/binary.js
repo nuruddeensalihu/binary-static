@@ -49563,6 +49563,7 @@ Header.prototype = {
         var clock = $('#gmt-clock');
 
         function init(){
+            this.clock_started = true;
             BinarySocket.send({ "time": 1,"passthrough":{"client_time" :  moment.utc().unix()}});
         }
 
@@ -49601,7 +49602,6 @@ Header.prototype = {
         if(BinarySocket.isReady() === true){
             init();
             that.run();
-            this.clock_started = true;
         }
         return;
     },
