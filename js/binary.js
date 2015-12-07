@@ -49726,7 +49726,6 @@ Contents.prototype = {
         var clock = $('#gmt-clock');
 
         function init(){
-            clock_started = true;
             BinarySocket.send({ "time": 1,"passthrough":{"client_time" :  moment().valueOf()}});
         }
         that.run = function(){
@@ -49758,6 +49757,8 @@ Contents.prototype = {
                             increase_time_by(1000);
                             update_time();
                         }, 1000);
+
+                        clock_started = true;
                     }
                 }
             });
