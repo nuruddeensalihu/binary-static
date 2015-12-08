@@ -49552,14 +49552,12 @@ Header.prototype = {
     start_clock_ws : function(){
         var that = this;
         var clock_handle;
-        var query_start_time;
         var clock = $('#gmt-clock');
 
         function init(){
             clock_started = true;
             BinarySocket.send({ "time": 1,"passthrough":{"client_time" :  moment().valueOf()}});
         }
-
         BinarySocket.init({
             onmessage : function(msg){
                 var response = JSON.parse(msg.data);
@@ -49588,7 +49586,6 @@ Header.prototype = {
                 }
             }
         });
-
         that.run = function(){
             setInterval(init, 900000);
         };
@@ -63401,14 +63398,6 @@ var BinarySocket = (function () {
                 events.onopen();
                 console.log("I am open here");
             }
-
-            if(isReady()=== true){
-                console.log("I Am ready bitch", isReady());
-                console.log("Start clock", clock_started);
-                if (!clock_started) {
-                    page.header.start_clock_ws();
-                }
-            }
         };
 
         binarySocket.onmessage = function (msg){
@@ -63434,6 +63423,13 @@ var BinarySocket = (function () {
 
                 if(typeof events.onmessage === 'function'){
                     events.onmessage(msg);
+                }
+            }
+            if(isReady()=== true){
+                console.log("I Am ready bitch", isReady());
+                console.log("Start clock", clock_started);
+                if (clock_started === false) {
+                    page.header.start_clock_ws();
                 }
             }
         };
