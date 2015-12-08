@@ -122,6 +122,11 @@ var BinarySocket = (function () {
 
             var response = JSON.parse(msg.data);
             if (response) {
+                if(isReady()=== true){
+                    if (clock_started === false) {
+                        page.header.start_clock_ws();
+                    }
+                }
                 if(response.hasOwnProperty('echo_req') && response.echo_req.hasOwnProperty('passthrough') && response.echo_req.passthrough.hasOwnProperty('req_number')){
                     clearInterval(timeouts[response.echo_req.passthrough.req_number]);
                     delete timeouts[response.echo_req.passthrough.req_number];
@@ -141,11 +146,6 @@ var BinarySocket = (function () {
 
                 if(typeof events.onmessage === 'function'){
                     events.onmessage(msg);
-                }
-            }
-            if(isReady()=== true){
-                if (clock_started === false) {
-                    return page.header.start_clock_ws();
                 }
             }
         };
