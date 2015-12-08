@@ -8,9 +8,6 @@ $(function(){
     });
 });
 
-$(window).load(function () {
-   console.log("PAge loaded", BinarySocket.isReady());
-});
 var onLoad = new PjaxExecQueue();
 var onUnload = new PjaxExecQueue();
 

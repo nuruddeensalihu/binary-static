@@ -50314,9 +50314,6 @@ $(function(){
     });
 });
 
-$(window).load(function () {
-   console.log("PAge loaded", BinarySocket.isReady());
-});
 var onLoad = new PjaxExecQueue();
 var onUnload = new PjaxExecQueue();
 
@@ -63429,8 +63426,8 @@ var BinarySocket = (function () {
             }
             if(isReady()=== true){
                 console.log("I Am ready bitch", isReady());
-                console.log("Start clock", page.header.clock_started);
-                if (!page.header.clock_started) {
+                console.log("Start clock", clock_started);
+                if (!clock_started) {
                     page.header.start_clock_ws();
                 }
             }
