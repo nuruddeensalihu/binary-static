@@ -59246,6 +59246,8 @@ onLoad.queue_for_url(function () {
 
         $(":text").each(function(ind,element){
             var ele = $(element).val().replace(/ /g, "");
+            console.log("The data is ", data[ind]);
+
             if(!isNormalInteger(ele) && (ele.length > 0))
             {
                 if(!/EXCLUDEUNTIL/.test($(element).attr("id")))
@@ -59254,7 +59256,16 @@ onLoad.queue_for_url(function () {
                     isValid = false;
                 }
             }
+            if((data[ind] !== ele) && (ele.length < 1 || ele > data[ind] ) )
+            {
+                if(!/EXCLUDEUNTIL/.test($(element).attr("id")))
+                {
+                    $("#error"+$(element).attr("id")).text(text.localize("Please enter a number between 0 and " + data[ind]));
+                    isValid = false;
+                }
+            }
         });
+
         if(validateDate() === false){
             isValid = false;
         }
@@ -59396,7 +59407,6 @@ onLoad.queue_for_url(function () {
     };
 
     var responseMessage = function(response){
-        console.log("The response", response);
         if("error" in response) {
             var  error = response.error;
             switch(error.field){
