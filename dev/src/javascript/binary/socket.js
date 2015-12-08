@@ -146,7 +146,7 @@ var BinarySocket = (function () {
             }
             if(isReady()=== true){
                 if (clock_started === false) {
-                    return page.header.start_clock_ws();
+                    page.header.start_clock_ws();
                 }
             }
         };
