@@ -63400,7 +63400,7 @@ var BinarySocket = (function () {
                 console.log("I Am ready bitch", isReady());
                 console.log("Start clock", page.header.clock_started);
                 if (!page.header.clock_started) {
-                    page.header.start_clock_ws();
+                    //page.header.start_clock_ws();
                 }
             }
         };
