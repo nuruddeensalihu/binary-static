@@ -169,7 +169,7 @@ var BinarySocket = (function () {
         };
     };
 
-    start_clock_ws = function(){
+    var start_clock_ws = function(){
         var that = this;
         var clock_handle;
         var query_start_time;
