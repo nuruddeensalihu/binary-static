@@ -513,6 +513,7 @@ Header.prototype = {
         init();
         that.run();
         
+        return;
     },
     start_clock: function() {
         var clock = $('#gmt-clock');
