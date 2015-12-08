@@ -31,6 +31,7 @@ var SelfExlusionWS = (function(){
         $(":text").each(function(ind,element){
             var ele = $(element).val().replace(/ /g, "");
             console.log("The data is 123", data);
+            console.log("The index is", ind);
             console.log("The data is ", data[ind]);
 
             if(!isNormalInteger(ele) && (ele.length > 0))
