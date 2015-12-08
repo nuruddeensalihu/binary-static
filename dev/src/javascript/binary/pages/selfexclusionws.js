@@ -250,6 +250,7 @@ var SelfExlusionWS = (function(){
     return {
         init: init,
         apiResponse: apiResponse,
+        data : data,
         populateForm : populateForm
     };
 })();

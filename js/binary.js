@@ -59466,6 +59466,7 @@ onLoad.queue_for_url(function () {
     return {
         init: init,
         apiResponse: apiResponse,
+        data : data,
         populateForm : populateForm
     };
 })();
