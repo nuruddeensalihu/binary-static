@@ -59256,11 +59256,12 @@ onLoad.queue_for_url(function () {
                 }
             }
             console.log("The real data are", data[Object.keys(data)[ind]]);
-            if(( data[Object.keys(data)[ind]] !== ele) && (ele.length < 1 || ele > parseInt[data[Object.keys(data)[ind]]] ) )
+            console.log("The elements are", ele);
+            if((data[Object.keys(data)[ind]] !== ele) && ( (ele.length < 1) || (ele > parseInt[data[Object.keys(data)[ind]]]) ) )
             {
                 if(!/EXCLUDEUNTIL/.test($(element).attr("id")))
                 {
-                    $("#error"+$(element).attr("id")).text(text.localize("Please enter a number between 0 and " + data[ind]));
+                    $("#error"+$(element).attr("id")).text(text.localize("Please enter a number between 0 and " + data[Object.keys(data)[ind]]));
                     isValid = false;
                 }
             }
