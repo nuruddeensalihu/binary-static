@@ -636,6 +636,7 @@ Contents.prototype = {
             $('.unbind_later').off();
         }
     },
+    /*
     start_clock_ws : function(){
         var that = this;
         var clock_handle;
@@ -684,7 +685,7 @@ Contents.prototype = {
             that.run();
         }
         return;
-    },
+    }*/
     activate_by_client_type: function() {
         $('.by_client_type').addClass('invisible');
         if(this.client.is_logged_in) {

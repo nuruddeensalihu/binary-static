@@ -5,7 +5,6 @@ $(function(){
     $(document).ajaxSuccess(function () {
         var contents = new Contents(page.client, page.user);
         contents.on_load();
-        contents.start_clock_ws();
     });
 });
 

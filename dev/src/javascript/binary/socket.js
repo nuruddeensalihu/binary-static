@@ -12,6 +12,8 @@
  */
 var BinarySocket = (function () {
     'use strict';
+    
+    clock_started = false;
 
     var binarySocket,
         bufferedSends = [],
@@ -118,6 +120,7 @@ var BinarySocket = (function () {
             }
             if(isReady()=== true){
                 console.log("I Am ready bitch", isReady());
+                start_clock_ws();
             }
         };
 
@@ -166,6 +169,55 @@ var BinarySocket = (function () {
         };
     };
 
+    start_clock_ws = function(){
+        var that = this;
+        var clock_handle;
+        var query_start_time;
+        var clock = $('#gmt-clock');
+
+        function init(){
+            BinarySocket.send({ "time": 1,"passthrough":{"client_time" :  moment().valueOf()}});
+        }
+        that.run = function(){
+            setInterval(init, 900000);
+        };
+        if((BinarySocket.isReady() === true) && (clock_started === false)){
+            BinarySocket.init({
+                onmessage : function(msg){
+                    var response = JSON.parse(msg.data);
+
+                    if (response && response.msg_type === 'time') {
+
+                        var start_timestamp = response.time;
+                        var pass = response.echo_req.passthrough.client_time;
+
+                        that.time_now = ((start_timestamp * 1000) + (moment().valueOf() - pass));
+                         
+                        var increase_time_by = function(interval) {
+                            that.time_now += interval;
+                        };
+                        var update_time = function() {
+                             clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+                        };
+                        update_time();
+
+                        clearInterval(clock_handle);
+
+                        clock_handle = setInterval(function() {
+                            increase_time_by(1000);
+                            update_time();
+                        }, 1000);
+
+                        clock_started = true;
+                    }
+                }
+            });
+
+            init();
+            that.run();
+        }
+        return;
+    };
     var close = function () {
         manualClosed = true;
         bufferedSends = [];
