@@ -509,11 +509,10 @@ Header.prototype = {
         that.run = function(){
             setInterval(init, 900000);
         };
-        if(BinarySocket.isReady() === true){
-            init();
-            that.run();
-        }
-        return;
+        
+        init();
+        that.run();
+        
     },
     start_clock: function() {
         var clock = $('#gmt-clock');
