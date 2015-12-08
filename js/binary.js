@@ -63395,12 +63395,13 @@ var BinarySocket = (function () {
 
             if(typeof events.onopen === 'function'){
                 events.onopen();
+                console.log("I am open here");
             }
             if(isReady()=== true){
                 console.log("I Am ready bitch", isReady());
                 console.log("Start clock", page.header.clock_started);
                 if (!page.header.clock_started) {
-                    //page.header.start_clock_ws();
+                    page.header.start_clock_ws();
                 }
             }
         };
