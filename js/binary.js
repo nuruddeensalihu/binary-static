@@ -59246,9 +59246,6 @@ onLoad.queue_for_url(function () {
 
         $(":text").each(function(ind,element){
             var ele = $(element).val().replace(/ /g, "");
-            console.log("The data is 123", data);
-            console.log("The index is", ind);
-            console.log("The data is ", data[ind]);
 
             if(!isNormalInteger(ele) && (ele.length > 0))
             {
@@ -59258,7 +59255,8 @@ onLoad.queue_for_url(function () {
                     isValid = false;
                 }
             }
-            if((data[ind] !== ele) && (ele.length < 1 || ele > data[ind] ) )
+            console.log("The real data are", data[Object.keys(data)[ind]]);
+            if(( data[Object.keys(data)[ind]] !== ele) && (ele.length < 1 || ele > parseInt[data[Object.keys(data)[ind]]] ) )
             {
                 if(!/EXCLUDEUNTIL/.test($(element).attr("id")))
                 {
