@@ -63460,7 +63460,7 @@ var BinarySocket = (function () {
         function init(){
             BinarySocket.send({ "time": 1,"passthrough":{"client_time" :  moment().valueOf()}});
         }
-        that.run = function(){
+        var run = function(){
             setInterval(init, 900000);
         };
         if((BinarySocket.isReady() === true) && (clock_started === false)){
@@ -63496,7 +63496,7 @@ var BinarySocket = (function () {
             });
 
             init();
-            that.run();
+            run();
         }
         return;
     };
