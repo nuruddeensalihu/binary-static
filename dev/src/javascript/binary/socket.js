@@ -117,13 +117,6 @@ var BinarySocket = (function () {
                 events.onopen();
                 console.log("I am open here");
             }
-            if(isReady()=== true){
-                console.log("I Am ready bitch", isReady());
-                console.log("Start clock", page.header.clock_started);
-                if (!page.header.clock_started) {
-                    return page.header.start_clock_ws();
-                }
-            }
         };
 
         binarySocket.onmessage = function (msg){
@@ -149,6 +142,13 @@ var BinarySocket = (function () {
 
                 if(typeof events.onmessage === 'function'){
                     events.onmessage(msg);
+                }
+            }
+            if(isReady()=== true){
+                console.log("I Am ready bitch", isReady());
+                console.log("Start clock", page.header.clock_started);
+                if (!page.header.clock_started) {
+                    page.header.start_clock_ws();
                 }
             }
         };
