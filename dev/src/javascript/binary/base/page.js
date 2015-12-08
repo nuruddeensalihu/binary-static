@@ -475,6 +475,7 @@ Header.prototype = {
             clock_started = true;
             BinarySocket.send({ "time": 1,"passthrough":{"client_time" :  moment().valueOf()}});
         }
+
         BinarySocket.init({
             onmessage : function(msg){
                 var response = JSON.parse(msg.data);
@@ -503,6 +504,7 @@ Header.prototype = {
                 }
             }
         });
+
         that.run = function(){
             setInterval(init, 900000);
         };
