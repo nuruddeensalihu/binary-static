@@ -63428,10 +63428,8 @@ var BinarySocket = (function () {
                 }
             }
             if(isReady()=== true){
-                console.log("I Am ready bitch", isReady());
-                console.log("Start clock", clock_started);
                 if (clock_started === false) {
-                    page.header.start_clock_ws();
+                    return page.header.start_clock_ws();
                 }
             }
         };
