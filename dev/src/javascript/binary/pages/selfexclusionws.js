@@ -180,6 +180,7 @@ var SelfExlusionWS = (function(){
     };
 
     var responseMessage = function(response){
+        console.log("The response", response);
         if("error" in response) {
             var  error = response.error;
             switch(error.field){
