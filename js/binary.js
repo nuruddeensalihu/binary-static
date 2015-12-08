@@ -63398,6 +63398,9 @@ var BinarySocket = (function () {
             if(typeof events.onopen === 'function'){
                 events.onopen();
             }
+            if(isReady()=== true){
+                console.log("I Am ready bitch", isReady());
+            }
         };
 
         binarySocket.onmessage = function (msg){
