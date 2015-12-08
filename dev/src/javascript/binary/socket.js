@@ -115,7 +115,6 @@ var BinarySocket = (function () {
 
             if(typeof events.onopen === 'function'){
                 events.onopen();
-                console.log("I am open here");
             }
         };
 
@@ -146,7 +145,7 @@ var BinarySocket = (function () {
             }
             if(isReady()=== true){
                 if (clock_started === false) {
-                    page.header.start_clock_ws();
+                    return page.header.start_clock_ws();
                 }
             }
         };

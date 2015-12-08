@@ -1374,12 +1374,24 @@ ul.checked li {
   width: 14em;
 }
 
+@media screen and (max-width: 480px) {
+  #reality-check-content {
+    width: 45% !important;
+  }
+}
+
 #reality-check-nav, #balances-nav {
   margin-top: 1em;
 }
 #reality-check-nav span:nth-child(2), #balances-nav span:nth-child(2) {
   display: inline-block;
   width: 5em;
+}
+
+@media screen and (max-width: 480px) {
+  #reality-check-nav {
+    width: 45% !important;
+  }
 }
 
 #tooltip {
@@ -5989,15 +6001,14 @@ body.ID .extra-space {
   }
 }
 
-/*Italian Language */
-body.IT #legal-tab li.tm-li-2 {
+body.IT #legal-tab li.tm-li-2, body.DE #legal-tab li.tm-li-2 {
   margin-right: 0px !important;
   padding: 0 8px !important;
 }
-body.IT a, body.IT button, body.IT .button, body.IT span, body.IT input {
+body.IT a, body.IT button, body.IT .button, body.IT span, body.IT input, body.DE a, body.DE button, body.DE .button, body.DE span, body.DE input {
   text-transform: initial !important;
 }
-body.IT h1, body.IT h2, body.IT h3, body.IT h4, body.IT h5, body.IT h6 {
+body.IT h1, body.IT h2, body.IT h3, body.IT h4, body.IT h5, body.IT h6, body.DE h1, body.DE h2, body.DE h3, body.DE h4, body.DE h5, body.DE h6 {
   text-transform: initial !important;
 }
 
@@ -6013,14 +6024,10 @@ body.RU #trading_socket_container .contract_heading {
   padding-top: 2.7em;
 }
 
-body.DE #legal-tab li.tm-li-2 {
-  margin-right: 0px !important;
-  padding: 0 8px !important;
-}
-body.DE a, body.DE button, body.DE .button, body.DE span, body.DE input {
+body.PT a, body.PT button, body.PT .button, body.PT span, body.PT input {
   text-transform: initial !important;
 }
-body.DE h1, body.DE h2, body.DE h3, body.DE h4, body.DE h5, body.DE h6 {
+body.PT h1, body.PT h2, body.PT h3, body.PT h4, body.PT h5, body.PT h6 {
   text-transform: initial !important;
 }
 
