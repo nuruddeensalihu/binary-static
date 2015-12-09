@@ -49915,7 +49915,7 @@ Page.prototype = {
             ViewBalance.init();
         }
         $('#current_width').val(get_container_width());//This should probably not be here.
-        cosnole.log("The rady state is", document.readyState);
+        console.log("The rady state is", document.readyState);
     },
     on_unload: function() {
         this.header.on_unload();
