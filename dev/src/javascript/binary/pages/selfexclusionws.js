@@ -68,6 +68,7 @@ var SelfExlusionWS = (function(){
                     $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.session_duration_limit ));
                     isValid = false;
                 } else if(id === ("EXCLUDEUNTIL")){
+                    console.log("The id is here", id);
                     isValid = validateDate();
                 } 
             }
