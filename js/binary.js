@@ -55754,9 +55754,10 @@ BetForm.Time.EndTime.prototype = {
                     }
                 }
 
-                var final = [text_arr[0]];
-                if(typeof text_arr[1] !== 'undefined'){
-                    final.push(text_arr[1]);
+                var final = [text_arr[0],text_arr[1]];
+                if(typeof text_arr[2] !== 'undefined'){
+                    final.push(text_arr[2]);
+                    final.push(text_arr[3]);
                 }
 
                 container.text(final.join(' '));
@@ -63465,12 +63466,12 @@ var BinarySocket = (function () {
             if(typeof events.onopen === 'function'){
                 events.onopen();
             }
-            /*
+
             if(isReady()=== true){
                 if (clock_started === false) {
                     page.header.start_clock_ws();
                 }
-            }*/
+            }
         };
 
         binarySocket.onmessage = function (msg){
@@ -63492,7 +63493,9 @@ var BinarySocket = (function () {
                     sendBufferedSends();
                 } else if (type === 'balance') {
                     ViewBalanceUI.updateBalances(response.balance);
-                } 
+                } else if(type ==='time'){
+                    page.header.time_counter(response);
+                }
 
                 if(typeof events.onmessage === 'function'){
                     events.onmessage(msg);
