@@ -833,7 +833,7 @@ Page.prototype = {
         }
         $('#current_width').val(get_container_width());//This should probably not be here.
         console.log("The rady state is", document.readyState);
-        $(document).on('readystatechange', readyStateChanged); 
+        $(document).on('readystatechange', this.readyStateChanged); 
     },
     on_unload: function() {
         this.header.on_unload();
