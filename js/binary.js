@@ -50326,7 +50326,7 @@ $(function(){
     });
 });
 
-$(window).load(function() {
+$(document).load(function() {
  // executes when complete page is fully loaded, including all frames, objects and images
     console.log("window is loaded");
     console.log("The log state in action");
