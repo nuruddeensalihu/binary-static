@@ -116,15 +116,15 @@ var BinarySocket = (function () {
             if(typeof events.onopen === 'function'){
                 events.onopen();
             }
-        };
 
-        binarySocket.onmessage = function (msg){
-            /*
             if(isReady()=== true){
                 if (clock_started === false) {
                     page.header.start_clock_ws();
                 }
-            }*/
+            }
+        };
+
+        binarySocket.onmessage = function (msg){
 
             var response = JSON.parse(msg.data);
             if (response) {
@@ -143,6 +143,8 @@ var BinarySocket = (function () {
                     sendBufferedSends();
                 } else if (type === 'balance') {
                     ViewBalanceUI.updateBalances(response.balance);
+                } else if(type ==='time'){
+                    page.header.time_counter(response);
                 }
 
                 if(typeof events.onmessage === 'function'){
