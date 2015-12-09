@@ -49916,14 +49916,11 @@ Page.prototype = {
         }
         $('#current_width').val(get_container_width());//This should probably not be here.
         console.log("The rady state is", document.readyState);
-
-        document.onreadystatechange = function(){
-            if(document.readyState === 'complete'){
-                console.log("the ready state is ", document.readyState);
-                console.log("the page is ", document.location);
-                console.log("the WS status is", BinarySocket.isReady());
-            }
-        }
+        $(window).load(function() {
+            console.log("The log state in action");
+            console.log("Is the WS ready ? ", BinarySocket.isReady());
+              
+        });
     },
     on_unload: function() {
         this.header.on_unload();
@@ -49935,6 +49932,17 @@ Page.prototype = {
             var language = $(this).find('option:selected').attr('class');
             document.location = that.url_for_language(language);
         });
+    },
+    on_readystate_change : function(){
+        document.onreadystatechange = function(){
+            if(document.readyState === 'complete'){
+                console.log("the ready state is ", document.readyState);
+                console.log("the page is ", document.location);
+                console.log("the WS status is", BinarySocket.isReady());
+            }
+
+        }
+
     },
     on_change_loginid: function() {
         var that = this;
