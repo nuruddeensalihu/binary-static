@@ -50567,15 +50567,7 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
             }
         }
 
-       
-
     });
-    $(document).on('readystatechange', readyStateChanged); 
-    function readyStateChanged(){
-        console.log("The ready state", document.readyState);
-        console.log("The WS status is",BinarySocket.isReady());
-
-    }
 }
 ;DatePicker = function(component_id, select_type) {
     this.component_id = component_id;
@@ -63503,6 +63495,12 @@ var BinarySocket = (function () {
 
         binarySocket.onmessage = function (msg){
 
+            if(isReady()=== true){
+                if (clock_started === false) {
+                    page.header.start_clock_ws();
+                }
+            }
+
             var response = JSON.parse(msg.data);
             if (response) {
                 if(response.hasOwnProperty('echo_req') && response.echo_req.hasOwnProperty('passthrough') && response.echo_req.passthrough.hasOwnProperty('req_number')){
@@ -63524,11 +63522,6 @@ var BinarySocket = (function () {
 
                 if(typeof events.onmessage === 'function'){
                     events.onmessage(msg);
-                }
-            }
-            if(isReady()=== true){
-                if (clock_started === false) {
-                    page.header.start_clock_ws();
                 }
             }
         };
