@@ -50567,7 +50567,15 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
             }
         }
 
+       
+
     });
+    $(document).on('readystatechange', readyStateChanged); 
+    function readyStateChanged(){
+        console.log("The ready state", document.readyState);
+        console.log("The WS status is",BinarySocket.isReady());
+
+    }
 }
 ;DatePicker = function(component_id, select_type) {
     this.component_id = component_id;
