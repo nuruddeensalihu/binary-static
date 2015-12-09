@@ -72,10 +72,10 @@ var SelfExlusionWS = (function(){
                 } 
             }
         });
-
+        /*
         if(validateDate() ===false){
             isValid = false;
-        }
+        }*/
 
         if(isValid === false){
 

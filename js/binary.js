@@ -59288,10 +59288,10 @@ onLoad.queue_for_url(function () {
                 } 
             }
         });
-
+        /*
         if(validateDate() ===false){
             isValid = false;
-        }
+        }*/
 
         if(isValid === false){
 
