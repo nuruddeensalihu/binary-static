@@ -59246,7 +59246,7 @@ onLoad.queue_for_url(function () {
 
         $(":text").each(function(ind,element){
             var ele = $(element).val().replace(/ /g, "");
-
+       
             if(!isNormalInteger(ele) && (ele.length > 0))
             {
                 if(!/EXCLUDEUNTIL/.test($(element).attr("id")))
@@ -59257,24 +59257,22 @@ onLoad.queue_for_url(function () {
             }
             console.log("The real data are", data[Object.keys(data)[ind]]);
             console.log("The elements are", ele);
-               
+            
              
-            data.max_balance = $("#MAXCASHBAL").val();
-            data.max_turnover = $("#DAILYTURNOVERLIMIT").val();
-            data.max_losses = $("#DAILYLOSSLIMIT").val();
-            data.max_7day_turnover = $("#7DAYTURNOVERLIMIT").val();
-            data.max_7day_losses = $("#7DAYLOSSLIMIT").val();
-            data.max_30day_turnover = $("#30DAYTURNOVERLIMIT").val();
-            data.max_30day_losses = $("#30DAYLOSSLIMIT").val();
-            data.max_open_bets = $("#MAXOPENPOS").val();
-            data.session_duration_limit =  $("#SESSIONDURATION").val();
-            data.exclude_until = $("#EXCLUDEUNTIL").val();
+
 
             var id = $(element).attr("id");
 
             console.log("The id is", id);
 
-            if(id ===("MAXCASHBAL") && ((ele > data.max_balance) || ele.length < 1) ){
+            if(data.max_balance > 0 ){
+                console.log("Goood");
+            }
+            if( ele > 0){
+                console.log("BAd");
+            }
+
+            if(id ===("MAXCASHBAL") && (ele > data.max_balance || (ele.length < 1 && data.max_balance > 0) ) ){
                 $("#error"+$(element).attr("id")).text(text.localize("Please enter a number between 0 and " + data.max_balance ));
                 isValid = false;
             } else if(id === ("DAILYTURNOVERLIMIT") && ((parseInt(ele) > parseInt(data.max_turnover)) || ele.length < 1) ){
