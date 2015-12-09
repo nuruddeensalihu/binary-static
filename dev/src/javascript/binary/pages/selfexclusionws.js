@@ -27,10 +27,16 @@ var SelfExlusionWS = (function(){
         $("p.errorfield").each(function(ind,element){
             $(element).text("");
         });
-
+   
         $(":text").each(function(ind,element){
             var ele = $(element).val().replace(/ /g, "");
             var id = $(element).attr("id");
+
+            if(id = "SESSIONDURATION"){
+                console.log("ele is greather ",(ele > data.SESSIONDURATION) )
+                console.log("SESSIONDURATION is", data.SESSIONDURATION);
+                console.log("With conversion",(parseInt(ele) > data.SESSIONDURATION));
+            }
        
             if(!isNormalInteger(ele) && (ele.length > 0))
             {
@@ -42,31 +48,31 @@ var SelfExlusionWS = (function(){
             }else{
 
                 if(id ===("MAXCASHBAL") && ((ele > data.max_balance && data.max_balance > 0) || (ele.length < 1 && data.max_balance > 0) ) ){
-                    $("#error"+$(element).attr("id")).text(text.localize("Please enter a number between 0 and " + data.max_balance ));
+                    $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.max_balance ));
                     isValid = false;
                 } else if(id === ("DAILYTURNOVERLIMIT") && ((ele > data.max_turnover &&  data.max_turnover > 0) || (ele.length < 1 &&  data.max_turnover > 0) ) ){
-                    $("#error"+$(element).attr("id")).text(text.localize("Please enter a number between 0 and " + data.max_turnover ));
+                    $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.max_turnover ));
                     isValid = false;
                 } else if(id === ("DAILYLOSSLIMIT") && ((ele > data.DAILYLOSSLIMIT && data.DAILYLOSSLIMIT > 0) || (ele.length < 1 && data.DAILYLOSSLIMIT > 0) ) ){
-                    $("#error"+$(element).attr("id")).text(text.localize("Please enter a number between 0 and " + data.DAILYLOSSLIMIT ));
+                    $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.DAILYLOSSLIMIT ));
                     isValid = false;
                 } else if(id === ("7DAYTURNOVERLIMIT") && ((ele > data.max_7day_turnover && data.max_7day_turnover > 0 ) || (ele.length < 1 && data.max_7day_turnover > 0 ) ) ){
-                    $("#error"+$(element).attr("id")).text(text.localize("Please enter a number between 0 and " + data.max_7day_turnover ));
+                    $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.max_7day_turnover ));
                     isValid = false;
                 } else if(id === ("7DAYLOSSLIMIT") && ((ele > data.max_7day_losses && data.max_7day_losses > 0) || (ele.length < 1 && data.max_7day_losses > 0 ) ) ){
-                    $("#error"+$(element).attr("id")).text(text.localize("Please enter a number between 0 and " + data.max_7day_losses ));
+                    $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.max_7day_losses ));
                     isValid = false;
                 }  else if(id === ("30DAYTURNOVERLIMIT") && ((ele > data.max_30day_turnover && data.max_30day_turnover > 0) || (ele.length < 1 && data.max_30day_turnover > 0 ) ) ){
-                    $("#error"+$(element).attr("id")).text(text.localize("Please enter a number between 0 and " + data.max_30day_turnover ));
+                    $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.max_30day_turnover ));
                     isValid = false;
                 } else if(id === ("30DAYLOSSLIMIT") && ((ele > data.max_30day_losses && data.max_30day_losses > 0) || (ele.length < 1 && data.max_30day_losses > 0 ) ) ){
-                    $("#error"+$(element).attr("id")).text(text.localize("Please enter a number between 0 and " + data.max_30day_losses ));
+                    $("#error"+$id).text(text.localize("Please enter a number between 0 and " + data.max_30day_losses ));
                     isValid = false;
                 }  else if(id === ("MAXOPENPOS") && ((ele > data.MAXOPENPOS && data.MAXOPENPOS > 0 ) || (ele.length < 1 && data.MAXOPENPOS > 0 ) ) ){
-                    $("#error"+$(element).attr("id")).text(text.localize("Please enter a number between 0 and " + data.MAXOPENPOS ));
+                    $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.MAXOPENPOS ));
                     isValid = false;
                 } else if(id === ("SESSIONDURATION") && ((ele > data.SESSIONDURATION && data.SESSIONDURATION > 0 ) || (ele.length < 1 && data.SESSIONDURATION > 0) ) ){
-                    $("#error"+$(element).attr("id")).text(text.localize("Please enter a number between 0 and " + data.SESSIONDURATION ));
+                    $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.SESSIONDURATION ));
                     isValid = false;
                 }
                 else if(id === ("EXCLUDEUNTIL") && validateDate() ===false){
