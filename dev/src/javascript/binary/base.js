@@ -8,6 +8,12 @@ $(function(){
     });
 });
 
+$(window).load(function() {
+ // executes when complete page is fully loaded, including all frames, objects and images
+    console.log("window is loaded");
+    console.log("The log state in action");
+    console.log("Is the WS ready ? ", BinarySocket.isReady());
+});
 var onLoad = new PjaxExecQueue();
 var onUnload = new PjaxExecQueue();
 

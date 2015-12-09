@@ -49916,11 +49916,6 @@ Page.prototype = {
         }
         $('#current_width').val(get_container_width());//This should probably not be here.
         console.log("The rady state is", document.readyState);
-        $(window).load(function() {
-            console.log("The log state in action");
-            console.log("Is the WS ready ? ", BinarySocket.isReady());
-              
-        });
     },
     on_unload: function() {
         this.header.on_unload();
@@ -49940,7 +49935,7 @@ Page.prototype = {
                 console.log("the page is ", document.location);
                 console.log("the WS status is", BinarySocket.isReady());
             }
-
+             
         }
 
     },
@@ -50331,6 +50326,12 @@ $(function(){
     });
 });
 
+$(window).load(function() {
+ // executes when complete page is fully loaded, including all frames, objects and images
+    console.log("window is loaded");
+    console.log("The log state in action");
+    console.log("Is the WS ready ? ", BinarySocket.isReady());
+});
 var onLoad = new PjaxExecQueue();
 var onUnload = new PjaxExecQueue();
 
