@@ -59246,6 +59246,7 @@ onLoad.queue_for_url(function () {
 
         $(":text").each(function(ind,element){
             var ele = $(element).val().replace(/ /g, "");
+            var id = $(element).attr("id");
        
             if(!isNormalInteger(ele) && (ele.length > 0))
             {
