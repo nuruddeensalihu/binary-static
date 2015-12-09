@@ -59283,18 +59283,13 @@ onLoad.queue_for_url(function () {
                 } else if(id === ("SESSIONDURATION") && ((ele > data.session_duration_limit && data.session_duration_limit > 0 ) || (ele.length < 1 && data.session_duration_limit > 0) ) ){
                     $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.session_duration_limit ));
                     isValid = false;
-                } else if(id === ("EXCLUDEUNTIL") ){
-                    if(validateDate() ===false){
-                        isValid = false;
-                    }
-                    console.log("The id is here", id);
                 } 
             }
         });
-        /*
+
         if(validateDate() ===false){
             isValid = false;
-        }*/
+        }
 
         if(isValid === false){
 
