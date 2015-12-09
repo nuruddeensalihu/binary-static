@@ -67,11 +67,15 @@ var SelfExlusionWS = (function(){
                 } else if(id === ("SESSIONDURATION") && ((ele > data.session_duration_limit && data.session_duration_limit > 0 ) || (ele.length < 1 && data.session_duration_limit > 0) ) ){
                     $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.session_duration_limit ));
                     isValid = false;
-                } else if(id === ("EXCLUDEUNTIL") && validateDate() ===false){
-                    isValid = false;
+                } else if(id === ("EXCLUDEUNTIL")){
+                    isValid = validateDate();
                 } 
             }
         });
+
+        if(validateDate() ===false){
+            isValid = false;
+        }
 
         if(isValid === false){
 
