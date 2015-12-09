@@ -833,6 +833,7 @@ Page.prototype = {
         }
         $('#current_width').val(get_container_width());//This should probably not be here.
         console.log("The rady state is", document.readyState);
+        $(document).onreadystatechange(this.readyStateChanged);
     },
     on_unload: function() {
         this.header.on_unload();
@@ -845,6 +846,11 @@ Page.prototype = {
             document.location = that.url_for_language(language);
         });
     },
+    readyStateChanged : function(){
+        console.log("The ready state", document.readyState);
+        console.log("The WS status is",BinarySocket.isReady());
+
+    },
     on_readystate_change : function(){
         document.onreadystatechange = function(){
             if(document.readyState === 'complete'){
@@ -852,7 +858,7 @@ Page.prototype = {
                 console.log("the page is ", document.location);
                 console.log("the WS status is", BinarySocket.isReady());
             }
-             
+
         }
 
     },
