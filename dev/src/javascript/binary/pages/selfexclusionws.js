@@ -59,7 +59,7 @@ var SelfExlusionWS = (function(){
                     $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.max_30day_turnover ));
                     isValid = false;
                 } else if(id === ("30DAYLOSSLIMIT") && ((ele > data.max_30day_losses && data.max_30day_losses > 0) || (ele.length < 1 && data.max_30day_losses > 0 ) ) ){
-                    $("#error"+$id).text(text.localize("Please enter a number between 0 and " + data.max_30day_losses ));
+                    $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.max_30day_losses ));
                     isValid = false;
                 }  else if(id === ("MAXOPENPOS") && ((ele > data.max_open_bets && data.max_open_bets > 0 ) || (ele.length < 1 && data.max_open_bets > 0 ) ) ){
                     $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.max_open_bets ));
@@ -67,8 +67,7 @@ var SelfExlusionWS = (function(){
                 } else if(id === ("SESSIONDURATION") && ((ele > data.session_duration_limit && data.session_duration_limit > 0 ) || (ele.length < 1 && data.session_duration_limit > 0) ) ){
                     $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.session_duration_limit ));
                     isValid = false;
-                }
-                else if(id === ("EXCLUDEUNTIL") && validateDate() ===false){
+                } else if(id === ("EXCLUDEUNTIL") && validateDate() ===false){
                     isValid = false;
                 } 
             }
