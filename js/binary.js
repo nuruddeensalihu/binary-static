@@ -59247,12 +59247,6 @@ onLoad.queue_for_url(function () {
         $(":text").each(function(ind,element){
             var ele = $(element).val().replace(/ /g, "");
             var id = $(element).attr("id");
-
-            if(id === "SESSIONDURATION"){
-                console.log("ele is greather ",(ele > data.session_duration_limit) )
-                console.log("SESSIONDURATION is", data.session_duration_limit);
-                console.log("With conversion",(parseInt(ele) > data.session_duration_limit));
-            }
        
             if(!isNormalInteger(ele) && (ele.length > 0))
             {
@@ -59295,10 +59289,7 @@ onLoad.queue_for_url(function () {
                 } 
             }
         });
-        /*
-        if(validateDate() === false){
-            isValid = false;
-        }*/
+
         if(isValid === false){
 
             return false;
@@ -59495,7 +59486,6 @@ onLoad.queue_for_url(function () {
     return {
         init: init,
         apiResponse: apiResponse,
-        data : data,
         populateForm : populateForm
     };
 })();
