@@ -833,6 +833,14 @@ Page.prototype = {
         }
         $('#current_width').val(get_container_width());//This should probably not be here.
         console.log("The rady state is", document.readyState);
+
+        document.onreadystatechange = function(){
+            if(document.readyState === 'complete'){
+                console.log("the ready state is ", document.readyState);
+                console.log("the page is ", document.location);
+                console.log("the WS status is", BinarySocket.isReady());
+            }
+        }
     },
     on_unload: function() {
         this.header.on_unload();
