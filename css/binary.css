@@ -1374,12 +1374,24 @@ ul.checked li {
   width: 14em;
 }
 
+@media screen and (max-width: 480px) {
+  #reality-check-content {
+    width: 45% !important;
+  }
+}
+
 #reality-check-nav, #balances-nav {
   margin-top: 1em;
 }
 #reality-check-nav span:nth-child(2), #balances-nav span:nth-child(2) {
   display: inline-block;
   width: 5em;
+}
+
+@media screen and (max-width: 480px) {
+  #reality-check-nav {
+    width: 45% !important;
+  }
 }
 
 #tooltip {
@@ -1758,6 +1770,336 @@ abbr {
     margin: 10px 0;
   }
   .home-content .xcta .xvirtual span {
+    background-color: #2a3052;
+    font-weight: 300;
+    padding: 20px 20px;
+    width: 60%;
+  }
+}
+/* HOME PAGE RULES */
+.home2-content#content {
+  width: 100%;
+}
+
+.home2-content #banner {
+  background: url("../images/pages/home/banner-background_1.png") no-repeat 0 0;
+}
+.home2-content .xtopseparator {
+  border: 0;
+  height: 2px;
+  background-image: -o-linear-gradient(left, transparent, rgba(68, 72, 76, 0.5), transparent);
+  display: block !important;
+}
+.home2-content #open-account {
+  background: #e98024;
+  color: #fff;
+  text-align: center;
+  border-radius: 0;
+  margin-top: 70px;
+  text-align: center;
+  padding: 0 0 10px;
+}
+.home2-content #open-account h3 {
+  background: #15212d;
+  color: #fff;
+  padding: 15px 10px;
+}
+.home2-content #open-account #virtual-fields input, .home2-content #open-account #virtual-fields select, .home2-content #open-account #virtual-fields textarea {
+  border-radius: 3px;
+  margin-top: 10px;
+  padding: 0px;
+}
+.home2-content #open-account input[type=submit] {
+  color: #fff;
+  text-decoration: none;
+  text-align: center;
+  line-height: 100%;
+  background: #2E8836;
+  border-radius: 4px;
+  text-transform: capitalize;
+  padding: 10px 25px 10px 25px;
+  display: inline-block;
+  letter-spacing: 0.75px;
+  width: 78%;
+  background: #2a3052;
+  padding: 9px 10.83333%;
+  margin-top: 0;
+  margin-bottom: 15px;
+  border: 0;
+  white-space: normal;
+  font-size: 18px;
+}
+.home2-content #open-account input[type=submit]:visited {
+  color: #fff;
+}
+.home2-content #open-account input[type=submit]:hover, .home2-content #open-account input[type=submit]:active {
+  text-decoration: none;
+  background-color: #14602B;
+}
+.home2-content #open-account input[type=submit]:hover {
+  text-decoration: none;
+  background-color: #14602B;
+}
+.home2-content #open-account form {
+  font-size: 100%;
+  margin: 5px 20px;
+}
+.home2-content #open-account #signup_error {
+  background: #e98024;
+  color: #fff;
+  font-size: 85%;
+}
+.home2-content #open-account .error-message {
+  font-style: italic;
+  margin: 0;
+  margin-top: 8px;
+}
+.home2-content #xsection1 {
+  padding: 30px 0;
+  display: inline-block;
+}
+.home2-content #xsection1 ul li {
+  padding-left: 10px;
+  margin: 1em 0 0;
+}
+.home2-content #xsection1 ul li span {
+  color: #2E8836;
+  font-weight: 700;
+}
+.home2-content #xsection1 ul li i {
+  color: #e98024;
+}
+.home2-content #xsection1 h1 {
+  margin-top: 20px;
+}
+.home2-content #xreason, .home2-content #xacademy, .home2-content #xtestimonial {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.home2-content #xreason {
+  background-color: #F2F2F2;
+}
+.home2-content #xtop {
+  padding-top: 30px;
+  padding-left: 10px;
+  text-align: center;
+  line-height: 1.5;
+}
+.home2-content #xtop p {
+  font-size: 110%;
+}
+.home2-content #xtop ul li {
+  display: inline;
+  margin-left: 10px;
+}
+.home2-content .break {
+  margin-top: 30px;
+}
+.home2-content .no-break {
+  margin-top: 10px;
+}
+.home2-content .boldtop {
+  font-size: 170%;
+}
+.home2-content #xbadges {
+  text-align: center;
+}
+.home2-content #xbadges img {
+  text-align: center;
+  max-width: 100px;
+  position: relative;
+  top: 50px;
+  margin-right: 20px;
+}
+.home2-content .xhead {
+  margin-bottom: 20px;
+  margin-top: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #DEDEDE;
+}
+.home2-content .inlined {
+  display: inline-block;
+}
+.home2-content .xlist1 {
+  background: url(../images/pages/home/xicon-1.png) no-repeat;
+  padding-left: 50px;
+  min-height: 24px;
+  background-size: 30px;
+}
+.home2-content .xlist2 {
+  background: url(../images/pages/home/xicon-2.png) no-repeat;
+  padding-left: 50px;
+  min-height: 24px;
+  background-size: 30px;
+}
+.home2-content .xlist3 {
+  background: url(../images/pages/home/xicon-3.png) no-repeat;
+  padding-left: 50px;
+  min-height: 24px;
+  background-size: 30px;
+}
+.home2-content .xlist4 {
+  background: url(../images/pages/home/xicon-4.png) no-repeat;
+  padding-left: 50px;
+  min-height: 24px;
+  background-size: 30px;
+}
+.home2-content .xcta {
+  position: relative;
+  bottom: 30px;
+  text-align: center;
+}
+.home2-content .xcta .xreal {
+  margin-right: 10px;
+}
+.home2-content .xcta .xreal span {
+  padding: 10px 25px;
+}
+.home2-content .xcta .xvirtual span {
+  background-color: #2a3052;
+  padding: 10px 25px;
+}
+.home2-content .xcta .xvirtual span:hover {
+  text-decoration: none;
+  background-color: #14602B;
+}
+.home2-content .xquote {
+  background-color: #F2F2F2;
+  padding: 20px 40px;
+}
+.home2-content .xquote p {
+  font-style: italic;
+}
+.home2-content .xbubble-right {
+  content: '';
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 25px 5px 0 10px;
+  border-color: #F2F2F2 transparent transparent transparent;
+  position: relative;
+  left: 80%;
+}
+.home2-content .xbubble-left {
+  content: '';
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 25px 10px 0 5px;
+  border-color: #F2F2F2 transparent transparent transparent;
+  position: relative;
+  left: 10%;
+}
+.home2-content .xquoter-left {
+  text-align: left;
+}
+.home2-content .xquoter-right {
+  text-align: right;
+}
+.home2-content #verify-email-form input, .home2-content #verify-email-form select {
+  width: 70%;
+  display: inline-block;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 8px !important;
+  font-size: 14px;
+}
+.home2-content #xacademy .head-academy {
+  margin-bottom: 10px;
+  margin-top: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #dedede;
+}
+.home2-content #xacademy ul {
+  margin-top: 20px;
+  margin-left: 10px;
+}
+.home2-content #xacademy img {
+  max-width: 180px;
+}
+.home2-content #xacademy .academy-cta {
+  margin-top: 20px;
+  margin-bottom: 0;
+}
+.home2-content .xtopcta {
+  display: inline-block;
+  width: 50%;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  padding: 15px !important;
+}
+.home2-content .xquoter-left p span, .home2-content .xquoter-right p span {
+  font-size: 12px;
+  font-style: italic;
+}
+.home2-content #xpayment a:hover {
+  text-decoration: none;
+}
+
+@media screen and (max-width: 767px) {
+  .home2-content #xtop {
+    padding-top: 30px;
+    padding-left: 0;
+    line-height: 1;
+  }
+  .home2-content #xtop ul li {
+    margin-left: 5px;
+  }
+  .home2-content .break {
+    margin-top: 20px;
+    margin-bottom: 5px;
+  }
+  .home2-content .no-break {
+    margin-top: 0px;
+  }
+  .home2-content .xhead2 {
+    margin-top: 30px;
+  }
+  .home2-content #open-account {
+    margin-left: 0;
+    margin-top: 20px;
+    padding: 0;
+  }
+  .home2-content #open-account h3 {
+    background: #15212d;
+    color: #fff;
+    padding: 10px;
+  }
+  .home2-content #open-account input[type=submit] {
+    width: 86% !important;
+  }
+  .home2-content #open-account form {
+    margin: 5px 5px;
+  }
+  .home2-content #residence {
+    width: 86% !important;
+  }
+  .home2-content .virtual-acc-left {
+    width: 80% !important;
+    margin-right: 0;
+  }
+  .home2-content .xtopcta {
+    width: 80%;
+  }
+  .home2-content .xtestimonial h1, .home2-content .xhead {
+    padding: 10px;
+  }
+  .home2-content #xsection1 {
+    padding: 10px 0;
+  }
+  .home2-content .xcta {
+    position: initial;
+  }
+  .home2-content .xcta .xreal {
+    margin-right: 0px;
+  }
+  .home2-content .xcta .xreal span {
+    font-weight: 300;
+    padding: 20px 20px;
+    width: 60%;
+    margin: 10px 0;
+  }
+  .home2-content .xcta .xvirtual span {
     background-color: #2a3052;
     font-weight: 300;
     padding: 20px 20px;
@@ -5659,15 +6001,14 @@ body.ID .extra-space {
   }
 }
 
-/*Italian Language */
-body.IT #legal-tab li.tm-li-2 {
+body.IT #legal-tab li.tm-li-2, body.DE #legal-tab li.tm-li-2 {
   margin-right: 0px !important;
   padding: 0 8px !important;
 }
-body.IT a, body.IT button, body.IT .button, body.IT span, body.IT input {
+body.IT a, body.IT button, body.IT .button, body.IT span, body.IT input, body.DE a, body.DE button, body.DE .button, body.DE span, body.DE input {
   text-transform: initial !important;
 }
-body.IT h1, body.IT h2, body.IT h3, body.IT h4, body.IT h5, body.IT h6 {
+body.IT h1, body.IT h2, body.IT h3, body.IT h4, body.IT h5, body.IT h6, body.DE h1, body.DE h2, body.DE h3, body.DE h4, body.DE h5, body.DE h6 {
   text-transform: initial !important;
 }
 
@@ -5683,14 +6024,10 @@ body.RU #trading_socket_container .contract_heading {
   padding-top: 2.7em;
 }
 
-body.DE #legal-tab li.tm-li-2 {
-  margin-right: 0px !important;
-  padding: 0 8px !important;
-}
-body.DE a, body.DE button, body.DE .button, body.DE span, body.DE input {
+body.PT a, body.PT button, body.PT .button, body.PT span, body.PT input {
   text-transform: initial !important;
 }
-body.DE h1, body.DE h2, body.DE h3, body.DE h4, body.DE h5, body.DE h6 {
+body.PT h1, body.PT h2, body.PT h3, body.PT h4, body.PT h5, body.PT h6 {
   text-transform: initial !important;
 }
 
