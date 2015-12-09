@@ -119,12 +119,12 @@ var BinarySocket = (function () {
         };
 
         binarySocket.onmessage = function (msg){
-
+            /*
             if(isReady()=== true){
                 if (clock_started === false) {
                     page.header.start_clock_ws();
                 }
-            }
+            }*/
 
             var response = JSON.parse(msg.data);
             if (response) {
