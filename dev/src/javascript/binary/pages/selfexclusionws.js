@@ -39,23 +39,6 @@ var SelfExlusionWS = (function(){
                     isValid = false;
                 }
             }
-            console.log("The real data are", data[Object.keys(data)[ind]]);
-            console.log("The elements are", ele);
-            
-             
-
-
-            var id = $(element).attr("id");
-
-            console.log("The id is", id);
-
-            if(data.max_balance > 0 ){
-                console.log("Goood");
-            }
-            if( ele > 0){
-                console.log("BAd");
-            }
-            console.log("The element is greather than 0", (ele > 0));
 
             if(id ===("MAXCASHBAL") && (ele > data.max_balance || (ele.length < 1 && data.max_balance > 0) ) ){
                 $("#error"+$(element).attr("id")).text(text.localize("Please enter a number between 0 and " + data.max_balance ));
@@ -84,21 +67,15 @@ var SelfExlusionWS = (function(){
             } else if(id === ("SESSIONDURATION") && (ele > data.SESSIONDURATION || (ele.length < 1 && data.SESSIONDURATION > 0) ) ){
                 $("#error"+$(element).attr("id")).text(text.localize("Please enter a number between 0 and " + data.SESSIONDURATION ));
                 isValid = false;
+            }
+            else if(id === ("EXCLUDEUNTIL") && validateDate() ===false){
+                isValid = false;
             } 
-            /*
-            if((data[Object.keys(data)[ind]] !== ele) && ( (ele.length < 1) || (ele > parseInt[data[Object.keys(data)[ind]]]) ) )
-            {
-                if(!/EXCLUDEUNTIL/.test($(element).attr("id")))
-                {
-                    $("#error"+$(element).attr("id")).text(text.localize("Please enter a number between 0 and " + data[Object.keys(data)[ind]]));
-                    isValid = false;
-                }
-            }*/
         });
-
+        /*
         if(validateDate() === false){
             isValid = false;
-        }
+        }*/
         if(isValid === false){
 
             return false;
