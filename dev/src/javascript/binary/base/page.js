@@ -468,8 +468,6 @@ Header.prototype = {
     },
     start_clock_ws : function(){
         var that = this;
-        var clock_handle;
-        var clock = $('#gmt-clock');
 
         function init(){
             clock_started = true;
@@ -515,6 +513,9 @@ Header.prototype = {
         return;
     },
     time_counter : function(response){
+        var that = this;
+        var clock_handle;
+        var clock = $('#gmt-clock');
         var start_timestamp = response.time;
         var pass = response.echo_req.passthrough.client_time;
 
