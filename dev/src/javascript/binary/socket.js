@@ -59,11 +59,11 @@ var BinarySocket = (function () {
     };
 
     var send = function(data) {
-      
+
         if (isClose()) {
             bufferedSends.push(data);
             init(1);
-        } else if (isReady() && (authorized || TradePage.is_trading_page() || data.hasOwnProperty('time') )) {
+        } else if (isReady() && (authorized || TradePage.is_trading_page())) {
             if(!data.hasOwnProperty('passthrough')){
                 data.passthrough = {};
             }
@@ -116,12 +116,6 @@ var BinarySocket = (function () {
             if(typeof events.onopen === 'function'){
                 events.onopen();
             }
-
-            if(isReady()=== true){
-                if (clock_started === false) {
-                    page.header.start_clock_ws();
-                }
-            }
         };
 
         binarySocket.onmessage = function (msg){
@@ -143,8 +137,6 @@ var BinarySocket = (function () {
                     sendBufferedSends();
                 } else if (type === 'balance') {
                     ViewBalanceUI.updateBalances(response.balance);
-                } else if(type ==='time'){
-                    page.header.time_counter(response);
                 }
 
                 if(typeof events.onmessage === 'function'){
@@ -170,7 +162,7 @@ var BinarySocket = (function () {
             console.log('socket error', error);
         };
     };
-    
+
     var close = function () {
         manualClosed = true;
         bufferedSends = [];
@@ -189,7 +181,6 @@ var BinarySocket = (function () {
     return {
         init: init,
         send: send,
-        isReady : isReady,
         close: close,
         socket: function () { return binarySocket; },
         clear: clear,

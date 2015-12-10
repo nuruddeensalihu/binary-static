@@ -49082,7 +49082,7 @@ SubMarket.prototype = {
     };
 })();
 ;var text;
-var clock_started = false;
+
 var gtm_data_layer_info = function() {
     var gtm_data_layer_info = [];
     $('.gtm_data_layer').each(function() {
@@ -49474,12 +49474,14 @@ var Header = function(params) {
     this.client = params['client'];
     this.settings = params['settings'];
     this.menu = new Menu(params['url']);
+    this.clock_started = false;
 };
 
 Header.prototype = {
     on_load: function() {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
+        if (!this.clock_started) this.start_clock();
         this.simulate_input_placeholder_for_ie();
     },
     on_unload: function() {
@@ -49549,51 +49551,12 @@ Header.prototype = {
 
         this.menu.register_dynamic_links();
     },
-    start_clock_ws : function(){
-        var that = this;
-
-        function init(){
-            clock_started = true;
-            BinarySocket.send({ "time": 1,"passthrough":{"client_time" :  moment().valueOf()}});
-        }
-        that.run = function(){
-            setInterval(init, 900000);
-        };
-        
-        init();
-        that.run();
-
-        return;
-    },
-    time_counter : function(response){
-        var that = this;
-        var clock_handle;
-        var clock = $('#gmt-clock');
-        var start_timestamp = response.time;
-        var pass = response.echo_req.passthrough.client_time;
-
-        that.time_now = ((start_timestamp * 1000) + (moment().valueOf() - pass));
-         
-        var increase_time_by = function(interval) {
-            that.time_now += interval;
-        };
-        var update_time = function() {
-             clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
-        };
-        update_time();
-
-        clearInterval(clock_handle);
-
-        clock_handle = setInterval(function() {
-            increase_time_by(1000);
-            update_time();
-        }, 1000);
-    },
     start_clock: function() {
         var clock = $('#gmt-clock');
         if (clock.length === 0) {
             return;
         }
+
         var that = this;
         var clock_handle;
         var sync = function() {
@@ -49629,7 +49592,7 @@ Header.prototype = {
             sync();
         }, 900000);
 
-        clock_started = true;
+        this.clock_started = true;
         return;
     },
 };
@@ -63409,11 +63372,11 @@ var BinarySocket = (function () {
     };
 
     var send = function(data) {
-      
+
         if (isClose()) {
             bufferedSends.push(data);
             init(1);
-        } else if (isReady() && (authorized || TradePage.is_trading_page() || data.hasOwnProperty('time') )) {
+        } else if (isReady() && (authorized || TradePage.is_trading_page())) {
             if(!data.hasOwnProperty('passthrough')){
                 data.passthrough = {};
             }
@@ -63466,12 +63429,6 @@ var BinarySocket = (function () {
             if(typeof events.onopen === 'function'){
                 events.onopen();
             }
-
-            if(isReady()=== true){
-                if (clock_started === false) {
-                    page.header.start_clock_ws();
-                }
-            }
         };
 
         binarySocket.onmessage = function (msg){
@@ -63493,8 +63450,6 @@ var BinarySocket = (function () {
                     sendBufferedSends();
                 } else if (type === 'balance') {
                     ViewBalanceUI.updateBalances(response.balance);
-                } else if(type ==='time'){
-                    page.header.time_counter(response);
                 }
 
                 if(typeof events.onmessage === 'function'){
@@ -63520,7 +63475,7 @@ var BinarySocket = (function () {
             console.log('socket error', error);
         };
     };
-    
+
     var close = function () {
         manualClosed = true;
         bufferedSends = [];
@@ -63539,7 +63494,6 @@ var BinarySocket = (function () {
     return {
         init: init,
         send: send,
-        isReady : isReady,
         close: close,
         socket: function () { return binarySocket; },
         clear: clear,
