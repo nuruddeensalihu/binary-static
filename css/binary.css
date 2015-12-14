@@ -5020,24 +5020,34 @@ a.dynamic, span.dynamic, div.dynamic, p.dynamic, button.dynamic, table.dynamic {
   width: 45%;
 }
 
-#trading-times th.flex-tr-child {
+#trading-times th.flex-tr-child, #asset-index th.flex-tr-child {
   line-height: 30px;
 }
-#trading-times th.submarket-name {
+#trading-times th.submarket-name, #asset-index th.submarket-name {
   border-bottom: 1px solid #44484C !important;
   text-align: center !important;
 }
-#trading-times th.asset {
+#trading-times th.asset, #asset-index th.asset {
   width: 24%;
 }
-#trading-times th.opens, #trading-times th.closes, #trading-times th.settles {
+#trading-times th.opens, #trading-times th.closes, #trading-times th.settles, #asset-index th.opens, #asset-index th.closes, #asset-index th.settles {
   width: 12%;
 }
-#trading-times th.upcomingevents {
+#trading-times th.upcomingevents, #asset-index th.upcomingevents {
   width: 40%;
 }
-#trading-times td.asset {
+#trading-times td.asset, #asset-index td.asset {
   font-weight: 700;
+}
+
+#asset-index th, #asset-index .asset {
+  width: 12%;
+}
+#asset-index th.flex-tr-child:nth-child(2):nth-last-child(1) {
+  width: 24%;
+}
+#asset-index th.flex-tr-child:nth-child(2):nth-last-child(2), #asset-index th.flex-tr-child:nth-child(3):nth-last-child(1) {
+  width: 18%;
 }
 
 /* static pages */
