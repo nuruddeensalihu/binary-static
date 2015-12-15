@@ -11,7 +11,7 @@
 
             .grd-row-padding.row.clear
               .grd-grid-4.form_label
-                %label{:for => "cashierlockpassword1"}=l ('Cashier password')
+                %label{:for => "cashierlockpassword1" }= l('Cashier password')
               .grd-grid-8
                 %input{:autocomplete =>"off" , :class =>" text",:id =>"cashierlockpassword1", :maxlength =>"25" ,:name =>"cashierlockpassword1" ,:type =>"password" }
                 %p.hint=l ('6 - 25 characters.')
@@ -19,7 +19,7 @@
 
             %div{:class =>"grd-row-padding.row.clear"}	
               %div{:class => "grd-grid-4  form_label"}
-                %label{:for => "cashierlockpassword2"}=l ('Re-enter your password')
+                %label{:for => "cashierlockpassword2" }= l('Re-enter your password')
               .grd-grid-8
                 %input{:autocomplete =>"off" ,class =>"text", :id =>"cashierlockpassword2",:maxlength =>"25" ,:name =>"cashierlockpassword2", :type =>"password"}
                 %p.errorfield#errorcashierlockpassword2
