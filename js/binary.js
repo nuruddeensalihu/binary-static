@@ -57623,10 +57623,16 @@ ClientForm.prototype = {
             },
             validate_exclusion_date: function() {
                 var exclusion_date = $('#EXCLUDEUNTIL').val();
+                var date_regex = /^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
+                var error_element_errorEXCLUDEUNTIL = clearInputErrorField('errorEXCLUDEUNTIL');
 
                 if (exclusion_date) {
-                    var error_element_errorEXCLUDEUNTIL = clearInputErrorField('errorEXCLUDEUNTIL');
 
+                    if(date_regex.test($('#EXCLUDEUNTIL').val()) === false){
+                        error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please select a valid date");
+                        return false;
+                    }
+            
                     exclusion_date = new Date(exclusion_date);
                     // self exclusion date must >= 6 month from now
                     var six_month_date = new Date();
@@ -58540,205 +58546,6 @@ $(function() {
       active: false
     });
 });
-;var PortfolioWS =  (function() {
-
-    'use strict';
-
-    var pageLanguage = page.language();
-    if(!pageLanguage) pageLanguage = "EN";
-
-    var rowTemplate;
-    var retry;
-
-    var init = function() {
-        // get the row template and then discard the node as it has served its purpose
-        rowTemplate = $("#portfolio-dynamic tr:first")[0].outerHTML;
-        $("#portfolio-dynamic tr:first").remove();
-        BinarySocket.send({"balance":1});
-    };
-
-
-    /**
-     * Show balance
-    **/
-    var updateBalance = function(data) {
-        $("span[data-id='balance']").text(data.balance.currency + ' ' + addComma(parseFloat(data.balance.balance)));
-        if(parseFloat(data.balance.balance, 10) > 0) {
-            $("#if-balance-zero").remove();
-        }
-        BinarySocket.send({"portfolio":1});
-    };
-    
-    /**
-     * Updates portfolio table
-    **/
-    var updatePortfolio = function(data) {
-
-        /**
-         * Check for error
-        **/
-        if("error" in data) {
-            throw new Error("Trying to get portfolio data, we got this error", data.error);
-        }
-
-        /**
-         * no contracts
-        **/
-        if(0 === data.portfolio.contracts.length) {
-            $("#portfolio-table").remove();
-            $("#portfolio-no-contract").removeClass("dynamic");
-            return true;
-        }
-
-        /**
-         * User has at least one contract
-        **/
-
-        $("#portfolio-no-contract").remove();
-        var contracts = '';
-        var sumPurchase = 0.0;
-        var currency;
-        $.each(data.portfolio.contracts, function(ci, c) {
-            sumPurchase += parseFloat(c.buy_price, 10);
-            currency = c.currency;
-            contracts += rowTemplate
-            .split("!transaction_id!").join(c.transaction_id)
-            .split("!contract_id!").join(c.contract_id)
-            .split("!longcode!").join(c.longcode)
-            .split("!currency!").join(c.currency)
-            .split("!buy_price!").join(addComma(parseFloat(c.buy_price)));
-        });
-
-        // contracts is ready to be added to the dom
-        $("#portfolio-dynamic").replaceWith(trans(contracts));
-
-        // update footer area data
-        sumPurchase = sumPurchase.toFixed(2);
-        $("#cost-of-open-positions").text(currency + ' ' + addComma(parseFloat(sumPurchase)));
-
-        // request "proposal_open_contract"
-        BinarySocket.send({"proposal_open_contract":1});
-
-        // ready to show portfolio table
-        $("#trading_init_progress").remove();
-        $("#portfolio-content").removeClass("dynamic");
-
-    };
-
-    var updateIndicative = function(data) {
-
-        var $td = $("tr[data-contract_id='"+data.proposal_open_contract.contract_id+"'] td.indicative");
-        var old_indicative = $td.find('strong').text();
-        old_indicative = parseFloat(old_indicative, 2);
-        if(isNaN(old_indicative)) old_indicative = 0.0;
-
-        var new_indicative = parseFloat(data.proposal_open_contract.bid_price, 2);
-        if(isNaN(new_indicative)) new_indicative = 0.0;
-
-        if(data.proposal_open_contract.is_valid_to_sell != 1) {
-            $td.html(data.proposal_open_contract.currency+' <strong class="indicative_price">'+data.proposal_open_contract.bid_price+'</strong><span>'+text.localize('Resale not offered')+'</span>').addClass("no_resale");
-        } else {
-            $td.removeClass("no_resale");
-
-            if(old_indicative > new_indicative) {
-                $td.html(data.proposal_open_contract.currency+' <strong class="indicative_price price_moved_down">'+data.proposal_open_contract.bid_price+'</strong>');
-            } else if(old_indicative < new_indicative) {
-                $td.html(data.proposal_open_contract.currency+' <strong class="indicative_price price_moved_up">'+data.proposal_open_contract.bid_price+'</strong>');
-            }            
-        }
-
-        var indicative_sum = 0, indicative_price = 0, up_down;
-        $("strong.indicative_price").each(function() {
-            indicative_price = $(this).text();
-            indicative_price = parseFloat(indicative_price, 2);
-            if(!isNaN(indicative_price)) {
-                indicative_sum += indicative_price;
-            }
-        });
-
-        indicative_sum = indicative_sum.toFixed(2);
-
-        $("#value-of-open-positions").text('USD ' + addComma(parseFloat(indicative_sum)));
-
-    };
-
-
-    /*** utility functions ***/
-
-    // Dynamic text
-    var dTexts = ["view", "indicative"];
-
-    /**
-     * In the dynamic parts we have strings to include
-     * For instance, in portfolio table, we have a 'View' button
-     * for each contract.
-    **/
-    var trans = function(str) {
-        var placeholder;
-        for(var i = 0, l = dTexts.length; i < l; i++) {
-            placeholder = ":"+dTexts[i]+":";
-            if(-1 === str.indexOf(placeholder)) continue;
-            str = str.split(placeholder).join(text.localize(dTexts[i]));
-        }
-        return str;
-    };
- 
-    return {
-        init: init,
-        updateBalance: updateBalance,
-        updatePortfolio: updatePortfolio,
-        updateIndicative: updateIndicative
-    };
-
-})();
-
-pjax_config_page("user/portfoliows", function() {
-    return {
-        onLoad: function() {
-            if (!getCookieItem('login')) {
-                window.location.href = page.url.url_for('login');
-                return;
-            }
-            BinarySocket.init({
-
-                onmessage: function(msg){
-
-                    try {
-                        response  = JSON.parse(msg.data);
-                        if("object" !== typeof response || !("msg_type" in response)) {
-                            throw new Error("Response from WS API is not well formatted.");
-                        }
-                    } catch(e) {
-                        throw new Error("Response from WS API is not well formatted.");
-                    }
-
-                    var msg_type = response.msg_type;
-            
-                    switch(msg_type) {
-
-                        case "balance":
-                            PortfolioWS.updateBalance(response);
-                            break;
-
-                        case "portfolio":
-                            PortfolioWS.updatePortfolio(response);
-                            break;
-
-                        case "proposal_open_contract":
-                            PortfolioWS.updateIndicative(response);
-                            break;
-
-                        default:
-                            // msg_type is not what PortfolioWS handles, so ignore it.
-
-                    }
-
-                }
-            });      
-            PortfolioWS.init();
-        }
-    };
-});
 ;function currencyConvertorCalculator()
 {
     var currencyto = document.getElementById('currencyto');
@@ -58889,6 +58696,207 @@ pjax_config_page('portfolio', function() {
             $('#currencyfromvalue').change(function(event) { checkCurrencyAmountFormat(event.target); });
             $('#currencyfromvalue').keyup(function(event) { checkCurrencyAmountFormat(event.target); });
             Portfolio.update_indicative_prices();
+        }
+    };
+});
+;var PortfolioWS =  (function() {
+
+    'use strict';
+
+    var pageLanguage = page.language();
+    if(!pageLanguage) pageLanguage = "EN";
+
+    var rowTemplate;
+    var retry;
+
+    var init = function() {
+        showLoadingImage($("#portfolio-loading"));
+        // get the row template and then discard the node as it has served its purpose
+        rowTemplate = $("#portfolio-dynamic tr:first")[0].outerHTML;
+        $("#portfolio-dynamic tr:first").remove();
+        BinarySocket.send({"balance":1});
+    };
+
+
+    /**
+     * Show balance
+    **/
+    var updateBalance = function(data) {
+        $("span[data-id='balance']").text(data.balance.currency + ' ' + addComma(parseFloat(data.balance.balance)));
+        if(parseFloat(data.balance.balance, 10) > 0) {
+            $("#if-balance-zero").remove();
+        }
+        BinarySocket.send({"portfolio":1});
+    };
+    
+    /**
+     * Updates portfolio table
+    **/
+    var updatePortfolio = function(data) {
+
+        /**
+         * Check for error
+        **/
+        if("error" in data) {
+            throw new Error("Trying to get portfolio data, we got this error", data.error);
+        }
+
+        /**
+         * no open contracts
+        **/
+        if(0 === data.portfolio.contracts.length) {
+            $("#portfolio-table").addClass("dynamic");
+            $("#portfolio-content").removeClass("dynamic");
+            $("#portfolio-loading").hide();
+            return true;
+        }
+
+        /**
+         * User has at least one contract
+        **/
+
+        $("#portfolio-no-contract").remove();
+        var contracts = '';
+        var sumPurchase = 0.0;
+        var currency;
+        $.each(data.portfolio.contracts, function(ci, c) {
+            sumPurchase += parseFloat(c.buy_price, 10);
+            currency = c.currency;
+            contracts += rowTemplate
+            .split("!transaction_id!").join(c.transaction_id)
+            .split("!contract_id!").join(c.contract_id)
+            .split("!longcode!").join(c.longcode)
+            .split("!currency!").join(c.currency)
+            .split("!buy_price!").join(addComma(parseFloat(c.buy_price)));
+        });
+
+        // contracts is ready to be added to the dom
+        $("#portfolio-dynamic").replaceWith(trans(contracts));
+
+        // update footer area data
+        sumPurchase = sumPurchase.toFixed(2);
+        $("#cost-of-open-positions").text(currency + ' ' + addComma(parseFloat(sumPurchase)));
+
+        // request "proposal_open_contract"
+        BinarySocket.send({"proposal_open_contract":1});
+
+        // ready to show portfolio table
+        $("#portfolio-loading").remove();
+        $("#portfolio-content").removeClass("dynamic");
+
+    };
+
+    var updateIndicative = function(data) {
+
+        var $td = $("tr[data-contract_id='"+data.proposal_open_contract.contract_id+"'] td.indicative");
+        var old_indicative = $td.find('strong').text();
+        old_indicative = parseFloat(old_indicative, 2);
+        if(isNaN(old_indicative)) old_indicative = 0.0;
+
+        var new_indicative = parseFloat(data.proposal_open_contract.bid_price, 2);
+        if(isNaN(new_indicative)) new_indicative = 0.0;
+
+        if(data.proposal_open_contract.is_valid_to_sell != 1) {
+            $td.html(data.proposal_open_contract.currency+' <strong class="indicative_price">'+data.proposal_open_contract.bid_price+'</strong><span>'+text.localize('Resale not offered')+'</span>').addClass("no_resale");
+        } else {
+            $td.removeClass("no_resale");
+
+            if(old_indicative > new_indicative) {
+                $td.html(data.proposal_open_contract.currency+' <strong class="indicative_price price_moved_down">'+data.proposal_open_contract.bid_price+'</strong>');
+            } else if(old_indicative < new_indicative) {
+                $td.html(data.proposal_open_contract.currency+' <strong class="indicative_price price_moved_up">'+data.proposal_open_contract.bid_price+'</strong>');
+            }            
+        }
+
+        var indicative_sum = 0, indicative_price = 0, up_down;
+        $("strong.indicative_price").each(function() {
+            indicative_price = $(this).text();
+            indicative_price = parseFloat(indicative_price, 2);
+            if(!isNaN(indicative_price)) {
+                indicative_sum += indicative_price;
+            }
+        });
+
+        indicative_sum = indicative_sum.toFixed(2);
+
+        $("#value-of-open-positions").text('USD ' + addComma(parseFloat(indicative_sum)));
+
+    };
+
+
+    /*** utility functions ***/
+
+    // Dynamic text
+    var dTexts = ["view", "indicative"];
+
+    /**
+     * In the dynamic parts we have strings to include
+     * For instance, in portfolio table, we have a 'View' button
+     * for each contract.
+    **/
+    var trans = function(str) {
+        var placeholder;
+        for(var i = 0, l = dTexts.length; i < l; i++) {
+            placeholder = ":"+dTexts[i]+":";
+            if(-1 === str.indexOf(placeholder)) continue;
+            str = str.split(placeholder).join(text.localize(dTexts[i]));
+        }
+        return str;
+    };
+ 
+    return {
+        init: init,
+        updateBalance: updateBalance,
+        updatePortfolio: updatePortfolio,
+        updateIndicative: updateIndicative
+    };
+
+})();
+
+pjax_config_page("user/portfoliows", function() {
+    return {
+        onLoad: function() {
+            if (!getCookieItem('login')) {
+                window.location.href = page.url.url_for('login');
+                return;
+            }
+            BinarySocket.init({
+
+                onmessage: function(msg){
+
+                    try {
+                        response  = JSON.parse(msg.data);
+                        if("object" !== typeof response || !("msg_type" in response)) {
+                            throw new Error("Response from WS API is not well formatted.");
+                        }
+                    } catch(e) {
+                        throw new Error("Response from WS API is not well formatted.");
+                    }
+
+                    var msg_type = response.msg_type;
+            
+                    switch(msg_type) {
+
+                        case "balance":
+                            PortfolioWS.updateBalance(response);
+                            break;
+
+                        case "portfolio":
+                            PortfolioWS.updatePortfolio(response);
+                            break;
+
+                        case "proposal_open_contract":
+                            PortfolioWS.updateIndicative(response);
+                            break;
+
+                        default:
+                            // msg_type is not what PortfolioWS handles, so ignore it.
+
+                    }
+
+                }
+            });      
+            PortfolioWS.init();
         }
     };
 });
@@ -59435,40 +59443,346 @@ pjax_config_page("trading_timesws", function() {
         }
     };
 });
-;
-var self_exclusion_date_picker = function () {
-    // 6 months from now
-    var start_date = new Date();
-    start_date.setMonth(start_date.getMonth() + 6);
+;var Exclusion = (function(){
+    var self_exclusion_date_picker = function () {
+        // 6 months from now
+        var start_date = new Date();
+        start_date.setMonth(start_date.getMonth() + 6);
 
-    // 5 years from now
-    var end_date = new Date();
-    end_date.setFullYear(end_date.getFullYear() + 5);
+        // 5 years from now
+        var end_date = new Date();
+        end_date.setFullYear(end_date.getFullYear() + 5);
 
-    var id = $('#EXCLUDEUNTIL');
+        var id = $('#EXCLUDEUNTIL');
 
-    id.datepicker({
-        dateFormat: 'yy-mm-dd',
-        minDate: start_date,
-        maxDate: end_date,
-        onSelect: function(dateText, inst) {
-            id.attr("value", dateText);
-        },
-    });
-};
+        id.datepicker({
+            dateFormat: 'yy-mm-dd',
+            minDate: start_date,
+            maxDate: end_date,
+            onSelect: function(dateText, inst) {
+                id.attr("value", dateText);
+            },
+        });
+    };
 
-var self_exclusion_validate_date = function () {
-    $('#selfExclusion').on('click', '#self_exclusion_submit', function () {
-        return client_form.self_exclusion.validate_exclusion_date();
-    });
-};
+    var self_exclusion_validate_date = function () {
+        $('#selfExclusion').on('click', '#self_exclusion_submit', function () {
+            return client_form.self_exclusion.validate_exclusion_date();
+        });
+    };
 
+    return{
+        self_exclusion_validate_date : self_exclusion_validate_date,
+        self_exclusion_date_picker :self_exclusion_date_picker
+    };
+
+})();
 onLoad.queue_for_url(function () {
 // date picker for self exclusion
-    self_exclusion_date_picker();
-    self_exclusion_validate_date();
+    Exclusion.self_exclusion_date_picker();
+    Exclusion.self_exclusion_validate_date();
 }, 'self_exclusion');
-;onLoad.queue_for_url(function() {
+;var SelfExlusionWS = (function(){
+    
+    "use strict";
+
+    var $form;
+    var data = {};
+
+    var init = function(){
+        $form   = $("#selfExclusion");
+        $form.find("button").on("click", function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            if(validateForm($form) === false){
+                return false;
+            }
+            BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "set_self_exclusion"}});
+        });
+        BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "get_self_exclusion"}});
+    };
+
+    var isNormalInteger= function(str) {
+        return /^\+?\d+$/.test(str);
+    };
+
+    var validateForm = function(frm){
+        var isValid = true;
+        $("p.errorfield").each(function(ind,element){
+            $(element).text("");
+        });
+   
+        $(":text").each(function(ind,element){
+            var ele = $(element).val().replace(/ /g, "");
+            var id = $(element).attr("id");
+       
+            if(!isNormalInteger(ele) && (ele.length > 0))
+            {
+                if(!/EXCLUDEUNTIL/.test($(element).attr("id")))
+                {
+                    $("#error"+$(element).attr("id")).text(text.localize("Please enter an integer value"));
+                    isValid = false;
+                }
+            }else{
+                if(id ===("MAXCASHBAL") && ((ele > data.max_balance && data.max_balance > 0) || (ele.length < 1 && data.max_balance > 0) ) ){
+                    $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.max_balance ));
+                    isValid = false;
+                } else if(id === ("DAILYTURNOVERLIMIT") && ((ele > data.max_turnover &&  data.max_turnover > 0) || (ele.length < 1 &&  data.max_turnover > 0) ) ){
+                    $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.max_turnover ));
+                    isValid = false;
+                } else if(id === ("DAILYLOSSLIMIT") && ((ele > data.max_losses && data.max_losses > 0) || (ele.length < 1 && data.max_losses > 0) ) ){
+                    $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.max_losses ));
+                    isValid = false;
+                } else if(id === ("7DAYTURNOVERLIMIT") && ((ele > data.max_7day_turnover && data.max_7day_turnover > 0 ) || (ele.length < 1 && data.max_7day_turnover > 0 ) ) ){
+                    $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.max_7day_turnover ));
+                    isValid = false;
+                } else if(id === ("7DAYLOSSLIMIT") && ((ele > data.max_7day_losses && data.max_7day_losses > 0) || (ele.length < 1 && data.max_7day_losses > 0 ) ) ){
+                    $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.max_7day_losses ));
+                    isValid = false;
+                }  else if(id === ("30DAYTURNOVERLIMIT") && ((ele > data.max_30day_turnover && data.max_30day_turnover > 0) || (ele.length < 1 && data.max_30day_turnover > 0 ) ) ){
+                    $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.max_30day_turnover ));
+                    isValid = false;
+                } else if(id === ("30DAYLOSSLIMIT") && ((ele > data.max_30day_losses && data.max_30day_losses > 0) || (ele.length < 1 && data.max_30day_losses > 0 ) ) ){
+                    $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.max_30day_losses ));
+                    isValid = false;
+                }  else if(id === ("MAXOPENPOS") && ((ele > data.max_open_bets && data.max_open_bets > 0 ) || (ele.length < 1 && data.max_open_bets > 0 ) ) ){
+                    $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.max_open_bets ));
+                    isValid = false;
+                } else if(id === ("SESSIONDURATION") && ((ele > data.session_duration_limit && data.session_duration_limit > 0 ) || (ele.length < 1 && data.session_duration_limit > 0) ) ){
+                    $("#error"+id).text(text.localize("Please enter a number between 0 and " + data.session_duration_limit ));
+                    isValid = false;
+                } 
+            }
+        });
+
+        if(validateDate() ===false){
+            isValid = false;
+        }
+
+        if(isValid === false){
+
+            return false;
+        }
+    };
+
+    var isAuthorized =  function(response){
+        if(response.echo_req.passthrough){
+            var option= response.echo_req.passthrough.value ;
+
+            switch(option){
+                case   "get_self_exclusion" :
+                        BinarySocket.send({"get_self_exclusion": 1});
+                        break;
+                case   "set_self_exclusion" :
+                        sendRequest();
+                        break;                   
+            }
+        }
+    };
+
+    var validateDate = function(){
+        return client_form.self_exclusion.validate_exclusion_date();
+    };
+
+    var populateForm = function(response){
+        var res = response.get_self_exclusion;
+
+        if("error" in response) {
+            if("message" in response.error) {
+                console.log(response.error.message);
+            }
+            return false;
+        }else{
+            data.max_balance = $("#MAXCASHBAL").val();
+            data.max_turnover = $("#DAILYTURNOVERLIMIT").val();
+            data.max_losses = $("#DAILYLOSSLIMIT").val();
+            data.max_7day_turnover = $("#7DAYTURNOVERLIMIT").val();
+            data.max_7day_losses = $("#7DAYLOSSLIMIT").val();
+            data.max_30day_turnover = $("#30DAYTURNOVERLIMIT").val();
+            data.max_30day_losses = $("#30DAYLOSSLIMIT").val();
+            data.max_open_bets = $("#MAXOPENPOS").val();
+            data.session_duration_limit =  $("#SESSIONDURATION").val();
+            data.exclude_until = $("#EXCLUDEUNTIL").val();
+
+            if(res){
+                $.map(res,function(value,property){
+
+                    switch(property){
+                        case  "max_balance" :
+                               data.max_balance = parseInt(value);
+                               break;
+                        case  "max_turnover" :
+                               data.max_turnover = parseInt(value);
+                               break;
+                        case  "max_losses"   :
+                               data.max_losses = parseInt(value);
+                               break;
+                        case  "max_7day_turnover" :
+                               data.max_7day_turnover = parseInt(value);
+                               break;
+                        case  "max_7day_losses" :
+                               data.max_7day_losses = parseInt(value);
+                               break;
+                        case   "max_30day_turnover" :
+                                data.max_30day_turnover = parseInt(value);
+                                break;
+                        case   "max_30day_losses" :
+                                data.max_30day_losses = parseInt(value);
+                                break;
+                        case   "max_open_bets" :
+                                data.max_open_bets = parseInt(value);
+                                break; 
+                        case   "session_duration_limit"  :
+                                data.session_duration_limit = parseInt(value);
+                                break;
+                        case   "exclude_until"   :
+                                data.exclude_until = value;
+                                break;       
+
+                    }
+
+                });
+            }
+        }
+        $("#MAXCASHBAL").val(data.max_balance);
+        $("#DAILYTURNOVERLIMIT").val(data.max_turnover);
+        $("#DAILYLOSSLIMIT").val(data.max_losses);
+        $("#7DAYTURNOVERLIMIT").val(data.max_7day_turnover);
+        $("#7DAYLOSSLIMIT").val(data.max_7day_losses);
+        $("#30DAYTURNOVERLIMIT").val(data.max_30day_turnover);
+        $("#30DAYLOSSLIMIT").val(data.max_30day_losses);
+        $("#MAXOPENPOS").val(data.max_open_bets);
+        $("#SESSIONDURATION").val(data.session_duration_limit);
+        $("#EXCLUDEUNTIL").val(data.exclude_until);
+    };
+
+    var sendRequest = function(){
+        var hasChanges  = false;
+        var newData = {
+            "max_balance"  : parseInt($("#MAXCASHBAL").val()) || "",
+            "max_turnover" : parseInt($("#DAILYTURNOVERLIMIT").val()) || "",
+            "max_losses" : parseInt($("#DAILYLOSSLIMIT").val()) || "" ,
+            "max_7day_turnover" : parseInt($("#7DAYTURNOVERLIMIT").val()) || "",
+            "max_7day_losses" : parseInt($("#7DAYLOSSLIMIT").val()) || "",
+            "max_30day_turnover" : parseInt($("#30DAYTURNOVERLIMIT").val()) || "",
+            "max_30day_losses" : parseInt($("#30DAYLOSSLIMIT").val()) || "",
+            "max_open_bets": parseInt($("#MAXOPENPOS").val()) || "" ,
+            "session_duration_limit" :  parseInt($("#SESSIONDURATION").val()) || "",
+            "exclude_until" : $("#EXCLUDEUNTIL").val()
+        };
+        $.map(newData , function(value, property){
+            if(value !== data[property])
+                hasChanges = true ;
+        }); 
+        if(hasChanges === false){
+            $("#invalidinputfound").text(text.localize("Please provide at least one self-exclusion setting"));
+            return false;
+        }else{
+            BinarySocket.send(
+                {
+                  "set_self_exclusion": 1,
+                  "max_balance": parseInt(newData.max_balance),
+                  "max_turnover": parseInt(newData.max_turnover),
+                  "max_losses": parseInt(newData.max_losses),
+                  "max_7day_turnover": parseInt(newData.max_7day_turnover),
+                  "max_7day_losses": parseInt(newData.max_7day_losses),
+                  "max_30day_turnover": parseInt(newData.max_30day_turnover),
+                  "max_30day_losses": parseInt(newData.max_30day_losses),
+                  "max_open_bets": parseInt(newData.max_open_bets),
+                  "session_duration_limit": parseInt(newData.session_duration_limit),
+                  "exclude_until": newData.exclude_until ? newData.exclude_until : null
+                });
+            return true;
+        }
+    };
+
+    var responseMessage = function(response){
+        if("error" in response) {
+            var  error = response.error;
+            switch(error.field){
+                case  "max_balance" :
+                       $("#errorMAXCASHBAL").text(text.localize(error.message));
+                       break;
+                case  "max_turnover" :
+                       $("#errorDAILYTURNOVERLIMIT").text(text.localize(error.message));
+                       break;
+                case  "max_losses"   :
+                       $("#errorDAILYLOSSLIMIT").text(text.localize(error.message));
+                       break;
+                case  "max_7day_turnover" :
+                       $("#error7DAYTURNOVERLIMIT").text(text.localize(error.message));
+                       break;
+                case  "max_7day_losses" :
+                       $("#error7DAYLOSSLIMIT").text(text.localize(error.message));
+                       break;
+                case   "max_30day_turnover" :
+                        $("#error30DAYTURNOVERLIMIT").text(text.localize(error.message));
+                        break;
+                case   "max_30day_losses" :
+                        $("#error30DAYLOSSLIMIT").text(text.localize(error.message));
+                        break;
+                case   "max_open_bets" :
+                        $("#errorMAXOPENPOS").text(text.localize(error.message));
+                        break; 
+                case   "session_duration_limit"  :
+                        $("#errorSESSIONDURATION").text(text.localize(error.message));
+                        break;
+                case   "exclude_until"   :
+                        $("#errorEXCLUDEUNTIL").text(text.localize(error.message));
+                        break;       
+
+            }
+            return false;
+        }else{
+            window.location.href = window.location.href;
+        }
+    };
+
+    var apiResponse = function(response){
+        var type = response.msg_type;
+    
+        if (type === "get_self_exclusion" || (type === "error" && "get_self_exclusion" in response.echo_req)){
+            populateForm(response);
+        }else if(type === "set_self_exclusion" || (type === "error" && "set_self_exclusion" in response.echo_req))
+        {
+            responseMessage(response);
+        }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
+        {
+            isAuthorized(response);
+        }
+    };
+
+    return {
+        init: init,
+        apiResponse: apiResponse,
+        populateForm : populateForm
+    };
+})();
+pjax_config_page("user/self_exclusionws", function() {
+    return {
+        onLoad: function() {
+        	if (!getCookieItem('login')) {
+                window.location.href = page.url.url_for('login');
+                return;
+            }
+            if((/VRT/.test($.cookie('loginid')))){
+                window.location.href = ("/");
+            }
+
+        	BinarySocket.init({
+                onmessage: function(msg){
+                    var response = JSON.parse(msg.data);
+                    if (response) {
+                        SelfExlusionWS.apiResponse(response);
+                          
+                    }
+                }
+            });	
+            Exclusion.self_exclusion_date_picker();
+            SelfExlusionWS.init();
+        }
+    };
+});;onLoad.queue_for_url(function() {
     $('#statement-date').on('change', function() {
         $('#submit-date').removeClass('invisible');
     });
