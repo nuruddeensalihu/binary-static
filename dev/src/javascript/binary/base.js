@@ -223,13 +223,14 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         
         var start_time;
         var tabChanged = function() {
-
-            if (document.hidden || document.webkitHidden) {
-                start_time = moment().valueOf();
-                time_now = page.header.time_now;
-            }else {
-                time_now = (time_now + (moment().valueOf() - start_time));
-                page.header.time_now = time_now;
+            if(clock_started === true){
+                if (document.hidden || document.webkitHidden) {
+                    start_time = moment().valueOf();
+                    time_now = page.header.time_now;
+                }else {
+                    time_now = (time_now + (moment().valueOf() - start_time));
+                    page.header.time_now = time_now;
+                }
             }
         };
 
