@@ -64414,9 +64414,11 @@ pjax_config_page("paymentagent/withdrawws", function() {
                 {
                     //its a lock password
                     //send emai 
+                    console.log("mog");
                 }else{
                     //its an unlock password
                     //send email
+                    console.log("smug");
                 }
             }
             else{

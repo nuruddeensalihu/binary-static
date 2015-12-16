@@ -112,9 +112,11 @@ var securityws = (function(){
                 {
                     //its a lock password
                     //send emai 
+                    console.log("mog");
                 }else{
                     //its an unlock password
                     //send email
+                    console.log("smug");
                 }
             }
             else{
