@@ -9,6 +9,7 @@ var securityws = (function(){
         $("#changeCashierLock").show();
         $("legend").text(text.localize('Lock Cashier'));
         $("#lockInfo").text(text.localize('An additional password can be used to restrict access to the cashier.'));
+        clearErrors();
         $form.find("button").attr("value","Update");
 
         $form.find("button").on("click", function(e){
@@ -26,15 +27,19 @@ var securityws = (function(){
         });
         BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "is_locked"}});
     };
+    
+    var clearErrors = function(){
+        $("#SecuritySuccessMsg").text('');
+        $("#errorcashierlockpassword1").text('');
+        $("#errorcashierlockpassword2").text('');
+        $("#client_message_content").text('');
+        $("#client_message_content").hide();
 
+    };
     var validateForm = function(){
         var isValid = true;
       
-        $("#SecuritySuccessMsg").text('');
-        $("#cashierlockpassword1").text('');
-        $("#cashierlockpassword2").text('');
-        $("#client_message_content").text('');
-        $("#client_message_content").hide();
+        clearErrors();
 
         var pwd1 = $("#cashierlockpassword1").val();
         var pwd2 = $("#cashierlockpassword2").val();
