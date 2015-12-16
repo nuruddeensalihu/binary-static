@@ -64430,8 +64430,8 @@ pjax_config_page("paymentagent/withdrawws", function() {
         }
     };
     return {
-        init: init,
-        apiResponse: apiResponse
+        init : init,
+        SecurityApiResponse : SecurityApiResponse
     };
 })();
 
@@ -64450,7 +64450,7 @@ pjax_config_page("user/settings/securityws", function() {
                 onmessage: function(msg){
                     var response = JSON.parse(msg.data);
                     if (response) {
-                        securityws.apiResponse(response);
+                        securityws.SecurityApiResponse(response);
                           
                     }
                 }
