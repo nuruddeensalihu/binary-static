@@ -64429,6 +64429,10 @@ pjax_config_page("paymentagent/withdrawws", function() {
             isAuthorized(response);
         }
     };
+    return {
+        init: init,
+        apiResponse: apiResponse
+    };
 })();
 
 pjax_config_page("user/settings/securityws", function() {
