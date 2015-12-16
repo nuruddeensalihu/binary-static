@@ -34,6 +34,7 @@ var securityws = (function(){
         $("#cashierlockpassword1").text('');
         $("#cashierlockpassword2").text('');
         $("#client_message_content").text('');
+        $("#client_message_content").hide();
 
         var pwd1 = $("#cashierlockpassword1").val();
         var pwd2 = $("#cashierlockpassword2").val();
