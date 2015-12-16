@@ -2,16 +2,17 @@
   %h1= l('Security')
   %div{:class => "errorbox rbox", :id => "client_message"}
     .rbox-wrap
-      .rbox-content#client_message_content  
+      .rbox-content#client_message_content
+  %p#SecuritySuccessMsg      
   %form{:class => "formObject grd-row-padding",:id => "changeCashierLock" }
     .rbox.form
       .rbox-wrap
         %fieldset#lockcashiersection
           %legend= l('Lock Cashier')
           .grd-grid-12
-            %p= l('An additional password can be used to restrict access to the cashier.')
+            %p#lockInfo= l('An additional password can be used to restrict access to the cashier.')
 
-          %div{:class =>"grd-row-padding row clear"}
+          %div{:class =>"grd-row-padding row clear", :id =>"passwordrow"}
             .grd-grid-4.form_label
               %label{:for => "cashierlockpassword1" }= l('Cashier password')
             .grd-grid-8
@@ -19,7 +20,7 @@
               %p.hint= l('6 - 25 characters.')
               %p.errorfield#errorcashierlockpassword1	
 
-          %div{:class =>"grd-row-padding row clear"}	
+          %div{:class =>"grd-row-padding row clear", :id =>"repasswordrow"}	
             %div{:class => "grd-grid-4  form_label"}
               %label{:for => "cashierlockpassword2" }= l('Re-enter your password')
             .grd-grid-8

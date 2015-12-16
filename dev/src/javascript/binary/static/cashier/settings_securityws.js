@@ -9,6 +9,7 @@ var securityws = (function(){
         $("#changeCashierLock").show();
         $("legend").text(text.localize('Lock Cashier'));
         $("#lockInfo").text(text.localize('An additional password can be used to restrict access to the cashier.'));
+        $("#SecuritySuccessMsg").text(text.localize('Yo.'));
         $form.find("button").attr("value","Update");
 
         $form.find("button").on("click", function(e){
