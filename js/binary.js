@@ -64345,7 +64345,7 @@ pjax_config_page("paymentagent/withdrawws", function() {
         if(isVisible === true){
 
             $(":password").each(function(ind,ele){
-
+                
                 var value = $(ele).val();
 
                 if(value.length <= 0 ){
