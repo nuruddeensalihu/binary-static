@@ -64422,6 +64422,7 @@ pjax_config_page("paymentagent/withdrawws", function() {
                 }
             }
             else{
+                console.log("mean old man");
                 $("#client_message_content").text(text.localize('Sorry, an error occurred while processing your account.'));
                 //send email
                 return false;
