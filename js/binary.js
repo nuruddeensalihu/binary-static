@@ -64377,7 +64377,9 @@ pjax_config_page("paymentagent/withdrawws", function() {
         }
     };
     var responseMessage = function(response){
+       
         if("error" in response) {
+            console.log("the error response is", response);
             if("message" in response.error) {
 
                 if(response.error.message === "Your cashier was locked." && response.error.code === "CashierPassword"){
@@ -64394,6 +64396,7 @@ pjax_config_page("paymentagent/withdrawws", function() {
             return false;
         }
         else{
+            console.log("the response is", response);
             var resvalue = response.echo_req.cashier_password.value;
             if(resvalue === 1){
                 //set success msg
