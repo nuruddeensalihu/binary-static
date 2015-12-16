@@ -9,7 +9,6 @@ var securityws = (function(){
         $("#changeCashierLock").show();
         $("legend").text(text.localize('Lock Cashier'));
         $("#lockInfo").text(text.localize('An additional password can be used to restrict access to the cashier.'));
-        $("#SecuritySuccessMsg").text(text.localize('Yo.'));
         $form.find("button").attr("value","Update");
 
         $form.find("button").on("click", function(e){
@@ -30,6 +29,11 @@ var securityws = (function(){
 
     var validateForm = function(){
         var isValid = true;
+      
+         $("#SecuritySuccessMsg").text('');
+         $("#cashierlockpassword1").text('');
+         $("#cashierlockpassword2").text('');
+         $("#client_message_content").text('');
 
         $(":password").each(function(ind,ele){
 
@@ -98,7 +102,7 @@ var securityws = (function(){
             console.log("the response is", response);
             var resvalue = response.echo_req.cashier_password;
             console.log("The value is",resvalue);
-            if(parseInt(resvalue) === 1){
+            if(resvalue === 1){
                 //set success msg
                 console.log("The result is ok");
                 $("#changeCashierLock").hide();
