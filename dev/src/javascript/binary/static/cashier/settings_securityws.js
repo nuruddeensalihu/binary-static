@@ -1,6 +1,7 @@
 var securityws = (function(){
 
     "use strict";
+    var $form ;
 
     var init = function(){
         $form   = $("#changeCashierLock");
@@ -81,7 +82,7 @@ var securityws = (function(){
                     $("#repasswordrow").hide();
                     $("legend").text(text.localize("Unlock Cashier"));
                     $("#lockInfo").text(text.localize("Your cashier is locked as per your request - to unlock it, please enter the password."));
-                    $(this).find("button").attr("value","Unlock Cashier");
+                    $form.find("button").attr("value","Unlock Cashier");
                 }
                 else{
                     $("#client_message_content").text(text.localize(response.error.message));
