@@ -3,7 +3,7 @@
   %div{:class => "errorbox rbox", :id => "client_message"}
     .rbox-wrap
       .rbox-content#client_message_content
-  %p#SecuritySuccessMsg      
+  %p#SecuritySuccessMsg
   %form{:class => "formObject grd-row-padding",:id => "changeCashierLock" }
     .rbox.form
       .rbox-wrap
@@ -18,9 +18,9 @@
             .grd-grid-8
               %input{:autocomplete =>"off" , :class =>" text",:id =>"cashierlockpassword1", :maxlength =>"25" ,:name =>"cashierlockpassword1" ,:type =>"password" }
               %p.hint= l('6 - 25 characters.')
-              %p.errorfield#errorcashierlockpassword1	
+              %p.errorfield#errorcashierlockpassword1
 
-          %div{:class =>"grd-row-padding row clear", :id =>"repasswordrow"}	
+                %div{:class =>"grd-row-padding row clear", :id =>"repasswordrow"}
             %div{:class => "grd-grid-4  form_label"}
               %label{:for => "cashierlockpassword2" }= l('Re-enter your password')
             .grd-grid-8
