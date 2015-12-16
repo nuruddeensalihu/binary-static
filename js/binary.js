@@ -64397,8 +64397,7 @@ pjax_config_page("paymentagent/withdrawws", function() {
         }
         else{
             console.log("the response is", response);
-            console.log("The value is first ", response.echo_req.cashier_password);
-            var resvalue = response.echo_req.cashier_password.value;
+            var resvalue = response.echo_req.cashier_password;
             console.log("The value is",resvalue);
             if(resvalue === 1){
                 //set success msg
