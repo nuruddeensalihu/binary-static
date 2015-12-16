@@ -64399,8 +64399,9 @@ pjax_config_page("paymentagent/withdrawws", function() {
             console.log("the response is", response);
             var resvalue = response.echo_req.cashier_password;
             console.log("The value is",resvalue);
-            if(resvalue === 1){
+            if(parseInt(resvalue) === 1){
                 //set success msg
+                console.log("The result is ok");
                 $("#changeCashierLock").hide();
                 $("#SecuritySuccessMsg").text(text.localize('Your settings have been updated successfully.'));
                 
