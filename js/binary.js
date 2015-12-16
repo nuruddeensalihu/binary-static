@@ -64337,21 +64337,34 @@ pjax_config_page("paymentagent/withdrawws", function() {
          $("#cashierlockpassword2").text('');
          $("#client_message_content").text('');
 
+         var pwd1 = $("#cashierlockpassword1").val();
+         var pwd2 = $("#cashierlockpassword2").val();
+
         $(":password").each(function(ind,ele){
 
             var value = $(ele).val().replace(/ /g, "");
             var isVisible = $(ele).is(':visible');
 
             if(value.length <= 0 && isVisible ){
-                $("error" + $(ele).attr(id)).text(text.localize("Please enter a password."));
-                isValid = false
+                $("#error" + $(ele).attr("id")).text(text.localize("Please enter a password."));
+                isValid = false;
             }
             else if(value.length > 25 && isVisible){
-                $("error" + $(ele).attr(id)).text(text.localize("password can't be longer than 25."));
-                isValid = false
+                $("#error" + $(ele).attr("id")).text(text.localize("password can't be longer than 25."));
+                isValid = false;
+            }else if(value.length < 6 && isVisible){
+                $("#error" + $(ele).attr("id")).text(text.localize("Your password should be at least 6 characters."));
+                isValid = false;
             }
-
         });
+
+        if(pwd1 !== pwd2 ){
+            $("#errorcashierlockpassword2").text(text.localize("The two passwords that you entered do not match."));
+            isValid = false;
+        }
+
+        return isValid;
+
     };
     var isAuthorized =  function(response){
         if(response.echo_req.passthrough){
