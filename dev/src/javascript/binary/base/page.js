@@ -492,7 +492,6 @@ Header.prototype = {
         that.time_now = ((start_timestamp * 1000) + (moment().valueOf() - pass));
 
         var update_time = function() {
-            console.log("the interval is ",(moment().valueOf() - that.time_now));
             that.time_now += (moment().valueOf() - that.time_now);
             clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
         };

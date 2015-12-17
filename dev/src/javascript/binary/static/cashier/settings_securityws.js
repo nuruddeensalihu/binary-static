@@ -7,8 +7,8 @@ var securityws = (function(){
         $form   = $("#changeCashierLock");
         $("#repasswordrow").show();
         $("#changeCashierLock").show();
-        $("legend").text(text.localize('Lock Cashier'));
-        $("#lockInfo").text(text.localize('An additional password can be used to restrict access to the cashier.'));
+       // $("legend").text(text.localize('Lock Cashier'));
+       // $("#lockInfo").text(text.localize('An additional password can be used to restrict access to the cashier.'));
         clearErrors();
         $form.find("button").attr("value","Update");
 
@@ -116,14 +116,23 @@ var securityws = (function(){
     };
     var responseMessage = function(response){
        
-       if("passthrough" in response){
+       if(response.echo_req.passthrough){
             var passthrough = response.echo_req.passthrough.value;
-
+            var resvalue = response.echo_req.cashier_password;
+            console.log("the resvalue is ", resvalue);
             if(passthrough === "lock_status" ){
-                $("#repasswordrow").hide();
-                $("legend").text(text.localize("Unlock Cashier"));
-                $("#lockInfo").text(text.localize("Your cashier is locked as per your request - to unlock it, please enter the password."));
-                $form.find("button").attr("value","Unlock Cashier");
+                if(resvalue === 1){
+                    $("#repasswordrow").hide();
+                    $("legend").text(text.localize("Unlock Cashier"));
+                    $("#lockInfo").text(text.localize("Your cashier is locked as per your request - to unlock it, please enter the password."));
+                    $form.find("button").attr("value","Unlock Cashier");
+                }
+                else if(resvalue === 0){
+                    $("#repasswordrow").show();
+                    $("legend").text(text.localize("lock Cashier"));
+                    $("#lockInfo").text(text.localize("An additional password can be used to restrict access to the cashier."));
+                    $form.find("button").attr("value","lock Cashier");
+                }
             }
 
        }else{
