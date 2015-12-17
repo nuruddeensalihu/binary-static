@@ -64408,6 +64408,7 @@ pjax_config_page("paymentagent/withdrawws", function() {
                 case   "is_locked" :
                         BinarySocket.send({ 
                             "cashier_password": "1",
+                            "passthrough" : {"value" : "lock_status"}
                         });
                         break ;                          
             }
@@ -64415,38 +64416,40 @@ pjax_config_page("paymentagent/withdrawws", function() {
     };
     var responseMessage = function(response){
        
-        if("error" in response) {
-            console.log("the error response is", response);
-            if("message" in response.error) {
+       if("passthrough" in response){
+            var passthrough = response.echo_req.passthrough.value;
 
-                if(response.error.message === "Your cashier was locked." && response.error.code === "CashierPassword"){
-                    $("#repasswordrow").hide();
-                    $("legend").text(text.localize("Unlock Cashier"));
-                    $("#lockInfo").text(text.localize("Your cashier is locked as per your request - to unlock it, please enter the password."));
-                    $form.find("button").attr("value","Unlock Cashier");
-                }
-                else{
-                    $("#client_message_content").text(text.localize(response.error.message));
-                    //send email
-                }
+            if(passthrough === "lock_status" ){
+                $("#repasswordrow").hide();
+                $("legend").text(text.localize("Unlock Cashier"));
+                $("#lockInfo").text(text.localize("Your cashier is locked as per your request - to unlock it, please enter the password."));
+                $form.find("button").attr("value","Unlock Cashier");
             }
-            return false;
-        }
-        else{
-            console.log("the response is", response);
-            var resvalue = response.echo_req.cashier_password;
-            console.log("The value is",resvalue);
-            if(parseInt(resvalue) === 1){
-                //set success msg
-                console.log("The result is ok");
-                $("#changeCashierLock").hide();
-                $("client_message_content").hide();
-                $("#SecuritySuccessMsg").text(text.localize('Your settings have been updated successfully.'));
+
+       }else{
+            if("error" in response) {
+                console.log("the error response is", response);
+                if("message" in response.error) {
+                    $("#client_message_content").text(text.localize(response.error.message));
+                }
+                return false;
             }
             else{
-                console.log("mean old man");
-                $("#client_message_content").text(text.localize('Sorry, an error occurred while processing your account.'));
-                return false;
+                console.log("the response is", response);
+                var resvalue = response.echo_req.cashier_password;
+                console.log("The value is",resvalue);
+                if(parseInt(resvalue) === 1){
+                    //set success msg
+                    console.log("The result is ok");
+                    $("#changeCashierLock").hide();
+                    $("client_message_content").hide();
+                    $("#SecuritySuccessMsg").text(text.localize('Your settings have been updated successfully.'));
+                }
+                else{
+                    console.log("mean old man");
+                    $("#client_message_content").text(text.localize('Sorry, an error occurred while processing your account.'));
+                    return false;
+                }
             }
         }
         return;
