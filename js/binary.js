@@ -64410,7 +64410,7 @@ pjax_config_page("paymentagent/withdrawws", function() {
     };
     var responseMessage = function(response){
        var resvalue;
-       if(response.echo_req.passthrough && (response.echo_req.passthrough === "lock_status") ){
+       if(response.echo_req.passthrough && (response.echo_req.passthrough.value === "lock_status") ){
             var passthrough = response.echo_req.passthrough.value;
             resvalue = response.cashier_password;
             console.log("the resvalue is ", resvalue);
