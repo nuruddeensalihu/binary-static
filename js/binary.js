@@ -49566,22 +49566,16 @@ Header.prototype = {
         return;
     },
     time_counter : function(response){
-        var start_timestamp = response.time;
-        var pass = response.echo_req.passthrough.client_time;
-
-        var time = ((start_timestamp * 1000) + (moment().valueOf() - pass));
-        this.time_changed(time);
-
-    },
-    time_changed : function(time){
         var that = this;
         var clock_handle;
         var clock = $('#gmt-clock');
+        var start_timestamp = response.time;
+        var pass = response.echo_req.passthrough.client_time;
 
-        that.time_now = time;
+        that.time_now = ((start_timestamp * 1000) + (moment().valueOf() - pass));
+         
         var increase_time_by = function(interval) {
-            that.time_now += interval;
-            console.log("the interval is",(that.time_now - interval)/1000);
+            that.time_now += (moment.valueOf() - that.time_now);
         };
         var update_time = function() {
              clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
@@ -49591,10 +49585,9 @@ Header.prototype = {
         clearInterval(clock_handle);
 
         clock_handle = setInterval(function() {
-            increase_time_by(1000);
+            increase_time();
             update_time();
         }, 1000);
-
     },
 };
 
@@ -50486,15 +50479,12 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         var start_time;
         var tabChanged = function() {
             if(clock_started === true){
-                console.log("The clock_started is", clock_started);
                 if (document.hidden || document.webkitHidden) {
                     start_time = moment().valueOf();
                     time_now = page.header.time_now;
                 }else {
-                    console.log("The timenow is ", time_now);
-                    var tnow = (time_now + (moment().valueOf() - start_time));
-                    //page.header.time_now = time_now;
-                    page.header.time_changed(tnow);
+                    time_now = (time_now + (moment().valueOf() - start_time));
+                    page.header.time_now = time_now;
                 }
             }
         };
