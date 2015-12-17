@@ -83,7 +83,7 @@ var securityws = (function(){
             $("#errorcashierlockpassword2").text(text.localize("The two passwords that you entered do not match."));
             isValid = false;
         }
-
+        console.log("the isValid is", isValid);
         return isValid;
 
     };
