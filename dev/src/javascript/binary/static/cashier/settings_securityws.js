@@ -83,7 +83,7 @@ var securityws = (function(){
 
     };
     var isAuthorized =  function(response){
-        if("passthrough" in response.echo_req){
+        if(("passthrough" in response.echo_req) && response.echo_req.passthrough !== "undefined"){
             var option= response.echo_req.passthrough.value ;
             var pwd = $("#cashierlockpassword1").val();
 
@@ -111,7 +111,7 @@ var securityws = (function(){
     };
     var responseMessage = function(response){
        var resvalue;
-       if("passthrough" in response.echo_req){
+       if(("passthrough" in response.echo_req) && response.echo_req.passthrough !== "undefined"){
             var passthrough = response.echo_req.passthrough.value;
             resvalue = response.cashier_password;
             console.log("the resvalue is ", resvalue);
