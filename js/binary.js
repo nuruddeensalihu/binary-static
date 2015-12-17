@@ -49570,7 +49570,7 @@ Header.prototype = {
         var pass = response.echo_req.passthrough.client_time;
 
         var time = ((start_timestamp * 1000) + (moment().valueOf() - pass));
-        header.time_changed(time);
+        this.time_changed(time);
 
     },
     time_changed : function(time){
