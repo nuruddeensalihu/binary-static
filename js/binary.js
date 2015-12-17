@@ -49578,7 +49578,7 @@ Header.prototype = {
         var clock_handle;
         var clock = $('#gmt-clock');
         var increase_time_by = function(interval) {
-            that.time_now += interval;
+            header.time_now += interval;
             console.log("the interval is",(that.time_now - interval)/1000);
         };
         var update_time = function() {
