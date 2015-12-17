@@ -228,6 +228,7 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
                     start_time = moment().valueOf();
                     time_now = page.header.time_now;
                 }else {
+                    console.log("The timenow is ", time_now);
                     time_now = (time_now + (moment().valueOf() - start_time));
                     page.header.time_now = time_now;
                 }
