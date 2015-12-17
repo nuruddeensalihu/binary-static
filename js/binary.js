@@ -64360,14 +64360,14 @@ pjax_config_page("paymentagent/withdrawws", function() {
         if(isVisible === true){
             
             if(pwd2.length <= 0 ){
-                $("#errorcashierlockpassword1").text(text.localize("Please enter a password."));
+                $("#errorcashierlockpassword2").text(text.localize("Please enter a password."));
                 isValid = false;
             }
             else if(pwd2.length > 25){
-                $("#errorcashierlockpassword1").text(text.localize("password can't be longer than 25."));
+                $("#errorcashierlockpassword2").text(text.localize("password can't be longer than 25."));
                 isValid = false;
             }else if(pwd2.length < 6 ){
-                $("#errorcashierlockpassword1").text(text.localize("Your password should be at least 6 characters."));
+                $("#errorcashierlockpassword2").text(text.localize("Your password should be at least 6 characters."));
                 isValid = false;
             }
 
