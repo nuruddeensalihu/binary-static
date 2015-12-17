@@ -484,8 +484,6 @@ Header.prototype = {
     },
     time_counter : function(response){
         var that = this;
-        var clock_handle;
-        var clock = $('#gmt-clock');
         var start_timestamp = response.time;
         var pass = response.echo_req.passthrough.client_time;
 
@@ -494,7 +492,9 @@ Header.prototype = {
 
     },
     time_changed : function(){
-
+        var clock_handle;
+        var clock = $('#gmt-clock');
+        
         var increase_time_by = function(interval) {
             that.time_now += interval;
             console.log("the interval is",(that.time_now - interval)/1000);
