@@ -63,9 +63,13 @@ var securityws = (function(){
                     isValid = false;
                 }
             });
+
+            if(pwd1 !== pwd2 ){
+                $("#errorcashierlockpassword2").text(text.localize("The two passwords that you entered do not match."));
+                isValid = false;
+            }
         }
         else{
-
             if(pwd1.length <= 0 ){
                 $("#errorcashierlockpassword1").text(text.localize("Please enter a password."));
                 isValid = false;
@@ -79,10 +83,7 @@ var securityws = (function(){
             }
 
         }
-        if(pwd1 !== pwd2 ){
-            $("#errorcashierlockpassword2").text(text.localize("The two passwords that you entered do not match."));
-            isValid = false;
-        }
+        
         console.log("the isValid is", isValid);
         return isValid;
 
