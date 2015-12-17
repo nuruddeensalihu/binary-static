@@ -70,9 +70,7 @@ var securityws = (function(){
             }else if(pwd2.length < 6 ){
                 $("#errorcashierlockpassword2").text(text.localize("Your password should be at least 6 characters."));
                 isValid = false;
-            }
-
-            if(pwd1 !== pwd2 ){
+            }else if(pwd1 !== pwd2 ){
                 $("#errorcashierlockpassword2").text(text.localize("The two passwords that you entered do not match."));
                 isValid = false;
             }
