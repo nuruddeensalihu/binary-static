@@ -49587,7 +49587,7 @@ Header.prototype = {
         clock_handle = setInterval(function() {
             increase_time();
             update_time();
-        }, 1000);
+        }, 500);
     },
 };
 
