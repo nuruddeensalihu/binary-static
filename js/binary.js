@@ -64350,7 +64350,7 @@ pjax_config_page("paymentagent/withdrawws", function() {
             $(":password").each(function(ind,ele){
                 console.log("The element is", ele);
                 var value = $(ele).val();
-
+   
                 if(value.length <= 0 ){
                     $("#error" + $(ele).attr("id")).text(text.localize("Please enter a password."));
                     isValid = false;
