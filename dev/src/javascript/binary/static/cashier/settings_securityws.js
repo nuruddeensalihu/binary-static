@@ -45,45 +45,39 @@ var securityws = (function(){
         var pwd2 = $("#cashierlockpassword2").val();
         var isVisible = $("#repasswordrow").is(':visible');
         console.log("isVisible", isVisible);
-        if(isVisible === true){
 
-            $(":password").each(function(ind,ele){
-                console.log("The element is", ele);
-                var value = $(ele).val();
-   
-                if(value.length <= 0 ){
-                    $("#error" + $(ele).attr("id")).text(text.localize("Please enter a password."));
-                    isValid = false;
-                }
-                else if(value.length > 25){
-                    $("#error" + $(ele).attr("id")).text(text.localize("password can't be longer than 25."));
-                    isValid = false;
-                }else if(value.length < 6 ){
-                    $("#error" + $(ele).attr("id")).text(text.localize("Your password should be at least 6 characters."));
-                    isValid = false;
-                }
-            });
+        if(pwd1.length <= 0 ){
+            $("#errorcashierlockpassword1").text(text.localize("Please enter a password."));
+            isValid = false;
+        }
+        else if(pwd1.length > 25){
+            $("#errorcashierlockpassword1").text(text.localize("password can't be longer than 25."));
+            isValid = false;
+        }else if(pwd1.length < 6 ){
+            $("#errorcashierlockpassword1").text(text.localize("Your password should be at least 6 characters."));
+            isValid = false;
+        }
+        
+        if(isVisible === true){
+            
+            if(pwd2.length <= 0 ){
+                $("#errorcashierlockpassword1").text(text.localize("Please enter a password."));
+                isValid = false;
+            }
+            else if(pwd2.length > 25){
+                $("#errorcashierlockpassword1").text(text.localize("password can't be longer than 25."));
+                isValid = false;
+            }else if(pwd2.length < 6 ){
+                $("#errorcashierlockpassword1").text(text.localize("Your password should be at least 6 characters."));
+                isValid = false;
+            }
 
             if(pwd1 !== pwd2 ){
                 $("#errorcashierlockpassword2").text(text.localize("The two passwords that you entered do not match."));
                 isValid = false;
             }
         }
-        else{
-            if(pwd1.length <= 0 ){
-                $("#errorcashierlockpassword1").text(text.localize("Please enter a password."));
-                isValid = false;
-            }
-            else if(pwd1.length > 25){
-                $("#errorcashierlockpassword1").text(text.localize("password can't be longer than 25."));
-                isValid = false;
-            }else if(pwd1.length < 6 ){
-                $("#errorcashierlockpassword1").text(text.localize("Your password should be at least 6 characters."));
-                isValid = false;
-            }
-
-        }
-        
+                
         console.log("the isValid is", isValid);
         return isValid;
 
