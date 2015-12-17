@@ -64417,16 +64417,18 @@ pjax_config_page("paymentagent/withdrawws", function() {
        
        if(response.echo_req.passthrough){
             var passthrough = response.echo_req.passthrough.value;
-            var resvalue = response.echo_req.cashier_password;
+            var resvalue = response.cashier_password;
             console.log("the resvalue is ", resvalue);
+            console.log("the res", response);
             if(passthrough === "lock_status" ){
-                if(resvalue === 1){
+
+                if(parseInt(resvalue) === 1){
                     $("#repasswordrow").hide();
                     $("legend").text(text.localize("Unlock Cashier"));
                     $("#lockInfo").text(text.localize("Your cashier is locked as per your request - to unlock it, please enter the password."));
                     $form.find("button").attr("value","Unlock Cashier");
                 }
-                else if(resvalue === 0){
+                else if(parseInt(resvalue) === 0){
                     $("#repasswordrow").show();
                     $("legend").text(text.localize("lock Cashier"));
                     $("#lockInfo").text(text.localize("An additional password can be used to restrict access to the cashier."));
