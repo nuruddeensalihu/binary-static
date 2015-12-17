@@ -494,7 +494,7 @@ Header.prototype = {
     time_changed : function(){
         var clock_handle;
         var clock = $('#gmt-clock');
-        
+        var that = this;
         var increase_time_by = function(interval) {
             that.time_now += interval;
             console.log("the interval is",(that.time_now - interval)/1000);
