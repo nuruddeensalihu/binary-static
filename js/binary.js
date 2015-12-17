@@ -49573,15 +49573,9 @@ Header.prototype = {
         var pass = response.echo_req.passthrough.client_time;
 
         that.time_now = ((start_timestamp * 1000) + (moment().valueOf() - pass));
-        console.log("the time now is 3", that.time_now);
-        console.log("the current time is ", moment.valueOf());
+        
         var increase_time = function() {
             that.time_now += (moment().valueOf() - that.time_now);
-            console.log("The time_now is ", that.time_now);
-            console.log("The moment is ", moment().valueOf());
-            var delay  = (moment().valueOf() - that.time_now);
-            console.log("the delay is", delay);
-            console.log("the interval is ",(moment().valueOf() - that.time_now));
         };
         var update_time = function() {
              clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
