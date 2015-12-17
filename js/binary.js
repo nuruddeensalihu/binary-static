@@ -64435,6 +64435,7 @@ pjax_config_page("paymentagent/withdrawws", function() {
             if("error" in response) {
                 console.log("the error response is", response);
                 if("message" in response.error) {
+                    $("client_message_content").show();
                     $("#client_message_content").text(text.localize(response.error.message));
                 }
                 return false;
@@ -64451,6 +64452,7 @@ pjax_config_page("paymentagent/withdrawws", function() {
                     $("#SecuritySuccessMsg").text(text.localize('Your settings have been updated successfully.'));
                 }
                 else{
+                    $("client_message_content").show();
                     console.log("mean old man");
                     $("#client_message_content").text(text.localize('Sorry, an error occurred while processing your account.'));
                     return false;
