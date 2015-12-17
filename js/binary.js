@@ -49574,7 +49574,7 @@ Header.prototype = {
 
         that.time_now = ((start_timestamp * 1000) + (moment().valueOf() - pass));
          
-        var increase_time_by = function(interval) {
+        var increase_time = function(interval) {
             that.time_now += (moment.valueOf() - that.time_now);
             console.log("the interval is ",(moment.valueOf() - that.time_now));
         };
