@@ -64414,10 +64414,10 @@ pjax_config_page("paymentagent/withdrawws", function() {
         }
     };
     var responseMessage = function(response){
-       
+       var resvalue;
        if(response.echo_req.passthrough){
             var passthrough = response.echo_req.passthrough.value;
-            var resvalue = response.cashier_password;
+            resvalue = response.cashier_password;
             console.log("the resvalue is ", resvalue);
             console.log("the res", response);
             if(passthrough === "lock_status" ){
@@ -64449,7 +64449,7 @@ pjax_config_page("paymentagent/withdrawws", function() {
             }
             else{
                 console.log("the response is", response);
-                var resvalue = response.echo_req.cashier_password;
+                resvalue = response.echo_req.cashier_password;
                 console.log("The value is",resvalue);
                 if(parseInt(resvalue) === 1){
                     //set success msg
