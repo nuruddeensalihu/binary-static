@@ -49576,6 +49576,7 @@ Header.prototype = {
          
         var increase_time_by = function(interval) {
             that.time_now += (moment.valueOf() - that.time_now);
+            console.log("the interval is ",(moment.valueOf() - that.time_now));
         };
         var update_time = function() {
              clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
