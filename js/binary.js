@@ -50479,6 +50479,7 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
         var start_time;
         var tabChanged = function() {
             if(clock_started === true){
+                console.log("The clock_started is", clock_started);
                 if (document.hidden || document.webkitHidden) {
                     start_time = moment().valueOf();
                     time_now = page.header.time_now;
