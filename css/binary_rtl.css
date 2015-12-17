@@ -4894,13 +4894,26 @@ table .loss, table .lower {
   }
 }
 
-.api_token table td {
+.api_token table td, .api_token table th.flex-tr-child {
   text-align: center !important;
   vertical-align: middle !important;
+  line-height: 30px;
+}
+.api_token table td .button, .api_token table th.flex-tr-child .button {
+  margin: 3px 0px;
+}
+.api_token table tr.deleting {
+  background-color: lightgray;
+}
+.api_token table tr.new {
+  background-color: #EDFFEE;
 }
 .api_token fieldset {
   border-bottom: 1px solid #E5E5E5;
   margin: 20px 0;
+}
+.api_token fieldset #formMessage {
+  margin-bottom: 10px;
 }
 
 @media screen and (max-width: 480px) {

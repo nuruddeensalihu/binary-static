@@ -104,9 +104,9 @@ var Content = (function () {
             textFormEvenOdd: text.localize('Even/Odd'),
             textFormOverUnder: text.localize('Over/Under'),
             textMessageRequired: text.localize('This field is required.'),
-            textMessageCountLimit: text.localize('You should enter between %LIMIT% characters.'), // %LIMIT% should be replaced by a range. sample: (6-20)
-            textMessageJustAllowed: text.localize('Only %ALLOWED% are allowed.'), // %ALLOWED% should be replaced by values including: letters, numbers, space, period, ...
-            textMessageValid: text.localize('Please submit a valid %FIELD%.'), // %FIELD% should be replaced by values such as Email address
+            textMessageCountLimit: text.localize('You should enter between %1 characters.'), // %LIMIT% should be replaced by a range. sample: (6-20)
+            textMessageJustAllowed: text.localize('Only %1 are allowed.'), // %ALLOWED% should be replaced by values including: letters, numbers, space, period, ...
+            textMessageValid: text.localize('Please submit a valid %1.'), // %FIELD% should be replaced by values such as Email address
             textLetters: text.localize('letters'),
             textNumbers: text.localize('numbers'),
             textSpace: text.localize('space'),
@@ -292,15 +292,15 @@ var Content = (function () {
                 break;
             case 'reg':
                 if(param)
-                    msg = localize.textMessageJustAllowed.replace('%ALLOWED%', param.join(separator));
+                    msg = localize.textMessageJustAllowed.replace('%1', param.join(separator));
                 break;
             case 'range':
                 if(param)
-                    msg = localize.textMessageCountLimit.replace('%LIMIT%', param);
+                    msg = localize.textMessageCountLimit.replace('%1', param);
                 break;
             case 'valid':
                 if(param)
-                    msg = localize.textMessageValid.replace('%FIELD%', param);
+                    msg = localize.textMessageValid.replace('%1', param);
                 break;
             default:
                 break;

@@ -61,7 +61,7 @@ var Validate = (function(){
 
             return false;
 
-        } else if (!/^[^-~\s]+$/.test(password)) {
+        } else if (!/^[ -~]+$/.test(password)) {
             hideErrorMessage(rError);
             error.textContent = Content.errorMessage('valid', Content.localize().textPassword);
             displayErrorMessage(error);

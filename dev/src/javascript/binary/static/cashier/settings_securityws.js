@@ -3,12 +3,20 @@ var securityws = (function(){
     "use strict";
     var $form ;
 
+    var clearErrors = function(){
+        $("#SecuritySuccessMsg").text('');
+        $("#errorcashierlockpassword1").text('');
+        $("#errorcashierlockpassword2").text('');
+        $("#client_message_content").text('');
+        $("#client_message_content").hide();
+
+    };
+
     var init = function(){
         $form   = $("#changeCashierLock");
         $("#repasswordrow").show();
         $("#changeCashierLock").show();
-       // $("legend").text(text.localize('Lock Cashier'));
-       // $("#lockInfo").text(text.localize('An additional password can be used to restrict access to the cashier.'));
+
         clearErrors();
         $form.find("button").attr("value","Update");
 
@@ -28,14 +36,6 @@ var securityws = (function(){
         BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "is_locked"}});
     };
     
-    var clearErrors = function(){
-        $("#SecuritySuccessMsg").text('');
-        $("#errorcashierlockpassword1").text('');
-        $("#errorcashierlockpassword2").text('');
-        $("#client_message_content").text('');
-        $("#client_message_content").hide();
-
-    };
     var validateForm = function(){
         var isValid = true;
       
@@ -44,7 +44,6 @@ var securityws = (function(){
         var pwd1 = $("#cashierlockpassword1").val();
         var pwd2 = $("#cashierlockpassword2").val();
         var isVisible = $("#repasswordrow").is(':visible');
-        console.log("isVisible", isVisible);
 
         if(pwd1.length <= 0 ){
             $("#errorcashierlockpassword1").text(text.localize("Please enter a password."));
@@ -76,9 +75,7 @@ var securityws = (function(){
             }
         }
                 
-        console.log("the isValid is", isValid);
         return isValid;
-
     };
     var isAuthorized =  function(response){
         if(response.echo_req.passthrough){
@@ -108,12 +105,12 @@ var securityws = (function(){
         }
     };
     var responseMessage = function(response){
+
        var resvalue;
+       
        if(response.echo_req.passthrough && (response.echo_req.passthrough.value === "lock_status") ){
             var passthrough = response.echo_req.passthrough.value;
             resvalue = response.cashier_password;
-            console.log("the resvalue is ", resvalue);
-            console.log("the res", response);
             if(parseInt(resvalue) === 1){
                 $("#repasswordrow").hide();
                 $("legend").text(text.localize("Unlock Cashier"));
@@ -130,9 +127,9 @@ var securityws = (function(){
                 $form.find("button").html("Update");
             }
 
-       }else{
+        }
+        else{
             if("error" in response) {
-                console.log("the error response is", response);
                 if("message" in response.error) {
                     $("#client_message_content").show();
                     $("#client_message_content").text(text.localize(response.error.message));
@@ -140,20 +137,17 @@ var securityws = (function(){
                 return false;
             }
             else{
-                console.log("the response is", response);
+
                 resvalue = response.echo_req.cashier_password;
-                console.log("The value is",resvalue);
                 if(parseInt(resvalue) === 1){
-                    //set success msg
-                    console.log("The result is ok");
                     $("#changeCashierLock").hide();
                     $("#client_message_content").hide();
                     $("#SecuritySuccessMsg").text(text.localize('Your settings have been updated successfully.'));
                 }
                 else{
                     $("#client_message_content").show();
-                    console.log("mean old man");
                     $("#client_message_content").text(text.localize('Sorry, an error occurred while processing your account.'));
+                    
                     return false;
                 }
             }
@@ -170,6 +164,7 @@ var securityws = (function(){
             isAuthorized(response);
         }
     };
+
     return {
         init : init,
         SecurityApiResponse : SecurityApiResponse
@@ -196,6 +191,7 @@ pjax_config_page("user/settings/securityws", function() {
                     }
                 }
             });	
+
             securityws.init();
         }
     };

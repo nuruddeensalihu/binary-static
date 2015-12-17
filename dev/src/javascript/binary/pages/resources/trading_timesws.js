@@ -1,14 +1,18 @@
 var TradingTimesWS = (function() {
     "use strict";
 
-    var $date      = $('#trading-date');
-    var $container = $('#trading-times');
-    var columns    = ['Asset', 'Opens', 'Closes', 'Settles', 'UpcomingEvents'];
-    var activeSymbols, 
+    var $date,
+        $container;
+
+    var columns,
+        activeSymbols, 
         tradingTimes;
 
 
     var init = function() {
+        $date      = $('#trading-date');
+        $container = $('#trading-times');
+        columns    = ['Asset', 'Opens', 'Closes', 'Settles', 'UpcomingEvents'];
         showLoadingImage($container);
         BinarySocket.send({"active_symbols": "brief"});
         sendRequest('today');
