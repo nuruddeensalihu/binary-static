@@ -91,7 +91,6 @@ var securityws = (function(){
         if(response.echo_req.passthrough){
             var option= response.echo_req.passthrough.value ;
             var pwd = $("#cashierlockpassword1").val();
-           // var pwd2 = $("#cashierlockpassword2").val();
 
             switch(option){
                 case   "lock_password" :
@@ -109,7 +108,6 @@ var securityws = (function(){
                 case   "is_locked" :
                         BinarySocket.send({ 
                             "cashier_password": "1",
-                            "lock_password": pwd
                         });
                         break ;                          
             }
@@ -144,23 +142,10 @@ var securityws = (function(){
                 $("#changeCashierLock").hide();
                 $("client_message_content").hide();
                 $("#SecuritySuccessMsg").text(text.localize('Your settings have been updated successfully.'));
-                //console.log("The result 234 is ok");
-                /*
-                if("lock_password" in response.echo_req)
-                {
-                    //its a lock password
-                    //send emai 
-                    console.log("mog");
-                }else{
-                    //its an unlock password
-                    //send email
-                    console.log("smug");
-                }*/
             }
             else{
                 console.log("mean old man");
                 $("#client_message_content").text(text.localize('Sorry, an error occurred while processing your account.'));
-                //send email
                 return false;
             }
         }
@@ -169,11 +154,8 @@ var securityws = (function(){
     var SecurityApiResponse = function(response){
         var type = response.msg_type;
         if (type === "cashier_password" || (type === "error" && "cashier_password" in response.echo_req)){
-           // populateForm(response);
-           //check for lock account
            responseMessage(response);
 
-        
         }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
         {
             isAuthorized(response);

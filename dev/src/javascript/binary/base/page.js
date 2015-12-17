@@ -491,21 +491,17 @@ Header.prototype = {
 
         that.time_now = ((start_timestamp * 1000) + (moment().valueOf() - pass));
 
-        var increase_time = function() {
-            that.time_now += (moment().valueOf() - that.time_now);
-            console.log("the interval is ",(moment().valueOf() - that.time_now));
-        };
         var update_time = function() {
-             clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+            console.log("the interval is ",(moment().valueOf() - that.time_now));
+            that.time_now += (moment().valueOf() - that.time_now);
+            clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
         };
+
         update_time();
 
         clearInterval(clock_handle);
 
-        clock_handle = setInterval(function() {
-            increase_time();
-            update_time();
-        }, 500);
+        clock_handle = setInterval(update_time , 500);
     },
 };
 
