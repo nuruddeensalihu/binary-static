@@ -49576,6 +49576,10 @@ Header.prototype = {
          
         var increase_time = function() {
             that.time_now += (moment.valueOf() - that.time_now);
+            console.log("The time_now is ", that.time_now);
+            console.log("The moment is ", moment.valueOf());
+            var delay  = (moment.valueOf() - that.time_now);
+            console.log("the delay is", delay);
             console.log("the interval is ",(moment.valueOf() - that.time_now));
         };
         var update_time = function() {
