@@ -64382,7 +64382,7 @@ pjax_config_page("paymentagent/withdrawws", function() {
 
     };
     var isAuthorized =  function(response){
-        if("passthrough" in response){
+        if("passthrough" in response.echo_req){
             var option= response.echo_req.passthrough.value ;
             var pwd = $("#cashierlockpassword1").val();
 
@@ -64410,7 +64410,7 @@ pjax_config_page("paymentagent/withdrawws", function() {
     };
     var responseMessage = function(response){
        var resvalue;
-       if("passthrough" in response){
+       if("passthrough" in response.echo_req){
             var passthrough = response.echo_req.passthrough.value;
             resvalue = response.cashier_password;
             console.log("the resvalue is ", resvalue);
