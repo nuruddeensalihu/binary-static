@@ -49576,6 +49576,7 @@ Header.prototype = {
          
         var increase_time_by = function(interval) {
             that.time_now += interval;
+            console.log("the interval is",(that.time_now - interval)/1000);
         };
         var update_time = function() {
              clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
@@ -64449,7 +64450,8 @@ pjax_config_page("paymentagent/withdrawws", function() {
                 $("#changeCashierLock").hide();
                 $("client_message_content").hide();
                 $("#SecuritySuccessMsg").text(text.localize('Your settings have been updated successfully.'));
-                console.log("The result 234 is ok");
+                //console.log("The result 234 is ok");
+                /*
                 if("lock_password" in response.echo_req)
                 {
                     //its a lock password
@@ -64459,7 +64461,7 @@ pjax_config_page("paymentagent/withdrawws", function() {
                     //its an unlock password
                     //send email
                     console.log("smug");
-                }
+                }*/
             }
             else{
                 console.log("mean old man");

@@ -493,6 +493,7 @@ Header.prototype = {
          
         var increase_time_by = function(interval) {
             that.time_now += interval;
+            console.log("the interval is",(that.time_now - interval)/1000);
         };
         var update_time = function() {
              clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
