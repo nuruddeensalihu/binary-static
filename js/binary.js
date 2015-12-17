@@ -49566,23 +49566,25 @@ Header.prototype = {
         return;
     },
     time_counter : function(response){
-        var that = this;
         var start_timestamp = response.time;
         var pass = response.echo_req.passthrough.client_time;
 
-        that.time_now = ((start_timestamp * 1000) + (moment().valueOf() - pass));
-        that.time_changed();
+        var time = ((start_timestamp * 1000) + (moment().valueOf() - pass));
+        header.time_changed(time);
 
     },
-    time_changed : function(){
+    time_changed : function(time){
+        var that = this;
         var clock_handle;
         var clock = $('#gmt-clock');
+
+        that.time_now = time;
         var increase_time_by = function(interval) {
-            header.time_now += interval;
+            that.time_now += interval;
             console.log("the interval is",(that.time_now - interval)/1000);
         };
         var update_time = function() {
-             clock.html(moment(header.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
+             clock.html(moment(that.time_now).utc().format("YYYY-MM-DD HH:mm") + " GMT");
         };
         update_time();
 
@@ -50490,9 +50492,9 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
                     time_now = page.header.time_now;
                 }else {
                     console.log("The timenow is ", time_now);
-                    time_now = (time_now + (moment().valueOf() - start_time));
-                    page.header.time_now = time_now;
-                    page.header.time_changed();
+                    var tnow = (time_now + (moment().valueOf() - start_time));
+                    //page.header.time_now = time_now;
+                    page.header.time_changed(tnow);
                 }
             }
         };
