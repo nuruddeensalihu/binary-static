@@ -490,7 +490,11 @@ Header.prototype = {
         var pass = response.echo_req.passthrough.client_time;
 
         that.time_now = ((start_timestamp * 1000) + (moment().valueOf() - pass));
-         
+        time_changed();
+
+    },
+    time_changed : function(){
+
         var increase_time_by = function(interval) {
             that.time_now += interval;
             console.log("the interval is",(that.time_now - interval)/1000);
@@ -506,6 +510,7 @@ Header.prototype = {
             increase_time_by(1000);
             update_time();
         }, 1000);
+
     },
 };
 

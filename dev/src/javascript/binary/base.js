@@ -232,6 +232,7 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
                     console.log("The timenow is ", time_now);
                     time_now = (time_now + (moment().valueOf() - start_time));
                     page.header.time_now = time_now;
+                    page.header.time_changed();
                 }
             }
         };
