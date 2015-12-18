@@ -190,6 +190,7 @@ pjax_config_page("user/settings/securityws", function() {
                 onmessage: function(msg){
                     var response = JSON.parse(msg.data);
                     if (response) {
+                        console.log("from the res",response);
                         securityws.SecurityApiResponse(response);
                           
                     }
