@@ -64702,6 +64702,8 @@ pjax_config_page("paymentagent/withdrawws", function() {
     var responseMessage = function(response){
 
        var resvalue;
+
+       console.log("the res is ", response);
        
        if(response.echo_req.passthrough && (response.echo_req.passthrough.value === "lock_status") ){
             var passthrough = response.echo_req.passthrough.value;
