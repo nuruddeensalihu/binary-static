@@ -59,7 +59,6 @@ var BinarySocket = (function () {
     };
 
     var send = function(data) {
-      
         if (isClose()) {
             bufferedSends.push(data);
             init(1);
@@ -88,7 +87,6 @@ var BinarySocket = (function () {
     };
 
     var init = function (es) {
-
         if(!es){
             events = {};
         }
@@ -104,7 +102,6 @@ var BinarySocket = (function () {
         }
 
         binarySocket.onopen = function (){
-
             var loginToken = getCookieItem('login');
             if(loginToken) {
                 binarySocket.send(JSON.stringify({authorize: loginToken}));
@@ -125,7 +122,6 @@ var BinarySocket = (function () {
         };
 
         binarySocket.onmessage = function (msg){
-
             var response = JSON.parse(msg.data);
             if (response) {
                 if(response.hasOwnProperty('echo_req') && response.echo_req.hasOwnProperty('passthrough') && response.echo_req.passthrough.hasOwnProperty('req_number')){
@@ -154,7 +150,6 @@ var BinarySocket = (function () {
         };
 
         binarySocket.onclose = function (e) {
-
             authorized = false;
             clearTimeouts();
 
@@ -170,7 +165,7 @@ var BinarySocket = (function () {
             console.log('socket error', error);
         };
     };
-    
+
     var close = function () {
         manualClosed = true;
         bufferedSends = [];
