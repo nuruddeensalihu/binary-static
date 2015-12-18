@@ -56,7 +56,7 @@ var securityws = (function(){
         }else if(pwd1.length < 6 ){
             $("#errorcashierlockpassword1").text(text.localize("Your password should be at least 6 characters."));
             isValid = false;
-        }else if(!regexp.test(pw1)){
+        }else if(!regexp.test(pwd1)){
             $("#errorcashierlockpassword1").text(text.localize("Your password contains invalid characters."));
             isValid = false;
         }
