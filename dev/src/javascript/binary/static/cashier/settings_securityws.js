@@ -24,6 +24,7 @@ var securityws = (function(){
             e.preventDefault();
             e.stopPropagation();
             if(validateForm() === false){
+                console.log("isValid is true");
                 return false;
             }
             if($(this).attr("value") === "Update"){
@@ -159,6 +160,7 @@ var securityws = (function(){
     var SecurityApiResponse = function(response){
         var type = response.msg_type;
         if (type === "cashier_password" || (type === "error" && "cashier_password" in response.echo_req)){
+            console.log("the res",response);
            responseMessage(response);
 
         }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
