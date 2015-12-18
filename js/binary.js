@@ -64619,7 +64619,6 @@ pjax_config_page("paymentagent/withdrawws", function() {
             e.preventDefault();
             e.stopPropagation();
             if(validateForm() === false){
-                console.log("isValid is true");
                 return false;
             }
             if($(this).attr("value") === "Update"){
@@ -64634,7 +64633,8 @@ pjax_config_page("paymentagent/withdrawws", function() {
     
     var validateForm = function(){
         var isValid = true;
-      
+        var regexp = new RegExp('^[ -~]+$');
+
         clearErrors();
 
         var pwd1 = $("#cashierlockpassword1").val();
@@ -64650,6 +64650,9 @@ pjax_config_page("paymentagent/withdrawws", function() {
             isValid = false;
         }else if(pwd1.length < 6 ){
             $("#errorcashierlockpassword1").text(text.localize("Your password should be at least 6 characters."));
+            isValid = false;
+        }else if(!regexp.test(pw1)){
+            $("#errorcashierlockpassword1").text(text.localize("Your password contains invalid characters."));
             isValid = false;
         }
         
@@ -64703,8 +64706,6 @@ pjax_config_page("paymentagent/withdrawws", function() {
     var responseMessage = function(response){
 
        var resvalue;
-
-       console.log("the res is ", response);
        
        if(response.echo_req.passthrough && (response.echo_req.passthrough.value === "lock_status") ){
             var passthrough = response.echo_req.passthrough.value;
@@ -64755,7 +64756,6 @@ pjax_config_page("paymentagent/withdrawws", function() {
     var SecurityApiResponse = function(response){
         var type = response.msg_type;
         if (type === "cashier_password" || (type === "error" && "cashier_password" in response.echo_req)){
-            console.log("the res",response);
            responseMessage(response);
 
         }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
@@ -64785,7 +64785,6 @@ pjax_config_page("user/settings/securityws", function() {
                 onmessage: function(msg){
                     var response = JSON.parse(msg.data);
                     if (response) {
-                        console.log("from the res",response);
                         securityws.SecurityApiResponse(response);
                           
                     }
