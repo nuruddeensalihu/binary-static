@@ -64705,7 +64705,7 @@ pjax_config_page("paymentagent/withdrawws", function() {
                 $("legend").text(text.localize("Unlock Cashier"));
                 $("#lockInfo").text(text.localize("Your cashier is locked as per your request - to unlock it, please enter the password."));
                 $form.find("button").attr("value","Unlock Cashier");
-                $form.find("button").html("Unlock Cashier");
+                $form.find("button").html(text.localize("Unlock Cashier"));
 
             }
             else if(parseInt(resvalue) === 0){
@@ -64713,7 +64713,7 @@ pjax_config_page("paymentagent/withdrawws", function() {
                 $("legend").text(text.localize("lock Cashier"));
                 $("#lockInfo").text(text.localize("An additional password can be used to restrict access to the cashier."));
                 $form.find("button").attr("value","Update");
-                $form.find("button").html("Update");
+                $form.find("button").html(text.localize("Update"));
             }
 
         }
