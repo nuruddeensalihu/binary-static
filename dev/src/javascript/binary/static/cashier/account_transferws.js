@@ -6,6 +6,9 @@ var account_transferws = (function(){
         $form = $('#accountTransfer');
         $('.grd-grid-12','#SuccessForm').hide();
         $('.errorbox').find('#client_message').hide();
+
+        console.log("the form is ", $form);
+        console.log("The first row is ",$('.grd-grid-12','#SuccessForm'));
     };
 
     var apiResponse = function(){
