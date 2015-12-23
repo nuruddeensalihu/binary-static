@@ -40,8 +40,8 @@
   %link{:rel => "icon", :sizes => "192x192",:href => url_for("/images/favicons/favicon-192x192.png"),:type => "image/png"}
   %link{:rel => "icon", :href => url_for("/images/favicons/favicon-160x160.png"),:sizes => "160x160", :type => "image/png"}
   %link{:rel => "icon", :sizes => "96x96", :href => url_for("/images/favicons/favicon-96x96.png"),:type => "image/png"}
-  %link{:href => url_for("/images/favicons/favicon-16x16.png"), :rel => "icon", :sizes => "16x16", :type => "image/png"}
-  %link{:href => url_for("/images/favicons/favicon-32x32.png"), :rel => "icon", :sizes => "32x32", :type => "image/png"}
+  %link{:rel => "icon", :sizes => "16x16",:href => url_for("/images/favicons/favicon-16x16.png"),  :type => "image/png"}
+  %link{ :rel => "icon", :href => url_for("/images/favicons/favicon-32x32.png"),:sizes => "32x32", :type => "image/png"}
 
   - my $languages = available_languages();
   - my $path = get_current_path();
