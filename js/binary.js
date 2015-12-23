@@ -64501,6 +64501,12 @@ var BinarySocket = (function () {
 
     };
 
+    
+    return {
+        init : init,
+        apiResponse : apiResponse
+    };
+
 })();
 
 pjax_config_page("cashier/account_transferws", function() {
