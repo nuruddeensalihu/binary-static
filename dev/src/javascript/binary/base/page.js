@@ -398,6 +398,7 @@ Header.prototype = {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
         this.simulate_input_placeholder_for_ie();
+        this.logout_handler();
     },
     on_unload: function() {
         this.menu.reset();
@@ -499,6 +500,22 @@ Header.prototype = {
         clearInterval(clock_handle);
 
         clock_handle = setInterval(update_time, 1000);
+    },
+    logout_handler : function(){
+        $('a.logout').unbind('click').click(function(){
+            BinarySocket.send({"logout": "1"});
+        });
+    },
+    do_logout : function(response){
+        if("logout" in response && response.logout === 1){
+            var cookies = ['login', 'loginid', 'loginid_list', 'email', 'settings', 'reality_check'];
+            var current_domain = window.location.hostname.replace('www', '');
+            cookies.map(function(c){
+                $.removeCookie(c, {path: '/', domain: current_domain});
+            });
+            
+            window.location.href = page.url.url_for(''); //redirect to homepage
+        }
     },
 };
 

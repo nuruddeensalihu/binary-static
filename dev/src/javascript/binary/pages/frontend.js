@@ -229,7 +229,7 @@ var display_career_email = function() {
     $("#hr_contact_eaddress").html(email_rot13("<n uers=\"znvygb:ue@ovanel.pbz\" ery=\"absbyybj\">ue@ovanel.pbz</n>"));
 };
 
-var get_residence_list = function() {
+var get_residence_list = function(residenceId) {
     var url = page.url.url_for('residence_list');
     $.getJSON(url, function(data) {
         var countries = [];
@@ -242,7 +242,11 @@ var get_residence_list = function() {
                 selected = ' selected="selected" ';
             }
             countries.push('<option value="' + country.value + '"' + disabled + selected + '>' + country.text + '</option>');
-            $("#residence").html(countries.join(''));
+            if(residenceId){
+                $("#" + residenceId).html(countries.join(''));
+            } else {
+                $("#residence").html(countries.join(''));
+            }
 
             $('form#virtual-acc-form #btn_registration').removeAttr('disabled');
         });
@@ -296,6 +300,117 @@ function hide_if_logged_in() {
     if (page.client.is_logged_in) {
         $('.client_logged_out').remove();
     }
+}
+
+// use function to generate elements and append them
+// e.g. element is select and element to append is option
+function appendTextValueChild(element, text, value){
+    var option = document.createElement("option");
+
+    option.text = text;
+    option.value = value;
+    element.appendChild(option);
+}
+
+// populate drop down list of Titles, pass in select element
+function setTitles(select){
+    appendTextValueChild(select, Content.localize().textMr, 'Mr');
+    appendTextValueChild(select, Content.localize().textMrs, 'Mrs');
+    appendTextValueChild(select, Content.localize().textMs, 'Ms');
+    appendTextValueChild(select, Content.localize().textMiss, 'Miss');
+    appendTextValueChild(select, Content.localize().textDr, 'Dr');
+    appendTextValueChild(select, Content.localize().textProf, 'Prof');
+}
+
+// append numbers to a drop down menu, eg 1-30
+function dropDownNumbers(select, startNum, endNum) {
+    select.appendChild(document.createElement("option"));
+
+    for (i = startNum; i <= endNum; i++){
+        var option = document.createElement("option");
+        option.text = i;
+        option.value = i;
+        select.appendChild(option);
+    }
+
+}
+
+function dropDownMonths(select, startNum, endNum) {
+    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    select.appendChild(document.createElement("option"));
+    for (i = startNum; i <= endNum; i++){
+        var option = document.createElement("option");
+        if (i <= '9') {
+            option.value = '0' + i;
+        } else {
+            option.value = i;
+        }
+
+        for (j = i; j <= i; j++) {
+            option.text = months[j-1];
+        }
+
+        select.appendChild(option);
+    }
+}
+
+function generateBirthDate(days, months, year){
+    //days
+    dropDownNumbers(days, 1, 31);
+    //months
+    dropDownMonths(months, 1, 12);
+
+    var currentYear = new Date().getFullYear();
+    var startYear = currentYear - 100;
+    var endYear = currentYear - 17;
+
+    //years
+    dropDownNumbers(year, startYear, endYear);
+}
+
+function isValidDate(day, month, year){
+    // Assume not leap year by default (note zero index for Jan)
+    var daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
+
+    // If evenly divisible by 4 and not evenly divisible by 100,
+    // or is evenly divisible by 400, then a leap year
+    if ( ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0) ) {
+        daysInMonth[1] = 29;
+    }
+    return day <= daysInMonth[--month];
+}
+
+//pass select element to generate list of states
+function generateState(select) {
+    appendTextValueChild(select, Content.localize().textSelect, '');
+
+    BinarySocket.init({
+        onmessage: function(msg){
+            var response = JSON.parse(msg.data);
+            if (response) {
+                var type = response.msg_type;
+                if (type === 'states_list'){
+                    var states_list = response.states_list;
+                    if (states_list.length > 0){
+                        for (i = 0; i < states_list.length; i++) {
+                            appendTextValueChild(select, states_list[i].text, states_list[i].value);
+                        }
+                        select.parentNode.parentNode.setAttribute('style', 'display:block');
+                    }
+                }
+            }
+        }
+    });
+    BinarySocket.send({ states_list: $.cookie('residence') });
+}
+
+function getUrlVars() {
+    var vars = {};
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        vars[key] = value;
+    });
+    return vars;
 }
 
 pjax_config_page('/$|/home', function() {
@@ -402,6 +517,35 @@ pjax_config_page('/bulk-trader-facility', function() {
         },
         onUnload: function() {
             $(window).off('scroll');
+        }
+    };
+});
+pjax_config_page('user/my_account', function() {
+    return {
+        onLoad: function() {
+            gtm_data_layer_info();
+            if (window.location.search.indexOf('id=') > -1) {
+                var loginid = getUrlVars()["id"];
+                var id_obj = { 'id':loginid, 'real':true, 'disabled':false };
+                var counter = 0;
+                var regex = new RegExp(loginid);
+
+                for (i = 0; i < page.user.loginid_array.length; i++){
+                    if (regex.test(page.user.loginid_array[i].id)) {
+                        counter++;
+                    }
+                }
+                if (counter === 0){
+                    page.user.loginid_array.unshift(id_obj);
+                }
+                if (!(regex.test($.cookie('loginid_list')))) {
+                    var oldCookieValue = $.cookie('loginid_list');
+                    $.cookie('loginid_list', loginid + ':R:E+' + oldCookieValue, {domain: document.domain.substring(3), path:'/'});
+                    $.cookie('loginid', loginid, {domain: document.domain.substring(3), path:'/'});
+                    page.header.show_or_hide_login_form();
+                }
+                
+            }
         }
     };
 });

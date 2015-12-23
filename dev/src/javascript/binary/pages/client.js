@@ -7,7 +7,7 @@ var select_user_country = function() {
     if ($('#residence').length > 0) {
         var selected_country = $('#residence').val();
         var c_config = page.settings.get('countries_list');
-        if (selected_country.length > 0) {
+        if (selected_country && selected_country.length > 0) {
             if (c_config[selected_country]['gaming_company'] == 'none' && c_config[selected_country]['financial_company'] == 'none') {
                 selected_country = '';
             }
@@ -20,7 +20,7 @@ var select_user_country = function() {
                 dataType: "json"
             }).done(function(response) {
                 selected_country = response.country;
-                if (c_config[selected_country]['gaming_company'] == 'none' && c_config[selected_country]['financial_company'] == 'none') {
+                if (selected_country && c_config[selected_country]['gaming_company'] == 'none' && c_config[selected_country]['financial_company'] == 'none') {
                     selected_country = '';
                 }
                 $('#residence').val(selected_country).change();

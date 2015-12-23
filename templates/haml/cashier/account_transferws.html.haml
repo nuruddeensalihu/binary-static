@@ -1,31 +1,26 @@
 .grd-row-padding
 %h1= l('Account Transfer')
 %br
-%form{:action => url_for('/cashier/account_transfer'), :method => 'POST'}
+%form{:action => url_for('/cashier/account_transfer'), :method => 'POST' ,:id => 'accountTransfer'}
   %fieldset
     .grd-parent.grd-grid-12.grd-row-padding
       .grd-grid-3.form_label
         %label{:for => "transfer"}= l('Transfer')
       .grd-grid-9
         %select#transfer{:name => 'transfer', :id => 'account_transfer'}
-          %option{:value => 'volvo' }= l('Volvo')
-          %option{:value => 'Nissan' }= l('Nissan')
-        %p.errorfield#errorOption
+          %option{:value => 'gtf'}= l('From Gaming Account to financial account')
+          %option{:value => 'ftg'}= l('From financial Account to gaming account')
+        %p.errorfield#erroraccount_transfer
+        
     .grd-parent.grd-grid-12.grd-row-padding
       .grd-grid-3.form_label
         %label{:for => "amount"}= l('Amount')
       .grd-grid-9.grd-parent
         .grd-grid-1.form_label
-          %label= stash('currency')
+          %label#currency
         .grd-grid-11
           %input#acc_transfer_amount{:type => 'text', :name => 'amount', :placeholder => "#{l('Amount')}"}
-          - my $invisible_amount = 'invisible';
-          - $invisible_amount = '' if (flash('error') and flash('error')->{amount});
-          %p#invalid_amount.errorfield{:class => "#{$invisible_amount}"}= l('Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places.')
-          - my $invisible_curr = 'invisible';
-          - $invisible_curr = '' if (flash('error') and flash('error')->{currency});
-          %p#invalid_currency.errorfield{:class => "#{$invisible_curr}"}= l('Invalid currency.')
-          %input#currency{:type => 'hidden', :name => 'currency', :value => "#{stash('currency')}"}
+          %p#invalid_amount.errorfield
     .grd-parent.grd-grid-12.grd-row-padding
     .grd-parent.grd-grid-12.grd-row-padding
       .grd-grid-4

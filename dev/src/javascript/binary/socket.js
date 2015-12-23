@@ -139,8 +139,10 @@ var BinarySocket = (function () {
                     sendBufferedSends();
                 } else if (type === 'balance') {
                     ViewBalanceUI.updateBalances(response.balance);
-                } else if(type ==='time'){
+                } else if (type === 'time') {
                     page.header.time_counter(response);
+                } else if (type === 'logout') {
+                    page.header.do_logout(response);
                 }
 
                 if(typeof events.onmessage === 'function'){
