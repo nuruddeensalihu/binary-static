@@ -1,4 +1,12 @@
 .grd-row-padding
+
+%div{:class => 'errorbox rbox' , :id =>'client_message'}
+  .rbox-wrap
+    %div{:class => 'grd-grid-12 rbox-content', :id => 'client_message_content'}
+      %p= l('The account transfer is unavailable. Please')
+        %a.pjaxload{:url_for => 'cashier/forward' , :href => '[_1]', :act => 'deposit'}= l('deposit')
+        = l('to your account.')
+
 %h1= l('Account Transfer')
 %br
 %form{:action => url_for('/cashier/account_transfer'), :method => 'POST' ,:id => 'accountTransfer'}
@@ -11,7 +19,6 @@
           %option{:value => 'gtf'}= l('From Gaming Account to financial account')
           %option{:value => 'ftg'}= l('From financial Account to gaming account')
         %p.errorfield#erroraccount_transfer
-        
     .grd-parent.grd-grid-12.grd-row-padding
       .grd-grid-3.form_label
         %label{:for => "amount"}= l('Amount')
