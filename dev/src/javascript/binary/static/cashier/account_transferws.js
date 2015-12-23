@@ -4,8 +4,8 @@ var account_transferws = (function(){
     
     var init = function(){
         $form = $('#accountTransfer');
-        $('.grd-grid-12','#SuccessForm').hide();
-        $('.errorbox').find('#client_message').hide();
+        $("#SuccessForm").hide();
+        $("#client_message").hide();
 
         console.log("the form is ", $form);
         console.log("The first row is ",$('.grd-grid-12','#SuccessForm'));
@@ -15,7 +15,7 @@ var account_transferws = (function(){
 
     };
 
-    
+
     return {
         init : init,
         apiResponse : apiResponse
