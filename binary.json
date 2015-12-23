@@ -104,6 +104,7 @@
     "src/javascript/binary/pages/trade/user.js",
     "src/javascript/binary/reality-check.js",
     "src/javascript/binary/socket.js",
+    "src/javascript/binary/static/cashier/account_transferws.js",
     "src/javascript/binary/static/cashier/paymentagent_withdrawws.js",
     "src/javascript/binary/static/cashier/settings_securityws.js",
     "src/javascript/binary/static/common/button.js",
