@@ -4,7 +4,7 @@
   .rbox-wrap
     %div{:class => 'grd-grid-12 rbox-content', :id => 'client_message_content'}
       %p= l('The account transfer is unavailable. Please')
-        %a.pjaxload{:url_for => ('/cashier/forward'), :act => 'deposit'}= l('deposit')
+        %a.pjaxload{:href => ('cashier/forward') , :act => 'deposit'}= l('deposit')
         = l('to your account.')
 
 %h1= l('Account Transfer')
