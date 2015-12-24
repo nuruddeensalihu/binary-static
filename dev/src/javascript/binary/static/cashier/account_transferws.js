@@ -72,6 +72,7 @@ var account_transferws = (function(){
                         break;
                 case   "transfer_between_accounts" :
                         console.log("Have send here");
+                        console.log("The list goes " + account_from + "," + account_to + "," + currType +"," + amt  );
                         BinarySocket.send({ 
                             "transfer_between_accounts": "1",
                             "account_from": account_from,
@@ -82,7 +83,6 @@ var account_transferws = (function(){
                         break;       
 
             }
-
 
         }
     };
