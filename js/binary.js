@@ -64580,6 +64580,7 @@ var BinarySocket = (function () {
             var currType = response.balance.currency;
             var loginid = response.balance.loginid;
             var optionMF, optionML;
+            console.log("the accounts are", client_accounts);
 
             if(loginid.substring(0,2) =="MF"){
                 //MF account
