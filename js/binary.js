@@ -64558,6 +64558,7 @@ var BinarySocket = (function () {
     var responseMessage = function(response) {
         var resvalue ;
         var str;
+        console.log("the responseMessage is", response);
         if("error" in response) {
                 if("message" in response.error) {
                     $("#client_message_content").show();
@@ -64568,6 +64569,9 @@ var BinarySocket = (function () {
         else if("accounts" in response){
             console.log("we are at account lane",response);
             client_accounts = response.accounts;
+            console.log("Thr accounts are now", client_accounts);
+            console.log("Account 1 is ", client_accounts[0]);
+            console.log("Account 2 is ", client_accounts[1]);
 
             BinarySocket.send({ 
                 "balance": "1",
