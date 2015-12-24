@@ -64655,11 +64655,11 @@ var BinarySocket = (function () {
                     $("#success_form").show();
                     $("#client_message").hide();
 
-                    if(value.account == account_from){
+                    if(value.loginid == account_from){
                         $("#loginid_1 span").html(value.loginid);
                         $("#balance_1 span").html(value.balance)
                     }
-                    else if(value.account == account_to){
+                    else if(value.loginid == account_to){
                         $("#loginid_2 span").html(value.loginid);
                         $("#balance_2 span").html(value.balance)
 
