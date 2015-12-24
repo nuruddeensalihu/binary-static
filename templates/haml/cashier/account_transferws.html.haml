@@ -32,7 +32,7 @@
       .grd-grid-3.form_label
         %label{:for => "transfer"}= l('Transfer')
       .grd-grid-9
-        %select#transfer_option{:name => 'transfer', :id => 'account_transfer'}
+        %select#transfer{:name => 'transfer', :id => 'account_transfer'}
           %option{:value => 'gtf'}= l('From Gaming Account to financial account')
           %option{:value => 'ftg'}= l('From financial Account to gaming account')
         %p.errorfield#erroraccount_transfer
@@ -41,7 +41,7 @@
         %label{:for => "amount", :id => 'transfer_amount'}= l('Amount')
       .grd-grid-9.grd-parent
         .grd-grid-1.form_label
-          %label#currency
+          %label#currencyType
         .grd-grid-11
           %input#acc_transfer_amount{:type => 'text', :name => 'amount', :placeholder => "#{l('Amount')}"}
           %p#invalid_amount.errorfield

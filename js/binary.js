@@ -64587,9 +64587,9 @@ var BinarySocket = (function () {
             console.log("the accounts are", client_accounts);
             console.log("the curr type is",currType);
 
-            $("#currencyType").text(currType);
+          //  $("#currencyType").text(currType);
 
-            $form.find("#currencyType").html();
+            $form.find("#currencyType").html(currType);
 
 
             if(loginid.substring(0,2) =="MF"){
