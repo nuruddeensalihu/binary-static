@@ -101,7 +101,7 @@ var account_transferws = (function(){
 
             if(bal <= 0 ){
                 console.log("The balance is",client_accounts);
-                if((client_accounts[0].balance > 0) && (client_accounts[0].substring(0,2) == "ML")){
+                if((client_accounts[0].balance > 0) && (client_accounts[0].loginid.substring(0,2) == "ML")){
                     str  = text.localize("from gaming account (" + client_accounts[1].loginid + ") to financial account (" + client_accounts[0].loginid + ")");
                     optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
                     optionML.text(str);
@@ -110,7 +110,7 @@ var account_transferws = (function(){
                     account_from = client_accounts[1].loginid;
                     account_to = client_accounts[0].loginid;
 
-                }else if((client_accounts[0].balance > 0) && (client_accounts[0].substring(0,2) == "MF")){
+                }else if((client_accounts[0].balance > 0) && (client_accounts[0].loginid.substring(0,2) == "MF")){
                     str = text.localize("from financial account (" + client_accounts[0].loginid + ") to gaming account (" + client_accounts[1].loginid + ")");
                     optionMF.text(str);
                     optionMF.attr('selected', 'selected');
