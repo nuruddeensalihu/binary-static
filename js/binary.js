@@ -64587,6 +64587,8 @@ var BinarySocket = (function () {
             console.log("the accounts are", client_accounts);
             console.log("the curr type is",currType);
 
+            console.log("The balance is ", bal);
+
           //  $("#currencyType").text(currType);
 
             $form.find("#currencyType").html(currType);
