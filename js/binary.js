@@ -64504,8 +64504,8 @@ var BinarySocket = (function () {
     
     var init = function(){
         $form = $('#account_transfer');
-        $form.find("#success_form").hide();
-        $form.find("#client_message").hide();
+        $("#success_form").hide();
+        $("#client_message").hide();
 
         BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "initValues"}});
       
@@ -64591,8 +64591,8 @@ var BinarySocket = (function () {
 
             if(bal <= 0 ){
                 console.log("The balance is below 0", bal);
-                $form.find("#client_message").show();
-                $form.find("#success_form").hide();
+                $("#client_message").show();
+                $("#success_form").hide();
                 $form.hide();
                 return false;
             }
