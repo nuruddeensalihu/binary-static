@@ -64650,16 +64650,17 @@ var BinarySocket = (function () {
                 $.each(response.accounts,function(key,value){
                     console.log("The key is ", key);
                     console.log("the value is", value);
-                    console.log("The real value is", value.account);
+                    console.log("The real value is", value.loginid);
+                    $form.hide();
+                    $("#success_form").show();
+                    $("#client_message").hide();
 
                     if(value.account == account_from){
-
-                        $form.find("#loginid_1").html(value.account);
+                        $form.find("#loginid_1").html(value.loginid);
                         $form.find("#balance_1").html(value.balance)
                     }
                     else if(value.account == account_to){
-
-                        $form.find("#loginid_2").html(value.account);
+                        $form.find("#loginid_2").html(value.loginid);
                         $form.find("#balance_2").html(value.balance)
 
                     }
