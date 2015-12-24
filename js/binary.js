@@ -64594,10 +64594,10 @@ var BinarySocket = (function () {
                 console.log("The MF account", loginid);
                 str  = text.localize("from gaming account " + client_accounts[1].loginid + "to financial account (+" + client_accounts[0].loginid + ")");
                 optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
-                console.log("The optionML is ", optionML);
+                console.log("The optionML is ", optionML.text());
                 optionML.text(str);
                 optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
-                console.log("the optionMF is", optionMF);
+                console.log("the optionMF is", optionMF.text());
                 str = text.localize("from financial account " + client_accounts[0].loginid + "to gaming account (+" + client_accounts[1].loginid + ")");
                 optionMF.text(str);
                 optionMF.attr('selected', 'selected');
