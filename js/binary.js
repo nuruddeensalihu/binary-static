@@ -64555,7 +64555,7 @@ var BinarySocket = (function () {
         }
     };
 
-    var responseMessage = function () {
+    var responseMessage = function(response) {
         var resvalue ;
         if("error" in response) {
                 if("message" in response.error) {
