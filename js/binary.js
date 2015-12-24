@@ -64624,7 +64624,7 @@ var BinarySocket = (function () {
 
                     optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
 
-                    optionMF.remove();
+                    optionML.remove();
 
                 }else{
                     $("#client_message").show();
