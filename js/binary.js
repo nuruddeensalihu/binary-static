@@ -64626,9 +64626,8 @@ var BinarySocket = (function () {
                 $form.hide();
                 return false;
             }
-            else if(currType.test("AUD")){
+            //else if(currType.test("AUD")){
                 //Currency not supported .
-            }
             else{
               //  $("#currencyType").text(currType);
                 $form.find("#currencyType").html(currType);
