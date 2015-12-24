@@ -99,7 +99,7 @@ var account_transferws = (function(){
             var loginid = response.balance.loginid;
             var optionMF, optionML;
 
-            if(client_accounts.length >= 1 ){
+            if(client_accounts.length >= 2 ){
                 console.log("The balance is",client_accounts);
                 if((client_accounts[0].balance > 0) && (client_accounts[0].loginid.substring(0,2) == "ML")){
                     str  = text.localize("from gaming account (" + client_accounts[0].loginid + ") to financial account (" + loginid + ")");
