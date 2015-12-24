@@ -16,6 +16,7 @@ var account_transferws = (function(){
     };
 
     var apiResponse = function(){
+        var type = response.msg_type;
         if (type === "cashier_password" || (type === "error" && "cashier_password" in response.echo_req)){
            responseMessage(response);
 
