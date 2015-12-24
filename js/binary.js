@@ -64608,6 +64608,10 @@ var BinarySocket = (function () {
 
                     account_from = client_accounts[0].loginid;
                     account_to = loginid;
+                    
+                    optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
+                    
+                    optionMF.remove();
 
                 }else if((client_accounts[0].balance > 0) && (client_accounts[0].loginid.substring(0,2) == "MF")){
                     str = text.localize("from financial account (" + client_accounts[0].loginid + ") to gaming account (" + loginid + ")");
@@ -64617,6 +64621,10 @@ var BinarySocket = (function () {
 
                     account_from = client_accounts[0].loginid;
                     account_to = loginid;
+
+                    optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
+
+                    optionMF.remove();
 
                 }else{
                     $("#client_message").show();
