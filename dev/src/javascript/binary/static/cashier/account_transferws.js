@@ -17,10 +17,15 @@ var account_transferws = (function(){
 
     var apiResponse = function(response){
         var type = response.msg_type;
-        if (type === "cashier_password" || (type === "error" && "cashier_password" in response.echo_req)){
+        if (type === "transfer_between_accounts" || (type === "error" && "transfer_between_accounts" in response.echo_req)){
            responseMessage(response);
 
-        }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
+        }
+        else if(type === "balance" || (type === "error" && "balance" in response.echo_req))
+        {
+            responseMessage(response);
+        }
+        else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
         {
             isAuthorized(response);
         }
@@ -31,6 +36,7 @@ var account_transferws = (function(){
         if(response.echo_req.passthrough){
             var option= response.echo_req.passthrough.value ;
             var amt = $("#transfer_amount").val();
+            console.log("its here authorize",response);
 
             switch(option){
                 case   "initValues":
