@@ -98,7 +98,7 @@ var account_transferws = (function(){
                 }
                 return false;
         }
-        else if("accounts" in response){
+        else if("accounts" in response ){
             console.log("we are at account lane",response);
             client_accounts = response.accounts;
             console.log("Thr accounts are now", client_accounts);
