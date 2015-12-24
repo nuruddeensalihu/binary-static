@@ -64570,6 +64570,7 @@ var BinarySocket = (function () {
                         });
                         break;
                 case   "transfer_between_accounts" :
+                        console.log("Have send here");
                         BinarySocket.send({ 
                             "transfer_between_accounts": "1",
                             "account_from": account_from,
