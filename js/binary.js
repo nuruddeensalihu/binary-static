@@ -64532,6 +64532,11 @@ var BinarySocket = (function () {
             $form.find("#invalid_amount").text(text.localize("Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places."));
             isValid = false;
         }
+        if((/USD/.test(currType) === false) && (/EUR/.test(currType) === false) )
+        {
+            $form.find("#invalid_amount").text(text.localize("Invalid currency."));
+            isValid = false;
+        }  
     
         return isValid;
     };
@@ -64702,11 +64707,11 @@ var BinarySocket = (function () {
 
                     if(value.loginid == account_from){
                         $("#loginid_1").html(value.loginid);
-                        $("#balance_1").html(value.balance)
+                        $("#balance_1").html(value.balance);
                     }
                     else if(value.loginid == account_to){
                         $("#loginid_2").html(value.loginid);
-                        $("#balance_2").html(value.balance)
+                        $("#balance_2").html(value.balance);
 
                     }
                 });
