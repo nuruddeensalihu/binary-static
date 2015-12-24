@@ -112,6 +112,7 @@ var account_transferws = (function(){
 
                 }else if((client_accounts[0].balance > 0) && (client_accounts[0].loginid.substring(0,2) == "MF")){
                     str = text.localize("from financial account (" + client_accounts[0].loginid + ") to gaming account (" + loginid + ")");
+                    optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
                     optionMF.text(str);
                     optionMF.attr('selected', 'selected');
 
