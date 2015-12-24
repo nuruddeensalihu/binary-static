@@ -64573,7 +64573,7 @@ var BinarySocket = (function () {
                 "passthrough" : { "value" : "get_bal_curr"}
             });
 
-        }else if("balance" in resvalue && (response.echo_req.passthrough == "get_bal_curr")){
+        }else if("balance" in response && (response.echo_req.passthrough == "get_bal_curr")){
             console.log("we are at balance lane",response);
             var bal = response.balance.balance;
             var currType = response.balance.currency;
