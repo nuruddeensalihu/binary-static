@@ -100,10 +100,23 @@ var account_transferws = (function(){
             var optionMF, optionML;
 
             if(bal <= 0 ){
-                $("#client_message").show();
-                $("#success_form").hide();
-                $form.hide();
-                return false;
+                if(client_accounts[1].balance > 0){
+                    str  = text.localize("from gaming account (" + client_accounts[1].loginid + ") to financial account (" + client_accounts[0].loginid + ")");
+                    optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
+                    optionML.text(str);
+                    optionML.attr('selected', 'selected');
+
+                }else if(client_accounts[0].balance > 0){
+                    str = text.localize("from financial account (" + client_accounts[0].loginid + ") to gaming account (" + client_accounts[1].loginid + ")");
+                    optionMF.text(str);
+                    optionMF.attr('selected', 'selected');
+
+                }else{
+                    $("#client_message").show();
+                    $("#success_form").hide();
+                    $form.hide();
+                    return false;
+                }
             }
             else{
 
