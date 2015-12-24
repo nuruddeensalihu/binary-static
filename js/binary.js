@@ -64646,9 +64646,7 @@ var BinarySocket = (function () {
 
 
             if(response.echo_req.passthrough.value == "get_new_balance"){
-                $("#loginid_1").text(account_from);
-                $("#balance_1").text(response.accounts(account_from).balance);
-
+        
                 $.each(response.accounts,function(key,value){
                     console.log("The key is ", key);
                     console.log("the value is", value);
