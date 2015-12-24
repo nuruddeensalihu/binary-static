@@ -2,6 +2,8 @@ var account_transferws = (function(){
     "use strict";
     var $form ;
     var client_accounts;
+    var account_from , account_to ;
+    var currType;
     
     var init = function(){
         $form = $('#account_transfer');
@@ -9,10 +11,34 @@ var account_transferws = (function(){
         $("#client_message").hide();
 
         BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "initValues"}});
+
+        $form.find("button").on("click", function(e){
+            e.preventDefault();
+            e.stopPropagation();
+
+            if(validateForm() === false){
+                return false;
+            }
+            
+            BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "transfer_between_accounts"}});
+        });
       
 
         console.log("the form is ", $form);
         console.log("The first row is ",$('.grd-grid-12','#SuccessForm'));
+    };
+
+    var validateForm =function(){
+
+        var amt = $form.find("#acc_transfer_amount").val();
+        var isValid = true;
+
+        if(amt <=0 || (amt.split(".")[1].length > 2)){
+            $form.find("#invalid_amount").text(text.localize("Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places."));
+            isValid = false;
+        }
+    
+        return isValid;
     };
 
     var apiResponse = function(response){
@@ -44,9 +70,13 @@ var account_transferws = (function(){
                             "transfer_between_accounts": "1"
                         });
                         break;
-                case   "One" :
+                case   "transfer_between_accounts" :
                         BinarySocket.send({ 
-                            "balance": "1"
+                            "transfer_between_accounts": "1",
+                            "account_from": account_from,
+                            "account_to": account_to,
+                            "currency": currType,
+                            "amount": amt
                         });
                         break;       
 
@@ -82,7 +112,7 @@ var account_transferws = (function(){
         }else if("balance" in response && (response.echo_req.passthrough.value == "get_bal_curr")){
             console.log("we are at balance lane",response);
             var bal = response.balance.balance;
-            var currType = response.balance.currency;
+            currType = response.balance.currency;
             var loginid = response.balance.loginid;
             var optionMF, optionML;
             console.log("the accounts are", client_accounts);
@@ -96,6 +126,9 @@ var account_transferws = (function(){
                 $("#success_form").hide();
                 $form.hide();
                 return false;
+            }
+            else if(currType.test("AUD")){
+                //Currency not supported .
             }
             else{
               //  $("#currencyType").text(currType);
@@ -115,6 +148,9 @@ var account_transferws = (function(){
                     optionMF.text(str);
                     optionMF.attr('selected', 'selected');
 
+                    account_from = optionMF;
+                    account_to = optionML;
+
                 }
                 else if(loginid.substring(0,2) == "ML"){
                     //MLT account
@@ -126,6 +162,9 @@ var account_transferws = (function(){
                     optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
                     str = text.localize("from financial account (" + client_accounts[0].loginid + ") to gaming account (" + client_accounts[1].loginid + ")");
                     optionMF.text(str);
+
+                    account_from = optionML;
+                    account_to = optionMF;
                     //from gaming account (MLT90000003) to financial account (MF90000003)
                 }
             }
