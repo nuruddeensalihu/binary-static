@@ -170,9 +170,29 @@ var account_transferws = (function(){
             }
 
         }
-        else{
+        else if ("transfer_between_accounts" in response){
 
             console.log("The response that came here is", response);
+            console.log("Transfer is successfully",response);
+
+
+            if(response.echo_req.passthrough.value == "get_new_balance"){
+                $("#loginid_1").text(account_from);
+                $("#balance_1").text(response.accounts(account_from).balance);
+
+                $.each(response.accounts,function(key,value){
+                    console.log("The key is ", key);
+                    console.log("the value is", value);
+                });
+            }
+            else{
+                
+                BinarySocket.send({ 
+                    "transfer_between_accounts": "1",
+                    "passthrough" : {"value" : "get_new_balance"}
+                });
+
+            }
             /*
             resvalue = response.echo_req.cashier_password;
             if(parseInt(resvalue) === 1){
@@ -187,6 +207,7 @@ var account_transferws = (function(){
                 return false;
             }
             */
+
         }
 
 
