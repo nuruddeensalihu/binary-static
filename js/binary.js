@@ -64560,7 +64560,7 @@ var BinarySocket = (function () {
     var isAuthorized =  function(response){
         if(response.echo_req.passthrough){
             var option= response.echo_req.passthrough.value ;
-            var amt = $form.find("#transfer_amount").val();
+            var amt = $form.find("#acc_transfer_amount").val();
             console.log("its here authorize",response);
 
             switch(option){
