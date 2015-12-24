@@ -92,15 +92,13 @@ var account_transferws = (function(){
 
             if(bal <= 0 ){
                 console.log("The balance is below 0", bal);
-                 $("#client_message").show();
-                 $("#success_form").hide();
-                 $form.hide();
-                 return false;
+                $form.find("#client_message").show();
+                $form.find("#success_form").hide();
+                $form.hide();
+                return false;
             }
             else{
-
               //  $("#currencyType").text(currType);
-
                 $form.find("#currencyType").html(currType);
 
 
@@ -135,6 +133,8 @@ var account_transferws = (function(){
         }
         else{
 
+            console.log("The response that came here is", response);
+            /*
             resvalue = response.echo_req.cashier_password;
             if(parseInt(resvalue) === 1){
                 $("#changeCashierLock").hide();
@@ -147,6 +147,7 @@ var account_transferws = (function(){
                 
                 return false;
             }
+            */
         }
 
 
