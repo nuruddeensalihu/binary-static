@@ -22,10 +22,6 @@ var account_transferws = (function(){
             
             BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "transfer_between_accounts"}});
         });
-      
-
-        console.log("the form is ", $form);
-        console.log("The first row is ",$('.grd-grid-12','#SuccessForm'));
     };
 
     var validateForm =function(){
@@ -62,7 +58,6 @@ var account_transferws = (function(){
         if(response.echo_req.passthrough){
             var option= response.echo_req.passthrough.value ;
             var amt = $form.find("#acc_transfer_amount").val();
-            console.log("its here authorize",response);
 
             switch(option){
                 case   "initValues":
@@ -71,8 +66,6 @@ var account_transferws = (function(){
                         });
                         break;
                 case   "transfer_between_accounts" :
-                        console.log("Have send here");
-                        console.log("The list goes " + account_from + "," + account_to + "," + currType +"," + amt  );
                         BinarySocket.send({ 
                             "transfer_between_accounts": "1",
                             "account_from": account_from,
@@ -90,7 +83,7 @@ var account_transferws = (function(){
     var responseMessage = function(response) {
         var resvalue ;
         var str;
-        console.log("the responseMessage is", response);
+
         if("error" in response) {
                 if("message" in response.error) {
                     $("#client_message_content").show();
@@ -98,12 +91,9 @@ var account_transferws = (function(){
                 }
                 return false;
         }
-        else if("accounts" in response ){
+        else if("accounts" in response){
             console.log("we are at account lane",response);
             client_accounts = response.accounts;
-            console.log("Thr accounts are now", client_accounts);
-            console.log("Account 1 is ", client_accounts[0]);
-            console.log("Account 2 is ", client_accounts[1]);
 
             BinarySocket.send({ 
                 "balance": "1",
@@ -116,34 +106,22 @@ var account_transferws = (function(){
             currType = response.balance.currency;
             var loginid = response.balance.loginid;
             var optionMF, optionML;
-            console.log("the accounts are", client_accounts);
-            console.log("the curr type is",currType);
-
-            console.log("The balance is ", bal);
 
             if(bal <= 0 ){
-                console.log("The balance is below 0", bal);
                 $("#client_message").show();
                 $("#success_form").hide();
                 $form.hide();
                 return false;
             }
-            //else if(currType.test("AUD")){
-                //Currency not supported .
             else{
               //  $("#currencyType").text(currType);
                 $form.find("#currencyType").html(currType);
 
-
                 if(loginid.substring(0,2) =="MF"){
-                    //MF account
-                    console.log("The MF account", loginid);
                     str  = text.localize("from gaming account (" + client_accounts[1].loginid + ") to financial account (" + client_accounts[0].loginid + ")");
                     optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
-                    console.log("The optionML is ", optionML.text());
                     optionML.text(str);
                     optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
-                    console.log("the optionMF is", optionMF.text());
                     str = text.localize("from financial account (" + client_accounts[0].loginid + ") to gaming account (" + client_accounts[1].loginid + ")");
                     optionMF.text(str);
                     optionMF.attr('selected', 'selected');
