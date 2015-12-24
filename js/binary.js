@@ -64593,10 +64593,10 @@ var BinarySocket = (function () {
                 //MF account
                 console.log("The MF account", loginid);
                 str  = text.localize("from gaming account " + client_accounts[1].loginid + "to financial account (+" + client_accounts[0].loginid + ")");
-                optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
+                optionML  = $form.find("#transfer_option_account_transfer option[value='gtf']");
                 console.log("The optionML is ", optionML.text());
                 optionML.text(str);
-                optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
+                optionMF = $form.find("#transfer_option_account_transfer option[value='ftg']");
                 console.log("the optionMF is", optionMF.text());
                 str = text.localize("from financial account " + client_accounts[0].loginid + "to gaming account (+" + client_accounts[1].loginid + ")");
                 optionMF.text(str);
@@ -64607,10 +64607,10 @@ var BinarySocket = (function () {
                 //MLT account
                 console.log("the ML account ", loginid);
                 str  = text.localize("from gaming account " + client_accounts[1].loginid + "to financial account (+" + client_accounts[0].loginid + ")");
-                optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
+                optionML  = $form.find("#transfer_option_account_transfer option[value='gtf']");
                 optionML.text(str);
                 optionML.attr('selected', 'selected');
-                optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
+                optionMF = $form.find("#transfer_option_account_transfer option[value='ftg']");
                 str = text.localize("from financial account " + client_accounts[0].loginid + "to gaming account (+" + client_accounts[1].loginid + ")");
                 optionMF.text(str);
                 //from gaming account (MLT90000003) to financial account (MF90000003)
