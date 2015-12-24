@@ -64589,16 +64589,19 @@ var BinarySocket = (function () {
 
             $("#currencyType").text(currType);
 
+            $form.find("#currencyType").html();
+
+
             if(loginid.substring(0,2) =="MF"){
                 //MF account
                 console.log("The MF account", loginid);
-                str  = text.localize("from gaming account " + client_accounts[1].loginid + "to financial account (+" + client_accounts[0].loginid + ")");
+                str  = text.localize("from gaming account (" + client_accounts[1].loginid + ") to financial account (" + client_accounts[0].loginid + ")");
                 optionML  = $form.find("#transfer_option_account_transfer option[value='gtf']");
                 console.log("The optionML is ", optionML.text());
                 optionML.text(str);
                 optionMF = $form.find("#transfer_option_account_transfer option[value='ftg']");
                 console.log("the optionMF is", optionMF.text());
-                str = text.localize("from financial account " + client_accounts[0].loginid + "to gaming account (+" + client_accounts[1].loginid + ")");
+                str = text.localize("from financial account (" + client_accounts[0].loginid + ") to gaming account (" + client_accounts[1].loginid + ")");
                 optionMF.text(str);
                 optionMF.attr('selected', 'selected');
 
@@ -64606,12 +64609,12 @@ var BinarySocket = (function () {
             else if(loginid.substring(0,2) == "ML"){
                 //MLT account
                 console.log("the ML account ", loginid);
-                str  = text.localize("from gaming account " + client_accounts[1].loginid + "to financial account (+" + client_accounts[0].loginid + ")");
+                str  = text.localize("from gaming account (" + client_accounts[1].loginid + ") to financial account (" + client_accounts[0].loginid + ")");
                 optionML  = $form.find("#transfer_option_account_transfer option[value='gtf']");
                 optionML.text(str);
                 optionML.attr('selected', 'selected');
                 optionMF = $form.find("#transfer_option_account_transfer option[value='ftg']");
-                str = text.localize("from financial account " + client_accounts[0].loginid + "to gaming account (+" + client_accounts[1].loginid + ")");
+                str = text.localize("from financial account (" + client_accounts[0].loginid + ") to gaming account (" + client_accounts[1].loginid + ")");
                 optionMF.text(str);
                 //from gaming account (MLT90000003) to financial account (MF90000003)
             }
