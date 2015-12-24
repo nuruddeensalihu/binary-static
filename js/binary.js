@@ -64574,7 +64574,6 @@ var BinarySocket = (function () {
                             "amount": amt
                         });
                         break;       
-
             }
 
         }
@@ -64592,7 +64591,6 @@ var BinarySocket = (function () {
                 return false;
         }
         else if("balance" in response && (response.echo_req.passthrough.value == "get_bal_curr")){
-            console.log("we are at balance lane",response);
             var bal = response.balance.balance;
             currType = response.balance.currency;
             var loginid = response.balance.loginid;
@@ -64601,18 +64599,15 @@ var BinarySocket = (function () {
             $form.find("#currencyType").html(currType);
 
             if(client_accounts.length < 2 ){
-                console.log("The balance is",client_accounts);
                 if((client_accounts[0].balance > 0) && (client_accounts[0].loginid.substring(0,2) == "ML")){
                     str  = text.localize("from gaming account (" + client_accounts[0].loginid + ") to financial account (" + loginid + ")");
                     optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
                     optionML.text(str);
                     optionML.attr('selected', 'selected');
-
                     account_from = client_accounts[0].loginid;
                     account_to = loginid;
-                    
+
                     optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
-                    
                     optionMF.remove();
 
                 }else if((client_accounts[0].balance > 0) && (client_accounts[0].loginid.substring(0,2) == "MF")){
@@ -64625,7 +64620,6 @@ var BinarySocket = (function () {
                     account_to = loginid;
 
                     optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
-
                     optionML.remove();
 
                 }else{
@@ -64651,8 +64645,6 @@ var BinarySocket = (function () {
 
                 }
                 else if(loginid.substring(0,2) == "ML"){
-                    //MLT account
-                    console.log("the ML account ", loginid);
                     str  = text.localize("from gaming account (" + client_accounts[1].loginid + ") to financial account (" + client_accounts[0].loginid + ")");
                     optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
                     optionML.text(str);
@@ -64663,7 +64655,6 @@ var BinarySocket = (function () {
 
                     account_from = client_accounts[1].loginid;
                     account_to = client_accounts[0].loginid;
-                    //from gaming account (MLT90000003) to financial account (MF90000003)
                 }
             }
             else{
@@ -64677,7 +64668,6 @@ var BinarySocket = (function () {
                     account_to = loginid;
                     
                     optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
-                    
                     optionMF.remove();
 
                 }else if((client_accounts[0].balance > 0) && (client_accounts[0].loginid.substring(0,2) == "MF")){
@@ -64690,7 +64680,6 @@ var BinarySocket = (function () {
                     account_to = loginid;
 
                     optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
-
                     optionML.remove();
 
                 }else{
@@ -64704,16 +64693,9 @@ var BinarySocket = (function () {
         }
         else if ("transfer_between_accounts" in response){
 
-            console.log("The response that came here is", response);
-            console.log("Transfer is successfully",response);
-
-
             if(response.echo_req.passthrough.value == "get_new_balance"){
         
                 $.each(response.accounts,function(key,value){
-                    console.log("The key is ", key);
-                    console.log("the value is", value);
-                    console.log("The real value is", value.loginid);
                     $form.hide();
                     $("#success_form").show();
                     $("#client_message").hide();
@@ -64730,16 +64712,13 @@ var BinarySocket = (function () {
                 });
             }
             else if(response.echo_req.passthrough.value =="set_client"){
-                console.log("we are at account lane",response);
                 client_accounts = response.accounts;
-
                 BinarySocket.send({ 
                     "balance": "1",
                     "passthrough" : { "value" : "get_bal_curr"}
                 });
             }
             else{
-                
                 BinarySocket.send({ 
                     "transfer_between_accounts": "1",
                     "passthrough" : {"value" : "get_new_balance"}
@@ -64750,7 +64729,6 @@ var BinarySocket = (function () {
 
 
     };
-
 
     return {
         init : init,
