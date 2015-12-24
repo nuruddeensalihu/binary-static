@@ -62,7 +62,8 @@ var account_transferws = (function(){
             switch(option){
                 case   "initValues":
                         BinarySocket.send({ 
-                            "transfer_between_accounts": "1"
+                            "transfer_between_accounts": "1",
+                            "passthrough" : {"value" : "set_client"}
                         });
                         break;
                 case   "transfer_between_accounts" :
@@ -91,16 +92,7 @@ var account_transferws = (function(){
                 }
                 return false;
         }
-        else if("accounts" in response){
-            console.log("we are at account lane",response);
-            client_accounts = response.accounts;
-
-            BinarySocket.send({ 
-                "balance": "1",
-                "passthrough" : { "value" : "get_bal_curr"}
-            });
-
-        }else if("balance" in response && (response.echo_req.passthrough.value == "get_bal_curr")){
+        else if("balance" in response && (response.echo_req.passthrough.value == "get_bal_curr")){
             console.log("we are at balance lane",response);
             var bal = response.balance.balance;
             currType = response.balance.currency;
@@ -114,7 +106,7 @@ var account_transferws = (function(){
                 return false;
             }
             else{
-              //  $("#currencyType").text(currType);
+
                 $form.find("#currencyType").html(currType);
 
                 if(loginid.substring(0,2) =="MF"){
@@ -161,6 +153,28 @@ var account_transferws = (function(){
                 $.each(response.accounts,function(key,value){
                     console.log("The key is ", key);
                     console.log("the value is", value);
+                    console.log("The real value is", value.account);
+
+                    if(value.account == account_from){
+
+                        $form.find("#loginid_1").html(value.account);
+                        $form.find("#balance_1").html(value.balance)
+                    }
+                    else if(value.account == account_to){
+
+                        $form.find("#loginid_2").html(value.account);
+                        $form.find("#balance_2").html(value.balance)
+
+                    }
+                });
+            }
+            else if(response.echo_req.passthrough.value =="set_client"){
+                console.log("we are at account lane",response);
+                client_accounts = response.accounts;
+
+                BinarySocket.send({ 
+                    "balance": "1",
+                    "passthrough" : { "value" : "get_bal_curr"}
                 });
             }
             else{
@@ -171,21 +185,6 @@ var account_transferws = (function(){
                 });
 
             }
-            /*
-            resvalue = response.echo_req.cashier_password;
-            if(parseInt(resvalue) === 1){
-                $("#changeCashierLock").hide();
-                $("#client_message_content").hide();
-                $("#SecuritySuccessMsg").text(text.localize('Your settings have been updated successfully.'));
-            }
-            else{
-                $("#client_message_content").show();
-                $("#client_message_content").text(text.localize('Sorry, an error occurred while processing your account.'));
-                
-                return false;
-            }
-            */
-
         }
 
 
