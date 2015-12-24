@@ -64598,6 +64598,8 @@ var BinarySocket = (function () {
             var loginid = response.balance.loginid;
             var optionMF, optionML;
 
+            $form.find("#currencyType").html(currType);
+
             if(client_accounts.length < 2 ){
                 console.log("The balance is",client_accounts);
                 if((client_accounts[0].balance > 0) && (client_accounts[0].loginid.substring(0,2) == "ML")){
@@ -64633,10 +64635,8 @@ var BinarySocket = (function () {
                     return false;
                 }
             }
-            else{
-
-                $form.find("#currencyType").html(currType);
-
+            else if(client_accounts[0].balance > 0 && client_accounts[1].balance > 0)
+            {
                 if(loginid.substring(0,2) =="MF"){
                     str  = text.localize("from gaming account (" + client_accounts[1].loginid + ") to financial account (" + client_accounts[0].loginid + ")");
                     optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
@@ -64664,6 +64664,40 @@ var BinarySocket = (function () {
                     account_from = client_accounts[1].loginid;
                     account_to = client_accounts[0].loginid;
                     //from gaming account (MLT90000003) to financial account (MF90000003)
+                }
+            }
+            else{
+                if((client_accounts[0].balance > 0) && (client_accounts[0].loginid.substring(0,2) == "ML")){
+                    str  = text.localize("from gaming account (" + client_accounts[0].loginid + ") to financial account (" + loginid + ")");
+                    optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
+                    optionML.text(str);
+                    optionML.attr('selected', 'selected');
+
+                    account_from = client_accounts[0].loginid;
+                    account_to = loginid;
+                    
+                    optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
+                    
+                    optionMF.remove();
+
+                }else if((client_accounts[0].balance > 0) && (client_accounts[0].loginid.substring(0,2) == "MF")){
+                    str = text.localize("from financial account (" + client_accounts[0].loginid + ") to gaming account (" + loginid + ")");
+                    optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
+                    optionMF.text(str);
+                    optionMF.attr('selected', 'selected');
+
+                    account_from = client_accounts[0].loginid;
+                    account_to = loginid;
+
+                    optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
+
+                    optionML.remove();
+
+                }else{
+                    $("#client_message").show();
+                    $("#success_form").hide();
+                    $form.hide();
+                    return false;
                 }
             }
 
