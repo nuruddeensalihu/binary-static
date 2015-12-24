@@ -64656,12 +64656,12 @@ var BinarySocket = (function () {
                     $("#client_message").hide();
 
                     if(value.loginid == account_from){
-                        $("#loginid_1 span").html(value.loginid);
-                        $("#balance_1 span").html(value.balance)
+                        $("#loginid_1").html(value.loginid);
+                        $("#balance_1").html(value.balance)
                     }
                     else if(value.loginid == account_to){
-                        $("#loginid_2 span").html(value.loginid);
-                        $("#balance_2 span").html(value.balance)
+                        $("#loginid_2").html(value.loginid);
+                        $("#balance_2").html(value.balance)
 
                     }
                 });
