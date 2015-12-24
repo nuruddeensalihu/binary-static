@@ -5,8 +5,8 @@ var account_transferws = (function(){
     
     var init = function(){
         $form = $('#account_transfer');
-        $("#success_form").hide();
-        $("#client_message").hide();
+        $form.find("#success_form").hide();
+        $form.find("#client_message").hide();
 
         BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "initValues"}});
       
