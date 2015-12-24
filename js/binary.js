@@ -64514,7 +64514,7 @@ var BinarySocket = (function () {
         console.log("The first row is ",$('.grd-grid-12','#SuccessForm'));
     };
 
-    var apiResponse = function(){
+    var apiResponse = function(response){
         var type = response.msg_type;
         if (type === "cashier_password" || (type === "error" && "cashier_password" in response.echo_req)){
            responseMessage(response);
