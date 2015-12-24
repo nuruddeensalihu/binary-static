@@ -64647,8 +64647,8 @@ var BinarySocket = (function () {
                     optionMF.text(str);
                     optionMF.attr('selected', 'selected');
 
-                    account_from = optionMF;
-                    account_to = optionML;
+                    account_from = client_accounts[0].loginid;
+                    account_to = client_accounts[1].loginid;
 
                 }
                 else if(loginid.substring(0,2) == "ML"){
@@ -64662,8 +64662,8 @@ var BinarySocket = (function () {
                     str = text.localize("from financial account (" + client_accounts[0].loginid + ") to gaming account (" + client_accounts[1].loginid + ")");
                     optionMF.text(str);
 
-                    account_from = optionML;
-                    account_to = optionMF;
+                    account_from = client_accounts[1].loginid;
+                    account_to = client_accounts[0].loginid;
                     //from gaming account (MLT90000003) to financial account (MF90000003)
                 }
             }
