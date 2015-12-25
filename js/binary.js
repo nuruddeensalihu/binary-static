@@ -64719,6 +64719,8 @@ var BinarySocket = (function () {
                 });
             }
             else if(response.echo_req.passthrough.value =="set_client"){
+                console.log("the reasl accounts", response.accounts);
+                console.log("The account response", response);
                 client_accounts = response.accounts;
                 BinarySocket.send({ 
                     "balance": "1",
