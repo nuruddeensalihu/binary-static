@@ -104,6 +104,8 @@ var account_transferws = (function(){
 
             $form.find("#currencyType").html(currType);
 
+            console.log("The account are", client_accounts);
+            
             if(client_accounts.length < 2 ){
                 if((client_accounts[0].balance > 0) && (client_accounts[0].loginid.substring(0,2) == "ML")){
                     str  = text.localize("from gaming account (" + client_accounts[0].loginid + ") to financial account (" + loginid + ")");
