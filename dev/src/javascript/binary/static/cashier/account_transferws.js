@@ -263,8 +263,8 @@ var account_transferws = (function(){
                 
                 console.log("the real accounts", response.accounts);
                 console.log("The account response", response);
-
-                if(firstbal <=0){
+                console.log("the account is not undefined", (account_to !=undefined));
+                if(firstbal <=0 && account_to != undefined ){
                     $("#client_message").show();
                     $("#success_form").hide();
                     $form.hide();
