@@ -131,6 +131,7 @@ var account_transferws = (function(){
     var responseMessage = function(response) {
         var resvalue ;
         var str;
+        var loginid;
 
         if("error" in response) {
                 if("message" in response.error) {
@@ -140,6 +141,8 @@ var account_transferws = (function(){
                 return false;
         }
         else if ("transfer_between_accounts" in response){
+            loginid = response.authorize.loginid;
+            console.log("The loginid is", loginid);
 
             if(response.echo_req.passthrough.value == "get_new_balance"){
         
@@ -224,11 +227,20 @@ var account_transferws = (function(){
                 }
                 else if(account_to == undefined || account_from === undefined || $.isEmptyObject(account_to))
                 {
-                    $("#client_message").show();
-                    $("#client_message p").html(text.localize("The account transfer is unavailable for your account."));
-                    $("#success_form").hide();
-                    $form.hide();
-                    return false;
+                    if(account_to == loginid || account_from == loginid){
+                        $("#client_message").show();
+                        $("#client_message p").html(text.localize("The account transfer is unavailable for your account: " + loginid));
+                        $("#success_form").hide();
+                        $form.hide();
+                        return false;
+                    }
+                    else{
+                        $("#client_message").show();
+                        $("#client_message p").html(text.localize("The account transfer is unavailable for your account."));
+                        $("#success_form").hide();
+                        $form.hide();
+                        return false;
+                    }
 
                 }
                 else if(account_to == secondacct && account_from == firstacct){
