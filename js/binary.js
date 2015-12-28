@@ -64747,7 +64747,7 @@ var BinarySocket = (function () {
 
                 
                 $.each(response.accounts, function(index,value){
-                    if(index == 0){
+                    if(index === 0){
                         firstbal = value["balance"];
                         firstCurrType = value["currency"];
                         firstacct  = value["loginid"];
@@ -64759,7 +64759,7 @@ var BinarySocket = (function () {
                         secondacct = value["loginid"];
                     }
 
-                    if($.isEmptyObject(firstbal) || (firstbal == 0))
+                    if($.isEmptyObject(firstbal) || (firstbal === 0))
                     {
                         console.log("Firstbal is 0");
                         account_from = secondacct;
@@ -64784,8 +64784,8 @@ var BinarySocket = (function () {
                 account_bal = firstbal;
                 console.log("the real accounts", response.accounts);
                 console.log("The account response", response);
-                console.log("the account is not undefined", (account_to !=undefined));
-                if((firstbal <=0) && (account_to != undefined) ){
+                console.log("the account is not undefined", (account_to !== undefined));
+                if((firstbal <=0) && (account_to !== undefined) ){
                     $("#client_message").show();
                     $("#success_form").hide();
                     $form.hide();
