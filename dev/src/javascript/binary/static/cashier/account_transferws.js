@@ -70,7 +70,7 @@ var account_transferws = (function(){
 
         console.log("the amt is ", amt);
 
-        if(amt > account_bal)
+        if(parseFloat(amt) > account_bal)
         {
             console.log("the value is here");
             var msg = text.localize("The maximum amount you may transfer is: " + currType + " " + account_bal );
