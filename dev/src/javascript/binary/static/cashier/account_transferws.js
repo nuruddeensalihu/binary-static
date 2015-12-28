@@ -229,14 +229,25 @@ var account_transferws = (function(){
                     $form.find("#currencyType").html(currType);
 
                     if(account_from.substring(0,2) =="MF"){
-                        str  = text.localize("from gaming account (" + account_to + ") to financial account (" + account_from + ")");
-                        optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
-                        optionML.text(str);
+                    
                         optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
                         str = text.localize("from financial account (" + account_from + ") to gaming account (" + account_to + ")");
                         optionMF.text(str);
-                        optionML.attr('selected', 'selected');
+                        if(secondbal > 0){
+                            str  = text.localize("from gaming account (" + account_to + ") to financial account (" + account_from + ")");
+                            optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
+                            optionML.text(str);
+                            optionML.attr('selected', 'selected');
 
+                        }
+                        else{
+                            optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
+                            optionML.remove();
+                            optionMF.attr('selected', 'selected');
+
+                        }
+                    
+ 
                     }
                     else if(account_from.substring(0,2) == "ML")
                     {
@@ -244,9 +255,17 @@ var account_transferws = (function(){
                         optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
                         optionML.text(str);
                         optionML.attr('selected', 'selected');
-                        optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
-                        str = text.localize("from financial account (" + account_to + ") to gaming account (" + account_from + ")");
-                        optionML.text(str);
+
+                        if(secondbal > 0){
+                            optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
+                            str = text.localize("from financial account (" + account_to + ") to gaming account (" + account_from + ")");
+                            optionML.text(str);
+                        }
+                        else{
+                            optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
+                            optionMF.remove();
+
+                        }
                     }
 
                 }
