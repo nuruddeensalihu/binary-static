@@ -281,6 +281,7 @@ var account_transferws = (function(){
                 }
                 else if(account_to == secondacct && account_from == firstacct){
                     $form.find("#currencyType").html(currType);
+                    console.log("The two of them are not empty");
 
                     if(account_from.substring(0,2) =="MF"){
                         str  = text.localize("from gaming account (" + account_from + ") to financial account (" + account_to + ")");
@@ -306,11 +307,16 @@ var account_transferws = (function(){
                 }
                 else if(account_to == firstacct && account_from == secondacct)
                 {
-                     if(account_from.substring(0,2) =="MF"){
+                    console.log("One is empty");
+                    if(account_from.substring(0,2) =="MF"){
                         optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
                         str = text.localize("from financial account (" + account_from + ") to gaming account (" + account_to + ")");
                         optionMF.text(str);
                         optionMF.attr('selected', 'selected');
+
+
+                        optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
+                        optionML.remove();
                     }
                     else if(account_from.substring(0,2) == "ML")
                     {
@@ -318,16 +324,20 @@ var account_transferws = (function(){
                         optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
                         optionML.text(str);
                         optionML.attr('selected', 'selected');
+
+                        optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
+                        optionMF.remove();
                     }
 
                 }
-                
+                /*
                 console.log("account_to", account_to);
                 console.log("account_from",account_from);
                 console.log("firstacct", firstacct);
                 console.log("secondacct", secondacct);
                 console.log("account_from equals firstacct", (account_from == firstacct));
                 console.log("account_to equals secondacct", (account_to == secondacct));
+                */
                 console.log("the real accounts", response.accounts);
                 console.log("The account response", response);
                 
