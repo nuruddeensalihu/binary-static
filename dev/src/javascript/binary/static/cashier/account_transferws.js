@@ -211,6 +211,10 @@ var account_transferws = (function(){
                 account_bal = firstbal;
 
                 console.log("The account from is",account_from);
+                console.log("The aco are ", response.accounts);
+                console.log("The account to is ", account_to);
+                console.log("the firstbal is", firstbal);
+                console.log("the secondbal is", secondbal);
     
                 if((firstbal <=0) && (account_to !== undefined) ){
                     $("#client_message").show();
@@ -230,7 +234,7 @@ var account_transferws = (function(){
                 else if(account_to == secondacct && account_from == firstacct){
                     $form.find("#currencyType").html(currType);
 
-                    if(account_from.substring(0,2) =="MF"){
+                    if(account_from.substring(0,2) == "MF"){
                     
                         optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
                         str = text.localize("from financial account (" + account_from + ") to gaming account (" + account_to + ")");
