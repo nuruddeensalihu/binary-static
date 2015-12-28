@@ -64739,7 +64739,6 @@ var BinarySocket = (function () {
                             str  = text.localize("from gaming account (" + account_to + ") to financial account (" + account_from + ")");
                             optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
                             optionML.text(str);
-                            optionML.attr('selected', 'selected');
 
                         }
                         else{
