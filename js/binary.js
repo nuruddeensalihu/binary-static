@@ -64726,7 +64726,7 @@ var BinarySocket = (function () {
                 }
                 else if(account_to == undefined || account_from === undefined || $.isEmptyObject(account_to))
                 {
-                    if(account_from == loginid){
+                    if(account_from == loginid && (loginid.substring(0,2) == "ML")){
                         $("#client_message").show();
                         $("#client_message p").html(text.localize("The account transfer is unavailable for your account: " + loginid));
                         $("#success_form").hide();
