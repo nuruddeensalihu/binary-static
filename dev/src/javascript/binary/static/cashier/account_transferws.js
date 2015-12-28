@@ -220,6 +220,18 @@ var account_transferws = (function(){
                 });
             }
             else if(response.echo_req.passthrough.value =="set_client"){
+                var bal = response.balance.balance;
+                currType = response.balance.currency;
+                var loginid = response.balance.loginid;
+                var optionMF, optionML;
+                
+                $.each(response.accounts, function(index,value){
+                    console.log("The index is ", index);
+                    console.log("The value is ", value);
+
+                    console.log("The account from value is ", value["loginid"]);
+
+                });
                 console.log("the reasl accounts", response.accounts);
                 console.log("The account response", response);
                 client_accounts = response.accounts;
