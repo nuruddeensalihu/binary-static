@@ -57,11 +57,19 @@ var account_transferws = (function(){
 
         var amt = $form.find("#acc_transfer_amount").val();
         var isValid = true;
-
-        if(amt <=0 ){
+       
+        if(parseFloat(amt) <=0 ){
             $form.find("#invalid_amount").text(text.localize("Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places."));
             isValid = false;
         }
+
+        if(amt % 1 != 0){
+           if(amt.split(".")[1].length > 2){
+              $form.find("#invalid_amount").text(text.localize("Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places."));
+              isValid = false;
+           }
+        }
+
         if((/USD/.test(currType) === false) && (/EUR/.test(currType) === false) )
         {
             $form.find("#invalid_amount").text(text.localize("Invalid currency."));
