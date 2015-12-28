@@ -64583,6 +64583,15 @@ var BinarySocket = (function () {
 
         }
 
+        if(account_from == loginid && (loginid.substring(0,2) == "ML")){
+            isValid = false;
+            $("#client_message").show();
+            $("#client_message p").html(text.localize("The account transfer is unavailable for your account: " + loginid));
+            $("#success_form").hide();
+            $form.hide();
+            return false;
+        }
+
         return isValid;
     };
 
