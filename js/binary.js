@@ -64596,6 +64596,7 @@ var BinarySocket = (function () {
                 return false;
         }
         else if("balance" in response && (response.echo_req.passthrough.value == "get_bal_curr")){
+            /*
             var bal = response.balance.balance;
             currType = response.balance.currency;
             var loginid = response.balance.loginid;
@@ -64696,7 +64697,7 @@ var BinarySocket = (function () {
                     return false;
                 }
             }
-
+        */
         }
         else if ("transfer_between_accounts" in response){
 
