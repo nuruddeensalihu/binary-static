@@ -255,7 +255,9 @@ var account_transferws = (function(){
                     }
                     else if(account_from.substring(0,2) == "ML")
                     {
+                        console.log("it came here");
                         str  = text.localize("from gaming account (" + account_from + ") to financial account (" + account_to + ")");
+                        console.log("the string s", str);
                         optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
                         optionML.text(str);
                         optionML.attr('selected', 'selected');
