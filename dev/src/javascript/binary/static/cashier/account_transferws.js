@@ -292,6 +292,8 @@ var account_transferws = (function(){
                     }
 
                 }
+
+                console.log("The account from is",account_from);
             }
             else{
                 BinarySocket.send({ 
