@@ -252,6 +252,7 @@ var account_transferws = (function(){
                 }
                 else if(account_to == firstacct && account_from == secondacct)
                 {
+                    $form.find("#currencyType").html(currType);
                     if(account_from.substring(0,2) =="MF"){
                         optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
                         str = text.localize("from financial account (" + account_from + ") to gaming account (" + account_to + ")");
