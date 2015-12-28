@@ -64659,7 +64659,7 @@ var BinarySocket = (function () {
                 });
             }
             else if(response.echo_req.passthrough.value =="set_client"){
-               
+                console.log("the acct", response.accounts);
                 var optionMF, optionML ,str, bal1,bal2;
                 var firstbal,secondbal,firstacct,secondacct,firstCurrType,firstbal,secondbal,SecondCurrType;
                 
@@ -64781,7 +64781,6 @@ var BinarySocket = (function () {
 
             }
         }
-
 
     };
 
