@@ -64569,7 +64569,7 @@ var BinarySocket = (function () {
             $form.find("#invalid_amount").text(text.localize("Invalid currency."));
             isValid = false;
         }  
-
+        /*
         if(parseFloat(amt) > account_bal)
         {
             var msg = text.localize("The maximum amount you may transfer is: " + currType + " " + account_bal );
@@ -64582,6 +64582,7 @@ var BinarySocket = (function () {
             return false;
 
         }
+        */
 
         return isValid;
     };
@@ -64634,7 +64635,7 @@ var BinarySocket = (function () {
 
         if("error" in response) {
                 if("message" in response.error) {
-                    console.log("from server error");
+                    console.log("Error from server");
                     $("#client_message").show();
                     $("#client_message p").html(text.localize(response.error.message));
                     $("#success_form").hide();
@@ -64712,7 +64713,6 @@ var BinarySocket = (function () {
                 account_bal = firstbal;
     
                 if((firstbal <=0) && (account_to !== undefined) ){
-                    console.log("its now ehre");
                     $("#client_message").show();
                     $("#success_form").hide();
                     $form.hide();
@@ -64745,8 +64745,6 @@ var BinarySocket = (function () {
                             optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
                             optionML.remove();
                         }
-                    
- 
                     }
                     else if(account_from.substring(0,2) == "ML")
                     {
