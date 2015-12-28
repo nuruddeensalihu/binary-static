@@ -58,7 +58,7 @@ var account_transferws = (function(){
         var amt = $form.find("#acc_transfer_amount").val();
         var isValid = true;
        
-        if(parseFloat(amt) <=0 ){
+        if(amt.length <=0 ){
             $form.find("#invalid_amount").text(text.localize("Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places."));
             isValid = false;
         }
