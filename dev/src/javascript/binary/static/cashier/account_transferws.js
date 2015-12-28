@@ -70,6 +70,7 @@ var account_transferws = (function(){
 
         if(amt > account_bal)
         {
+            console.log("the value is here");
             var msg = text.localize("The maximum amount you may transfer is: " + currType + " " + account_bal );
             isValid = false;
             $("#client_message").show();
