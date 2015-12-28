@@ -1,7 +1,6 @@
 var account_transferws = (function(){
     "use strict";
     var $form ;
-    var client_accounts;
     var account_from , account_to ;
     var currType;
     
@@ -221,23 +220,12 @@ var account_transferws = (function(){
                 });
             }
             else if(response.echo_req.passthrough.value =="set_client"){
-                /*
-                var bal = response.balance.balance;
-                currType = response.balance.currency;
-                var loginid = response.balance.loginid;
-                var optionMF, optionML;
-                */
+               
                 var optionMF, optionML ,str, bal1,bal2;
                 var firstbal,secondbal,firstacct,secondacct,firstCurrType,firstbal,secondbal,SecondCurrType;
 
                 
                 $.each(response.accounts, function(index,value){
-                    console.log("The index is ", index);
-                    console.log("The value is ", value);
-
-                    console.log("The account from value is ", value["loginid"]);
-
-
                     if(index == 0){
                         firstbal = value["balance"];
                         firstCurrType = value["currency"];
@@ -339,25 +327,9 @@ var account_transferws = (function(){
                     }
 
                 }
-                /*
-                console.log("account_to", account_to);
-                console.log("account_from",account_from);
-                console.log("firstacct", firstacct);
-                console.log("secondacct", secondacct);
-                console.log("account_from equals firstacct", (account_from == firstacct));
-                console.log("account_to equals secondacct", (account_to == secondacct));
-                */
+                
                 console.log("the real accounts", response.accounts);
                 console.log("The account response", response);
-                
-                //client_accounts = response.accounts;
-                
-                /*
-                BinarySocket.send({ 
-                    "balance": "1",
-                    "passthrough" : { "value" : "get_bal_curr"}
-                });
-                */
             }
             else{
                 BinarySocket.send({ 
