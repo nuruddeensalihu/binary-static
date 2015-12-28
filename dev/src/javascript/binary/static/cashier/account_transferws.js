@@ -2,7 +2,7 @@ var account_transferws = (function(){
     "use strict";
     var $form ;
     var account_from , account_to ,account_bal;
-    var currType, MLTBal,MFBal;
+    var currType, MLTBal,MFBal,MLCurrType,MFCurrType;
     
     var init = function(){
         $form = $('#account_transfer');
@@ -38,13 +38,13 @@ var account_transferws = (function(){
            
             if(account_from.substring(0,2) == "MF"){
                 account_bal = MFBal;
+                currType = MFCurrType;
             }else if(account_from.substring(0,2) == "ML"){
                 account_bal = MLTBal;
+                currType = MLCurrType;
             } 
-            console.log("The new account from id ", account_from);
-            console.log("the new account to is ", account_to);
-            console.log("the new account balance is ", account_bal);
 
+            $form.find("#currencyType").html(currType);
         });
     };
     var validateForm =function(){
@@ -179,15 +179,16 @@ var account_transferws = (function(){
 
                     if(value["loginid"].substring(0,2) == "MF"){
                         MFBal = value["balance"];
+                        MFCurrType  = value["currency"];
                     }
                     else if(value["loginid"].substring(0,2) == "ML")
                     {
                         MLTBal = value["balance"];
+                        MLCurrType = value["currency"];
                     }
 
                     if($.isEmptyObject(firstbal) || (firstbal === 0))
                     {
-                        console.log("Firstbal is 0");
                         account_from = secondacct;
                         firstbal = secondbal;
                         currType = SecondCurrType;
@@ -196,7 +197,6 @@ var account_transferws = (function(){
                         secondbal = firstbal;
                     }
                     else{
-                        console.log("The first bal is greater");
                         account_from = firstacct;
                         firstbal = firstbal;
 
@@ -209,7 +209,6 @@ var account_transferws = (function(){
                 });
                
                 account_bal = firstbal;
-                console.log("the current")
     
                 if((firstbal <=0) && (account_to !== undefined) ){
                     $("#client_message").show();
