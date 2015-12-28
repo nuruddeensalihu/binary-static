@@ -3,7 +3,6 @@ var account_transferws = (function(){
     var $form ;
     var account_from , account_to ,account_bal;
     var currType, MLTBal,MFBal,MLCurrType,MFCurrType;
-    var loginid;
     
     var init = function(){
         $form = $('#account_transfer');
@@ -57,14 +56,7 @@ var account_transferws = (function(){
             $form.find("#invalid_amount").text(text.localize("Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places."));
             isValid = false;
         }
-        /*
-        if(amt % 1 != 0){
-           if(amt.split(".")[1].length > 2){
-              $form.find("#invalid_amount").text(text.localize("Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places."));
-              isValid = false;
-           }
-        }*/
-
+        
         if((/USD/.test(currType) === false) && (/EUR/.test(currType) === false) )
         {
             $form.find("#invalid_amount").text(text.localize("Invalid currency."));
@@ -122,7 +114,6 @@ var account_transferws = (function(){
 
         if("error" in response) {
                 if("message" in response.error) {
-                    console.log("Error from server");
                     $("#client_message").show();
                     $("#client_message p").html(text.localize(response.error.message));
                     $("#success_form").hide();
