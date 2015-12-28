@@ -64634,7 +64634,7 @@ var BinarySocket = (function () {
 
         if("error" in response) {
                 if("message" in response.error) {
-                    console.lo("from server error");
+                    console.log("from server error");
                     $("#client_message").show();
                     $("#client_message p").html(text.localize(response.error.message));
                     $("#success_form").hide();
