@@ -165,16 +165,13 @@ var account_transferws = (function(){
                 });
             }
             else if(response.echo_req.passthrough.value =="set_client"){
-                console.log("the acct", response.accounts);
                 var optionMF, optionML ,str, bal1,bal2;
                 var firstbal,secondbal,firstacct,secondacct,firstCurrType,firstbal,secondbal,SecondCurrType;
-                
                 $.each(response.accounts, function(index,value){
                     if(index == 0){
                         firstbal = value["balance"];
                         firstCurrType = value["currency"];
                         firstacct  = value["loginid"];
-
                     }
                     else{
                         secondbal = value["balance"];
@@ -216,6 +213,7 @@ var account_transferws = (function(){
                 account_bal = firstbal;
     
                 if((firstbal <=0) && (account_to !== undefined) ){
+                    console.log("its now ehre");
                     $("#client_message").show();
                     $("#success_form").hide();
                     $form.hide();
@@ -228,7 +226,6 @@ var account_transferws = (function(){
                     $("#success_form").hide();
                     $form.hide();
                     return false;
-
                 }
                 else if(account_to == secondacct && account_from == firstacct){
                     $form.find("#currencyType").html(currType);
@@ -254,18 +251,13 @@ var account_transferws = (function(){
                     }
                     else if(account_from.substring(0,2) == "ML")
                     {
-                        console.log("it came here");
                         str  = text.localize("from gaming account (" + account_from + ") to financial account (" + account_to + ")");
-                        console.log("the string s", str);
                         optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
-                        console.log("ML is", optionML)
                         optionML.text(str);
                         optionML.attr('selected', 'selected');
 
                         if(secondbal > 0){
-                            console.log("And here");
                             optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
-
                             str = text.localize("from financial account (" + account_to + ") to gaming account (" + account_from + ")");
                             optionMF.text(str);
                         }
