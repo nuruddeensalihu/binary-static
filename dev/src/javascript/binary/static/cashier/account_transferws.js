@@ -165,7 +165,7 @@ var account_transferws = (function(){
                 var firstbal,secondbal,firstacct,secondacct,firstCurrType,firstbal,secondbal,SecondCurrType;
                 
                 $.each(response.accounts, function(index,value){
-                    if(index === 0){
+                    if(index == 0){
                         firstbal = value["balance"];
                         firstCurrType = value["currency"];
                         firstacct  = value["loginid"];
@@ -187,7 +187,7 @@ var account_transferws = (function(){
                         MLCurrType = value["currency"];
                     }
 
-                    if($.isEmptyObject(firstbal) || (firstbal === 0))
+                    if($.isEmptyObject(firstbal) || (firstbal == 0))
                     {
                         account_from = secondacct;
                         firstbal = secondbal;
