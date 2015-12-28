@@ -222,7 +222,7 @@ var account_transferws = (function(){
                     $form.hide();
                     return false;
                 }
-                else if(account_to == undefined || $.isEmptyObject(account_to))
+                else if(account_to == undefined || account_from === undefined || $.isEmptyObject(account_to))
                 {
                     $("#client_message").show();
                     $("#client_message p").html(text.localize("The account transfer is unavailable for your account."));
@@ -266,7 +266,7 @@ var account_transferws = (function(){
                         if(secondbal > 0){
                             console.log("And here");
                             optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
-                            
+
                             str = text.localize("from financial account (" + account_to + ") to gaming account (" + account_from + ")");
                             optionMF.text(str);
                         }
