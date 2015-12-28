@@ -3,6 +3,7 @@ var account_transferws = (function(){
     var $form ;
     var account_from , account_to ,account_bal;
     var currType, MLTBal,MFBal,MLCurrType,MFCurrType;
+    var loginid;
     
     var init = function(){
         $form = $('#account_transfer');
@@ -131,7 +132,6 @@ var account_transferws = (function(){
     var responseMessage = function(response) {
         var resvalue ;
         var str;
-        var loginid;
 
         if("error" in response) {
                 if("message" in response.error) {
