@@ -64643,8 +64643,11 @@ var BinarySocket = (function () {
 
         if("error" in response) {
                 if("message" in response.error) {
-                    $("#client_message_content").show();
-                    $("#client_message_content").text(text.localize(response.error.message));
+                    $("#client_message").show();
+                    $("#client_message p").html(text.localize(response.error.message));
+                    $("#success_form").hide();
+                    $form.hide();
+                    return false;
                 }
                 return false;
         }
