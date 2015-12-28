@@ -25,7 +25,7 @@ var account_transferws = (function(){
 
         $form.find("#transfer_account_transfer").on("change",function(){
             var accounts = $("#transfer_account_transfer").val();
-            var reg = account.match(/\(([^)]+)\)/)[1];
+            var reg = accounts.match(/\(([^)]+)\)/)[1];
             var redEx = accounts.match(/\(([^)]+)\)/);
             console.log("The first reg is " , reg);
             console.log("the second reg is ",redEx);
@@ -51,9 +51,11 @@ var account_transferws = (function(){
 
         if(amt > account_bal)
         {
+            var msg = text.localize("The maximum amount you may transfer is: " + currType + " " + account_bal );
             isValid = false;
             $("#client_message").show();
-            $("#client_message p").html("The account transfer is unavailable for your account.");
+
+            $("#client_message p").html(msg);
             $("#success_form").hide();
             $form.hide();
             return false;
