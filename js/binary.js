@@ -64583,15 +64583,6 @@ var BinarySocket = (function () {
 
         }
 
-        if(account_from == loginid && (loginid.substring(0,2) == "ML")){
-            isValid = false;
-            $("#client_message").show();
-            $("#client_message p").html(text.localize("The account transfer is unavailable for your account: " + loginid));
-            $("#success_form").hide();
-            $form.hide();
-            return false;
-        }
-
         return isValid;
     };
 
@@ -64643,6 +64634,7 @@ var BinarySocket = (function () {
 
         if("error" in response) {
                 if("message" in response.error) {
+                    console.lo("from server error");
                     $("#client_message").show();
                     $("#client_message p").html(text.localize(response.error.message));
                     $("#success_form").hide();
@@ -64652,8 +64644,6 @@ var BinarySocket = (function () {
                 return false;
         }
         else if ("transfer_between_accounts" in response){
-            loginid = response.authorize.loginid;
-            console.log("The loginid is", loginid);
 
             if(response.echo_req.passthrough.value == "get_new_balance"){
         
@@ -64723,12 +64713,6 @@ var BinarySocket = (function () {
                 });
                
                 account_bal = firstbal;
-
-                console.log("The account from is",account_from);
-                console.log("The aco are ", response.accounts);
-                console.log("The account to is ", account_to);
-                console.log("the firstbal is", firstbal);
-                console.log("the secondbal is", secondbal);
     
                 if((firstbal <=0) && (account_to !== undefined) ){
                     $("#client_message").show();
@@ -64738,20 +64722,11 @@ var BinarySocket = (function () {
                 }
                 else if(account_to == undefined || account_from === undefined || $.isEmptyObject(account_to))
                 {
-                    if(account_from == loginid && (loginid.substring(0,2) == "ML")){
-                        $("#client_message").show();
-                        $("#client_message p").html(text.localize("The account transfer is unavailable for your account: " + loginid));
-                        $("#success_form").hide();
-                        $form.hide();
-                        return false;
-                    }
-                    else{
-                        $("#client_message").show();
-                        $("#client_message p").html(text.localize("The account transfer is unavailable for your account."));
-                        $("#success_form").hide();
-                        $form.hide();
-                        return false;
-                    }
+                    $("#client_message").show();
+                    $("#client_message p").html(text.localize("The account transfer is unavailable for your account."));
+                    $("#success_form").hide();
+                    $form.hide();
+                    return false;
 
                 }
                 else if(account_to == secondacct && account_from == firstacct){
