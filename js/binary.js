@@ -64500,13 +64500,14 @@ var BinarySocket = (function () {
 ;var account_transferws = (function(){
     "use strict";
     var $form ;
-    var account_from , account_to ;
+    var account_from , account_to ,account_bal;
     var currType;
     
     var init = function(){
         $form = $('#account_transfer');
         $("#success_form").hide();
         $("#client_message").hide();
+        account_bal = 0;
 
         BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "initValues"}});
 
@@ -64519,6 +64520,16 @@ var BinarySocket = (function () {
             }
             
             BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "transfer_between_accounts"}});
+        });
+
+        $form.find("#transfer_account_transfer").on("change",function(){
+            var accounts = $("#transfer_account_transfer").val();
+            var reg = account.match(/\(([^)]+)\)/)[1];
+            var redEx = accounts.match(/\(([^)]+)\)/);
+            console.log("The first reg is " , reg);
+            console.log("the second reg is ",redEx);
+            console.log("accounts are ", accounts);
+
         });
     };
 
@@ -64536,6 +64547,17 @@ var BinarySocket = (function () {
             $form.find("#invalid_amount").text(text.localize("Invalid currency."));
             isValid = false;
         }  
+
+        if(amt > account_bal)
+        {
+            isValid = false;
+            $("#client_message").show();
+            $("#client_message p").html("The account transfer is unavailable for your account.");
+            $("#success_form").hide();
+            $form.hide();
+            return false;
+
+        }
     
         return isValid;
     };
@@ -64759,11 +64781,11 @@ var BinarySocket = (function () {
                     }
 
                 });
-                
+                account_bal = firstbal;
                 console.log("the real accounts", response.accounts);
                 console.log("The account response", response);
                 console.log("the account is not undefined", (account_to !=undefined));
-                if(firstbal <=0 && account_to != undefined ){
+                if((firstbal <=0) && (account_to != undefined) ){
                     $("#client_message").show();
                     $("#success_form").hide();
                     $form.hide();
@@ -64783,7 +64805,7 @@ var BinarySocket = (function () {
                     console.log("The two of them are not empty");
 
                     if(account_from.substring(0,2) =="MF"){
-                        str  = text.localize("from gaming account (" + account_from + ") to financial account (" + account_to + ")");
+                        str  = text.localize("from gaming account (" + account_to + ") to financial account (" + account_from + ")");
                         optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
                         optionML.text(str);
                         optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
@@ -64794,12 +64816,12 @@ var BinarySocket = (function () {
                     }
                     else if(account_from.substring(0,2) == "ML")
                     {
-                        str  = text.localize("from gaming account (" + account_from + ") to financial account (" + account_to+ ")");
+                        str  = text.localize("from gaming account (" + account_from + ") to financial account (" + account_to + ")");
                         optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
                         optionML.text(str);
                         optionML.attr('selected', 'selected');
                         optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
-                        str = text.localize("from financial account (" + account_from + ") to gaming account (" + account_to + ")");
+                        str = text.localize("from financial account (" + account_to + ") to gaming account (" + account_from + ")");
                         optionML.text(str);
                     }
 
