@@ -64523,15 +64523,23 @@ var BinarySocket = (function () {
         });
 
         $form.find("#transfer_account_transfer").on("change",function(){
-            var accounts = $("#transfer_account_transfer").val();
+            var accounts = $("#transfer_account_transfer option:selected").text();
             var reg = accounts.match(/\(([^)]+)\)/)[1];
             var redEx = accounts.match(/\(([^)]+)\)/);
-            console.log("The first reg is " , reg);
+            console.log("The first reg is " , getWordsBetweenBrackets(accounts));
             console.log("the second reg is ",redEx);
             console.log("accounts are ", accounts);
 
         });
     };
+    var getWordsBetweenBrackets = function(str) {
+        var results = [], re = /(([^)]+))/g, text;
+
+        while(text = re.exec(str)) {
+            results.push(text[1]);
+        }
+        return results;
+    }
 
     var validateForm =function(){
 
