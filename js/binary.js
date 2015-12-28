@@ -64758,11 +64758,14 @@ var BinarySocket = (function () {
                         str  = text.localize("from gaming account (" + account_from + ") to financial account (" + account_to + ")");
                         console.log("the string s", str);
                         optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
+                        console.log("ML is", optionML)
                         optionML.text(str);
                         optionML.attr('selected', 'selected');
 
                         if(secondbal > 0){
+                            console.log("And here");
                             optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
+                            
                             str = text.localize("from financial account (" + account_to + ") to gaming account (" + account_from + ")");
                             optionML.text(str);
                         }
