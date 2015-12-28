@@ -68,6 +68,8 @@ var account_transferws = (function(){
             isValid = false;
         }  
 
+        console.log("the amt is ", amt);
+
         if(amt > account_bal)
         {
             console.log("the value is here");
