@@ -64778,6 +64778,15 @@ var BinarySocket = (function () {
                     $form.hide();
                     return false;
                 }
+                else if(account_to == undefined || $.isEmptyObject(account_to))
+                {
+                    $("#client_message").show();
+                    $("#client_message p").html("The account transfer is unavailable for your account.");
+                    $("#success_form").hide();
+                    $form.hide();
+                    return false;
+
+                }
                 else if(account_to == secondacct && account_from == firstacct){
                     $form.find("#currencyType").html(currType);
                     console.log("The two of them are not empty");
