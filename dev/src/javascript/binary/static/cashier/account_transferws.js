@@ -173,7 +173,7 @@ var account_transferws = (function(){
                     }
                     else{
                         secondbal = value["balance"];
-                        firstCurrType = value["currency"];
+                        SecondCurrType = value["currency"];
                         secondacct = value["loginid"];
                     }
 
@@ -209,6 +209,7 @@ var account_transferws = (function(){
                 });
                
                 account_bal = firstbal;
+                console.log("the current")
     
                 if((firstbal <=0) && (account_to !== undefined) ){
                     $("#client_message").show();

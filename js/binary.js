@@ -64672,7 +64672,7 @@ var BinarySocket = (function () {
                     }
                     else{
                         secondbal = value["balance"];
-                        firstCurrType = value["currency"];
+                        SecondCurrType = value["currency"];
                         secondacct = value["loginid"];
                     }
 
@@ -64708,6 +64708,7 @@ var BinarySocket = (function () {
                 });
                
                 account_bal = firstbal;
+                console.log("the current")
     
                 if((firstbal <=0) && (account_to !== undefined) ){
                     $("#client_message").show();
