@@ -64781,11 +64781,11 @@ var BinarySocket = (function () {
                     }
 
                     if(value["loginid"].substring(0,2) == "MF"){
-                        MFBal = value["loginid"];
+                        MFBal = value["balance"];
                     }
                     else if(value["loginid"].substring(0,2) == "ML")
                     {
-                        MLTBal = value["loginid"];
+                        MLTBal = value["balance"];
                     }
 
                     if($.isEmptyObject(firstbal) || (firstbal === 0))
