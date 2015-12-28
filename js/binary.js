@@ -64725,6 +64725,9 @@ var BinarySocket = (function () {
                 var loginid = response.balance.loginid;
                 var optionMF, optionML;
                 */
+                var optionMF, optionML ,str, bal1,bal2;
+                var firstbal,secondbal,firstacct,secondacct,firstCurrType,firstbal,secondbal,SecondCurrType;
+
                 
                 $.each(response.accounts, function(index,value){
                     console.log("The index is ", index);
@@ -64732,14 +64735,108 @@ var BinarySocket = (function () {
 
                     console.log("The account from value is ", value["loginid"]);
 
+
+                    if(index == 0){
+                        firstbal = value["balance"];
+                        firstCurrType = value["currency"];
+                        firstacct  = value["loginid"];
+
+                    }
+                    else{
+                        secondbal = value["balance"];
+                        firstCurrType = value["currency"];
+                        secondacct = value["loginid"];
+                    }
+
+                    if($.isEmptyObject(firstbal) || (firstbal == 0))
+                    {
+                        console.log("Firstbal is 0");
+                        account_from = secondacct;
+                        firstbal = secondbal;
+                        currType = SecondCurrType;
+
+                        account_to = firstacct;
+                        secondbal = firstbal;
+                    }
+                    else{
+                        console.log("The first bal is greater");
+                        account_from = firstacct;
+                        firstbal = firstbal;
+
+                        secondbal = secondbal;
+
+                        account_to = secondacct;
+                        currType = firstCurrType;
+                    }
+
                 });
-                console.log("the reasl accounts", response.accounts);
+
+                if(firstbal <=0){
+                    $("#client_message").show();
+                    $("#success_form").hide();
+                    $form.hide();
+                    return false;
+                }
+                else if(account_to == secondacct && account_from == firstacct){
+                    $form.find("#currencyType").html(currType);
+
+                    if(account_from.substring(0,2) =="MF"){
+                        str  = text.localize("from gaming account (" + account_from + ") to financial account (" + account_to + ")");
+                        optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
+                        optionML.text(str);
+                        optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
+                        str = text.localize("from financial account (" + account_from + ") to gaming account (" + account_to + ")");
+                        optionMF.text(str);
+                        optionMF.attr('selected', 'selected');
+
+                    }
+                    else if(account_from.substring(0,2) == "ML")
+                    {
+                        str  = text.localize("from gaming account (" + account_from + ") to financial account (" + account_to+ ")");
+                        optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
+                        optionML.text(str);
+                        optionML.attr('selected', 'selected');
+                        optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
+                        str = text.localize("from financial account (" + account_from + ") to gaming account (" + account_to + ")");
+                        optionMF.text(str);
+                    }
+
+                }
+                else if(account_to == firstacct && account_from == secondacct)
+                {
+                     if(account_from.substring(0,2) =="MF"){
+                        optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
+                        str = text.localize("from financial account (" + account_from + ") to gaming account (" + account_to + ")");
+                        optionMF.text(str);
+                        optionMF.attr('selected', 'selected');
+                    }
+                    else if(account_from.substring(0,2) == "ML")
+                    {
+                        str  = text.localize("from gaming account (" + account_from + ") to financial account (" + account_to+ ")");
+                        optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
+                        optionML.text(str);
+                        optionML.attr('selected', 'selected');
+                    }
+
+                }
+                
+                console.log("account_to", account_to);
+                console.log("account_from",account_from);
+                console.log("firstacct", firstacct);
+                console.log("secondacct", secondacct);
+                console.log("account_from equals firstacct", (account_from == firstacct));
+                console.log("account_to equals secondacct", (account_to == secondacct));
+                console.log("the real accounts", response.accounts);
                 console.log("The account response", response);
-                client_accounts = response.accounts;
+                
+                //client_accounts = response.accounts;
+                
+                /*
                 BinarySocket.send({ 
                     "balance": "1",
                     "passthrough" : { "value" : "get_bal_curr"}
                 });
+                */
             }
             else{
                 BinarySocket.send({ 
