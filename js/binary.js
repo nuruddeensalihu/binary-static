@@ -64526,7 +64526,6 @@ var BinarySocket = (function () {
             var accounts = $("#transfer_account_transfer option:selected").text();
             var reg = accounts.match(/\(([^)]+)\)/)[1];
             var redEx = accounts.match(/\(([^)]+)\)/);
-            console.log("The first reg is " , getWordsBetweenBrackets(accounts));
             console.log("the second reg is ",redEx);
             console.log("accounts are ", accounts);
 
@@ -64780,7 +64779,7 @@ var BinarySocket = (function () {
                         firstCurrType = value["currency"];
                         secondacct = value["loginid"];
                     }
-                    
+
                     if(value["loginid"].substring(0,2) == "MF"){
                         MFBal = value["loginid"];
                     }
