@@ -64708,6 +64708,8 @@ var BinarySocket = (function () {
                 });
                
                 account_bal = firstbal;
+
+                console.log("The account from is",account_from);
     
                 if((firstbal <=0) && (account_to !== undefined) ){
                     $("#client_message").show();
@@ -64792,7 +64794,6 @@ var BinarySocket = (function () {
 
                 }
 
-                console.log("The account from is",account_from);
             }
             else{
                 BinarySocket.send({ 
