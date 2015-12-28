@@ -34,7 +34,7 @@ var account_transferws = (function(){
         });
     };
     var getWordsBetweenBrackets = function(str) {
-        var results = [], re = /(([^)]+))/g, text;
+        var results = [], re = /\(([^)]+)\)/, text;
 
         while(text = re.exec(str)) {
             results.push(text[1]);
