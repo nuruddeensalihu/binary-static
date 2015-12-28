@@ -2,7 +2,7 @@ var account_transferws = (function(){
     "use strict";
     var $form ;
     var account_from , account_to ,account_bal;
-    var currType;
+    var currType, MLTBal,MFBal;
     
     var init = function(){
         $form = $('#account_transfer');
@@ -31,17 +31,29 @@ var account_transferws = (function(){
             console.log("the second reg is ",redEx);
             console.log("accounts are ", accounts);
 
+            var matches = accounts
+                            .split('(')
+                            .filter(function(v){ 
+                                return v.indexOf(')') > -1})
+                            .map( function(value) { 
+                                return value.split(')')[0]
+                        }); 
+            console.log(matches);
+
+            account_from = matches[0];
+            account_to = matches[1];
+           
+            if(account_from.substring(0,2) == "MF"){
+                account_bal = MFBal;
+            }else if(account_from.substring(0,2) == "ML"){
+                account_bal = MLTBal;
+            } 
+            console.log("The new account from id ", account_from);
+            console.log("the new account to is ", account_to);
+            console.log("the new account balance is ", account_bal);
+
         });
     };
-    var getWordsBetweenBrackets = function(str) {
-        var results = [], re = /\(([^)]+)\)/, text;
-
-        while(text = re.exec(str)) {
-            results.push(text[1]);
-        }
-        return results;
-    }
-
     var validateForm =function(){
 
         var amt = $form.find("#acc_transfer_amount").val();
@@ -269,6 +281,14 @@ var account_transferws = (function(){
                         firstCurrType = value["currency"];
                         secondacct = value["loginid"];
                     }
+                    
+                    if(value["loginid"].substring(0,2) == "MF"){
+                        MFBal = value["loginid"];
+                    }
+                    else if(value["loginid"].substring(0,2) == "ML")
+                    {
+                        MLTBal = value["loginid"];
+                    }
 
                     if($.isEmptyObject(firstbal) || (firstbal === 0))
                     {
@@ -292,6 +312,7 @@ var account_transferws = (function(){
                     }
 
                 });
+               
                 account_bal = firstbal;
                 console.log("the real accounts", response.accounts);
                 console.log("The account response", response);
