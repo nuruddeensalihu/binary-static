@@ -235,6 +235,7 @@ var account_transferws = (function(){
                         optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
                         str = text.localize("from financial account (" + account_from + ") to gaming account (" + account_to + ")");
                         optionMF.text(str);
+                        optionMF.attr('selected', 'selected');
                         if(secondbal > 0){
                             str  = text.localize("from gaming account (" + account_to + ") to financial account (" + account_from + ")");
                             optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
@@ -245,8 +246,6 @@ var account_transferws = (function(){
                         else{
                             optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
                             optionML.remove();
-                            optionMF.attr('selected', 'selected');
-
                         }
                     
  
