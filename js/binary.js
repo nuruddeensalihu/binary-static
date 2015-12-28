@@ -64759,6 +64759,9 @@ var BinarySocket = (function () {
                     }
 
                 });
+                
+                console.log("the real accounts", response.accounts);
+                console.log("The account response", response);
 
                 if(firstbal <=0){
                     $("#client_message").show();
