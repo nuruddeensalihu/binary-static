@@ -64789,7 +64789,7 @@ var BinarySocket = (function () {
                         optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
                         str = text.localize("from financial account (" + account_from + ") to gaming account (" + account_to + ")");
                         optionMF.text(str);
-                        optionMF.attr('selected', 'selected');
+                        optionML.attr('selected', 'selected');
 
                     }
                     else if(account_from.substring(0,2) == "ML")
@@ -64800,7 +64800,7 @@ var BinarySocket = (function () {
                         optionML.attr('selected', 'selected');
                         optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
                         str = text.localize("from financial account (" + account_from + ") to gaming account (" + account_to + ")");
-                        optionMF.text(str);
+                        optionML.text(str);
                     }
 
                 }
