@@ -57,33 +57,19 @@ var account_transferws = (function(){
             $form.find("#invalid_amount").text(text.localize("Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places."));
             isValid = false;
         }
-
+        /*
         if(amt % 1 != 0){
            if(amt.split(".")[1].length > 2){
               $form.find("#invalid_amount").text(text.localize("Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places."));
               isValid = false;
            }
-        }
+        }*/
 
         if((/USD/.test(currType) === false) && (/EUR/.test(currType) === false) )
         {
             $form.find("#invalid_amount").text(text.localize("Invalid currency."));
             isValid = false;
         }  
-        /*
-        if(parseFloat(amt) > account_bal)
-        {
-            var msg = text.localize("The maximum amount you may transfer is: " + currType + " " + account_bal );
-            isValid = false;
-            $("#client_message").show();
-
-            $("#client_message p").html(msg);
-            $("#success_form").hide();
-            $form.hide();
-            return false;
-
-        }
-        */
 
         return isValid;
     };
