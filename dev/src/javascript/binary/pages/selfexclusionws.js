@@ -186,6 +186,7 @@ var SelfExlusionWS = (function(){
             "session_duration_limit" :  parseInt($("#SESSIONDURATION").val()) || "",
             "exclude_until" : $("#EXCLUDEUNTIL").val()
         };
+        console.log("the newData is", newData);
         $.map(newData , function(value, property){
             if(value !== data[property])
                 hasChanges = true ;
