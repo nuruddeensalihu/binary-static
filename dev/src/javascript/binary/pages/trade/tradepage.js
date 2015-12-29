@@ -30,6 +30,11 @@ var TradePage = (function(){
 		if (document.getElementById('websocket_form')) {
 		    addEventListenerForm();
 		}
+
+		// Walktrough Guide
+		Guide.init({
+			script : 'trading'
+		});
 	};
 
 	var onUnload = function(){

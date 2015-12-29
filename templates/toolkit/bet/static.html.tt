@@ -5,6 +5,7 @@
 <div id="trading_socket_container" class="tab-menu-wrap">
    <div id="loading_container" class="overlay_container">
    </div>
+   <div id="guideBtn"></div>
    <div class="row" id="contract_symbol_container">
       <div id="contract_markets_container">
          <select id="contract_markets"></select>
@@ -17,7 +18,7 @@
          <span id="trading_worm_chart"></span>
       </div>
    </div>
-   <div class="row" id="contract_form_content_wrapper">
+   <div class="row clear" id="contract_form_content_wrapper">
       <div class="col row-inner">
          <div id="contract_market_form_container">
             <ul class="nav tm-ul" id="contract_form_name_nav"></ul>

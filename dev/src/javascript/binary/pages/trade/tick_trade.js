@@ -7,7 +7,7 @@ WSTickDisplay.plot = function(plot_from, plot_to){
 };
 WSTickDisplay.update_ui = function(final_price, pnl, contract_status) {
     var $self = this;
-    updatePurchaseStatus(final_price, pnl, contract_status);
+    updatePurchaseStatus(final_price, final_price-pnl, contract_status);
 };
 
 WSTickDisplay.updateChart = function(data){
