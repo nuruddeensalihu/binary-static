@@ -61318,8 +61318,7 @@ onLoad.queue_for_url(function () {
             "session_duration_limit" :  $("#SESSIONDURATION").val() || "",
             "exclude_until" : $("#EXCLUDEUNTIL").val()
         };
-        console.log("the newData is", newData);
-        return false;
+        
         $.map(newData , function(value, property){
             if(value !== data[property])
                 hasChanges = true ;
