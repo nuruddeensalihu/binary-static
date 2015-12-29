@@ -252,10 +252,6 @@ var account_transferws = (function(){
                         }
                     }
 
-                    BinarySocket.send({ 
-                        "payout_currencies": "1"
-                    });
-
                 }
                 else if(account_to == firstacct && account_from == secondacct)
                 {
@@ -280,6 +276,11 @@ var account_transferws = (function(){
                     }
 
                 }
+
+            
+                BinarySocket.send({ 
+                    "payout_currencies": "1"
+                });
 
             }
             else{

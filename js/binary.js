@@ -64751,10 +64751,6 @@ var BinarySocket = (function () {
                         }
                     }
 
-                    BinarySocket.send({ 
-                        "payout_currencies": "1"
-                    });
-
                 }
                 else if(account_to == firstacct && account_from == secondacct)
                 {
@@ -64779,6 +64775,11 @@ var BinarySocket = (function () {
                     }
 
                 }
+
+            
+                BinarySocket.send({ 
+                    "payout_currencies": "1"
+                });
 
             }
             else{
