@@ -117,6 +117,8 @@ var account_transferws = (function(){
         var resvalue ;
         var str;
 
+        console.log("the response is ", response);
+
         if("error" in response) {
                 if("message" in response.error) {
                     console.log("Its a backend error");
