@@ -3,8 +3,8 @@ var account_transferws = (function(){
     var $form ;
     var account_from , account_to ,account_bal;
     var currType, MLTBal,MFBal,MLCurrType,MFCurrType;
-    var availableCurr= {} ;
-    var availableAccounts ={};
+    var availableCurr= [] ;
+    var availableAccounts =[];
     
     var init = function(){
         $form = $('#account_transfer');
