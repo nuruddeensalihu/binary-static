@@ -15,6 +15,9 @@ var ProfitTableUI = (function(){
             Content.localize().textSalePrice,
             Content.localize().textProfitLoss
         ];
+
+        header[6] = header[6] + (TUser.get().currency ? "(" + TUser.get().currency + ")" : "");
+
         var footer = [Content.localize().textTotalProfitLoss, "", "", "", "", "", ""];
 
         var data = [];

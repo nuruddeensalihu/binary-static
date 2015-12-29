@@ -1,5 +1,5 @@
 <div class="grd-grid-12">
-    <h1>[% l('Binary.com - Trading Times') %]</h1>
+    <h1>[% l('Trading Times') %]</h1>
     <p>
         <label for="trading-date">[% l('Date') %]: </label>
         <input type="text" id="trading-date" readonly="readonly" />

@@ -146,7 +146,7 @@ var TradingTimesWS = (function() {
         for(var i = 0; i < events.length; i++) {
             result += (i > 0 ? '<br />' : '') + events[i].descrip + ': ' + events[i].dates;
         }
-        return result;
+        return result.length > 0 ? result : '--';
     };
 
     var createEmptyTable = function(tableID) {

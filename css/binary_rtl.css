@@ -5015,7 +5015,7 @@ a.dynamic, span.dynamic, div.dynamic, p.dynamic, button.dynamic, table.dynamic {
 }
 
 #portfolio td {
-  padding: 10px 30px;
+  padding: 10px 10px;
 }
 #portfolio td.indicative, #portfolio td.purchase {
   white-space: nowrap;
@@ -5029,11 +5029,19 @@ a.dynamic, span.dynamic, div.dynamic, p.dynamic, button.dynamic, table.dynamic {
   margin-top: -11px;
 }
 #portfolio th {
-  padding: 10px 30px;
+  padding: 10px 10px;
   text-align: left;
 }
 #portfolio th.details {
   width: 45%;
+}
+#portfolio table .ref {
+  text-align: left !important;
+}
+@media screen and (max-width: 480px) {
+  #portfolio .details {
+    display: none;
+  }
 }
 
 #trading-times th.flex-tr-child, #asset-index th.flex-tr-child {
@@ -5054,6 +5062,7 @@ a.dynamic, span.dynamic, div.dynamic, p.dynamic, button.dynamic, table.dynamic {
 }
 #trading-times td.asset, #asset-index td.asset {
   font-weight: 700;
+  white-space: nowrap;
 }
 
 #asset-index th, #asset-index .asset {
@@ -5392,7 +5401,7 @@ div.kineticjs-content {
   height: 22px;
   background-repeat: no-repeat;
   background-position: center;
-  background-image: url("../images/pages/trade/guide-icon_rtl.svg");
+  background-image: url("../images/pages/guide/guide-icon_rtl.svg");
   margin-left: 7px;
 }
 #guideBtn strong:hover {
@@ -6123,6 +6132,9 @@ div.kineticjs-content {
 
 #profit-table-ws-container th {
   padding-right: 8px;
+}
+#profit-table-ws-container th.buy-date {
+  white-space: pre;
 }
 #profit-table-ws-container td {
   padding-right: 8px;

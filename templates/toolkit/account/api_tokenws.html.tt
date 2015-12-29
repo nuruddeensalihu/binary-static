@@ -5,15 +5,8 @@
     <p>[% l('Should you not need any of the API tokens that you’ve already generated, you may simply delete them from the list.') %]</p>
     <p>[% l('Label your API tokens so as to recognise them easily at a later time.') %]</p>
 
-    <div id="tokens_list" class="grd-grid-12 grd-parent grd-row-padding">
-    </div>
-
-    <div id="token_message" class="grd-grid-12 grd-row-padding center dynamic">
-        <p></p>
-    </div>
-
     <div id="token_form" class="grd-grid-12 grd-row-padding">
-        <form class="form rbox grd-row-padding" id="frmNewToken">
+        <form class="form rbox" id="frmNewToken">
             <fieldset>
                 <legend>[% l('Create New Token') %]</legend>
 
@@ -44,5 +37,12 @@
 
             </fieldset>
         </form>
+    </div>
+
+    <div id="token_message" class="grd-grid-12 grd-row-padding center dynamic">
+        <p></p>
+    </div>
+
+    <div id="tokens_list" class="grd-grid-12 grd-parent grd-row-padding">
     </div>
 </div>
