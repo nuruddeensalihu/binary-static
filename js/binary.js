@@ -64613,6 +64613,7 @@ var BinarySocket = (function () {
 
         if("error" in response) {
                 if("message" in response.error) {
+                    console.log("Its a backend error");
                     $("#client_message").show();
                     $("#client_message p").html(text.localize(response.error.message));
                     $("#success_form").hide();
