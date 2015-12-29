@@ -61257,31 +61257,31 @@ onLoad.queue_for_url(function () {
 
                     switch(property){
                         case  "max_balance" :
-                               data.max_balance = value;
+                               data.max_balance = parseInt(value);
                                break;
                         case  "max_turnover" :
-                               data.max_turnover = value;
+                               data.max_turnover = parseInt(value);
                                break;
                         case  "max_losses"   :
-                               data.max_losses = value;
+                               data.max_losses = parseInt(value);
                                break;
                         case  "max_7day_turnover" :
-                               data.max_7day_turnover = value;
+                               data.max_7day_turnover = parseInt(value);
                                break;
                         case  "max_7day_losses" :
-                               data.max_7day_losses = value;
+                               data.max_7day_losses = parseInt(value);
                                break;
                         case   "max_30day_turnover" :
-                                data.max_30day_turnover = value;
+                                data.max_30day_turnover = parseInt(value);
                                 break;
                         case   "max_30day_losses" :
-                                data.max_30day_losses = value;
+                                data.max_30day_losses = parseInt(value);
                                 break;
                         case   "max_open_bets" :
-                                data.max_open_bets = value;
+                                data.max_open_bets = parseInt(value);
                                 break; 
                         case   "session_duration_limit"  :
-                                data.session_duration_limit = value;
+                                data.session_duration_limit = parseInt(value);
                                 break;
                         case   "exclude_until"   :
                                 data.exclude_until = value;
@@ -61307,19 +61307,17 @@ onLoad.queue_for_url(function () {
     var sendRequest = function(){
         var hasChanges  = false;
         var newData = {
-            "max_balance"  : $("#MAXCASHBAL").val() || "",
-            "max_turnover" : $("#DAILYTURNOVERLIMIT").val() || "",
-            "max_losses" : $("#DAILYLOSSLIMIT").val() || "" ,
-            "max_7day_turnover" : $("#7DAYTURNOVERLIMIT").val() || "",
-            "max_7day_losses" : $("#7DAYLOSSLIMIT").val() || "",
-            "max_30day_turnover" : $("#30DAYTURNOVERLIMIT").val() || "",
-            "max_30day_losses" : $("#30DAYLOSSLIMIT").val() || "",
-            "max_open_bets": $("#MAXOPENPOS").val() || "" ,
-            "session_duration_limit" :  $("#SESSIONDURATION").val() || "",
+            "max_balance"  : parseInt($("#MAXCASHBAL").val()) || "",
+            "max_turnover" : parseInt($("#DAILYTURNOVERLIMIT").val()) || "",
+            "max_losses" : parseInt($("#DAILYLOSSLIMIT").val()) || "" ,
+            "max_7day_turnover" : parseInt($("#7DAYTURNOVERLIMIT").val()) || "",
+            "max_7day_losses" : parseInt($("#7DAYLOSSLIMIT").val()) || "",
+            "max_30day_turnover" : parseInt($("#30DAYTURNOVERLIMIT").val()) || "",
+            "max_30day_losses" : parseInt($("#30DAYLOSSLIMIT").val()) || "",
+            "max_open_bets": parseInt($("#MAXOPENPOS").val()) || "" ,
+            "session_duration_limit" :  parseInt($("#SESSIONDURATION").val()) || "",
             "exclude_until" : $("#EXCLUDEUNTIL").val()
         };
-        console.log("the newData is", newData);
-        
         $.map(newData , function(value, property){
             if(value !== data[property])
                 hasChanges = true ;
@@ -61331,14 +61329,14 @@ onLoad.queue_for_url(function () {
             BinarySocket.send(
                 {
                   "set_self_exclusion": 1,
-                  "max_balance": newData.max_balance,
-                  "max_turnover": newData.max_turnover,
-                  "max_losses": newData.max_losses,
-                  "max_7day_turnover": newData.max_7day_turnover,
-                  "max_7day_losses": newData.max_7day_losses,
-                  "max_30day_turnover": newData.max_30day_turnover,
-                  "max_30day_losses": newData.max_30day_losses,
-                  "max_open_bets": newData.max_open_bets,
+                  "max_balance": parseInt(newData.max_balance),
+                  "max_turnover": parseInt(newData.max_turnover),
+                  "max_losses": parseInt(newData.max_losses),
+                  "max_7day_turnover": parseInt(newData.max_7day_turnover),
+                  "max_7day_losses": parseInt(newData.max_7day_losses),
+                  "max_30day_turnover": parseInt(newData.max_30day_turnover),
+                  "max_30day_losses": parseInt(newData.max_30day_losses),
+                  "max_open_bets": parseInt(newData.max_open_bets),
                   "session_duration_limit": parseInt(newData.session_duration_limit),
                   "exclude_until": newData.exclude_until ? newData.exclude_until : null
                 });
@@ -61347,7 +61345,6 @@ onLoad.queue_for_url(function () {
     };
 
     var responseMessage = function(response){
-        console.log("the response is ", response);
         if("error" in response) {
             var  error = response.error;
             switch(error.field){
