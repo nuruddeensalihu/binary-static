@@ -65706,6 +65706,7 @@ var BinarySocket = (function () {
     var account_from , account_to ,account_bal;
     var currType, MLTBal,MFBal,MLCurrType,MFCurrType;
     var availableCurr= {} ;
+    var availableAccounts ={};
     
     var init = function(){
         $form = $('#account_transfer');
@@ -65765,6 +65766,12 @@ var BinarySocket = (function () {
             $form.find("#invalid_amount").text(text.localize("Invalid currency."));
             isValid = false;
         }  
+
+        if(($.inArray(account_from, availableAccounts) == -1) || ($.inArray(account_to, availableAccounts) == -1))
+        {
+            $form.find("#invalid_amount").text(text.localize("Invalid Account."));
+            isValid = false;
+        }
 
         return isValid;
     };
@@ -65873,11 +65880,13 @@ var BinarySocket = (function () {
                     if(value["loginid"].substring(0,2) == "MF"){
                         MFBal = value["balance"];
                         MFCurrType  = value["currency"];
+                        availableAccounts.push(value["loginid"]);
                     }
                     else if(value["loginid"].substring(0,2) == "ML")
                     {
                         MLTBal = value["balance"];
                         MLCurrType = value["currency"];
+                        availableAccounts.push(value["loginid"]);
                     }
 
                     if($.isEmptyObject(firstbal) || (firstbal == 0))
@@ -65902,7 +65911,7 @@ var BinarySocket = (function () {
                 });
                
                 account_bal = firstbal;
-    
+                console.log("the availableAccounts are",availableAccounts);
                 if((firstbal <=0) && (account_to !== undefined) ){
                     $("#client_message").show();
                     $("#success_form").hide();
