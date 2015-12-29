@@ -215,6 +215,7 @@ var SelfExlusionWS = (function(){
     };
 
     var responseMessage = function(response){
+        console.log("the response is ", response);
         if("error" in response) {
             var  error = response.error;
             switch(error.field){
