@@ -64629,8 +64629,7 @@ var BinarySocket = (function () {
         }
         else if("payout_currencies" in response){
 
-            var t = ["USD","GBP","NR"];
-            availableCurr = t;//response.payout_currencies;
+            availableCurr = response.payout_currencies;
 
             console.log("The currencies are ", availableCurr);
 
