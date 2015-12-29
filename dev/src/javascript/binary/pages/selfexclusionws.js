@@ -207,7 +207,7 @@ var SelfExlusionWS = (function(){
                   "max_30day_turnover": newData.max_30day_turnover,
                   "max_30day_losses": newData.max_30day_losses,
                   "max_open_bets": newData.max_open_bets,
-                  "session_duration_limit": newData.session_duration_limit,
+                  "session_duration_limit": parseInt(newData.session_duration_limit),
                   "exclude_until": newData.exclude_until ? newData.exclude_until : null
                 });
             return true;
