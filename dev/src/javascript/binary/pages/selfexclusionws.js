@@ -125,31 +125,31 @@ var SelfExlusionWS = (function(){
 
                     switch(property){
                         case  "max_balance" :
-                               data.max_balance = parseInt(value);
+                               data.max_balance = value;
                                break;
                         case  "max_turnover" :
-                               data.max_turnover = parseInt(value);
+                               data.max_turnover = value;
                                break;
                         case  "max_losses"   :
-                               data.max_losses = parseInt(value);
+                               data.max_losses = value;
                                break;
                         case  "max_7day_turnover" :
-                               data.max_7day_turnover = parseInt(value);
+                               data.max_7day_turnover = value;
                                break;
                         case  "max_7day_losses" :
-                               data.max_7day_losses = parseInt(value);
+                               data.max_7day_losses = value;
                                break;
                         case   "max_30day_turnover" :
-                                data.max_30day_turnover = parseInt(value);
+                                data.max_30day_turnover = value;
                                 break;
                         case   "max_30day_losses" :
-                                data.max_30day_losses = parseInt(value);
+                                data.max_30day_losses = value;
                                 break;
                         case   "max_open_bets" :
-                                data.max_open_bets = parseInt(value);
+                                data.max_open_bets = value;
                                 break; 
                         case   "session_duration_limit"  :
-                                data.session_duration_limit = parseInt(value);
+                                data.session_duration_limit = value;
                                 break;
                         case   "exclude_until"   :
                                 data.exclude_until = value;
@@ -175,15 +175,15 @@ var SelfExlusionWS = (function(){
     var sendRequest = function(){
         var hasChanges  = false;
         var newData = {
-            "max_balance"  : parseInt($("#MAXCASHBAL").val()) || "",
-            "max_turnover" : parseInt($("#DAILYTURNOVERLIMIT").val()) || "",
-            "max_losses" : parseInt($("#DAILYLOSSLIMIT").val()) || "" ,
-            "max_7day_turnover" : parseInt($("#7DAYTURNOVERLIMIT").val()) || "",
-            "max_7day_losses" : parseInt($("#7DAYLOSSLIMIT").val()) || "",
-            "max_30day_turnover" : parseInt($("#30DAYTURNOVERLIMIT").val()) || "",
-            "max_30day_losses" : parseInt($("#30DAYLOSSLIMIT").val()) || "",
-            "max_open_bets": parseInt($("#MAXOPENPOS").val()) || "" ,
-            "session_duration_limit" :  parseInt($("#SESSIONDURATION").val()) || "",
+            "max_balance"  : $("#MAXCASHBAL").val() || "",
+            "max_turnover" : $("#DAILYTURNOVERLIMIT").val() || "",
+            "max_losses" : $("#DAILYLOSSLIMIT").val() || "" ,
+            "max_7day_turnover" : $("#7DAYTURNOVERLIMIT").val() || "",
+            "max_7day_losses" : $("#7DAYLOSSLIMIT").val() || "",
+            "max_30day_turnover" : $("#30DAYTURNOVERLIMIT").val() || "",
+            "max_30day_losses" : $("#30DAYLOSSLIMIT").val() || "",
+            "max_open_bets": $("#MAXOPENPOS").val() || "" ,
+            "session_duration_limit" :  $("#SESSIONDURATION").val() || "",
             "exclude_until" : $("#EXCLUDEUNTIL").val()
         };
         console.log("the newData is", newData);
@@ -199,15 +199,15 @@ var SelfExlusionWS = (function(){
             BinarySocket.send(
                 {
                   "set_self_exclusion": 1,
-                  "max_balance": parseInt(newData.max_balance),
-                  "max_turnover": parseInt(newData.max_turnover),
-                  "max_losses": parseInt(newData.max_losses),
-                  "max_7day_turnover": parseInt(newData.max_7day_turnover),
-                  "max_7day_losses": parseInt(newData.max_7day_losses),
-                  "max_30day_turnover": parseInt(newData.max_30day_turnover),
-                  "max_30day_losses": parseInt(newData.max_30day_losses),
-                  "max_open_bets": parseInt(newData.max_open_bets),
-                  "session_duration_limit": parseInt(newData.session_duration_limit),
+                  "max_balance": newData.max_balance,
+                  "max_turnover": newData.max_turnover,
+                  "max_losses": newData.max_losses,
+                  "max_7day_turnover": newData.max_7day_turnover,
+                  "max_7day_losses": newData.max_7day_losses,
+                  "max_30day_turnover": newData.max_30day_turnover,
+                  "max_30day_losses": newData.max_30day_losses,
+                  "max_open_bets": newData.max_open_bets,
+                  "session_duration_limit": newData.session_duration_limit,
                   "exclude_until": newData.exclude_until ? newData.exclude_until : null
                 });
             return true;
