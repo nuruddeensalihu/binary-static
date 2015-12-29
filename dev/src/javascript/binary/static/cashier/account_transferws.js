@@ -91,12 +91,11 @@ var account_transferws = (function(){
             switch(option){
                 case   "initValues":
                         BinarySocket.send({ 
-                            "payout_currencies": "1",
+                            "transfer_between_accounts": "1",
                             "passthrough" : {"value" : "set_client"}
                         });
                         BinarySocket.send({ 
-                            "transfer_between_accounts": "1",
-                            "passthrough" : {"value" : "set_client"}
+                            "payout_currencies": "1"
                         });
                         
                         break;
