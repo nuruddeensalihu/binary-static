@@ -58,8 +58,7 @@ var account_transferws = (function(){
             $form.find("#invalid_amount").text(text.localize("Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places."));
             isValid = false;
         }
-        
-        if((availableCurr.test(currType) === false) && (/EUR/.test(currType) === false) )
+        if($.inArray(currType, availableCurr) == -1)
         {
             $form.find("#invalid_amount").text(text.localize("Invalid currency."));
             isValid = false;
@@ -118,7 +117,6 @@ var account_transferws = (function(){
     var responseMessage = function(response) {
         var resvalue ;
         var str;
-        console.log("the res is ", response);
         if("error" in response) {
                 if("message" in response.error) {
                     console.log("Its a backend error");
@@ -132,7 +130,8 @@ var account_transferws = (function(){
         }
         else if("payout_currencies" in response){
 
-            availableCurr = response.payout_currencies;
+            var t = ["USD","GBP","NR"];
+            availableCurr = t;//response.payout_currencies;
 
             console.log("The currencies are ", availableCurr);
 
