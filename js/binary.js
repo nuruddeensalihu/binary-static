@@ -64511,6 +64511,7 @@ var BinarySocket = (function () {
         account_bal = 0;
 
         BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "initValues"}});
+        BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "payout_currencies"}})
 
         $form.find("button").on("click", function(e){
             e.preventDefault();
@@ -64602,7 +64603,12 @@ var BinarySocket = (function () {
                             "currency": currType,
                             "amount": amt
                         });
-                        break;       
+                        break; 
+                case   "payout_currencies" :
+                        BinarySocket.send({ 
+                            "payout_currencies": "1"
+                        });
+                        break;              
             }
 
         }
@@ -64775,11 +64781,6 @@ var BinarySocket = (function () {
                     }
 
                 }
-
-            
-                BinarySocket.send({ 
-                    "payout_currencies": "1"
-                });
 
             }
             else{
