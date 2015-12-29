@@ -65750,6 +65750,9 @@ var BinarySocket = (function () {
             } 
 
             $form.find("#currencyType").html(currType);
+
+            BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "payout_currencies"}})
+
         });
     };
     var validateForm =function(){
@@ -65828,7 +65831,6 @@ var BinarySocket = (function () {
         var str;
         if("error" in response) {
                 if("message" in response.error) {
-                    console.log("Its a backend error");
                     $("#client_message").show();
                     $("#client_message p").html(text.localize(response.error.message));
                     $("#success_form").hide();
@@ -65840,8 +65842,6 @@ var BinarySocket = (function () {
         else if("payout_currencies" in response){
 
             availableCurr = response.payout_currencies;
-
-            console.log("the curre is",availableCurr);
 
         }
         else if ("transfer_between_accounts" in response){
@@ -65913,7 +65913,7 @@ var BinarySocket = (function () {
                 });
                
                 account_bal = firstbal;
-                console.log("the availableAccounts are",availableAccounts);
+            
                 if((firstbal <=0) && (account_to !== undefined) ){
                     $("#client_message").show();
                     $("#success_form").hide();
