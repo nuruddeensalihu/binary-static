@@ -74,10 +74,6 @@ var account_transferws = (function(){
            responseMessage(response);
 
         }
-        else if(type === "balance" || (type === "error" && "balance" in response.echo_req))
-        {
-            responseMessage(response);
-        }
         else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
         {
             isAuthorized(response);
