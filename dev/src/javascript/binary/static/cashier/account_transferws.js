@@ -31,9 +31,9 @@ var account_transferws = (function(){
             var matches = accounts
                             .split('(')
                             .filter(function(v){ 
-                                return v.indexOf(')') > -1})
+                                return v.indexOf(')') > -1;})
                             .map( function(value) { 
-                                return value.split(')')[0]
+                                return value.split(')')[0];
                         }); 
 
             account_from = matches[0];
@@ -163,9 +163,9 @@ var account_transferws = (function(){
             }
             else if(response.echo_req.passthrough.value =="set_client"){
                 var optionMF, optionML ;
-                var firstbal,secondbal,firstacct,secondacct,firstCurrType,firstbal,secondbal,SecondCurrType;
+                var firstbal,secondbal,firstacct,secondacct,firstCurrType,SecondCurrType;
                 $.each(response.accounts, function(index,value){
-                    if(index == 0){
+                    if(index === 0){
                         firstbal = value["balance"];
                         firstCurrType = value["currency"];
                         firstacct  = value["loginid"];
@@ -188,7 +188,7 @@ var account_transferws = (function(){
                         availableAccounts.push(value["loginid"]);
                     }
 
-                    if($.isEmptyObject(firstbal) || (firstbal == 0))
+                    if($.isEmptyObject(firstbal) || (firstbal === 0))
                     {
                         account_from = secondacct;
                         firstbal = secondbal;
