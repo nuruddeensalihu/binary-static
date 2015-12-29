@@ -56,12 +56,12 @@ var account_transferws = (function(){
             $form.find("#invalid_amount").text(text.localize("Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places."));
             isValid = false;
         }
-        
+        /*
         if((/USD/.test(currType) === false) && (/EUR/.test(currType) === false) )
         {
             $form.find("#invalid_amount").text(text.localize("Invalid currency."));
             isValid = false;
-        }  
+        }  */
 
         return isValid;
     };
