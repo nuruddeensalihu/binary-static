@@ -187,7 +187,7 @@ var SelfExlusionWS = (function(){
             "exclude_until" : $("#EXCLUDEUNTIL").val()
         };
         console.log("the newData is", newData);
-        return false;
+        
         $.map(newData , function(value, property){
             if(value !== data[property])
                 hasChanges = true ;
