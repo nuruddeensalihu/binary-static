@@ -3,6 +3,7 @@ var account_transferws = (function(){
     var $form ;
     var account_from , account_to ,account_bal;
     var currType, MLTBal,MFBal,MLCurrType,MFCurrType;
+    var availableCurr= {} ;
     
     var init = function(){
         $form = $('#account_transfer');
@@ -90,9 +91,14 @@ var account_transferws = (function(){
             switch(option){
                 case   "initValues":
                         BinarySocket.send({ 
+                            "payout_currencies": "1",
+                            "passthrough" : {"value" : "set_client"}
+                        });
+                        BinarySocket.send({ 
                             "transfer_between_accounts": "1",
                             "passthrough" : {"value" : "set_client"}
                         });
+                        
                         break;
                 case   "transfer_between_accounts" :
                         BinarySocket.send({ 
@@ -122,6 +128,13 @@ var account_transferws = (function(){
                     return false;
                 }
                 return false;
+        }
+        else if("payout_currencies" in response){
+
+            availableCurr = response.payout_currencies;
+
+            console.log("The currencies are ", availableCurr);
+
         }
         else if ("transfer_between_accounts" in response){
 
