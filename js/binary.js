@@ -64556,12 +64556,12 @@ var BinarySocket = (function () {
             $form.find("#invalid_amount").text(text.localize("Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places."));
             isValid = false;
         }
-        /*
-        if((/USD/.test(currType) === false) && (/EUR/.test(currType) === false) )
+        
+        if((availableCurr.test(currType) === false) && (/EUR/.test(currType) === false) )
         {
             $form.find("#invalid_amount").text(text.localize("Invalid currency."));
             isValid = false;
-        }  */
+        }  
 
         return isValid;
     };
@@ -64593,10 +64593,6 @@ var BinarySocket = (function () {
                             "transfer_between_accounts": "1",
                             "passthrough" : {"value" : "set_client"}
                         });
-                        BinarySocket.send({ 
-                            "payout_currencies": "1"
-                        });
-                        
                         break;
                 case   "transfer_between_accounts" :
                         BinarySocket.send({ 
@@ -64615,9 +64611,7 @@ var BinarySocket = (function () {
     var responseMessage = function(response) {
         var resvalue ;
         var str;
-
-        console.log("the response is ", response);
-
+        console.log("the res is ", response);
         if("error" in response) {
                 if("message" in response.error) {
                     console.log("Its a backend error");
@@ -64756,6 +64750,10 @@ var BinarySocket = (function () {
 
                         }
                     }
+
+                    BinarySocket.send({ 
+                        "payout_currencies": "1"
+                    });
 
                 }
                 else if(account_to == firstacct && account_from == secondacct)
