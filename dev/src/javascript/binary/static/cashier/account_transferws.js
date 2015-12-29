@@ -13,7 +13,7 @@ var account_transferws = (function(){
         account_bal = 0;
 
         BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "initValues"}});
-        BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "payout_currencies"}})
+        BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "payout_currencies"}});
 
         $form.find("button").on("click", function(e){
             e.preventDefault();
@@ -49,7 +49,7 @@ var account_transferws = (function(){
 
             $form.find("#currencyType").html(currType);
 
-            BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "payout_currencies"}})
+            BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "payout_currencies"}});
 
         });
     };
@@ -162,7 +162,7 @@ var account_transferws = (function(){
                 });
             }
             else if(response.echo_req.passthrough.value =="set_client"){
-                var optionMF, optionML ,str, bal1,bal2;
+                var optionMF, optionML ;
                 var firstbal,secondbal,firstacct,secondacct,firstCurrType,firstbal,secondbal,SecondCurrType;
                 $.each(response.accounts, function(index,value){
                     if(index == 0){
@@ -217,7 +217,7 @@ var account_transferws = (function(){
                     $form.hide();
                     return false;
                 }
-                else if(account_to == undefined || account_from === undefined || $.isEmptyObject(account_to))
+                else if(account_to === undefined || account_from === undefined || $.isEmptyObject(account_to))
                 {
                     $("#client_message").show();
                     $("#client_message p").html(text.localize("The account transfer is unavailable for your account."));
