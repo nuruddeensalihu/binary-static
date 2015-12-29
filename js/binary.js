@@ -65842,6 +65842,7 @@ var BinarySocket = (function () {
         else if("payout_currencies" in response){
 
             availableCurr = response.payout_currencies;
+            console.log("the currType are ", availableCurr);
 
         }
         else if ("transfer_between_accounts" in response){
