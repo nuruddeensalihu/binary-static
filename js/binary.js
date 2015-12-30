@@ -65908,10 +65908,13 @@ var BinarySocket = (function () {
 
                         firstacct = " ";    
                    }
-
+                    
                     if(($.isEmptyObject(firstacct) === false) && ($.isEmptyObject(secondacct) === false))
                     {
                         console.log("the firstacct is ", firstacct);
+                        console.log("the length are", firstacct.length);
+                        console.log("the length is", secondacct.length);
+                        
                         str = text.localize("from account (" + secondacct + ") to account (" + firstacct + ")");
                         optionValue = secondacct + "_to_" + firstacct;
                         $form.find("#transfer_account_transfer")
