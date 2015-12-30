@@ -65731,7 +65731,7 @@ var BinarySocket = (function () {
         });
 
         $form.find("#transfer_account_transfer").on("change",function(){
-           account_from_to();
+           set_account_from_to();
 
            console.log("the account from is ", account_from);
            console.log("the accout to is ", account_to);
