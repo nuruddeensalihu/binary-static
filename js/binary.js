@@ -65752,7 +65752,8 @@ var BinarySocket = (function () {
         console.log("the currency is", availableCurr)
 
         $.each(availableCurr,function(index,value){
-            console.log("the dude is", value);
+            console.log("the dude is", value.account);
+            console.log("the account is ", account_from);
             if(value.account == account_from){
                 currType = value.currency;
                 account_bal = value.balance;
