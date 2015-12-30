@@ -65906,9 +65906,11 @@ var BinarySocket = (function () {
 
                         availableCurr.push(currObj);     
 
-                        firstacct = null;    
+                        firstacct = "";    
 
                         console.log(" the here is", firstacct);
+
+                        console.log(" the here ht", $.isEmptyObject(firstacct));
                    }
                     
                     if(($.isEmptyObject(firstacct) === false) && ($.isEmptyObject(secondacct) === false))
