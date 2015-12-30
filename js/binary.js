@@ -65858,6 +65858,15 @@ var BinarySocket = (function () {
                 });
             }
             else if(response.echo_req.passthrough.value =="set_client"){
+
+                console.log("the accounts are ",response.accounts);
+
+                $.each(response.accounts, function(index,value){
+
+
+                });
+
+                /*
                 var optionMF, optionML ;
                 var firstbal,secondbal,firstacct,secondacct,firstCurrType,SecondCurrType;
                 $.each(response.accounts, function(index,value){
@@ -65927,11 +65936,11 @@ var BinarySocket = (function () {
                     if(account_from.substring(0,2) == "MF"){
                     
                         optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
-                        str = text.localize("from financial account (" + account_from + ") to gaming account (" + account_to + ")");
+                        str = text.localize("from account (" + account_from + ") to account (" + account_to + ")");
                         optionMF.text(str);
                         optionMF.attr('selected', 'selected');
                         if(secondbal > 0){
-                            str  = text.localize("from gaming account (" + account_to + ") to financial account (" + account_from + ")");
+                            str  = text.localize("from account (" + account_to + ") to account (" + account_from + ")");
                             optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
                             optionML.text(str);
 
@@ -65943,14 +65952,14 @@ var BinarySocket = (function () {
                     }
                     else if(account_from.substring(0,2) == "ML")
                     {
-                        str  = text.localize("from gaming account (" + account_from + ") to financial account (" + account_to + ")");
+                        str  = text.localize("from account (" + account_from + ") to account (" + account_to + ")");
                         optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
                         optionML.text(str);
                         optionML.attr('selected', 'selected');
 
                         if(secondbal > 0){
                             optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
-                            str = text.localize("from financial account (" + account_to + ") to gaming account (" + account_from + ")");
+                            str = text.localize("from account (" + account_to + ") to account (" + account_from + ")");
                             optionMF.text(str);
                         }
                         else{
@@ -65959,14 +65968,13 @@ var BinarySocket = (function () {
 
                         }
                     }
-
                 }
                 else if(account_to == firstacct && account_from == secondacct)
                 {
                     $form.find("#currencyType").html(currType);
                     if(account_from.substring(0,2) =="MF"){
                         optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
-                        str = text.localize("from financial account (" + account_from + ") to gaming account (" + account_to + ")");
+                        str = text.localize("from account (" + account_from + ") to account (" + account_to + ")");
                         optionMF.text(str);
                         optionMF.attr('selected', 'selected');
                         optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
@@ -65974,7 +65982,7 @@ var BinarySocket = (function () {
                     }
                     else if(account_from.substring(0,2) == "ML")
                     {
-                        str  = text.localize("from gaming account (" + account_from + ") to financial account (" + account_to+ ")");
+                        str  = text.localize("from account (" + account_from + ") to account (" + account_to+ ")");
                         optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
                         optionML.text(str);
                         optionML.attr('selected', 'selected');
@@ -65984,6 +65992,7 @@ var BinarySocket = (function () {
                     }
 
                 }
+                */
 
             }
             else{
