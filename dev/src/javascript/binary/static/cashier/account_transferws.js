@@ -170,10 +170,9 @@ var account_transferws = (function(){
                 console.log("the accounts are ",response.accounts);
                 var secondacct, firstacct,str,optionValue;
                 var count = 1;
-                var currObj = {};
 
                 $.each(response.accounts, function(index,value){
-                   
+                   var currObj = {};
                    if($.isEmptyObject(firstacct))
                    {
                         firstacct = value.loginid;
@@ -208,7 +207,6 @@ var account_transferws = (function(){
                         firstacct = " ";    
                    }
 
-
                     if(($.isEmptyObject(firstacct) === false) && ($.isEmptyObject(secondacct) === false))
                     {
                         str = text.localize("from account (" + secondacct + ") to account (" + firstacct + ")");
@@ -217,13 +215,6 @@ var account_transferws = (function(){
                                  .append($("<option></option>")
                                  .attr("value",optionValue)
                                  .text(str));     
-
-                        currObj.account = value.loginid;
-                        currObj.currency = value.currency;
-                        currObj.balance = value.balance;
-
-                        availableCurr.push(currObj);         
-
                     }
 
 
