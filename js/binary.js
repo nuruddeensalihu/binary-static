@@ -65860,11 +65860,31 @@ var BinarySocket = (function () {
             else if(response.echo_req.passthrough.value =="set_client"){
 
                 console.log("the accounts are ",response.accounts);
-
+                var secondacct, firstacct ;
+                var count = 1;
                 $.each(response.accounts, function(index,value){
+                   
+                   if($.isEmptyObject(firstacct))
+                   {
+                        firstacct = value.loginid;
+                   }
+                   else
+                   {
+                        secondacct = value.loginid;
+                        var str = text.localize("from account (" + firstacct + ") to account (" + secondacct + ")");
+                        var optionValue = firstacct + "_to_" + secondacct;
+                        $form.find("#transfer_account_transfer")
+                             .append($("<option></option>")
+                             .attr("value",optionValue)
+                             .text(str));
+
+                         firstacct = " ";    
+                   }
 
 
                 });
+
+                $form.find("#transfer_account_transfer option").eq(0).attr('selected', 'selected');
 
                 /*
                 var optionMF, optionML ;
