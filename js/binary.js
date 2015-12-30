@@ -65704,7 +65704,6 @@ var BinarySocket = (function () {
     "use strict";
     var $form ;
     var account_from , account_to ;
-    //account_bal;
     var currType,account_bal;
     var availableCurr= [] ;
     var payoutCurr = [];
