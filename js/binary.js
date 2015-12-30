@@ -65703,10 +65703,12 @@ var BinarySocket = (function () {
 ;var account_transferws = (function(){
     "use strict";
     var $form ;
-    var account_from , account_to ,account_bal;
-    var currType, MLTBal,MFBal,MLCurrType,MFCurrType;
+    var account_from , account_to ;
+    //account_bal;
+    var currType;
+    //MLTBal,MFBal,MLCurrType,MFCurrType;
     var availableCurr= [] ;
-    var availableAccounts =[];
+    //var availableAccounts =[];
     
     var init = function(){
         $form = $('#account_transfer');
@@ -65729,31 +65731,39 @@ var BinarySocket = (function () {
         });
 
         $form.find("#transfer_account_transfer").on("change",function(){
-            var accounts = $("#transfer_account_transfer option:selected").text();
-            var matches = accounts
-                            .split('(')
-                            .filter(function(v){ 
-                                return v.indexOf(')') > -1;})
-                            .map( function(value) { 
-                                return value.split(')')[0];
-                        }); 
+           account_from_to();
 
-            account_from = matches[0];
-            account_to = matches[1];
-           
-            if(account_from.substring(0,2) == "MF"){
-                account_bal = MFBal;
-                currType = MFCurrType;
-            }else if(account_from.substring(0,2) == "ML"){
-                account_bal = MLTBal;
-                currType = MLCurrType;
-            } 
+           console.log("the account from is ", account_from);
+           console.log("the accout to is ", account_to);
 
-            $form.find("#currencyType").html(currType);
-
-            BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "payout_currencies"}});
+           BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "payout_currencies"}});
 
         });
+    };
+    var set_account_from_to = function(){
+
+        var accounts = $("#transfer_account_transfer option:selected").text();
+        var matches = accounts
+                        .split('(')
+                        .filter(function(v){ 
+                            return v.indexOf(')') > -1;})
+                        .map( function(value) { 
+                            return value.split(')')[0];
+                    }); 
+
+        account_from = matches[0];
+        account_to = matches[1];
+
+        console.log("the currency type is ", availableCurr)
+
+        $.each(availableCurr,function(index,value){
+            if(value.account === account_from){
+                currType = value.currency;
+            }
+        });
+
+        $form.find("#currencyType").html(currType);
+
     };
     var validateForm =function(){
 
@@ -65822,7 +65832,6 @@ var BinarySocket = (function () {
 
     var responseMessage = function(response) {
         var resvalue ;
-        var str;
         if("error" in response) {
                 if("message" in response.error) {
                     $("#client_message").show();
@@ -65860,31 +65869,70 @@ var BinarySocket = (function () {
             else if(response.echo_req.passthrough.value =="set_client"){
 
                 console.log("the accounts are ",response.accounts);
-                var secondacct, firstacct ;
+                var secondacct, firstacct,str,optionValue;
                 var count = 1;
+                var currObj = {};
+
                 $.each(response.accounts, function(index,value){
                    
                    if($.isEmptyObject(firstacct))
                    {
                         firstacct = value.loginid;
+                        currObj.account = value.loginid;
+                        currObj.currency = value.currency;
+
+                        availableCurr.push(currObj);
                    }
                    else
                    {
                         secondacct = value.loginid;
-                        var str = text.localize("from account (" + firstacct + ") to account (" + secondacct + ")");
-                        var optionValue = firstacct + "_to_" + secondacct;
+                        str = text.localize("from account (" + firstacct + ") to account (" + secondacct + ")");
+                        optionValue = firstacct + "_to_" + secondacct;
                         $form.find("#transfer_account_transfer")
                              .append($("<option></option>")
                              .attr("value",optionValue)
                              .text(str));
+                        str = text.localize("from account (" + secondacct + ") to account (" + firstacct + ")");
+                        optionValue = secondacct + "_to_" + firstacct;
+                        $form.find("#transfer_account_transfer")
+                             .append($("<option></option>")
+                             .attr("value",optionValue)
+                             .text(str));     
 
-                         firstacct = " ";    
+                        currObj.account = value.loginid;
+                        currObj.currency = value.currency;
+
+                        availableCurr.push(currObj);     
+
+                        firstacct = " ";    
                    }
+
+
+                    if(($.isEmptyObject(firstacct) === false) && ($.isEmptyObject(secondacct) === false))
+                    {
+                        str = text.localize("from account (" + secondacct + ") to account (" + firstacct + ")");
+                        optionValue = secondacct + "_to_" + firstacct;
+                        $form.find("#transfer_account_transfer")
+                                 .append($("<option></option>")
+                                 .attr("value",optionValue)
+                                 .text(str));     
+
+                        currObj.account = value.loginid;
+                        currObj.currency = value.currency;
+
+                        availableCurr.push(currObj);         
+
+                    }
 
 
                 });
 
                 $form.find("#transfer_account_transfer option").eq(0).attr('selected', 'selected');
+
+                set_account_from_to();
+
+                console.log("the account from is ", account_from);
+                console.log("the accout to is ", account_to);
 
                 /*
                 var optionMF, optionML ;
