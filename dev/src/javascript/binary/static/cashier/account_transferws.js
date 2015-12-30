@@ -4,9 +4,7 @@ var account_transferws = (function(){
     var account_from , account_to ;
     //account_bal;
     var currType,account_bal;
-    //MLTBal,MFBal,MLCurrType,MFCurrType;
     var availableCurr= [] ;
-    //var availableAccounts =[];
     
     var init = function(){
         $form = $('#account_transfer');
@@ -31,9 +29,6 @@ var account_transferws = (function(){
         $form.find("#transfer_account_transfer").on("change",function(){
            set_account_from_to();
 
-           console.log("the account from is ", account_from);
-           console.log("the accout to is ", account_to);
-
            BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "payout_currencies"}});
 
         });
@@ -52,8 +47,6 @@ var account_transferws = (function(){
         account_from = matches[0];
         account_to = matches[1];
 
-        console.log("the currency type is ", availableCurr)
-
         $.each(availableCurr,function(index,value){
             if(value.account === account_from){
                 currType = value.currency;
@@ -62,7 +55,6 @@ var account_transferws = (function(){
         });
 
         $form.find("#currencyType").html(currType);
-
     };
     var validateForm =function(){
 
@@ -167,62 +159,57 @@ var account_transferws = (function(){
             }
             else if(response.echo_req.passthrough.value =="set_client"){
 
-                console.log("the accounts are ",response.accounts);
                 var secondacct, firstacct,str,optionValue;
                 var count = 1;
 
                 $.each(response.accounts, function(index,value){
                    var currObj = {};
-                   if($.isEmptyObject(firstacct))
-                   {
-                        firstacct = value.loginid;
-                        currObj.account = value.loginid;
-                        currObj.currency = value.currency;
-                        currObj.balance = value.balance;
 
-                        availableCurr.push(currObj);
-                   }
-                   else
-                   {
-                        secondacct = value.loginid;
-                        str = text.localize("from account (" + firstacct + ") to account (" + secondacct + ")");
-                        optionValue = firstacct + "_to_" + secondacct;
-                        $form.find("#transfer_account_transfer")
-                             .append($("<option></option>")
-                             .attr("value",optionValue)
-                             .text(str));
-                        str = text.localize("from account (" + secondacct + ") to account (" + firstacct + ")");
-                        optionValue = secondacct + "_to_" + firstacct;
-                        $form.find("#transfer_account_transfer")
-                             .append($("<option></option>")
-                             .attr("value",optionValue)
-                             .text(str));     
+                    if(value.balance > 0){
 
-                        currObj.account = value.loginid;
-                        currObj.currency = value.currency;
-                        currObj.balance = value.balance;
+                        if($.isEmptyObject(firstacct))
+                        {
+                            firstacct = value.loginid;
+                            currObj.account = value.loginid;
+                            currObj.currency = value.currency;
+                            currObj.balance = value.balance;
 
-                        availableCurr.push(currObj);     
-
-                        firstacct = "";    
-
-                        console.log(" the here is", firstacct);
-
-                        console.log(" the here ht", $.isEmptyObject(firstacct));
-                   }
-                    
-                    if(($.isEmptyObject(firstacct) === false) && ($.isEmptyObject(secondacct) === false))
-                    {
-                        console.log("the firstacct is ", firstacct);
-                        console.log("the length are", firstacct.length);
-                        console.log("the length is", secondacct.length);
-                        
-                        str = text.localize("from account (" + secondacct + ") to account (" + firstacct + ")");
-                        optionValue = secondacct + "_to_" + firstacct;
-                        $form.find("#transfer_account_transfer")
+                            availableCurr.push(currObj);
+                        }
+                        else
+                        {
+                            secondacct = value.loginid;
+                            str = text.localize("from account (" + firstacct + ") to account (" + secondacct + ")");
+                            optionValue = firstacct + "_to_" + secondacct;
+                            $form.find("#transfer_account_transfer")
+                                 .append($("<option></option>")
+                                 .attr("value",optionValue)
+                                 .text(str));
+                            str = text.localize("from account (" + secondacct + ") to account (" + firstacct + ")");
+                            optionValue = secondacct + "_to_" + firstacct;
+                            $form.find("#transfer_account_transfer")
                                  .append($("<option></option>")
                                  .attr("value",optionValue)
                                  .text(str));     
+
+                            currObj.account = value.loginid;
+                            currObj.currency = value.currency;
+                            currObj.balance = value.balance;
+
+                            availableCurr.push(currObj);     
+
+                            firstacct = "";    
+                        }
+                        
+                        if(($.isEmptyObject(firstacct) === false) && ($.isEmptyObject(secondacct) === false))
+                        {
+                            str = text.localize("from account (" + secondacct + ") to account (" + firstacct + ")");
+                            optionValue = secondacct + "_to_" + firstacct;
+                            $form.find("#transfer_account_transfer")
+                                     .append($("<option></option>")
+                                     .attr("value",optionValue)
+                                     .text(str));     
+                        }
                     }
 
 
@@ -232,7 +219,6 @@ var account_transferws = (function(){
 
                 set_account_from_to();
 
-                console.log("the account bal is", account_bal);
                 if((account_bal <=0) && (account_to !== undefined) ){
                     $("#client_message").show();
                     $("#success_form").hide();
@@ -247,138 +233,6 @@ var account_transferws = (function(){
                     $form.hide();
                     return false;
                 }
-
-                console.log("the account from is ", account_from);
-                console.log("the accout to is ", account_to);
-
-                /*
-                var optionMF, optionML ;
-                var firstbal,secondbal,firstacct,secondacct,firstCurrType,SecondCurrType;
-                $.each(response.accounts, function(index,value){
-                    if(index === 0){
-                        firstbal = value["balance"];
-                        firstCurrType = value["currency"];
-                        firstacct  = value["loginid"];
-                    }
-                    else{
-                        secondbal = value["balance"];
-                        SecondCurrType = value["currency"];
-                        secondacct = value["loginid"];
-                    }
-
-                    if(value["loginid"].substring(0,2) == "MF"){
-                        MFBal = value["balance"];
-                        MFCurrType  = value["currency"];
-                        availableAccounts.push(value["loginid"]);
-                    }
-                    else if(value["loginid"].substring(0,2) == "ML")
-                    {
-                        MLTBal = value["balance"];
-                        MLCurrType = value["currency"];
-                        availableAccounts.push(value["loginid"]);
-                    }
-
-                    if($.isEmptyObject(firstbal) || (firstbal === 0))
-                    {
-                        account_from = secondacct;
-                        firstbal = secondbal;
-                        currType = SecondCurrType;
-
-                        account_to = firstacct;
-                        secondbal = firstbal;
-                    }
-                    else{
-                        account_from = firstacct;
-                        firstbal = firstbal;
-
-                        secondbal = secondbal;
-
-                        account_to = secondacct;
-                        currType = firstCurrType;
-                    }
-
-                });
-               
-                account_bal = firstbal;
-            
-                if((firstbal <=0) && (account_to !== undefined) ){
-                    $("#client_message").show();
-                    $("#success_form").hide();
-                    $form.hide();
-                    return false;
-                }
-                else if(account_to === undefined || account_from === undefined || $.isEmptyObject(account_to))
-                {
-                    $("#client_message").show();
-                    $("#client_message p").html(text.localize("The account transfer is unavailable for your account."));
-                    $("#success_form").hide();
-                    $form.hide();
-                    return false;
-                }
-                else if(account_to == secondacct && account_from == firstacct){
-                    $form.find("#currencyType").html(currType);
-
-                    if(account_from.substring(0,2) == "MF"){
-                    
-                        optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
-                        str = text.localize("from account (" + account_from + ") to account (" + account_to + ")");
-                        optionMF.text(str);
-                        optionMF.attr('selected', 'selected');
-                        if(secondbal > 0){
-                            str  = text.localize("from account (" + account_to + ") to account (" + account_from + ")");
-                            optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
-                            optionML.text(str);
-
-                        }
-                        else{
-                            optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
-                            optionML.remove();
-                        }
-                    }
-                    else if(account_from.substring(0,2) == "ML")
-                    {
-                        str  = text.localize("from account (" + account_from + ") to account (" + account_to + ")");
-                        optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
-                        optionML.text(str);
-                        optionML.attr('selected', 'selected');
-
-                        if(secondbal > 0){
-                            optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
-                            str = text.localize("from account (" + account_to + ") to account (" + account_from + ")");
-                            optionMF.text(str);
-                        }
-                        else{
-                            optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
-                            optionMF.remove();
-
-                        }
-                    }
-                }
-                else if(account_to == firstacct && account_from == secondacct)
-                {
-                    $form.find("#currencyType").html(currType);
-                    if(account_from.substring(0,2) =="MF"){
-                        optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
-                        str = text.localize("from account (" + account_from + ") to account (" + account_to + ")");
-                        optionMF.text(str);
-                        optionMF.attr('selected', 'selected');
-                        optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
-                        optionML.remove();
-                    }
-                    else if(account_from.substring(0,2) == "ML")
-                    {
-                        str  = text.localize("from account (" + account_from + ") to account (" + account_to+ ")");
-                        optionML  = $form.find("#transfer_account_transfer option[value='gtf']");
-                        optionML.text(str);
-                        optionML.attr('selected', 'selected');
-
-                        optionMF = $form.find("#transfer_account_transfer option[value='ftg']");
-                        optionMF.remove();
-                    }
-
-                }
-                */
-
             }
             else{
                 BinarySocket.send({ 
