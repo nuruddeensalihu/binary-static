@@ -205,6 +205,8 @@ var account_transferws = (function(){
                         availableCurr.push(currObj);     
 
                         firstacct = " ";    
+
+                        console.log(" the here is", firstacct);
                    }
                     
                     if(($.isEmptyObject(firstacct) === false) && ($.isEmptyObject(secondacct) === false))
