@@ -65705,7 +65705,7 @@ var BinarySocket = (function () {
     var $form ;
     var account_from , account_to ;
     //account_bal;
-    var currType;
+    var currType,account_bal;
     //MLTBal,MFBal,MLCurrType,MFCurrType;
     var availableCurr= [] ;
     //var availableAccounts =[];
@@ -65759,6 +65759,7 @@ var BinarySocket = (function () {
         $.each(availableCurr,function(index,value){
             if(value.account === account_from){
                 currType = value.currency;
+                account_bal = value.balance;
             }
         });
 
@@ -65880,6 +65881,7 @@ var BinarySocket = (function () {
                         firstacct = value.loginid;
                         currObj.account = value.loginid;
                         currObj.currency = value.currency;
+                        currObj.balance = value.balance;
 
                         availableCurr.push(currObj);
                    }
@@ -65901,6 +65903,7 @@ var BinarySocket = (function () {
 
                         currObj.account = value.loginid;
                         currObj.currency = value.currency;
+                        currObj.balance = value.balance;
 
                         availableCurr.push(currObj);     
 
@@ -65919,6 +65922,7 @@ var BinarySocket = (function () {
 
                         currObj.account = value.loginid;
                         currObj.currency = value.currency;
+                        currObj.balance = value.balance;
 
                         availableCurr.push(currObj);         
 
@@ -65930,6 +65934,22 @@ var BinarySocket = (function () {
                 $form.find("#transfer_account_transfer option").eq(0).attr('selected', 'selected');
 
                 set_account_from_to();
+
+                console.log("the account bal is", account_bal);
+                if((account_bal <=0) && (account_to !== undefined) ){
+                    $("#client_message").show();
+                    $("#success_form").hide();
+                    $form.hide();
+                    return false;
+                }
+                else if(account_to === undefined || account_from === undefined || $.isEmptyObject(account_to))
+                {
+                    $("#client_message").show();
+                    $("#client_message p").html(text.localize("The account transfer is unavailable for your account."));
+                    $("#success_form").hide();
+                    $form.hide();
+                    return false;
+                }
 
                 console.log("the account from is ", account_from);
                 console.log("the accout to is ", account_to);
