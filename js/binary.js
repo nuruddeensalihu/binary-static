@@ -65906,7 +65906,7 @@ var BinarySocket = (function () {
 
                         availableCurr.push(currObj);     
 
-                        firstacct = " ";    
+                        firstacct = null;    
 
                         console.log(" the here is", firstacct);
                    }
