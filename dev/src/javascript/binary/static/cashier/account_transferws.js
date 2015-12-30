@@ -51,7 +51,7 @@ var account_transferws = (function(){
 
         $.each(availableCurr,function(index,value){
             console.log("the dude is", value);
-            if(value.account === account_from){
+            if(value.account == account_from){
                 currType = value.currency;
                 account_bal = value.balance;
             }
