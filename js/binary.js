@@ -65749,7 +65749,10 @@ var BinarySocket = (function () {
         account_from = matches[0];
         account_to = matches[1];
 
+        console.log("the currency is", availableCurr)
+
         $.each(availableCurr,function(index,value){
+            console.log("the dude is", value);
             if(value.account === account_from){
                 currType = value.currency;
                 account_bal = value.balance;
