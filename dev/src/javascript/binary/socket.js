@@ -62,7 +62,7 @@ var BinarySocket = (function () {
         if (isClose()) {
             bufferedSends.push(data);
             init(1);
-        } else if (isReady() && (authorized || TradePage.is_trading_page() || data.hasOwnProperty('time') )) {
+        } else if (isReady()) {
             if(!data.hasOwnProperty('passthrough')){
                 data.passthrough = {};
             }

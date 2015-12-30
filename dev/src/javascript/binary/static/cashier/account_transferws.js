@@ -66,12 +66,6 @@ var account_transferws = (function(){
         {
             $form.find("#invalid_amount").text(text.localize("Invalid currency."));
             isValid = false;
-        }  
-
-        if(($.inArray(account_from, availableAccounts) == -1) || ($.inArray(account_to, availableAccounts) == -1))
-        {
-            $form.find("#invalid_amount").text(text.localize("Invalid Account."));
-            isValid = false;
         }
 
         return isValid;

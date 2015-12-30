@@ -65569,7 +65569,7 @@ var BinarySocket = (function () {
         if (isClose()) {
             bufferedSends.push(data);
             init(1);
-        } else if (isReady() && (authorized || TradePage.is_trading_page() || data.hasOwnProperty('time') )) {
+        } else if (isReady()) {
             if(!data.hasOwnProperty('passthrough')){
                 data.passthrough = {};
             }
@@ -65767,12 +65767,6 @@ var BinarySocket = (function () {
         if($.inArray(currType, availableCurr) == -1)
         {
             $form.find("#invalid_amount").text(text.localize("Invalid currency."));
-            isValid = false;
-        }  
-
-        if(($.inArray(account_from, availableAccounts) == -1) || ($.inArray(account_to, availableAccounts) == -1))
-        {
-            $form.find("#invalid_amount").text(text.localize("Invalid Account."));
             isValid = false;
         }
 
