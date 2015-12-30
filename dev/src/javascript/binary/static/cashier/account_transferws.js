@@ -5,6 +5,7 @@ var account_transferws = (function(){
     //account_bal;
     var currType,account_bal;
     var availableCurr= [] ;
+    var payoutCurr = [];
     
     var init = function(){
         $form = $('#account_transfer');
@@ -47,12 +48,7 @@ var account_transferws = (function(){
         account_from = matches[0];
         account_to = matches[1];
 
-        console.log("the currency is", availableCurr)
-
         $.each(availableCurr,function(index,value){
-            console.log("the dude is", value.account);
-            console.log("sup", value["account"]);
-            console.log("the account is ", account_from);
             if(value.account == account_from){
                 currType = value.currency;
                 account_bal = value.balance;
@@ -70,7 +66,7 @@ var account_transferws = (function(){
             $form.find("#invalid_amount").text(text.localize("Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places."));
             isValid = false;
         }
-        if($.inArray(currType, availableCurr) == -1)
+        if($.inArray(currType, payoutCurr) == -1)
         {
             $form.find("#invalid_amount").text(text.localize("Invalid currency."));
             isValid = false;
@@ -140,7 +136,7 @@ var account_transferws = (function(){
         }
         else if("payout_currencies" in response){
 
-            availableCurr = response.payout_currencies;
+            payoutCurr = response.payout_currencies;
         }
         else if ("transfer_between_accounts" in response){
 
