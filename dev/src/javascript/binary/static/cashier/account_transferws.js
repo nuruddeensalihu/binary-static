@@ -12,8 +12,8 @@ var account_transferws = (function(){
         $("#client_message").hide();
         account_bal = 0;
 
-        BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "initValues"}});
-        BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "payout_currencies"}});
+        BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 1,"passthrough": {"value": "initValues"}});
+        BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 2 ,"passthrough": {"value": "payout_currencies"}});
 
         $form.find("button").on("click", function(e){
             e.preventDefault();
