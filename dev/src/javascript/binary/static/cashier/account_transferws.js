@@ -134,6 +134,7 @@ var account_transferws = (function(){
         else if("payout_currencies" in response){
 
             payoutCurr = response.payout_currencies;
+            console.log("The payout is", payoutCurr);
         }
         else if ("transfer_between_accounts" in response){
 
@@ -158,8 +159,6 @@ var account_transferws = (function(){
             else if(response.req_id === 4){
 
                 var secondacct, firstacct,str,optionValue;
-
-                console.log("the response is ", response);
 
                 $.each(response.accounts, function(index,value){
                    var currObj = {};
