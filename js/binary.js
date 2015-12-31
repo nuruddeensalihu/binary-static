@@ -65873,7 +65873,7 @@ var BinarySocket = (function () {
         if(response.echo_req.passthrough){
             var option= response.req_id ;
             var amt = $form.find("#acc_transfer_amount").val();
-            console.log("the req_id is ", option);
+            console.log("the req_id is ", response);
 
             switch(option){
                 case    1:
