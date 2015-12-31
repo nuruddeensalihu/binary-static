@@ -65866,6 +65866,7 @@ var BinarySocket = (function () {
         }
         else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
         {
+            console.log("its here ");
             isAuthorized(response);
         }
     };
