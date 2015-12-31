@@ -65838,11 +65838,12 @@ var BinarySocket = (function () {
 
         var amt = $form.find("#acc_transfer_amount").val();
         var isValid = true;
-       
+       /*
         if(amt.length <=0 ){
             $form.find("#invalid_amount").text(text.localize("Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places."));
             isValid = false;
         }
+        */
         if($.inArray(currType, payoutCurr) == -1)
         {
             $form.find("#invalid_amount").text(text.localize("Invalid currency."));
@@ -65903,6 +65904,7 @@ var BinarySocket = (function () {
         var resvalue ;
         if("error" in response) {
                 if("message" in response.error) {
+                    console.log("from server");
                     $form.find("#invalid_amount").text(text.localize(response.error.message));
                     return false;
                 }
@@ -65936,9 +65938,6 @@ var BinarySocket = (function () {
 
                 var secondacct, firstacct,str,optionValue;
                 var count = 1;
-
-                console.log("the response account length", response.accounts.length);
-
 
                 $.each(response.accounts, function(index,value){
                    var currObj = {};
@@ -65996,8 +65995,6 @@ var BinarySocket = (function () {
                 $form.find("#transfer_account_transfer option").eq(0).attr('selected', 'selected');
 
                 set_account_from_to();
-
-                console.log("the response account", response.accounts);
 
                 if((account_bal <=0) && (response.accounts.length > 1) ){
                     $("#client_message").show();
