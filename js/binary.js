@@ -65941,24 +65941,26 @@ var BinarySocket = (function () {
                 var secondacct, firstacct,str,optionValue;
 
                 $.each(response.accounts, function(index,value){
-                   var currObj = {};
+                    var currObj = {};
 
-                    if(value.balance > 0){
+                   
 
-                        if($.isEmptyObject(firstacct))
-                        {
-                            firstacct = value.loginid;
-                            currObj.account = value.loginid;
-                            currObj.currency = value.currency;
-                            currObj.balance = value.balance;
+                    if($.isEmptyObject(firstacct))
+                    {
+                        firstacct = value.loginid;
+                        currObj.account = value.loginid;
+                        currObj.currency = value.currency;
+                        currObj.balance = value.balance;
 
-                            availableCurr.push(currObj);
-                        }
-                        else
-                        {
-                            secondacct = value.loginid;
-                            str = text.localize("from account (" + firstacct + ") to account (" + secondacct + ")");
-                            optionValue = firstacct + "_to_" + secondacct;
+                        availableCurr.push(currObj);
+                    }
+                    else
+                    {
+                        secondacct = value.loginid;
+                        str = text.localize("from account (" + firstacct + ") to account (" + secondacct + ")");
+                        optionValue = firstacct + "_to_" + secondacct;
+
+                        if(value.balance > 0){
                             $form.find("#transfer_account_transfer")
                                  .append($("<option></option>")
                                  .attr("value",optionValue)
@@ -65969,26 +65971,28 @@ var BinarySocket = (function () {
                                  .append($("<option></option>")
                                  .attr("value",optionValue)
                                  .text(str));     
-
-                            currObj.account = value.loginid;
-                            currObj.currency = value.currency;
-                            currObj.balance = value.balance;
-
-                            availableCurr.push(currObj);     
-
-                            firstacct = "";    
                         }
-                        
-                        if(($.isEmptyObject(firstacct) === false) && ($.isEmptyObject(secondacct) === false))
-                        {
-                            str = text.localize("from account (" + secondacct + ") to account (" + firstacct + ")");
-                            optionValue = secondacct + "_to_" + firstacct;
+                        currObj.account = value.loginid;
+                        currObj.currency = value.currency;
+                        currObj.balance = value.balance;
+
+                        availableCurr.push(currObj);     
+
+                        firstacct = "";    
+                    }
+                    
+                    if(($.isEmptyObject(firstacct) === false) && ($.isEmptyObject(secondacct) === false))
+                    {
+                        str = text.localize("from account (" + secondacct + ") to account (" + firstacct + ")");
+                        optionValue = secondacct + "_to_" + firstacct;
+                        if(value.balance > 0){
                             $form.find("#transfer_account_transfer")
                                      .append($("<option></option>")
                                      .attr("value",optionValue)
                                      .text(str));     
                         }
                     }
+                    
 
 
                 });
