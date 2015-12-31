@@ -65814,6 +65814,8 @@ var BinarySocket = (function () {
     var set_account_from_to = function(){
 
         var accounts = $("#transfer_account_transfer option:selected").text();
+
+        console.log("the selected is ", accounts);
         var matches = accounts
                         .split('(')
                         .filter(function(v){ 
@@ -65843,12 +65845,12 @@ var BinarySocket = (function () {
             $form.find("#invalid_amount").text(text.localize("Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places."));
             isValid = false;
         }
-        /*
+        
         if($.inArray(currType, payoutCurr) == -1)
         {
             $form.find("#invalid_amount").text(text.localize("Invalid currency."));
             isValid = false;
-        }*/
+        }
 
         return isValid;
     };
@@ -65994,6 +65996,8 @@ var BinarySocket = (function () {
                 });
 
                 $form.find("#transfer_account_transfer option").eq(0).attr('selected', 'selected');
+                 
+              
 
                 set_account_from_to();
 
