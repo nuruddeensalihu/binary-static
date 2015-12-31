@@ -12,7 +12,7 @@ var account_transferws = (function(){
         $("#client_message").hide();
         account_bal = 0;
 
-        BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 1});
+        BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 1 });
         BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 2 });
 
         $form.find("button").on("click", function(e){
@@ -77,6 +77,7 @@ var account_transferws = (function(){
 
     var apiResponse = function(response){
         var type = response.msg_type;
+        console.log("the response are ", response);
         if (type === "transfer_between_accounts" || (type === "error" && "transfer_between_accounts" in response.echo_req)){
            responseMessage(response);
 
