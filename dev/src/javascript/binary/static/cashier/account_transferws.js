@@ -96,7 +96,6 @@ var account_transferws = (function(){
         if(response.req_id){
             var option= response.req_id ;
             var amt = $form.find("#acc_transfer_amount").val();
-            console.log("the req_id is ", response);
 
             switch(option){
                 case    1:
@@ -127,7 +126,6 @@ var account_transferws = (function(){
         var resvalue ;
         if("error" in response) {
                 if("message" in response.error) {
-                    console.log("from server");
                     $form.find("#invalid_amount").text(text.localize(response.error.message));
                     return false;
                 }
@@ -136,7 +134,6 @@ var account_transferws = (function(){
         else if("payout_currencies" in response){
 
             payoutCurr = response.payout_currencies;
-            console.log("The payout is", payoutCurr);
         }
         else if ("transfer_between_accounts" in response){
 
