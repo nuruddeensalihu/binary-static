@@ -65938,6 +65938,8 @@ var BinarySocket = (function () {
 
                 var secondacct, firstacct,str,optionValue;
 
+                console.log("the response is ", response);
+
                 $.each(response.accounts, function(index,value){
                    var currObj = {};
 
