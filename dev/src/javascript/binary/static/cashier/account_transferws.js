@@ -77,7 +77,6 @@ var account_transferws = (function(){
 
     var apiResponse = function(response){
         var type = response.msg_type;
-        console.log("the response are ", response);
         if (type === "transfer_between_accounts" || (type === "error" && "transfer_between_accounts" in response.echo_req)){
            responseMessage(response);
 
@@ -88,13 +87,12 @@ var account_transferws = (function(){
         }
         else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
         {
-            console.log("its here ");
             isAuthorized(response);
         }
     };
 
     var isAuthorized =  function(response){
-        if(response.echo_req.passthrough){
+        if(response.req_id){
             var option= response.req_id ;
             var amt = $form.find("#acc_transfer_amount").val();
             console.log("the req_id is ", response);
