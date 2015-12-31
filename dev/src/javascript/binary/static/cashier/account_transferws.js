@@ -212,7 +212,9 @@ var account_transferws = (function(){
                     }
 
                     if(value.balance <= 0){
-                         $form.find("#transfer_account_transfer option:first").remove();
+                        console.log("it came here");
+                        console.log("the account is ", value.account); 
+                        $form.find("#transfer_account_transfer option:last").remove();
                     }
                 
 
