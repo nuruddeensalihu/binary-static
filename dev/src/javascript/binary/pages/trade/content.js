@@ -85,17 +85,15 @@ var Content = (function () {
             textMaxAggregateTooltip: text.localize('Presents the maximum aggregate payouts on outstanding contracts in your portfolio. If the maximum is attained, you may not purchase additional contracts without first closing out existing positions.'),
             textTradingLimits: text.localize('Trading Limits'),
             textWithdrawalTitle: text.localize('Withdrawal Limits'),
-            textWithdrawalLimits: text.localize('Your withdrawal limit is EUR'),
-            textCurrencyEquivalent: text.localize('or equivalent in other currency'),
-            textWithrawalAmount: text.localize('You have already withdrawn the equivalent of EUR'),
-            textYour: text.localize('Your'),
-            textDayWithdrawalLimit: text.localize('day withdrawal limit is currently EUR'),
+            textWithdrawalLimits: text.localize('Your withdrawal limit is EUR %1 (or equivalent in other currency).'),
+            textWithrawalAmount: text.localize('You have already withdrawn the equivalent of EUR %1'),
+            textDayWithdrawalLimit: text.localize('Your %1 day withdrawal limit is currently EUR %2 (or equivalent in other currency).'),
             textAuthenticatedWithdrawal: text.localize('Your account is fully authenticated and your withdrawal limits have been lifted.'),
             textAggregateOverLast: text.localize('in aggregate over the last'),
-            textWithdrawalForEntireDuration: text.localize('Your withdrawal limit for the entire duration of the account is currently: EUR'),
+            textWithdrawalForEntireDuration: text.localize('Your withdrawal limit for the entire duration of the account is currently: EUR %1 (or equivalent in other currency).'),
             textInAggregateOverLifetime: text.localize('in aggregate over the lifetime of your account.'),
             textNotAllowedToWithdraw: text.localize('Therefore you may not withdraw any additional funds.'),
-            textCurrentMaxWithdrawal: text.localize('Therefore your current immediate maximum withdrawal (subject to your account having sufficient funds) is EUR'),
+            textCurrentMaxWithdrawal: text.localize('Therefore your current immediate maximum withdrawal (subject to your account having sufficient funds) is EUR %1 (or equivalent in other currency).'),
             textBuyPrice: text.localize('Buy price'),
             textFinalPrice: text.localize('Final price'),
             textLoss: text.localize('Loss'),
@@ -279,7 +277,7 @@ var Content = (function () {
         var titleElement = document.getElementById("statement-title").firstElementChild;
         titleElement.textContent = localize.textStatement;
     };
-    
+
     var profitTableTranslation = function(){
         var titleElement = document.getElementById("profit-table-title").firstElementChild;
         titleElement.textContent = localize.textProfitTable;
@@ -288,13 +286,13 @@ var Content = (function () {
     var limitsTranslation = function(){
         var titleElement = document.getElementById("limits-title").firstElementChild;
         titleElement.textContent = localize.textLimits;
-        
+
         if(TUser.get().loginid){
             var loginId = TUser.get().loginid;
 
             var tradingLimits = document.getElementById("trading-limits");
             tradingLimits.textContent = loginId + " - " + localize.textTradingLimits;
-            
+
             var withdrawalTitle = document.getElementById("withdrawal-title");
             withdrawalTitle.textContent = loginId + " - " + localize.textWithdrawalTitle;
         }

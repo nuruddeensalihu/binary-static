@@ -15,11 +15,11 @@ function processActiveSymbols(data) {
 
     displayMarkets('contract_markets', Symbols.markets(), market);
     processMarket();
-    setTimeout(function(){
-        if(document.getElementById('underlying')){
-            Symbols.getSymbols(0);
-        }
-    }, 60*1000);
+    // setTimeout(function(){
+        // if(document.getElementById('underlying')){
+        //     Symbols.getSymbols(0);
+        // }
+    // }, 60*1000);
 }
 
 
