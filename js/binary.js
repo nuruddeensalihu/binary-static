@@ -65804,6 +65804,8 @@ var BinarySocket = (function () {
         });
 
         $form.find("#transfer_account_transfer").on("change",function(){
+
+           $form.find("#invalid_amount").text("");
            set_account_from_to();
 
            BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 3});
