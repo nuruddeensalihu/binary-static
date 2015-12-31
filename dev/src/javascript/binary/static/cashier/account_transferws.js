@@ -47,7 +47,7 @@ var account_transferws = (function(){
 
         account_from = matches[0];
         account_to = matches[1];
-
+        console.log("the available account are", availableCurr);
         $.each(availableCurr,function(index,value){
             if(value.account == account_from){
                 currType = value.currency;
