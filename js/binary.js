@@ -65991,7 +65991,7 @@ var BinarySocket = (function () {
 
                     if(value.balance <= 0){
                         console.log("it came here");
-                        console.log("the account is ", value.account); 
+                        console.log("the account is ", value.loginid); 
                         $form.find("#transfer_account_transfer option:last").remove();
                     }
                 
