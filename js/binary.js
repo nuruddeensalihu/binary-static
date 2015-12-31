@@ -65938,6 +65938,8 @@ var BinarySocket = (function () {
                 var secondacct, firstacct,str,optionValue;
                 var count = 1;
 
+                console.log("the account is ", response.accounts);
+
                 $.each(response.accounts, function(index,value){
                    var currObj = {};
 
@@ -65994,6 +65996,9 @@ var BinarySocket = (function () {
                 $form.find("#transfer_account_transfer option").eq(0).attr('selected', 'selected');
 
                 set_account_from_to();
+
+                console.log("account to is ", account_to);
+                console.log("the account from is ", account_from);
 
                 if((account_bal <=0) && (account_to !== undefined) ){
                     $("#client_message").show();
