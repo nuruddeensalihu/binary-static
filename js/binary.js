@@ -65838,12 +65838,14 @@ var BinarySocket = (function () {
 
         var amt = $form.find("#acc_transfer_amount").val();
         var isValid = true;
-       /*
+        console.log("the amount is", amt);
+        console.log("isEmptyObject", $.isEmptyObject(amt));
+       
         if(amt.length <=0 ){
             $form.find("#invalid_amount").text(text.localize("Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places."));
             isValid = false;
         }
-        */
+        
         if($.inArray(currType, payoutCurr) == -1)
         {
             $form.find("#invalid_amount").text(text.localize("Invalid currency."));
