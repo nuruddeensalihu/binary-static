@@ -129,9 +129,20 @@ var account_transferws = (function(){
         var resvalue ;
         if("error" in response) {
                 if("message" in response.error) {
-                    $form.find("#invalid_amount").text(text.localize(response.error.message));
+
+                    if($('#transfer_account_transfer option').length > 0 ){
+                        $form.find("#invalid_amount").text(text.localize(response.error.message));
+                    }
+                    else{
+                        $("#client_message").show();
+                        $("#client_message p").html(text.localize(response.error.message));
+                        $("#success_form").hide();
+                        $form.hide();
+
+                    }
                     return false;
                 }
+
                 return false;
         }
         else if("payout_currencies" in response){
