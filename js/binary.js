@@ -65790,8 +65790,8 @@ var BinarySocket = (function () {
         $("#client_message").hide();
         account_bal = 0;
 
-        BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 1,"passthrough": {"value": "initValues"}});
-        BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 2 ,"passthrough": {"value": "payout_currencies"}});
+        BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 1});
+        BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 2 });
 
         $form.find("button").on("click", function(e){
             e.preventDefault();
@@ -65871,11 +65871,12 @@ var BinarySocket = (function () {
 
     var isAuthorized =  function(response){
         if(response.echo_req.passthrough){
-            var option= response.echo_req.passthrough.value ;
+            var option= response.req_id ;
             var amt = $form.find("#acc_transfer_amount").val();
+            console.log("the req_id is ", option);
 
             switch(option){
-                case   "initValues":
+                case    1:
                         BinarySocket.send({ 
                             "transfer_between_accounts": "1",
                             "passthrough" : {"value" : "set_client"}
@@ -65890,7 +65891,7 @@ var BinarySocket = (function () {
                             "amount": amt
                         });
                         break; 
-                case   "payout_currencies" :
+                case    2 :
                         BinarySocket.send({ 
                             "payout_currencies": "1"
                         });
