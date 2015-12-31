@@ -65843,11 +65843,12 @@ var BinarySocket = (function () {
             $form.find("#invalid_amount").text(text.localize("Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places."));
             isValid = false;
         }
+        /*
         if($.inArray(currType, payoutCurr) == -1)
         {
             $form.find("#invalid_amount").text(text.localize("Invalid currency."));
             isValid = false;
-        }
+        }*/
 
         return isValid;
     };
@@ -65903,10 +65904,6 @@ var BinarySocket = (function () {
         var resvalue ;
         if("error" in response) {
                 if("message" in response.error) {
-                   // $("#client_message").show();
-                   // $("#client_message p").html(text.localize(response.error.message));
-                   // $("#success_form").hide();
-                    //$form.hide();
                     $form.find("#invalid_amount").text(text.localize(response.error.message));
                     return false;
                 }
