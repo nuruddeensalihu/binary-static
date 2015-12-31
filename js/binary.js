@@ -65791,7 +65791,6 @@ var BinarySocket = (function () {
         account_bal = 0;
 
         BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 1 });
-        BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 2 });
 
         $form.find("button").on("click", function(e){
             e.preventDefault();
@@ -65801,13 +65800,13 @@ var BinarySocket = (function () {
                 return false;
             }
             
-            BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "transfer_between_accounts"}});
+            BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 2 });
         });
 
         $form.find("#transfer_account_transfer").on("change",function(){
            set_account_from_to();
 
-           BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "payout_currencies"}});
+           BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 3});
 
         });
     };
@@ -65879,10 +65878,10 @@ var BinarySocket = (function () {
                 case    1:
                         BinarySocket.send({ 
                             "transfer_between_accounts": "1",
-                            "passthrough" : {"value" : "set_client"}
+                            "req_id" : 4
                         });
                         break;
-                case   "transfer_between_accounts" :
+                case    2 :
                         BinarySocket.send({ 
                             "transfer_between_accounts": "1",
                             "account_from": account_from,
@@ -65890,12 +65889,11 @@ var BinarySocket = (function () {
                             "currency": currType,
                             "amount": amt
                         });
-                        break; 
-                case    2 :
-                        BinarySocket.send({ 
-                            "payout_currencies": "1"
-                        });
-                        break;              
+                        break;  
+                case    3:
+                        BinarySocket.send({"payout_currencies": "1"});
+                        break;
+                                   
             }
 
         }
@@ -65917,7 +65915,7 @@ var BinarySocket = (function () {
         }
         else if ("transfer_between_accounts" in response){
 
-            if(response.echo_req.passthrough.value == "get_new_balance"){
+            if(response.req_id === 5){
         
                 $.each(response.accounts,function(key,value){
                     $form.hide();
@@ -65935,7 +65933,7 @@ var BinarySocket = (function () {
                     }
                 });
             }
-            else if(response.echo_req.passthrough.value =="set_client"){
+            else if(response.req_id === 4){
 
                 var secondacct, firstacct,str,optionValue;
 
@@ -66012,11 +66010,13 @@ var BinarySocket = (function () {
                     $form.hide();
                     return false;
                 }
+
+                BinarySocket.send({"payout_currencies": "1"});
             }
             else{
                 BinarySocket.send({ 
                     "transfer_between_accounts": "1",
-                    "passthrough" : {"value" : "get_new_balance"}
+                    "req_id" : 5
                 });
 
             }
