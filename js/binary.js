@@ -65999,7 +65999,7 @@ var BinarySocket = (function () {
 
                 console.log("the response account", response.accounts);
 
-                if((account_bal <=0) && (account_to !== undefined) ){
+                if((account_bal <=0) && (response.accounts.length > 1) ){
                     $("#client_message").show();
                     $("#success_form").hide();
                     $form.hide();
