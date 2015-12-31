@@ -65826,7 +65826,8 @@ var BinarySocket = (function () {
         account_from = matches[0];
         account_to = matches[1];
 
-        console.log("the accounts is ", accouunts);
+        console.log("the accounts is ", accounts);
+        console.log("the matches ", matches);
         console.log("the available account are", availableCurr);
         $.each(availableCurr,function(index,value){
             if(value.account == account_from){
