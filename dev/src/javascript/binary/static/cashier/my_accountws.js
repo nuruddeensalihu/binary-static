@@ -27,7 +27,7 @@ var my_accountws = (function(){
 	    			console.log("link is", $("#VRT_topup_link a"));
 	    			$("#VRT_topup_link a").text(text.localize(str));
 	    		}
-	    		console.log("the balanace is greater than 1000", (response.authorize.balance >= 1000));
+	    		console.log("the balanace is greater than 1000", (bal >= 1000));
 	    	}
     	}
 
