@@ -66570,7 +66570,7 @@ pjax_config_page("user/settings/securityws", function() {
     	$("#VRT_topup_errorMessage").hide();
     	BinarySocket.send({"authorize": $.cookie('login'), "req_id": 1 });
     };
-    var isAuthorized = function(){
+    var isAuthorized = function(response){
     	if(response.echo_req.req_id){
 	    	if("error" in response) {
 	            if("message" in response.error) {
