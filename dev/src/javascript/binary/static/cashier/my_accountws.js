@@ -18,9 +18,9 @@ var my_accountws = (function(){
 	            return false;
 	        }
 	    	else{
-	    		if(parseInt(response.req_id) === 1 && bal >= 1000){
-	    			currType = response.authorize.currency;
-	    			bal =  response.authorize.balance;
+	    		currType = response.authorize.currency;
+	    		bal =  response.authorize.balance;
+	    		if(parseInt(response.req_id) === 1 && bal < 1000){
 	    			str = "Deposit "+ currType + " 10000 virtual money into your account ";
 	    			$("#VRT_topup_link").show();
 	    			console.log("str is", str );
