@@ -26,6 +26,7 @@ var my_accountws = (function(){
 	    			console.log("link is", $("#VRT_topup_link a"));
 	    			$("#VRT_topup_link a").text(text.localize(text));
 	    			$("#VRT_topup_link a").html(text.localize(text));
+	    			console.log("the sel value is ", $("#VRT_topup_link a").val());
 	    		}
 	    	}
     	}
