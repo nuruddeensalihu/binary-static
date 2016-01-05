@@ -107,6 +107,7 @@
     "src/javascript/binary/reality-check.js",
     "src/javascript/binary/socket.js",
     "src/javascript/binary/static/cashier/account_transferws.js",
+    "src/javascript/binary/static/cashier/my_accountws.js",
     "src/javascript/binary/static/cashier/paymentagent_withdrawws.js",
     "src/javascript/binary/static/cashier/settings_securityws.js",
     "src/javascript/binary/static/cashier/top_up_virtualws.js",

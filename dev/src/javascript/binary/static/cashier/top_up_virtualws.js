@@ -23,7 +23,6 @@ var top_up_virtualws = (function(){
 	    	else{
 	    		if(parseInt(response.req_id) === 1){
 	    			account = response.authorize.loginid;
-	    			console.log("we are here and account is ", account);
 	    			BinarySocket.send({"topup_virtual": 1 });
 	    		}
 	    

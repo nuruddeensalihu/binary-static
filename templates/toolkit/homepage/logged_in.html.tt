@@ -11,7 +11,7 @@
         </div>
     [% END %]
     [% IF client.is_virtual %]
-            <p>
+            <p id='VRT_topup_link'>
                 <a href="[% url_for('/cashier/top_up_virtualws') %]">[% l('Deposit virtual money into your account') %]</a>
             </p>
     [% ELSE %]
