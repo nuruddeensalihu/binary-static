@@ -22,6 +22,8 @@ var my_accountws = (function(){
 	    			currType = response.authorize.currency;
 	    			str = "Deposit "+ currType + " 10000 virtual money into your account ";
 	    			$("#VRT_topup_link").show();
+	    			console.log("str is", str );
+	    			console.log("link is", $("#VRT_topup_link a"));
 	    			$("#VRT_topup_link a").text(text.localize(text));
 	    		}
 	    	}
