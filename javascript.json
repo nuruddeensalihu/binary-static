@@ -109,6 +109,7 @@
     "src/javascript/binary/static/cashier/account_transferws.js",
     "src/javascript/binary/static/cashier/paymentagent_withdrawws.js",
     "src/javascript/binary/static/cashier/settings_securityws.js",
+    "src/javascript/binary/static/cashier/top_up_virtualws.js",
     "src/javascript/binary/static/common/button.js",
     "src/javascript/binary/static/common/common_data.js",
     "src/javascript/binary/static/common/string_util.js",
