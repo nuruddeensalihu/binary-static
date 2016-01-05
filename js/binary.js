@@ -66103,11 +66103,8 @@ pjax_config_page("cashier/account_transferws", function() {
 	    		if(parseInt(response.req_id) === 1 && bal < 1000){
 	    			str = "Deposit "+ currType + " 10000 virtual money into your account ";
 	    			$("#VRT_topup_link").show();
-	    			console.log("str is", str );
-	    			console.log("link is", $("#VRT_topup_link a"));
 	    			$("#VRT_topup_link a").text(text.localize(str));
 	    		}
-	    		console.log("the balanace is greater than 1000", (bal >= 1000));
 	    	}
     	}
 
