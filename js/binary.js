@@ -66089,7 +66089,7 @@ pjax_config_page("cashier/account_transferws", function() {
     };
 
     var isAuthorized = function(response){
-    	var str ;
+    	var str , bal ;
     	if(response.echo_req.req_id){
 	    	if("error" in response) {
 	            if("message" in response.error) {
@@ -66098,14 +66098,13 @@ pjax_config_page("cashier/account_transferws", function() {
 	            return false;
 	        }
 	    	else{
-	    		if(parseInt(response.req_id) === 1){
+	    		if(parseInt(response.req_id) === 1 && bal >= 1000){
 	    			currType = response.authorize.currency;
 	    			str = "Deposit "+ currType + " 10000 virtual money into your account ";
 	    			$("#VRT_topup_link").show();
 	    			console.log("str is", str );
 	    			console.log("link is", $("#VRT_topup_link a"));
 	    			$("#VRT_topup_link a").text(text.localize(str));
-	    			console.log("the sel value is ", $("#VRT_topup_link a").val());
 	    		}
 	    	}
     	}
