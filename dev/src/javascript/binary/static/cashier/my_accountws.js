@@ -25,6 +25,7 @@ var my_accountws = (function(){
 	    			console.log("str is", str );
 	    			console.log("link is", $("#VRT_topup_link a"));
 	    			$("#VRT_topup_link a").text(text.localize(text));
+	    			$("#VRT_topup_link a").html(text.localize(text));
 	    		}
 	    	}
     	}
