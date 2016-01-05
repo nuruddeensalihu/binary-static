@@ -1,7 +1,7 @@
 .grd-grid-12
   %p#VRT_topup_errorMessage
-  %h1= l('Give me more money !')
   %div{:class => 'centerText', :id => 'VRT_topup_message'}
+    %h1= l('Give me more money !')
     %p
       %form{:action => url_for('/user/portfolio'),:method => 'POST'}
       %span.button
