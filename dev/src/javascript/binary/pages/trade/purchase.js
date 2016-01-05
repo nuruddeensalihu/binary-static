@@ -31,14 +31,15 @@ var Purchase = (function () {
         var error = details['error'];
         var show_chart = !error && passthrough['duration']<=10 && passthrough['duration_unit']==='t' && (sessionStorage.formname === 'risefall' || sessionStorage.formname === 'higherlower' || sessionStorage.formname === 'asian');
 
-        container.style.display = 'table-row';
         contracts_list.style.display = 'none';
 
         if (error) {
+            container.style.display = 'block';
             message_container.hide();
             confirmation_error.show();
             confirmation_error.textContent = error['message'];
         } else {
+            container.style.display = 'table-row';
             message_container.show();
             confirmation_error.hide();
 

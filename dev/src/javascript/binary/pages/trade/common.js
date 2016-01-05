@@ -608,12 +608,27 @@ function debounce(func, wait, immediate) {
  */
 function getDefaultMarket() {
     'use strict';
-   var mkt = sessionStorage.getItem('market');
-   var markets = Symbols.markets(1);
-   if(!mkt ||  !markets[mkt]){
-        mkt = Object.keys(markets)[0];
-   }
-   return mkt;
+    var mkt = sessionStorage.getItem('market');
+    var markets = Symbols.markets(1);
+    if (!mkt || !markets[mkt]) {
+        var sorted_markets = Object.keys(Symbols.markets()).sort(function(a, b) {
+            return getMarketsOrder(a) - getMarketsOrder(b);
+        });
+        mkt = sorted_markets[0];
+    }
+    return mkt;
+}
+
+// Order
+function getMarketsOrder(market) {
+    var order = {
+        'forex': 1,
+        'random': 2,
+        'indices': 3,
+        'stocks': 4,
+        'commodities': 5
+    };
+    return order[market] ? order[market] : 100;
 }
 
 /*

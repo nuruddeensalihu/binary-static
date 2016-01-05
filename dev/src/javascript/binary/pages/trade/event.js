@@ -161,7 +161,6 @@ var TradingEvents = (function () {
             });
             underlyingElement.addEventListener('mousedown', function(e) {
                 Symbols.getSymbols(0);
-                while(t+300>Date.now()){var c=1;}
             });
         }
 

@@ -5,36 +5,36 @@
   %h1= stash->{title}
   .grd-grid-3.grd-grid-mobile-6.grd-parent
     .grd-grid-8.grd-with-padding
-      %a.pjaxload{:href => url_for('/user/settings/details')}
+      %a.pjaxload{:href => url_for('/user/settings/detailsws')}
         %img.responsive{:src => url_for('images/pages/settings/detail.svg')}
     .grd-grid-12
       %h4
-        %a.pjaxload{:href => url_for('/user/settings/details')}= l('Personal Details')
+        %a.pjaxload{:href => url_for('/user/settings/detailsws')}= l('Personal Details')
       %p= l('View your personal information.')
   - if ($is_real) {
     .grd-grid-3.grd-grid-mobile-6.grd-parent
       .grd-grid-8.grd-with-padding
-        %a.pjaxload{:href => url_for('/user/settings/security')}
+        %a.pjaxload{:href => url_for('/user/settings/securityws')}
           %img.responsive{:src => url_for('images/pages/settings/security.svg')}
       .grd-grid-12
         %h4
-          %a.pjaxload{:href => url_for('/user/settings/security')}= l('Security')
+          %a.pjaxload{:href => url_for('/user/settings/securityws')}= l('Security')
         %p= l('Manage your account access and security settings.')
     .grd-grid-3.grd-grid-mobile-6.grd-parent
       .grd-grid-8.grd-with-padding
-        %a.pjaxload{:href => url_for('/user/self_exclusion')}
+        %a.pjaxload{:href => url_for('/user/self_exclusionws')}
           %img.responsive{:src => url_for('images/pages/settings/self-exclusion.svg')}
       .grd-grid-12
         %h4
-          %a.pjaxload{:href => url_for('/user/self_exclusion')}= l('Self Exclusion')
+          %a.pjaxload{:href => url_for('/user/self_exclusionws')}= l('Self Exclusion')
         %p= l('Facility that allows you to set limits on your account.')
     .grd-grid-3.grd-grid-mobile-6.grd-parent
       .grd-grid-8.grd-with-padding
-        %a.pjaxload{:href => url_for('/cashier/limits')}
+        %a.pjaxload{:href => url_for('/cashier/limitsws')}
           %img.responsive{:src => url_for('images/pages/settings/limits.svg')}
       .grd-grid-12
         %h4
-          %a.pjaxload{:href => url_for('/cashier/limits')}= l('Limits')
+          %a.pjaxload{:href => url_for('/cashier/limitsws')}= l('Limits')
         %p= l('View your trading and withdrawal limits.')
     .grd-clear
     - if ($show_financial_assessment) {
@@ -50,9 +50,9 @@
   - }
   .grd-grid-3.grd-grid-mobile-6.grd-parent.ja-hide
     .grd-grid-8.grd-with-padding
-      %a.pjaxload{:href => url_for('/user/api_token')}
+      %a.pjaxload{:href => url_for('/user/api_tokenws')}
         %img.responsive{:src => url_for('images/pages/settings/api-token.svg')}
     .grd-grid-12
       %h4
-        %a.pjaxload{:href => url_for('/user/api_token')}= l('API Token')
+        %a.pjaxload{:href => url_for('/user/api_tokenws')}= l('API Token')
       %p= l('API token for third party applications.')

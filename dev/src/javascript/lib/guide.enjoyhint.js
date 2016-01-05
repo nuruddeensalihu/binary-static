@@ -284,7 +284,7 @@ var EnjoyHint = function (_options) {
 (function ($) {
     var methods = {
         init: function (options) {
-            console.log(options,'-------------');
+            //console.log(options,'-------------');
             return this.each(function () {
                 var defaults = {
                     onNextClick: function () {
@@ -351,7 +351,7 @@ var EnjoyHint = function (_options) {
                     width: that.canvas_size.w,
                     height: that.canvas_size.h
                 });
-                console.log(that.enjoyhint);
+                //console.log(that.enjoyhint);
 
                 that.layer = new Kinetic.Layer();
                 that.rect = new Kinetic.Rect({
@@ -381,11 +381,11 @@ var EnjoyHint = function (_options) {
                 });
 
                 that.$canvas.mousedown(function (e) {
-                    console.log('cl')
+                    //console.log('cl')
                     $('canvas').css({left: '4000px'});
 
                     var BottomElement = document.elementFromPoint(e.clientX, e.clientY);
-                    console.log(BottomElement.tagName)
+                    //console.log(BottomElement.tagName)
                     $('canvas').css({left: '0px'});
 
                     $(BottomElement).click();
@@ -813,7 +813,7 @@ var EnjoyHint = function (_options) {
                         top: label_y + label_height + 15
                     });
                     var left_skip = label_x + that.$next_btn.width() + 10;
-                    console.log(that.nextBtn);
+                    //console.log(that.nextBtn);
                     if (that.nextBtn == "hide"){
                         left_skip = label_x;
                     }
@@ -1016,7 +1016,7 @@ var EnjoyHint = function (_options) {
     };
 
     $.fn.enjoyhint = function (method) {
-        console.log(method);
+        //console.log(method);
         if (methods[method]) {
             return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
         } else if (typeof method === 'object' || !method) {

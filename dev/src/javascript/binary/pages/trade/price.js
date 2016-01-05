@@ -122,12 +122,20 @@ var Price = (function () {
 
     var display = function (details, contractType) {
         var proposal = details['proposal'];
-        var params = details['echo_req'],
-            id = proposal['id'],
-            type = params['contract_type'] || typeDisplayIdMapping[id],
-            is_spread = proposal['spread'] ? true : false;
+        var id = proposal ? proposal['id'] : '';
+        var params = details['echo_req'];
 
-        if (params && Object.getOwnPropertyNames(params).length > 0) {
+        var type = params['contract_type'];
+        if (id && !type) {
+            type = typeDisplayIdMapping[id];
+        }
+
+        var is_spread = false;
+        if (proposal && proposal['spread']) {
+            is_spread = true;
+        }
+
+        if (params && id && Object.getOwnPropertyNames(params).length > 0) {
             typeDisplayIdMapping[id] = type;
         }
 
@@ -136,7 +144,7 @@ var Price = (function () {
         if(!position){
             return;
         }
-        
+
         var container = document.getElementById('price_container_'+position);
         if(!$(container).is(":visible")){
             $(container).fadeIn(200);
@@ -166,7 +174,7 @@ var Price = (function () {
             }
         }
 
-        if (proposal['display_value']) {
+        if (proposal && proposal['display_value']) {
             if (is_spread) {
                 amount.textContent = proposal['display_value'];
             } else {
@@ -174,7 +182,7 @@ var Price = (function () {
             }
         }
 
-        if (proposal['longcode']) {
+        if (proposal && proposal['longcode']) {
             proposal['longcode'] = proposal['longcode'].replace(/[\d\,]+\.\d\d/,function(x){return '<b>'+x+'</b>';});
             description.innerHTML = '<div>'+proposal['longcode']+'</div>';
         }
@@ -183,11 +191,11 @@ var Price = (function () {
             purchase.hide();
             comment.hide();
             amount_wrapper.hide();
+            description.innerHTML = "";
             price_wrapper.classList.add('small');
             error.show();
             error.textContent = details['error'].message;
-        }
-        else{
+        } else{
             purchase.show();
             comment.show();
             amount_wrapper.show();

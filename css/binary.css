@@ -1048,8 +1048,11 @@ ul.checked li {
   margin: 0 2em 0 0;
   display: inline-block;
 }
-.tab-menu-wrap ul li#topMenuBetaInterface, #content .tab-menu-wrap ul li#topMenuBetaInterface {
+.tab-menu-wrap ul li#topMenuStartBetting, #content .tab-menu-wrap ul li#topMenuStartBetting {
   float: right;
+}
+.tab-menu-wrap ul li#topMenuStartBetting ul, #content .tab-menu-wrap ul li#topMenuStartBetting ul {
+  text-align: right;
 }
 .tab-menu-wrap ul li a, #content .tab-menu-wrap ul li a {
   font-weight: normal;
@@ -5052,6 +5055,12 @@ a.dynamic, span.dynamic, div.dynamic, p.dynamic, button.dynamic, table.dynamic {
   }
 }
 
+#trading-times table, #asset-index table {
+  margin-top: -2px;
+}
+#trading-times tr:nth-child(1) th, #asset-index tr:nth-child(1) th {
+  background-color: #C2C2C2;
+}
 #trading-times th.flex-tr-child, #asset-index th.flex-tr-child {
   line-height: 30px;
 }
@@ -5070,11 +5079,13 @@ a.dynamic, span.dynamic, div.dynamic, p.dynamic, button.dynamic, table.dynamic {
 }
 #trading-times td.asset, #asset-index td.asset {
   font-weight: 700;
-  white-space: nowrap;
 }
 
-#asset-index th, #asset-index .asset {
+#asset-index th {
   width: 12%;
+}
+#asset-index .asset {
+  width: 18%;
 }
 #asset-index th.flex-tr-child:nth-child(2):nth-last-child(1) {
   width: 24%;
@@ -5415,9 +5426,9 @@ div.kineticjs-content {
 
 #trading_init_progress {
   cursor: pointer;
-  background-image: url("../images/pages/binary-symbol-logo.png");
-  background-image: url("../images/pages/binary-symbol-logo.svg"), none;
-  background-size: contain;
+  /*background-image: url('../images/pages/binary-symbol-logo.png');
+  background-image: url('../images/pages/binary-symbol-logo.svg'), none;
+  background-size: contain;*/
   width: 10rem;
   height: 10rem;
   position: absolute;

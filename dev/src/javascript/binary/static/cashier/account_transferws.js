@@ -47,10 +47,7 @@ var account_transferws = (function(){
 
         account_from = matches[0];
         account_to = matches[1];
-
-        console.log("the accounts is ", accounts);
-        console.log("the matches ", matches);
-        console.log("the available account are", availableCurr);
+        
         $.each(availableCurr,function(index,value){
             if(value.account == account_from){
                 currType = value.currency;
@@ -174,9 +171,7 @@ var account_transferws = (function(){
                 var secondacct, firstacct,str,optionValue;
 
                 $.each(response.accounts, function(index,value){
-                   var currObj = {};
-
-                     
+                    var currObj = {};
 
                     if($.isEmptyObject(firstacct))
                     {
@@ -223,8 +218,6 @@ var account_transferws = (function(){
                     }
 
                     if(value.balance <= 0){
-                        console.log("it came here");
-                        console.log("the account is ", value.loginid); 
                         $form.find("#transfer_account_transfer option:last").remove();
                     }
                 
