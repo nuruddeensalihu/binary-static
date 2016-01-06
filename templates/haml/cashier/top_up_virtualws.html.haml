@@ -4,5 +4,5 @@
   %div{:class => 'centerText', :id => 'VRT_topup_message'}
     %p
       %span.button
-        %button{:class => 'button' , :type => 'submit', :id => 'submit', :value => 'View Updated Portfolio', :href => url_for('/user/openpositionsws')}
+        %button{:class => 'button' , :type => 'submit', :id => 'submit', :value => 'View Updated Portfolio', :onclick='location.href(url_for('/user/openpositionsws'))}
            = l('View Updated Portfolio')
