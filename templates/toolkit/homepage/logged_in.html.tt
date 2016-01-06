@@ -80,13 +80,13 @@
 <div class='grd-grid-6 grd-grid-mobile-12 grd-parent'>
     <div class='grd-grid-6 grd-parent'>
         <div class='grd-grid-8 grd-with-padding'>
-            <a href="[% request.url_for('/user/profit_table') %]" class="pjaxload">
+            <a href="[% request.url_for('/user/profit_tablews') %]" class="pjaxload">
                 <img class='responsive' src="[% request.url_for('images/pages/my_account/profit-table-icon.svg') %]"/>
             </a>
         </div>
         <div class='grd-grid-12'>
             <h4>
-                <a href="[% request.url_for('/user/profit_table') %]" class="pjaxload">[% l('Profit Table') %]</a>
+                <a href="[% request.url_for('/user/profit_tablews') %]" class="pjaxload">[% l('Profit Table') %]</a>
             </h4>
             <p>
                 [% l('View your trading profit/loss.') %]
@@ -95,13 +95,13 @@
     </div>
     <div class='grd-grid-6 grd-parent'>
         <div class='grd-grid-8 grd-with-padding'>
-            <a href="[% request.url_for('/user/statement') %]" class="pjaxload">
+            <a href="[% request.url_for('/user/statementws') %]" class="pjaxload">
                 <img class='responsive' src="[% request.url_for('images/pages/my_account/statement-icon.svg') %]"/>
             </a>
         </div>
         <div class='grd-grid-12'>
             <h4>
-                <a href="[% request.url_for('/user/statement') %]" class="pjaxload">[% l('Statement') %]</a>
+                <a href="[% request.url_for('/user/statementws') %]" class="pjaxload">[% l('Statement') %]</a>
             </h4>
             <p>
                 [% l('View your historical transactions.') %]
