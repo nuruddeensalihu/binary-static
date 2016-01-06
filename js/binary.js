@@ -66696,7 +66696,7 @@ pjax_config_page("user/settings/securityws", function() {
     	BinarySocket.send({"authorize": $.cookie('login'), "req_id": 1 });
 
         $('#btnPortfolioosubmit').on('click',function(e){
-            window.location  =page.url.url_for('/user/openpositionsws')
+            window.location  =page.url.url_for('user/openpositionsws')
 
         });
 
