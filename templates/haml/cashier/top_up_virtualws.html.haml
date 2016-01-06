@@ -4,5 +4,5 @@
   %div{:class => 'centerText', :id => 'VRT_topup_message'}
     %p
       %span.button
-        %button{:class => 'button':id => 'btnsubmitportfolio', :value => 'View Updated Portfolio'}
+        %a.pjaxload.button{:href => url_for('user/openpositionsws'), :class => 'button':id => 'btnsubmitportfolio', :value => 'View Updated Portfolio'}
           = l('View Updated Portfolio')
