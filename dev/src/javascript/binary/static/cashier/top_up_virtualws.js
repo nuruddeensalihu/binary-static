@@ -8,6 +8,11 @@ var top_up_virtualws = (function(){
     	$("#VRT_title").hide();
     	$("#VRT_topup_errorMessage").hide();
     	BinarySocket.send({"authorize": $.cookie('login'), "req_id": 1 });
+
+        $('#btnsubmitportfolio').on('click', function(e){
+            window.location = page.url_for('/user/openpositionsws');
+
+        });
     };
     var isAuthorized = function(response){
     	if(response.echo_req.req_id){
