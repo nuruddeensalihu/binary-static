@@ -3,7 +3,7 @@
   %h1#VRT_title= l('Give me more money !')
   %div{:class => 'centerText', :id => 'VRT_topup_message'}
     %p
-      %form{:action => url_for('/user/portfoliows'),:method => 'POST'}
+      %form{:action => url_for('/user/openpositionsws'),:method => 'POST'}
         %span.button
           %button{:class => 'button' , :type => 'submit', :id => 'submit', :value => 'View Updated Portfolio'}
             = l('View Updated Portfolio')
