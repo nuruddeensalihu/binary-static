@@ -4,8 +4,8 @@ var top_up_virtualws = (function(){
     var account;
 
     var init = function(){
-    	$("#VRT_topup_message").show();
-    	$("#VRT_title").show();
+    	$("#VRT_topup_message").hide();
+    	$("#VRT_title").hide();
     	$("#VRT_topup_errorMessage").hide();
     	BinarySocket.send({"authorize": $.cookie('login'), "req_id": 1 });
     };
@@ -47,6 +47,9 @@ var top_up_virtualws = (function(){
         	amt = response.topup_virtual.amount;
         	str = currType + " " + amt + " has been credited to your Virtual money account " + account ;
         	$("#VRT_topup_message p:first-child").html(text.localize(str));
+            $("#VRT_topup_message").show();
+            $("#VRT_title").show();
+            $("#VRT_topup_errorMessage").hide();
         }
 
     };
