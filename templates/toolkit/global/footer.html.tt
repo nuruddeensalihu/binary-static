@@ -71,15 +71,6 @@
                     <h1 class="ja-hide">[% l('Trading') %]</h1>
                     <ul class="ja-hide">
                         <li class="ja-hide">
-                            <a class="pjaxload" href="[% request.url_for('/resources/pricing_table') %]"[% IF target %]
-                            target="[%
-                            target %]"[% END %]>[% l('Pricing Table') %]</a>
-                        </li>
-                        <li>
-                            <a class="ja-hide pjaxload" href="[% request.url_for('/resources/rise_fall_table') %]"[% IF target %]
-                            target="[% target %]"[% END %]>[% l('Rise/Fall Table') %]</a>
-                        </li>
-                        <li class="ja-hide">
                             <a class="pjaxload" href="[% request.url_for('/resources/asset_indexws') %]"[% IF target %]
                             target="[%
                             target %]"[% END %]>[% l('Asset Index') %]</a>

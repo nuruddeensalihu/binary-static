@@ -140,6 +140,18 @@ URL.prototype = {
 
         return url;
     },
+    url_for_static: function(path) {
+        var locationHost = $('script[src*="binary.min.js"]').attr('src');
+
+        if(locationHost && locationHost.length > 0) {
+            locationHost = locationHost.substr(0, locationHost.indexOf('/js/') + 1);
+        }
+        else {
+            locationHost = 'https://static.binary.com/';
+        }
+
+        return locationHost + path;
+    },
     reset: function() {
         this.location = window.location;
         this._param_hash = undefined;

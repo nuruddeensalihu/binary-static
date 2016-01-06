@@ -2625,7 +2625,6 @@ abbr {
   font-size: 0.8em;
   display: inline-block;
   background: white;
-  /* Pricing Table */
 }
 #betpage #content-holder #content #bet_container #bet_cost_container .rbox-wrap {
   border-bottom: 1px solid #C2C2C2;
@@ -2636,27 +2635,6 @@ abbr {
 }
 #betpage #content-holder #content #bet_container #bet_cost_container .pricing-details {
   top: 1px;
-}
-#betpage #content-holder #content #bet_container #bet_cost_container .draggable form {
-  width: auto;
-}
-#betpage #content-holder #content #bet_container #bet_cost_container .draggable .odd {
-  background: #F2F2F2;
-}
-#betpage #content-holder #content #bet_container #bet_cost_container .draggable .rbox {
-  border: 1px solid #C2C2C2;
-  position: relative;
-  margin-bottom: 3em;
-}
-#betpage #content-holder #content #bet_container #bet_cost_container .draggable .rbox-table-full {
-  border: 1px solid #F2F2F2;
-  font-size: 93%;
-  text-align: left;
-}
-#betpage #content-holder #content #bet_container #bet_cost_container .draggable .rbox-table-full td {
-  text-align: left;
-  border: 1px solid #F2F2F2;
-  border-width: 0 1px;
 }
 #betpage #content-holder #content #bet_container #loading-price {
   text-align: center;
@@ -3635,10 +3613,6 @@ form#forward_start label {
   width: auto;
 }
 
-form#pricing_table_input select {
-  width: 90%;
-}
-
 #profit-table-form #fromdate {
   width: 105px;
 }
@@ -4207,14 +4181,6 @@ div#price_table_notes {
 
 .tab-menu-wrap ul#trading-times {
   margin-bottom: 1em;
-}
-
-form#rise_fall_form fieldset {
-  padding-top: 1em;
-  margin-bottom: 1em;
-}
-form#rise_fall_form label {
-  width: auto;
 }
 
 /* Terms and conditions */
@@ -4790,9 +4756,14 @@ table .loss, table .lower {
 #accordion .ui-widget-content {
   border: 1px solid #E5E5E5 !important;
 }
-#accordion #supported_banks {
+#accordion #supported_banks, #accordion .supported_banks {
   text-align: center;
   padding-top: 30px;
+}
+#accordion .supported_banks img {
+  width: 72px;
+  height: 57px;
+  margin: 3px;
 }
 
 .timeline {
@@ -6295,7 +6266,7 @@ body.JA #asset-forex div.table-header:nth-of-type(n + 3), body.JA #asset-forex d
 body.JA #tradingtimes-forex div.table-header:nth-of-type(n + 3), body.JA #tradingtimes-forex div.table-body:nth-of-type(n + 15) {
   display: none !important;
 }
-body.JA #topMenuHighCharts, body.JA #risefall_table_lnk, body.JA #pricing_table_lnk, body.JA #topMenuBetaInterface {
+body.JA #topMenuHighCharts, body.JA #topMenuBetaInterface {
   display: none !important;
 }
 body.JA #footer-regulatory .grd-grid-9, body.JA #footer-regulatory .grd-grid-phablet-7 {
