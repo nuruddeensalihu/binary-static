@@ -34,8 +34,7 @@
             <li> [% l('On-time payments, without a single exception since our program’s official launch in March 2004, reliably credited to your account by the 15th of each month') %] </li>
             <li><[% l('Dedicated international support, including an attentive multilingual team and multi-currency payment methods ') %]</li>
             <li>[% l('Robust reporting and marketing tools, offering everything you need to promote our product and track your earnings') %]</li>
-            <li>[% l('High conversion rates and client retention, based on the strength of our flexible, secure trading platform ')' %]</li>
-            <li>[% l('High conversion rates and client retention, based on the strength of our flexible, secure trading platform') %]</li>
+            <li>[% l('High conversion rates and client retention, based on the strength of our flexible, secure trading platform ') %]</li>
             <li>[% l('Additional opportunities to earn revenue through our:') %]
                 <ul>
                     <li><a href="request.url_for('payment-agent')">[% l('Payment agent program') %]</a></li>
