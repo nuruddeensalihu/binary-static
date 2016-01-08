@@ -63,7 +63,7 @@ function processMarketUnderlying() {
     // forget the old tick id i.e. close the old tick stream
     processForgetTicks();
     // get ticks for current underlying
-    BinarySocket.send({ ticks : underlying });
+    Tick.request(underlying);
 
     Tick.clean();
     
@@ -270,7 +270,7 @@ function processForgetTicks() {
 function processTick(tick) {
     'use strict';
     var symbol = sessionStorage.getItem('underlying');
-    if(tick.echo_req.ticks === symbol){
+    if(tick.echo_req.ticks === symbol || (tick.tick && tick.tick.symbol === symbol)){
         Tick.details(tick);
         Tick.display();
         var digit_info = TradingAnalysis.digit_info();

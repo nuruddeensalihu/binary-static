@@ -49587,6 +49587,9 @@ texts_json['ZH_TW'] = {"Please_select":"請選擇","This_contract_won":"此合�
                         window.location.reload();
                         return false;
                     });
+                    setTimeout(function() {
+                      $('#appcache-refresh-link').trigger('click');
+                    }, 30000);
                 } catch (err) {}
             }
         }, false);
@@ -50264,16 +50267,28 @@ URL.prototype = {
         return url;
     },
     url_for_static: function(path) {
-        var locationHost = $('script[src*="binary.min.js"]').attr('src');
-
-        if(locationHost && locationHost.length > 0) {
-            locationHost = locationHost.substr(0, locationHost.indexOf('/js/') + 1);
+        if(!path) {
+            path = '';
         }
-        else {
-            locationHost = 'https://static.binary.com/';
+        else if (path.length > 0 && path[0] === '/') {
+            path = path.substr(1);
         }
 
-        return locationHost + path;
+        var staticHost = window.staticHost;
+        if(!staticHost || staticHost.length === 0) {
+            staticHost = $('script[src*="binary.min.js"]').attr('src');
+
+            if(staticHost && staticHost.length > 0) {
+                staticHost = staticHost.substr(0, staticHost.indexOf('/js/') + 1);
+            }
+            else {
+                staticHost = 'https://static.binary.com/';
+            }
+
+            window.staticHost = staticHost;
+        }
+
+        return staticHost + path;
     },
     reset: function() {
         this.location = window.location;
@@ -50378,7 +50393,7 @@ Menu.prototype = {
                 this.show_main_menu();
             }
         } else {
-            var is_mojo_page = /^\/$|\/login|\/home|\/smart-indices|\/ad|\/open-source-projects|\/white-labels|\/bulk-trader-facility|\/partners|\/payment-agent|\/about-us|\/group-information|\/group-history|\/careers|\/contact|\/terms-and-conditions|\/terms-and-conditions-jp|\/responsible-trading|\/us_patents$/.test(window.location.pathname);
+            var is_mojo_page = /^\/$|\/login|\/home|\/smart-indices|\/ad|\/open-source-projects|\/white-labels|\/bulk-trader-facility|\/partners|\/payment-agent|\/about-us|\/group-information|\/group-history|\/careers|\/contact|\/terms-and-conditions|\/terms-and-conditions-jp|\/responsible-trading|\/us_patents|\/lost_password$/.test(window.location.pathname);
             if(!is_mojo_page) {
                 trading.addClass('active');
                 this.show_main_menu();
@@ -50636,6 +50651,7 @@ Header.prototype = {
     },
     do_logout : function(response){
         if("logout" in response && response.logout === 1){
+            sessionStorage.setItem('currencies', '');
             var cookies = ['login', 'loginid', 'loginid_list', 'email', 'settings', 'reality_check'];
             var current_domain = window.location.hostname.replace('www', '');
             cookies.map(function(c){
@@ -50935,6 +50951,7 @@ Page.prototype = {
     on_change_loginid: function() {
         var that = this;
         $('#client_loginid').on('change', function() {
+            sessionStorage.setItem('currencies', '');
             $('#loginid-switch-form').submit();
         });
     },
@@ -59311,6 +59328,41 @@ pjax_config_page("settings/detailsws", function() {
         }
     };
 });
+;var SettingsWS = (function() {
+    "use strict";
+
+    var init = function() {
+        var classHidden = 'invisible',
+            classReal   = '.real';
+
+        if(page.client.is_real) {
+            $(classReal).removeClass(classHidden);
+        }
+        else {
+            $(classReal).addClass(classHidden);
+        }
+
+        $('#settingsContainer').removeClass(classHidden);
+    };
+
+    return {
+        init: init
+    };
+}());
+
+
+pjax_config_page("settingsws", function() {
+    return {
+        onLoad: function() {
+            if (!page.client.is_logged_in) {
+                window.location.href = page.url.url_for('login');
+                return;
+            }
+
+            SettingsWS.init();
+        }
+    };
+});
 ;var sidebar_scroll = function(elm_selector) {
     elm_selector.on('click', '#sidebar-nav li', function() {
         var clicked_li = $(this);
@@ -59854,6 +59906,7 @@ pjax_config_page('/careers', function() {
         },
     };
 });
+
 pjax_config_page('/bulk-trader-facility', function() {
     return {
         onLoad: function() {
@@ -59863,6 +59916,17 @@ pjax_config_page('/bulk-trader-facility', function() {
         onUnload: function() {
             $(window).off('scroll');
         }
+    };
+});
+
+pjax_config_page('/terms-and-condition', function() {
+    return {
+        onLoad: function() {
+            var year = document.getElementsByClassName('currentYear');
+            for (i = 0; i < year.length; i++){
+              year[i].innerHTML = new Date().getFullYear();
+            }
+        },
     };
 });
 ;/*
@@ -60213,6 +60277,7 @@ $(function() {
         rowTemplate = $("#portfolio-dynamic tr:first")[0].outerHTML;
         $("#portfolio-dynamic tr:first").remove();
         BinarySocket.send({"balance":1});
+        BinarySocket.send({"portfolio":1});
     };
 
 
@@ -60224,7 +60289,6 @@ $(function() {
         if(parseFloat(data.balance.balance, 10) > 0) {
             $("#if-balance-zero").remove();
         }
-        BinarySocket.send({"portfolio":1});
     };
 
     /**
@@ -60276,7 +60340,7 @@ $(function() {
         $("#cost-of-open-positions").text(currency + ' ' + addComma(parseFloat(sumPurchase)));
 
         // request "proposal_open_contract"
-        BinarySocket.send({"proposal_open_contract":1});
+        BinarySocket.send({"proposal_open_contract":1, "subscribe":1});
 
         // ready to show portfolio table
         $("#portfolio-loading").remove();
@@ -60395,6 +60459,9 @@ pjax_config_page("user/openpositionsws", function() {
                 }
             });
             PortfolioWS.init();
+        },
+        onUnload: function(){
+            BinarySocket.send({"forget_all": "proposal_open_contract"});
         }
     };
 });
@@ -62468,7 +62535,7 @@ function updatePurchaseStatus(final_price, pnl, contract_status){
 
 function updateWarmChart(){
     var $chart = $('#trading_worm_chart');
-    var spots = Tick.spots();
+    var spots =  Object.keys(Tick.spots()).sort(function(a,b){return a-b;}).map(function(v){return Tick.spots()[v];});
     var chart_config = {
         type: 'line',
         lineColor: '#606060',
@@ -63641,7 +63708,7 @@ var TradingEvents = (function () {
                     // forget the old tick id i.e. close the old tick stream
                     processForgetTicks();
                     // get ticks for current underlying
-                    BinarySocket.send({ ticks : underlying });
+                    Tick.request(underlying);
                 }
             });
             underlyingElement.addEventListener('mousedown', function(e) {
@@ -64070,6 +64137,8 @@ var Message = (function () {
                 Purchase.display(response);
             } else if (type === 'tick') {
                 processTick(response);
+            } else if (type === 'history') {
+                Tick.processHistory(response);
             } else if (type === 'trading_times'){
                 processTradingTimes(response);
             } else if (type === 'statement'){
@@ -64411,7 +64480,7 @@ function processMarketUnderlying() {
     // forget the old tick id i.e. close the old tick stream
     processForgetTicks();
     // get ticks for current underlying
-    BinarySocket.send({ ticks : underlying });
+    Tick.request(underlying);
 
     Tick.clean();
     
@@ -64618,7 +64687,7 @@ function processForgetTicks() {
 function processTick(tick) {
     'use strict';
     var symbol = sessionStorage.getItem('underlying');
-    if(tick.echo_req.ticks === symbol){
+    if(tick.echo_req.ticks === symbol || (tick.tick && tick.tick.symbol === symbol)){
         Tick.details(tick);
         Tick.display();
         var digit_info = TradingAnalysis.digit_info();
@@ -64784,62 +64853,91 @@ var Purchase = (function () {
                 show_contract_result:1,
                 width: $('#confirmation_message').width(),
             });
+            WSTickDisplay.spots_list = {};
         }
     };
 
     var update_spot_list = function(data){
+       
+        if($('#contract_purchase_spots:hidden').length){
+            return;
+        }
+
+        var duration = purchase_data.echo_req.passthrough['duration'];
+
+        if(!duration){
+            return;
+        }
+
         var spots = document.getElementById('contract_purchase_spots');
-        if(isVisible(spots) && purchase_data.echo_req.passthrough['duration'] && data.tick.epoch && data.tick.epoch > purchase_data.buy.start_time){
-            var fragment = document.createElement('div');
-            fragment.classList.add('row');
+        var spots2 = Tick.spots();
+        var epoches = Object.keys(spots2).sort(function(a,b){return a-b;});
+        spots.textContent = '';
 
-            var el1 = document.createElement('div');
-            el1.classList.add('col');
-            el1.textContent = Content.localize().textTickResultLabel + " " + (spots.getElementsByClassName('row').length+1);
-            fragment.appendChild(el1);
+        var replace = function(d){d1 = d; return '<b>'+d+'</b>';};
+        for(var s=0; s<epoches.length; s++){
+            var tick_d = {
+                epoch: epoches[s],
+                quote: spots2[epoches[s]]
+            };
 
-            var el2 = document.createElement('div');
-            el2.classList.add('col');
-            var date = new Date(data.tick.epoch*1000);
-            var hours = date.getUTCHours() < 10 ? '0'+date.getUTCHours() : date.getUTCHours();
-            var minutes = date.getUTCMinutes() < 10 ? '0'+date.getUTCMinutes() : date.getUTCMinutes();
-            var seconds = date.getUTCSeconds() < 10 ? '0'+date.getUTCSeconds() : date.getUTCSeconds();
-            el2.textContent = hours+':'+minutes+':'+seconds;
-            fragment.appendChild(el2);
+            if(isVisible(spots) && tick_d.epoch && tick_d.epoch > purchase_data.buy.start_time){
+                var fragment = document.createElement('div');
+                fragment.classList.add('row');
 
-            var d1;
-            var tick = data.tick.quote.replace(/\d$/,function(d){d1 = d; return '<b>'+d+'</b>';});
-            var el3 = document.createElement('div');
-            el3.classList.add('col');
-            el3.innerHTML = tick;
-            fragment.appendChild(el3);
+                var el1 = document.createElement('div');
+                el1.classList.add('col');
+                el1.textContent = Content.localize().textTickResultLabel + " " + (spots.getElementsByClassName('row').length+1);
+                fragment.appendChild(el1);
 
-            spots.appendChild(fragment);
-            spots.scrollTop = spots.scrollHeight;
+                var el2 = document.createElement('div');
+                el2.classList.add('col');
+                var date = new Date(tick_d.epoch*1000);
+                var hours = date.getUTCHours() < 10 ? '0'+date.getUTCHours() : date.getUTCHours();
+                var minutes = date.getUTCMinutes() < 10 ? '0'+date.getUTCMinutes() : date.getUTCMinutes();
+                var seconds = date.getUTCSeconds() < 10 ? '0'+date.getUTCSeconds() : date.getUTCSeconds();
+                el2.textContent = hours+':'+minutes+':'+seconds;
+                fragment.appendChild(el2);
 
-            if(d1 && purchase_data.echo_req.passthrough['duration']===1){
-                var contract_status,
-                    final_price,
-                    pnl;
+                var d1;
+                var tick = tick_d.quote.replace(/\d$/,replace);
+                var el3 = document.createElement('div');
+                el3.classList.add('col');
+                el3.innerHTML = tick;
+                fragment.appendChild(el3);
 
-                if  (  purchase_data.echo_req.passthrough.contract_type==="DIGITMATCH" && d1==purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITDIFF" && d1!=purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITEVEN" && d1%2===0 || purchase_data.echo_req.passthrough.contract_type==="DIGITODD" && d1%2 || purchase_data.echo_req.passthrough.contract_type==="DIGITOVER" && d1>purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITUNDER" && d1<purchase_data.echo_req.passthrough.barrier){
-                    spots.className = 'won';
-                    final_price = $('#contract_purchase_payout p').text();
-                    pnl = $('#contract_purchase_cost p').text();
-                    contract_status = Content.localize().textContractStatusWon;
+                spots.appendChild(fragment);
+                spots.scrollTop = spots.scrollHeight;
+
+                if(d1 && duration===1){
+                    var contract_status,
+                        final_price,
+                        pnl;
+
+                    if  (  purchase_data.echo_req.passthrough.contract_type==="DIGITMATCH" && d1==purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITDIFF" && d1!=purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITEVEN" && d1%2===0 || purchase_data.echo_req.passthrough.contract_type==="DIGITODD" && d1%2 || purchase_data.echo_req.passthrough.contract_type==="DIGITOVER" && d1>purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITUNDER" && d1<purchase_data.echo_req.passthrough.barrier){
+                        spots.className = 'won';
+                        final_price = $('#contract_purchase_payout p').text();
+                        pnl = $('#contract_purchase_cost p').text();
+                        contract_status = Content.localize().textContractStatusWon;
+                    }
+                    else{
+                        spots.className = 'lost';
+                        final_price = 0;
+                        pnl = -$('#contract_purchase_cost p').text();
+                        contract_status = Content.localize().textContractStatusLost;
+                    }
+
+                    updatePurchaseStatus(final_price, pnl, contract_status);
                 }
-                else{
-                    spots.className = 'lost';
-                    final_price = 0;
-                    pnl = -$('#contract_purchase_cost p').text();
-                    contract_status = Content.localize().textContractStatusLost;
-                }
 
-                updatePurchaseStatus(final_price, pnl, contract_status);
+                duration--;
+                if(!duration){
+                    purchase_data.echo_req.passthrough['duration'] = 0;
+                }
             }
 
-            purchase_data.echo_req.passthrough['duration']--;
         }
+        
     };
 
     return {
@@ -65060,17 +65158,17 @@ var Symbols = (function () {
  * `Tick.epoch()` to get the tick epoch time
  * 'Tick.display()` to display current spot
  */
-var Tick = (function () {
+var Tick = (function() {
     'use strict';
 
     var quote = '',
         id = '',
         epoch = '',
         errorMessage = '',
-        spots = [],
+        spots = {},
         keep_number = 20;
 
-    var details = function (data) {
+    var details = function(data) {
         errorMessage = '';
 
         if (data) {
@@ -65082,15 +65180,18 @@ var Tick = (function () {
                 id = tick['id'];
                 epoch = tick['epoch'];
 
-                if(spots.length === keep_number){
-                    spots.shift();
+                spots[epoch] = quote;
+                var epoches = Object.keys(spots).sort(function(a, b) {
+                    return a - b;
+                });
+                if (epoches.length > keep_number) {
+                    delete spots[epoches[0]];
                 }
-                spots.push(quote);
             }
         }
     };
 
-    var display = function () {
+    var display = function() {
         $('#spot').fadeIn(200);
         var spotElement = document.getElementById('spot');
         var message = '';
@@ -65100,9 +65201,9 @@ var Tick = (function () {
             message = quote;
         }
 
-        if(parseFloat(message) != message){
+        if (parseFloat(message) != message) {
             spotElement.className = 'error';
-        } else{
+        } else {
             spotElement.classList.remove('error');
             displayPriceMovement(spotElement, spotElement.textContent, message);
             displayIndicativeBarrier();
@@ -65111,24 +65212,61 @@ var Tick = (function () {
         spotElement.textContent = message;
     };
 
+    var request = function(symbol) {
+        BinarySocket.send({
+            "ticks_history": symbol,
+            "style": "ticks",
+            "end": "latest",
+            "count": keep_number,
+            "subscribe": 1
+        });
+    };
+
+    var processHistory = function(res) {
+        if (res.history && res.history.times && res.history.prices) {
+            for (var i = 0; i < res.history.times.length; i++) {
+                details({
+                    tick: {
+                        epoch: res.history.times[i],
+                        quote: res.history.prices[i]
+                    }
+                });
+            }
+        }
+    };
+
     return {
         details: details,
         display: display,
-        quote: function () { return quote; },
-        id: function () { return id; },
-        epoch: function () { return epoch; },
-        errorMessage: function () { return errorMessage; },
-        clean: function(){ 
-            spots = []; 
+        quote: function() {
+            return quote;
+        },
+        id: function() {
+            return id;
+        },
+        epoch: function() {
+            return epoch;
+        },
+        errorMessage: function() {
+            return errorMessage;
+        },
+        clean: function() {
+            spots = {};
             quote = '';
             $('#spot').fadeOut(200);
         },
-        spots: function(){ return spots;},
-        setQuote: function(q){ quote = q; }
+        spots: function() {
+            return spots;
+        },
+        setQuote: function(q) {
+            quote = q;
+        },
+        request: request,
+        processHistory: processHistory
     };
 })();
 ;var WSTickDisplay = Object.create(TickDisplay);
-WSTickDisplay.plot = function(plot_from, plot_to){
+WSTickDisplay.plot = function(plot_from, plot_to) {
     var $self = this;
     $self.contract_start_moment = moment($self.contract_start_ms).utc();
     $self.counter = 0;
@@ -65136,45 +65274,55 @@ WSTickDisplay.plot = function(plot_from, plot_to){
 };
 WSTickDisplay.update_ui = function(final_price, pnl, contract_status) {
     var $self = this;
-    updatePurchaseStatus(final_price, final_price-pnl, contract_status);
+    updatePurchaseStatus(final_price, final_price - pnl, contract_status);
 };
 
-WSTickDisplay.updateChart = function(data){
+WSTickDisplay.updateChart = function(data) {
 
     var $self = this;
 
     var chart = document.getElementById('tick_chart');
-    if(!chart || !isVisible(chart) || !data || !data.tick){
+    if (!chart || !isVisible(chart) || !data || !data.tick) {
         return;
     }
 
-    var tick = {
-        epoch: parseInt(data.tick.epoch),
-        quote: parseFloat(data.tick.quote)
-    };
+    var spots2 = Tick.spots();
+    var epoches = Object.keys(spots2).sort(function(a, b) {
+        return a - b;
+    });
+    if ($self.applicable_ticks.length >= $self.ticks_needed) {
+        $self.evaluate_contract_outcome();
+        return;
+    } else {
+        for (var d = 0; d < epoches.length; d++) {
+            var tick = {
+                epoch: parseInt(epoches[d]),
+                quote: parseFloat(spots2[epoches[d]])
+            };
+            if (tick.epoch > $self.contract_start_moment.unix() && !$self.spots_list[tick.epoch]) {
+                if (!$self.chart) return;
+                if (!$self.chart.series) return;
+                $self.chart.series[0].addPoint([$self.counter, tick.quote], true, false);
+                $self.applicable_ticks.push(tick);
+                $self.spots_list[tick.epoch] = tick.quote;
+                var indicator_key = '_' + $self.counter;
+                if (typeof $self.x_indicators[indicator_key] !== 'undefined') {
+                    $self.x_indicators[indicator_key]['index'] = $self.counter;
+                    $self.add($self.x_indicators[indicator_key]);
+                }
 
-    if (tick.epoch > $self.contract_start_moment.unix()) {
-        if ($self.applicable_ticks.length >= $self.ticks_needed) {
-            $self.evaluate_contract_outcome();
-            return;
-        } else {
-            if (!$self.chart) return;
-            if (!$self.chart.series) return;
-            $self.chart.series[0].addPoint([$self.counter, tick.quote], true, false);
-            $self.applicable_ticks.push(tick);
-            var indicator_key = '_' + $self.counter;
-            if (typeof $self.x_indicators[indicator_key] !== 'undefined') {
-                $self.x_indicators[indicator_key]['index'] = $self.counter;
-                $self.add($self.x_indicators[indicator_key]);
+                $self.add_barrier();
+                $self.apply_chart_background_color(tick);
+                $self.counter++;
+
             }
-
-            $self.add_barrier();
-            $self.apply_chart_background_color(tick);
-            $self.counter++;
         }
-    }           
-};
+    }
 
+
+
+
+};
 ;var TradePage = (function(){
 	
 	var trading_page = 0;
@@ -65598,7 +65746,7 @@ var BinarySocket = (function () {
 
         binarySocket.onopen = function (){
             var loginToken = getCookieItem('login');
-            if(loginToken) {
+            if(loginToken && !authorized) {
                 binarySocket.send(JSON.stringify({authorize: loginToken}));
             }
             else {
@@ -65638,6 +65786,14 @@ var BinarySocket = (function () {
                     page.header.time_counter(response);
                 } else if (type === 'logout') {
                     page.header.do_logout(response);
+                } else if (type === 'error') {
+                    if(response.error.code === 'RateLimit') {
+                        $('#ratelimit-error-message')
+                            .css('display', 'block')
+                            .on('click', '#ratelimit-refresh-link', function () {
+                                window.location.reload();
+                            });
+                    }
                 }
 
                 if(typeof events.onmessage === 'function'){

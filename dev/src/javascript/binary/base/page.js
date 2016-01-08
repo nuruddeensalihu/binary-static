@@ -141,16 +141,28 @@ URL.prototype = {
         return url;
     },
     url_for_static: function(path) {
-        var locationHost = $('script[src*="binary.min.js"]').attr('src');
-
-        if(locationHost && locationHost.length > 0) {
-            locationHost = locationHost.substr(0, locationHost.indexOf('/js/') + 1);
+        if(!path) {
+            path = '';
         }
-        else {
-            locationHost = 'https://static.binary.com/';
+        else if (path.length > 0 && path[0] === '/') {
+            path = path.substr(1);
         }
 
-        return locationHost + path;
+        var staticHost = window.staticHost;
+        if(!staticHost || staticHost.length === 0) {
+            staticHost = $('script[src*="binary.min.js"]').attr('src');
+
+            if(staticHost && staticHost.length > 0) {
+                staticHost = staticHost.substr(0, staticHost.indexOf('/js/') + 1);
+            }
+            else {
+                staticHost = 'https://static.binary.com/';
+            }
+
+            window.staticHost = staticHost;
+        }
+
+        return staticHost + path;
     },
     reset: function() {
         this.location = window.location;
@@ -255,7 +267,7 @@ Menu.prototype = {
                 this.show_main_menu();
             }
         } else {
-            var is_mojo_page = /^\/$|\/login|\/home|\/smart-indices|\/ad|\/open-source-projects|\/white-labels|\/bulk-trader-facility|\/partners|\/payment-agent|\/about-us|\/group-information|\/group-history|\/careers|\/contact|\/terms-and-conditions|\/terms-and-conditions-jp|\/responsible-trading|\/us_patents$/.test(window.location.pathname);
+            var is_mojo_page = /^\/$|\/login|\/home|\/smart-indices|\/ad|\/open-source-projects|\/white-labels|\/bulk-trader-facility|\/partners|\/payment-agent|\/about-us|\/group-information|\/group-history|\/careers|\/contact|\/terms-and-conditions|\/terms-and-conditions-jp|\/responsible-trading|\/us_patents|\/lost_password$/.test(window.location.pathname);
             if(!is_mojo_page) {
                 trading.addClass('active');
                 this.show_main_menu();
@@ -513,6 +525,7 @@ Header.prototype = {
     },
     do_logout : function(response){
         if("logout" in response && response.logout === 1){
+            sessionStorage.setItem('currencies', '');
             var cookies = ['login', 'loginid', 'loginid_list', 'email', 'settings', 'reality_check'];
             var current_domain = window.location.hostname.replace('www', '');
             cookies.map(function(c){
@@ -812,6 +825,7 @@ Page.prototype = {
     on_change_loginid: function() {
         var that = this;
         $('#client_loginid').on('change', function() {
+            sessionStorage.setItem('currencies', '');
             $('#loginid-switch-form').submit();
         });
     },

@@ -190,7 +190,12 @@
         </div>
         <div id="appcache-reload-message">
             <div class="message">
-                [% l('A new version of the interface is available. Please <a href="#" id="appcache-refresh-link">refresh</a> this page to try again.') %]
+                [% l('A new version of the interface is available. This page will <a href="#" id="appcache-refresh-link">refresh</a> in 30 seconds.') %]
+            </div>
+        </div>
+        <div id="ratelimit-error-message">
+            <div class="message">
+                [% l('You have reached the rate limit of requests per second. To continue, please <a href="javascript:;" id="ratelimit-refresh-link">refresh</a> the page.') %]
             </div>
         </div>
     </div>

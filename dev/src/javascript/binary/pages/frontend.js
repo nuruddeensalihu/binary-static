@@ -541,6 +541,7 @@ pjax_config_page('/careers', function() {
         },
     };
 });
+
 pjax_config_page('/bulk-trader-facility', function() {
     return {
         onLoad: function() {
@@ -550,5 +551,16 @@ pjax_config_page('/bulk-trader-facility', function() {
         onUnload: function() {
             $(window).off('scroll');
         }
+    };
+});
+
+pjax_config_page('/terms-and-condition', function() {
+    return {
+        onLoad: function() {
+            var year = document.getElementsByClassName('currentYear');
+            for (i = 0; i < year.length; i++){
+              year[i].innerHTML = new Date().getFullYear();
+            }
+        },
     };
 });

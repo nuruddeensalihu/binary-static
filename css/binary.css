@@ -979,7 +979,7 @@ ul.checked li {
   display: inline-block;
   top: 3px;
 }
-#footer #footer-regulatory #appcache-reload-message {
+#footer #footer-regulatory #appcache-reload-message, #footer #footer-regulatory #ratelimit-error-message {
   display: none;
   position: fixed;
   top: 0;
@@ -988,12 +988,12 @@ ul.checked li {
   z-index: 999;
   text-align: center;
 }
-#footer #footer-regulatory #appcache-reload-message .message {
+#footer #footer-regulatory #appcache-reload-message .message, #footer #footer-regulatory #ratelimit-error-message .message {
   margin: 12px;
   font-style: italic;
   color: #c03;
 }
-#footer #footer-regulatory #appcache-reload-message .message a {
+#footer #footer-regulatory #appcache-reload-message .message a, #footer #footer-regulatory #ratelimit-error-message .message a {
   color: #2E8836;
 }
 #footer #footer-last {
@@ -1050,9 +1050,13 @@ ul.checked li {
 }
 .tab-menu-wrap ul li#topMenuStartBetting, #content .tab-menu-wrap ul li#topMenuStartBetting {
   float: right;
+  margin: 0 0 0 2em;
 }
 .tab-menu-wrap ul li#topMenuStartBetting ul, #content .tab-menu-wrap ul li#topMenuStartBetting ul {
   text-align: right;
+}
+.tab-menu-wrap ul li#topMenuStartBetting ul li, #content .tab-menu-wrap ul li#topMenuStartBetting ul li {
+  margin: 0 0 0 2em;
 }
 .tab-menu-wrap ul li a, #content .tab-menu-wrap ul li a {
   font-weight: normal;
@@ -1073,7 +1077,6 @@ ul.checked li {
 }
 .tab-menu-wrap ul li ul.sub_items li.sub_item, #content .tab-menu-wrap ul li ul.sub_items li.sub_item {
   font-size: 100%;
-  margin-right: 20px;
 }
 .tab-menu-wrap ul li ul.tm-ul-2, #content .tab-menu-wrap ul li ul.tm-ul-2 {
   margin-top: 1px;
@@ -1091,9 +1094,6 @@ ul.checked li {
   z-index: 10;
   margin-top: 3px solid transparent;
   background: #fff;
-}
-.tab-menu-wrap ul li.hover ul li, .tab-menu-wrap ul li.active ul li, #content .tab-menu-wrap ul li.active ul li, #content .tab-menu-wrap ul li.hover ul li, #content .tab-menu-wrap ul li.active ul li {
-  margin-right: 2em;
 }
 .tab-menu-wrap ul li.hover ul li a, .tab-menu-wrap ul li.active ul li a, #content .tab-menu-wrap ul li.active ul li a, .tab-menu-wrap ul li.hover ul li span, .tab-menu-wrap ul li.active ul li span, #content .tab-menu-wrap ul li.active ul li span, #content .tab-menu-wrap ul li.hover ul li a, #content .tab-menu-wrap ul li.active ul li a, #content .tab-menu-wrap ul li.hover ul li span, #content .tab-menu-wrap ul li.active ul li span {
   top: auto;
@@ -2804,7 +2804,7 @@ a.spread_250, a.spread_260, a.spread_buy, a.spread_sell {
 }
 
 #bet_bottom_content {
-  padding-top: 2em;
+  padding-top: 1em;
 }
 #bet_bottom_content input {
   border: 1px solid #DEDEDE;
@@ -6231,13 +6231,13 @@ body .opening_hours {
 }
 
 body.EN .calls_recording {
-  display: inline !important;
+  display: none;
 }
 body.EN .contactus_time {
-  display: inline !important;
+  display: none;
 }
 body.EN .opening_hours {
-  display: inline !important;
+  display: none;
 }
 
 body.JA .ja-hide {
@@ -6325,13 +6325,13 @@ body.AR .ar-hide {
 
 /*Indonesian Language */
 body.ID .calls_recording {
-  display: inline !important;
+  display: none;
 }
 body.ID .contactus_time {
-  display: inline !important;
+  display: none;
 }
 body.ID .opening_hours {
-  display: inline !important;
+  display: none;
 }
 body.ID .regulatory-logo {
   display: none !important;
@@ -6381,13 +6381,13 @@ body.RU #trading_socket_container .contract_heading {
   padding-top: 2.7em;
 }
 body.RU .calls_recording {
-  display: inline !important;
+  display: none;
 }
 body.RU .contactus_time {
-  display: inline !important;
+  display: none;
 }
 body.RU .opening_hours {
-  display: inline !important;
+  display: none;
 }
 
 body.PT a, body.PT button, body.PT .button, body.PT span, body.PT input {

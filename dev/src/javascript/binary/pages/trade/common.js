@@ -809,7 +809,7 @@ function updatePurchaseStatus(final_price, pnl, contract_status){
 
 function updateWarmChart(){
     var $chart = $('#trading_worm_chart');
-    var spots = Tick.spots();
+    var spots =  Object.keys(Tick.spots()).sort(function(a,b){return a-b;}).map(function(v){return Tick.spots()[v];});
     var chart_config = {
         type: 'line',
         lineColor: '#606060',

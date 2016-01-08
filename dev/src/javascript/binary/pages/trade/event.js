@@ -156,7 +156,7 @@ var TradingEvents = (function () {
                     // forget the old tick id i.e. close the old tick stream
                     processForgetTicks();
                     // get ticks for current underlying
-                    BinarySocket.send({ ticks : underlying });
+                    Tick.request(underlying);
                 }
             });
             underlyingElement.addEventListener('mousedown', function(e) {

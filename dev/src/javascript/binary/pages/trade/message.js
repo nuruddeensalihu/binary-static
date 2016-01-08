@@ -27,6 +27,8 @@ var Message = (function () {
                 Purchase.display(response);
             } else if (type === 'tick') {
                 processTick(response);
+            } else if (type === 'history') {
+                Tick.processHistory(response);
             } else if (type === 'trading_times'){
                 processTradingTimes(response);
             } else if (type === 'statement'){

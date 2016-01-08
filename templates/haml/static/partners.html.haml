@@ -33,11 +33,11 @@
   .grd-grid-12.grd-grid-mobile-12.grd-parent.grd-clear
     .grd-grid-4.grd-grid-mobile-12.grd-parent
       .grd-grid-6.grd-with-padding
-        %a{:href => 'https://developers.binary.com'}
+        %a{:href => 'https://developers.binary.com', :target => '_blank'}
           %img#charting_icon.responsive.charting-page-icon{:src => url_for('images/pages/partners/api.svg')}
       .grd-grid-12
         %h4
-          %a{:href => 'https://developers.binary.com'}= l('API')
+          %a{:href => 'https://developers.binary.com', :target => '_blank'}= l('API')
         %p= l('Develop your own trading application with our APIs.')
     .grd-grid-4.grd-grid-mobile-12.grd-parent
       .grd-grid-6.grd-with-padding
@@ -49,8 +49,8 @@
         %p= l('Contribute to [_1]\'s open-source projects.', stash->{website_name})
     .grd-grid-4.grd-grid-mobile-12.grd-parent
       .grd-grid-6.grd-with-padding
-        %a{:href => 'http://blog.binary.com/en/contributors/'}
-          %img#charting_icon.responsive.charting-page-icon{:src => url_for('images/pages/partners/contributors.svg')}
+        %a{:href => 'http://blog.binary.com/en/contributors/', :target => '_blank'}
+          %img#charting_icon.responsive.charting-page-icon{:src => url_for('images/pages/partners/contributors.svg'), :target => '_blank'}
       .grd-grid-12
         %h4
           %a{:href => 'https://blog.binary.com/en/contributors/'}= l('Contributors')

@@ -14,17 +14,17 @@
  * `Tick.epoch()` to get the tick epoch time
  * 'Tick.display()` to display current spot
  */
-var Tick = (function () {
+var Tick = (function() {
     'use strict';
 
     var quote = '',
         id = '',
         epoch = '',
         errorMessage = '',
-        spots = [],
+        spots = {},
         keep_number = 20;
 
-    var details = function (data) {
+    var details = function(data) {
         errorMessage = '';
 
         if (data) {
@@ -36,15 +36,18 @@ var Tick = (function () {
                 id = tick['id'];
                 epoch = tick['epoch'];
 
-                if(spots.length === keep_number){
-                    spots.shift();
+                spots[epoch] = quote;
+                var epoches = Object.keys(spots).sort(function(a, b) {
+                    return a - b;
+                });
+                if (epoches.length > keep_number) {
+                    delete spots[epoches[0]];
                 }
-                spots.push(quote);
             }
         }
     };
 
-    var display = function () {
+    var display = function() {
         $('#spot').fadeIn(200);
         var spotElement = document.getElementById('spot');
         var message = '';
@@ -54,9 +57,9 @@ var Tick = (function () {
             message = quote;
         }
 
-        if(parseFloat(message) != message){
+        if (parseFloat(message) != message) {
             spotElement.className = 'error';
-        } else{
+        } else {
             spotElement.classList.remove('error');
             displayPriceMovement(spotElement, spotElement.textContent, message);
             displayIndicativeBarrier();
@@ -65,19 +68,56 @@ var Tick = (function () {
         spotElement.textContent = message;
     };
 
+    var request = function(symbol) {
+        BinarySocket.send({
+            "ticks_history": symbol,
+            "style": "ticks",
+            "end": "latest",
+            "count": keep_number,
+            "subscribe": 1
+        });
+    };
+
+    var processHistory = function(res) {
+        if (res.history && res.history.times && res.history.prices) {
+            for (var i = 0; i < res.history.times.length; i++) {
+                details({
+                    tick: {
+                        epoch: res.history.times[i],
+                        quote: res.history.prices[i]
+                    }
+                });
+            }
+        }
+    };
+
     return {
         details: details,
         display: display,
-        quote: function () { return quote; },
-        id: function () { return id; },
-        epoch: function () { return epoch; },
-        errorMessage: function () { return errorMessage; },
-        clean: function(){ 
-            spots = []; 
+        quote: function() {
+            return quote;
+        },
+        id: function() {
+            return id;
+        },
+        epoch: function() {
+            return epoch;
+        },
+        errorMessage: function() {
+            return errorMessage;
+        },
+        clean: function() {
+            spots = {};
             quote = '';
             $('#spot').fadeOut(200);
         },
-        spots: function(){ return spots;},
-        setQuote: function(q){ quote = q; }
+        spots: function() {
+            return spots;
+        },
+        setQuote: function(q) {
+            quote = q;
+        },
+        request: request,
+        processHistory: processHistory
     };
 })();

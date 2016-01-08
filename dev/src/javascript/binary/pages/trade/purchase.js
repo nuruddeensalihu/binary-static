@@ -121,62 +121,91 @@ var Purchase = (function () {
                 show_contract_result:1,
                 width: $('#confirmation_message').width(),
             });
+            WSTickDisplay.spots_list = {};
         }
     };
 
     var update_spot_list = function(data){
+       
+        if($('#contract_purchase_spots:hidden').length){
+            return;
+        }
+
+        var duration = purchase_data.echo_req.passthrough['duration'];
+
+        if(!duration){
+            return;
+        }
+
         var spots = document.getElementById('contract_purchase_spots');
-        if(isVisible(spots) && purchase_data.echo_req.passthrough['duration'] && data.tick.epoch && data.tick.epoch > purchase_data.buy.start_time){
-            var fragment = document.createElement('div');
-            fragment.classList.add('row');
+        var spots2 = Tick.spots();
+        var epoches = Object.keys(spots2).sort(function(a,b){return a-b;});
+        spots.textContent = '';
 
-            var el1 = document.createElement('div');
-            el1.classList.add('col');
-            el1.textContent = Content.localize().textTickResultLabel + " " + (spots.getElementsByClassName('row').length+1);
-            fragment.appendChild(el1);
+        var replace = function(d){d1 = d; return '<b>'+d+'</b>';};
+        for(var s=0; s<epoches.length; s++){
+            var tick_d = {
+                epoch: epoches[s],
+                quote: spots2[epoches[s]]
+            };
 
-            var el2 = document.createElement('div');
-            el2.classList.add('col');
-            var date = new Date(data.tick.epoch*1000);
-            var hours = date.getUTCHours() < 10 ? '0'+date.getUTCHours() : date.getUTCHours();
-            var minutes = date.getUTCMinutes() < 10 ? '0'+date.getUTCMinutes() : date.getUTCMinutes();
-            var seconds = date.getUTCSeconds() < 10 ? '0'+date.getUTCSeconds() : date.getUTCSeconds();
-            el2.textContent = hours+':'+minutes+':'+seconds;
-            fragment.appendChild(el2);
+            if(isVisible(spots) && tick_d.epoch && tick_d.epoch > purchase_data.buy.start_time){
+                var fragment = document.createElement('div');
+                fragment.classList.add('row');
 
-            var d1;
-            var tick = data.tick.quote.replace(/\d$/,function(d){d1 = d; return '<b>'+d+'</b>';});
-            var el3 = document.createElement('div');
-            el3.classList.add('col');
-            el3.innerHTML = tick;
-            fragment.appendChild(el3);
+                var el1 = document.createElement('div');
+                el1.classList.add('col');
+                el1.textContent = Content.localize().textTickResultLabel + " " + (spots.getElementsByClassName('row').length+1);
+                fragment.appendChild(el1);
 
-            spots.appendChild(fragment);
-            spots.scrollTop = spots.scrollHeight;
+                var el2 = document.createElement('div');
+                el2.classList.add('col');
+                var date = new Date(tick_d.epoch*1000);
+                var hours = date.getUTCHours() < 10 ? '0'+date.getUTCHours() : date.getUTCHours();
+                var minutes = date.getUTCMinutes() < 10 ? '0'+date.getUTCMinutes() : date.getUTCMinutes();
+                var seconds = date.getUTCSeconds() < 10 ? '0'+date.getUTCSeconds() : date.getUTCSeconds();
+                el2.textContent = hours+':'+minutes+':'+seconds;
+                fragment.appendChild(el2);
 
-            if(d1 && purchase_data.echo_req.passthrough['duration']===1){
-                var contract_status,
-                    final_price,
-                    pnl;
+                var d1;
+                var tick = tick_d.quote.replace(/\d$/,replace);
+                var el3 = document.createElement('div');
+                el3.classList.add('col');
+                el3.innerHTML = tick;
+                fragment.appendChild(el3);
 
-                if  (  purchase_data.echo_req.passthrough.contract_type==="DIGITMATCH" && d1==purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITDIFF" && d1!=purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITEVEN" && d1%2===0 || purchase_data.echo_req.passthrough.contract_type==="DIGITODD" && d1%2 || purchase_data.echo_req.passthrough.contract_type==="DIGITOVER" && d1>purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITUNDER" && d1<purchase_data.echo_req.passthrough.barrier){
-                    spots.className = 'won';
-                    final_price = $('#contract_purchase_payout p').text();
-                    pnl = $('#contract_purchase_cost p').text();
-                    contract_status = Content.localize().textContractStatusWon;
+                spots.appendChild(fragment);
+                spots.scrollTop = spots.scrollHeight;
+
+                if(d1 && duration===1){
+                    var contract_status,
+                        final_price,
+                        pnl;
+
+                    if  (  purchase_data.echo_req.passthrough.contract_type==="DIGITMATCH" && d1==purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITDIFF" && d1!=purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITEVEN" && d1%2===0 || purchase_data.echo_req.passthrough.contract_type==="DIGITODD" && d1%2 || purchase_data.echo_req.passthrough.contract_type==="DIGITOVER" && d1>purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITUNDER" && d1<purchase_data.echo_req.passthrough.barrier){
+                        spots.className = 'won';
+                        final_price = $('#contract_purchase_payout p').text();
+                        pnl = $('#contract_purchase_cost p').text();
+                        contract_status = Content.localize().textContractStatusWon;
+                    }
+                    else{
+                        spots.className = 'lost';
+                        final_price = 0;
+                        pnl = -$('#contract_purchase_cost p').text();
+                        contract_status = Content.localize().textContractStatusLost;
+                    }
+
+                    updatePurchaseStatus(final_price, pnl, contract_status);
                 }
-                else{
-                    spots.className = 'lost';
-                    final_price = 0;
-                    pnl = -$('#contract_purchase_cost p').text();
-                    contract_status = Content.localize().textContractStatusLost;
-                }
 
-                updatePurchaseStatus(final_price, pnl, contract_status);
+                duration--;
+                if(!duration){
+                    purchase_data.echo_req.passthrough['duration'] = 0;
+                }
             }
 
-            purchase_data.echo_req.passthrough['duration']--;
         }
+        
     };
 
     return {

@@ -103,7 +103,7 @@ var BinarySocket = (function () {
 
         binarySocket.onopen = function (){
             var loginToken = getCookieItem('login');
-            if(loginToken) {
+            if(loginToken && !authorized) {
                 binarySocket.send(JSON.stringify({authorize: loginToken}));
             }
             else {
@@ -143,6 +143,14 @@ var BinarySocket = (function () {
                     page.header.time_counter(response);
                 } else if (type === 'logout') {
                     page.header.do_logout(response);
+                } else if (type === 'error') {
+                    if(response.error.code === 'RateLimit') {
+                        $('#ratelimit-error-message')
+                            .css('display', 'block')
+                            .on('click', '#ratelimit-refresh-link', function () {
+                                window.location.reload();
+                            });
+                    }
                 }
 
                 if(typeof events.onmessage === 'function'){
