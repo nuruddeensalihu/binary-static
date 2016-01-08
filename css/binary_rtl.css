@@ -6291,12 +6291,6 @@ body.RU #trading_socket_container .contract_heading {
 body.RU .calls_recording {
   display: inline !important;
 }
-body.RU .contactus_time {
-  display: none;
-}
-body.RU .opening_hours {
-  display: none;
-}
 
 body.PT a, body.PT button, body.PT .button, body.PT span, body.PT input {
   text-transform: initial !important;
