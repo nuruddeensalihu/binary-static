@@ -65,10 +65,10 @@
         .grd-grid-4
           %h1= l('Market Data')
           %ul
-            %li
-              %a.pjaxload{:href=>url_for("/charting/livechart")}= l('Live Charts')
             %li.ja-hide
               %a.pjaxload{:href => '//highcharts.binary.com'}= l('HighCharts')
+            %li
+              %a.pjaxload{:href=> '//tradingview.binary.com'}= l('TradingView')
         .grd-grid-4
           %h1.ja-hide= l('Partner With Us')
             %ul.ja-hide.partner
@@ -99,7 +99,7 @@
         != l("A new version of the interface is available. This page will <a href='#' id='appcache-refresh-link'>refresh</a> in 30 seconds.")
     #ratelimit-error-message
       .message
-        != l("You have reached the rate limit of requests per second. To continue, please <a href="javascript:;" id="ratelimit-refresh-link">refresh</a> the page.")
+        != l("You have reached the rate limit of requests per second. To continue, please <a href='javascript:;' id='ratelimit-refresh-link'>refresh</a> the page.")
   #footer-last
     .grd-container.grd-default-container
       .grd-grid-12
