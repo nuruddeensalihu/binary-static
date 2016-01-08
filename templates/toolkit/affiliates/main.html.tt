@@ -26,9 +26,13 @@
     <p>
         [% l('Start earning up to 35% of the net revenue for every client that you introduce to Binary.com, for as long as they trade on our platform.') %]
 
+         <div class="rbox-heading">
+            <h4>[% l('Register') %]</h4>
+        </div>
+
         <div class="center-aligned grd-row-padding">
-           <a class="button" href="https://login.binary.com/signup.php">
-                <span>[% l('APPLY NOW') %]</span>
+            <a class="button" href="https://login.binary.com/signup.php">
+                <span>[% l('Sign me up') %]</span>
             </a>
         </div>
     </p>
@@ -43,9 +47,13 @@
 
     <p>[% l('To date, we’ve hosted over $2 billion in trades across the globe. Share in our success, by working closely with our team to promote our product. ') %] 
 
+         <div class="rbox-heading">
+            <h4>[% l('Register') %]</h4>
+        </div>
+
         <div class="center-aligned grd-row-padding">
-           <a class="button" href="https://login.binary.com/signup.php">
-                <span>[% l('APPLY NOW') %]</span>
+            <a class="button" href="https://login.binary.com/signup.php">
+                <span>[% l('Sign me up') %]</span>
             </a>
         </div>
     </p>
@@ -90,9 +98,13 @@
 
     <p>[% l('Don’t wait – register to join our binary options affiliate program today!') %]
 
+        <div class="rbox-heading">
+            <h4>[% l('Register') %]</h4>
+        </div>
+
         <div class="center-aligned grd-row-padding">
-           <a class="button" href="https://login.binary.com/signup.php">
-                <span>[% l('APPLY NOW') %]</span>
+            <a class="button" href="https://login.binary.com/signup.php">
+                <span>[% l('Sign me up') %]</span>
             </a>
         </div>
     </p> 
