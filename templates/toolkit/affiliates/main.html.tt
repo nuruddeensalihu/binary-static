@@ -20,7 +20,9 @@
     <br>
 
      <h1>[% l('Searching for the Best Binary Options Affiliate Program ?') %]</h1>
-     <h2>[% l('Look No Further.') %]</h2>
+     <p>
+        <h2>[% l('Look No Further.') %]</h2>
+     </p>
     <p>
         [% l('Start earning up to 35% of the net revenue for every client that you introduce to Binary.com, for as long as they trade on our platform.') %]
 
@@ -62,10 +64,10 @@
             <li>[% l('High conversion rates and client retention, based on the strength of our flexible, secure trading platform ') %]</li>
             <li>[% l('Additional opportunities to earn revenue through our:') %]
                 <ul class="checked">
-                    <li><a href="https://www.binary.com/payment-agent">[% l('Payment agent program') %]</a></li>
+                    <li><a href="[% request.url_for('payment-agent') %] ">[% l('Payment agent program') %]</a></li>
                     <li><a href="https://developers.binary.com/">API</a></li>
-                    <li><a href="https://www.binary.com/open-source-projects">[% l('Open-source projects') %]</li>
-                    <li><a href="https://www.binary.com/white-labels">[% l('White-label offerings') %]</a></li>
+                    <li><a href="[% request.url_for('open-source-projects') %]">[% l('Open-source projects') %]</li>
+                    <li><a href="[% request.url_for('white-labels') %]">[% l('White-label offerings') %]</a></li>
                     <li>[% l('And more') %]</li>
                 </ul>
             </li>
