@@ -22,7 +22,7 @@
             <span>[% l('APPLY NOW') %]</span>
         </a>
 
-     </p>   
+     </p>
 
      <p>
         <h2>[% l('Benefit from Our Affiliate Program.') %]</h2>
@@ -32,20 +32,20 @@
         <ul class="checked">
             <li><a href="#commision">[% l('Generous commission') %]</a>[% l(', awarding up to 35% of the net revenue for all trades purchased by your referred clients ') %] </li>
             <li> [% l('On-time payments, without a single exception since our program’s official launch in March 2004, reliably credited to your account by the 15th of each month') %] </li>
-            <li><[% l('Dedicated international support, including an attentive multilingual team and multi-currency payment methods ') %]/li>
-            <li>[% l('Robust reporting and marketing tools, offering everything you need to promote our product and track your earnings ') %]</li>
+            <li><[% l('Dedicated international support, including an attentive multilingual team and multi-currency payment methods '') %]</li>
+            <li>[% l('Robust reporting and marketing tools, offering everything you need to promote our product and track your earnings') %]</li>
             <li>[% l('High conversion rates and client retention, based on the strength of our flexible, secure trading platform ')' %]</li>
-            <li>[% l('High conversion rates and client retention, based on the strength of our flexible, secure trading platform ') %]</li>
-            <li>[% l('Additional opportunities to earn revenue through our:')
+            <li>[% l('High conversion rates and client retention, based on the strength of our flexible, secure trading platform') %]</li>
+            <li>[% l('Additional opportunities to earn revenue through our:') %]
                 <ul>
                     <li><a href="request.url_for('payment-agent')">[% l('Payment agent program') %]</a></li>
                     <li><a href="https://developers.binary.com/"> API</a></li>
                     <li><a href="request.url_for('open-source-projects')">[% l('Open-source projects') %]</li>
-                    <li><a href="request.url_for('white-labels')">[% l('White-label offerings')%]</a></li>
+                    <li><a href="request.url_for('white-labels')">[% l('White-label offerings') %]</a></li>
                     <li>[% l('And more') %]</li>
 
                 </ul>
-            </li>    
+            </li>
 
 
         </ul>
@@ -60,9 +60,8 @@
             <p>
                 [% INCLUDE affiliates/commission_table.html.tt %]
 
-            </p>   
-        
-    </p>   
+            </p>
+    </p>
 
     <p>[% l('Don’t wait – register to join our binary options affiliate program today!') %]
         <a class="button" href="https://login.binary.com/signup.php">
