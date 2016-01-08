@@ -6149,23 +6149,9 @@ body .calls_recording {
   display: none;
   font-style: italic;
 }
-body .contactus_time {
-  display: none;
-  font-style: italic;
-}
-body .opening_hours {
-  display: none;
-  font-weight: bold;
-}
 
 body.EN .calls_recording {
   display: inline !important;
-}
-body.EN .contactus_time {
-  display: none;
-}
-body.EN .opening_hours {
-  display: none;
 }
 
 body.JA .ja-hide {
@@ -6254,12 +6240,6 @@ body.AR .ar-hide {
 /*Indonesian Language */
 body.ID .calls_recording {
   display: inline !important;
-}
-body.ID .contactus_time {
-  display: none;
-}
-body.ID .opening_hours {
-  display: none;
 }
 body.ID .regulatory-logo {
   display: none !important;
