@@ -23,10 +23,15 @@
      <h2>[% l('Look No Further.') %]</h2>
     <p>
         [% l('Start earning up to 35% of the net revenue for every client that you introduce to Binary.com, for as long as they trade on our platform.') %]
+
+        <div class="center-aligned grd-row-padding">
+           <a class="button" href="https://login.binary.com/signup.php">
+                <span>[% l('APPLY NOW') %]</span>
+            </a>
+        </div>
     </p>
-    <a class="button" href="https://login.binary.com/signup.php">
-            <span>[% l('APPLY NOW') %]</span>
-    </a>
+    
+     
 
     <h2>[% l('Why Join Our Affiliate Program ?') %]</h2>
     <p>[% l('Simply put, Binary.com is your best ally in the binary options trading industry – as a fully licensed, regulated, trustworthy company that you can partner with to earn extra income.') %]
@@ -34,11 +39,16 @@
 
     <p>[% l('For more than 15 years, our award-winning platform has enabled 300,000 traders worldwide to purchase contracts for Forex currencies, stocks, indices, commodities, and more – with as little as $1 required per purchase.') %]</p>
 
-    <p>[% l('To date, we’ve hosted over $2 billion in trades across the globe. Share in our success, by working closely with our team to promote our product. ') %]  </p>
+    <p>[% l('To date, we’ve hosted over $2 billion in trades across the globe. Share in our success, by working closely with our team to promote our product. ') %] 
 
-     <a class="button" href="https://login.binary.com/signup.php">
-        <span>[% l('APPLY NOW') %]</span>
-    </a>
+        <div class="center-aligned grd-row-padding">
+           <a class="button" href="https://login.binary.com/signup.php">
+                <span>[% l('APPLY NOW') %]</span>
+            </a>
+        </div>
+    </p>
+
+    
 
     <h2>[% l('Benefit from Our Affiliate Program.') %]</h2>
     <p>
@@ -47,7 +57,7 @@
         <ul class="checked">
             <li><a href="#commision">[% l('Generous commission') %]</a>[% l(', awarding up to 35% of the net revenue for all trades purchased by your referred clients ') %] </li>
             <li> [% l('On-time payments, without a single exception since our program’s official launch in March 2004, reliably credited to your account by the 15th of each month') %] </li>
-            <li><[% l('Dedicated international support, including an attentive multilingual team and multi-currency payment methods ') %]</li>
+            <li>[% l('Dedicated international support, including an attentive multilingual team and multi-currency payment methods ') %]</li>
             <li>[% l('Robust reporting and marketing tools, offering everything you need to promote our product and track your earnings') %]</li>
             <li>[% l('High conversion rates and client retention, based on the strength of our flexible, secure trading platform ') %]</li>
             <li>[% l('Additional opportunities to earn revenue through our:') %]
@@ -57,7 +67,6 @@
                     <li><a href="https://www.binary.com/open-source-projects">[% l('Open-source projects') %]</li>
                     <li><a href="https://www.binary.com/white-labels">[% l('White-label offerings') %]</a></li>
                     <li>[% l('And more') %]</li>
-
                 </ul>
             </li>
 
@@ -78,9 +87,12 @@
     </p>
 
     <p>[% l('Don’t wait – register to join our binary options affiliate program today!') %]
-        <a class="button" href="https://login.binary.com/signup.php">
-            <span>[% l('APPLY NOW') %]</span>
-        </a>
+
+        <div class="center-aligned grd-row-padding">
+           <a class="button" href="https://login.binary.com/signup.php">
+                <span>[% l('APPLY NOW') %]</span>
+            </a>
+        </div>
     </p> 
 
     <h2>[% l('Are your site visitors interested in:') %]</h2>
