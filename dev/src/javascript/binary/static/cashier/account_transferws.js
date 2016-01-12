@@ -243,7 +243,7 @@ var account_transferws = (function(){
                 for(i = 0 ; i < selectedIndex ; i++){
                     $form.find("#transfer_account_transfer option").eq(i).remove();
                 }
-
+                
                 if(selectedIndex >=0){
                     $form.find("#transfer_account_transfer option").eq(selectedIndex).attr('selected', 'selected');
                 }
