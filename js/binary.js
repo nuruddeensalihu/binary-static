@@ -66089,6 +66089,7 @@ var BinarySocket = (function () {
 
                 });
                 
+                console.log("the selectedIndex is", selectedIndex);
                 if(selectedIndex >=0 ){
                     $form.find("#transfer_account_transfer option").eq(selectedIndex).attr('selected', 'selected');
                 }
