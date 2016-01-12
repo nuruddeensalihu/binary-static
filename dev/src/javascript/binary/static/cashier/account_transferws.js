@@ -238,6 +238,7 @@ var account_transferws = (function(){
 
                 console.log("the account_to is", account_to);
                 console.log("the account_from", account_from);
+                console.log("isEmptyObject", $.isEmptyObject(account_to));
 
                 if((account_bal <=0) && (response.accounts.length > 1) ){
                     $("#client_message").show();
