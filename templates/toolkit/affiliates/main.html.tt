@@ -44,7 +44,7 @@
             <li>[% l('Robust reporting and marketing tools, offering everything you need to promote our product and track your earnings') %]</li>
             <li>[% l('High conversion rates and client retention, based on the strength of our flexible, secure trading platform ') %]</li>
             <li>[% l('Additional opportunities to earn revenue through our:') %]
-                <div class="grd-row-padding">
+                
                     <ul class="bullet">
                         <li><a href="[% request.url_for('payment-agent') %] ">[% l('Payment agent program') %]</a></li>
                         <li><a href="https://developers.binary.com/">API</a></li>
@@ -52,7 +52,7 @@
                         <li><a href="[% request.url_for('white-labels') %]">[% l('White-label offerings') %]</a></li>
                         <li>[% l('And more') %]</li>
                     </ul>
-                </div>
+               
             </li>
 
 
