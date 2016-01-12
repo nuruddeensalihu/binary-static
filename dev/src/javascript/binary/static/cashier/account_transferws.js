@@ -175,8 +175,11 @@ var account_transferws = (function(){
                 $.each(response.accounts, function(index,value){
                     var currObj = {};
 
+                    console.log("It hit here");
+
                     if($.isEmptyObject(firstacct))
                     {
+                        console.log("Now firstacct is hit");
                         firstacct = value.loginid;
                         currObj.account = value.loginid;
                         currObj.currency = value.currency;
@@ -186,6 +189,8 @@ var account_transferws = (function(){
                     }
                     else
                     {
+
+                        console.log("Now secondacct is hit");
                         secondacct = value.loginid;
                         str = text.localize("from account (" + firstacct + ") to account (" + secondacct + ")");
                         optionValue = firstacct + "_to_" + secondacct;
