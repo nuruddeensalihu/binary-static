@@ -44,7 +44,7 @@ var account_transferws = (function(){
                         .map( function(value) { 
                             return value.split(')')[0];
                     }); 
-        console.log("The matches are ", matches);
+
         account_from = matches[0];
         account_to = matches[1];
         
@@ -169,32 +169,21 @@ var account_transferws = (function(){
             else if(response.req_id === 4){
 
                 var secondacct, firstacct,str,optionValue;
-                var selectedIndex = -1;
-
-                console.log("the accounts are ", response.accounts);
 
                 $.each(response.accounts, function(index,value){
                     var currObj = {};
 
-                    console.log("It hit here");
-
                     if($.isEmptyObject(firstacct))
                     {
-                        console.log("Now firstacct is hit");
                         firstacct = value.loginid;
                         currObj.account = value.loginid;
                         currObj.currency = value.currency;
                         currObj.balance = value.balance;
-                        if(value.balance > 0)
-                        {
-                            selectedIndex = 0;
-                        }
+
                         availableCurr.push(currObj);
                     }
                     else
                     {
-
-                        console.log("Now secondacct is hit");
                         secondacct = value.loginid;
                         str = text.localize("from account (" + firstacct + ") to account (" + secondacct + ")");
                         optionValue = firstacct + "_to_" + secondacct;
@@ -215,11 +204,7 @@ var account_transferws = (function(){
 
                         availableCurr.push(currObj);     
 
-                        firstacct = "";
-
-                        if(selectedIndex < 0 && value.balance){
-                            selectedIndex =  index;
-                        }    
+                        firstacct = "";    
                     }
                     
                     if(($.isEmptyObject(firstacct) === false) && ($.isEmptyObject(secondacct) === false))
@@ -231,33 +216,18 @@ var account_transferws = (function(){
                                  .attr("value",optionValue)
                                  .text(str));     
                     }
-                    secondacct = "";
+
                     if(value.balance <= 0){
                         $form.find("#transfer_account_transfer option:last").remove();
                     }
-                    else{
-                        if(selectedIndex < 0 ){
-                            selectedIndex =  index;
-                        } 
-                    }
+                
+
 
                 });
-                
-                console.log("the selectedIndex is", selectedIndex);
 
-                for(i=0 ; i< selectedIndex ; i++){
-                    $form.find("#transfer_account_transfer option").eq(i).remove();
-                }
-
-                if(selectedIndex >=0 ){
-                    $form.find("#transfer_account_transfer option").eq(selectedIndex).attr('selected', 'selected');
-                }
+                $form.find("#transfer_account_transfer option").eq(0).attr('selected', 'selected');
 
                 set_account_from_to();
-
-                console.log("the account_to is", account_to);
-                console.log("the account_from", account_from);
-                console.log("isEmptyObject", $.isEmptyObject(account_to));
 
                 if((account_bal <=0) && (response.accounts.length > 1) ){
                     $("#client_message").show();
@@ -267,9 +237,6 @@ var account_transferws = (function(){
                 }
                 else if(account_to === undefined || account_from === undefined || $.isEmptyObject(account_to))
                 {
-                    consolelog("What happened to my account",account_to);
-                    console.log("What happened to my account account_from", account_from);
-                    console.log("isEmptyObject", $.isEmptyObject(account_to));
                     $("#client_message").show();
                     $("#client_message p").html(text.localize("The account transfer is unavailable for your account."));
                     $("#success_form").hide();
