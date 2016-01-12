@@ -66091,8 +66091,8 @@ var BinarySocket = (function () {
                 
                 console.log("the selectedIndex is", selectedIndex);
 
-                while(selectedIndex > 0){
-                    $form.find("#transfer_account_transfer option").eq(selectedIndex).remove();
+                for(i=0 ; i< selectedIndex ; i++){
+                    $form.find("#transfer_account_transfer option").eq(i).remove();
                 }
 
                 if(selectedIndex >=0 ){
