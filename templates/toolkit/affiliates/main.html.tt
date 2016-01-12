@@ -1,6 +1,7 @@
 <div class="grd-grid-12">
-
+    <p>
      <h1>[% l('Searching for the Best Binary Options Affiliate Program ?') %]</h1>
+    </p>
      <p>
         <h2>[% l('Look No Further.') %]</h2>
      </p>
@@ -88,7 +89,7 @@
         </div>
     </p> 
 
-   <p><em>[% l('"I work with a number of affiliate companies, and it is by far, the friendliest and most helpful that I\'ve found. They go out of their way to provide their affiliates with all the tools, advice and support they need in order to succeed. To top it all off, they offer some of the most handsome rebates in the industry." - <br/><strong>Vinod Gorasia, Marketing Manager, Agora Lifestyles</strong>.') %]</em></p>
+   <p><em>[% l('"I work with a number of affiliate companies, and it is by far, the friendliest and most helpful that I\'ve found. They go out of their way to provide their affiliates with all the tools, advice and support they need in order to succeed. To top it all off, they offer some of the most handsome rebates in the industry."<br/> - <strong>Vinod Gorasia, Marketing Manager, Agora Lifestyles</strong>.') %]</em></p>
  
  
 
