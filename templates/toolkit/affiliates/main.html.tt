@@ -1,17 +1,14 @@
 <div class="grd-grid-12">
     <p>
-     <h1>[% l('Searching for the Best Binary Options Affiliate Program ?') %]</h1>
+     <h2>[% l('Searching for the Best Binary Options Affiliate Program ?') %]</h2>
     </p>
      <p>
-        <h2>[% l('Look No Further.') %]</h2>
+        <h3>[% l('Look No Further.') %]</h3>
      </p>
     <p>
         [% l('Start earning up to 35% of the net revenue for every client that you introduce to Binary.com, for as long as they trade on our platform.') %]
 
-         <div class="rbox-heading">
-            <h4>[% l('Register') %]</h4>
-        </div>
-
+       
         <div class="center-aligned grd-row-padding">
             <a class="button" href="https://login.binary.com/signup.php">
                 <span>[% l('APPLY NOW') %]</span>
@@ -28,10 +25,6 @@
     <p>[% l('For more than 15 years, our award-winning platform has enabled 300,000 traders worldwide to purchase contracts for Forex currencies, stocks, indices, commodities, and more – with as little as $1 required per purchase.') %]</p>
 
     <p>[% l('To date, we’ve hosted over $2 billion in trades across the globe. Share in our success, by working closely with our team to promote our product. ') %] 
-
-         <div class="rbox-heading">
-            <h4>[% l('Register') %]</h4>
-        </div>
 
         <div class="center-aligned grd-row-padding">
             <a class="button" href="https://login.binary.com/signup.php">
@@ -51,13 +44,15 @@
             <li>[% l('Robust reporting and marketing tools, offering everything you need to promote our product and track your earnings') %]</li>
             <li>[% l('High conversion rates and client retention, based on the strength of our flexible, secure trading platform ') %]</li>
             <li>[% l('Additional opportunities to earn revenue through our:') %]
-                <ul class="checked">
-                    <li><a href="[% request.url_for('payment-agent') %] ">[% l('Payment agent program') %]</a></li>
-                    <li><a href="https://developers.binary.com/">API</a></li>
-                    <li><a href="[% request.url_for('open-source-projects') %]">[% l('Open-source projects') %]</li>
-                    <li><a href="[% request.url_for('white-labels') %]">[% l('White-label offerings') %]</a></li>
-                    <li>[% l('And more') %]</li>
-                </ul>
+                <div class="grd-row-padding">
+                    <ul class="bullet">
+                        <li><a href="[% request.url_for('payment-agent') %] ">[% l('Payment agent program') %]</a></li>
+                        <li><a href="https://developers.binary.com/">API</a></li>
+                        <li><a href="[% request.url_for('open-source-projects') %]">[% l('Open-source projects') %]</li>
+                        <li><a href="[% request.url_for('white-labels') %]">[% l('White-label offerings') %]</a></li>
+                        <li>[% l('And more') %]</li>
+                    </ul>
+                </div>
             </li>
 
 
@@ -77,10 +72,6 @@
     </p>
 
     <p>[% l('Don’t wait – register to join our binary options affiliate program today!') %]
-
-        <div class="rbox-heading">
-            <h4>[% l('Register') %]</h4>
-        </div>
 
         <div class="center-aligned grd-row-padding">
             <a class="button" href="https://login.binary.com/signup.php">
