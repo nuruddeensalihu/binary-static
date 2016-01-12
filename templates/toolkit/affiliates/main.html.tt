@@ -51,9 +51,8 @@
             <ul class="bullet">
                 <li><a href="[% request.url_for('payment-agent') %] ">[% l('Payment agent program') %]</a></li>
                 <li><a href="https://developers.binary.com/">API</a></li>
-                <li><a href="[% request.url_for('open-source-projects') %]">[% l('Open-source projects') %]</li>
                 <li><a href="[% request.url_for('white-labels') %]">[% l('White-label offerings') %]</a></li>
-                <li>[% l('And more') %]</li>
+                <li><a href="[% request.url_for('partners') %] ">[% l('And more') %]</a></li>
             </ul>
         </span>
 
