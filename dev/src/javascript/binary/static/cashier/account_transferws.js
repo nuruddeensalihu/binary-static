@@ -231,7 +231,7 @@ var account_transferws = (function(){
                                  .attr("value",optionValue)
                                  .text(str));     
                     }
-
+                    secondacct = "";
                     if(value.balance <= 0){
                         $form.find("#transfer_account_transfer option:last").remove();
                     }
@@ -248,7 +248,7 @@ var account_transferws = (function(){
                 while(selectedIndex > 0){
                     $form.find("#transfer_account_transfer option").eq(selectedIndex).remove();
                 }
-                
+
                 if(selectedIndex >=0 ){
                     $form.find("#transfer_account_transfer option").eq(selectedIndex).attr('selected', 'selected');
                 }
