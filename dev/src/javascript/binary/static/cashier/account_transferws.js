@@ -217,7 +217,7 @@ var account_transferws = (function(){
 
                         firstacct = "";
 
-                        if(selectedIndex < 0){
+                        if(selectedIndex < 0 && value.balance){
                             selectedIndex =  index;
                         }    
                     }
@@ -236,7 +236,7 @@ var account_transferws = (function(){
                         $form.find("#transfer_account_transfer option:last").remove();
                     }
                     else{
-                        if(selectedIndex < 0){
+                        if(selectedIndex < 0 ){
                             selectedIndex =  index;
                         } 
                     }
@@ -244,6 +244,11 @@ var account_transferws = (function(){
                 });
                 
                 console.log("the selectedIndex is", selectedIndex);
+
+                while(selectedIndex > 0){
+                    $form.find("#transfer_account_transfer option").eq(selectedIndex).remove();
+                }
+                
                 if(selectedIndex >=0 ){
                     $form.find("#transfer_account_transfer option").eq(selectedIndex).attr('selected', 'selected');
                 }
