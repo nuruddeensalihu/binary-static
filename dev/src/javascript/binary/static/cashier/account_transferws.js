@@ -44,7 +44,7 @@ var account_transferws = (function(){
                         .map( function(value) { 
                             return value.split(')')[0];
                     }); 
-
+        console.log("The matches are ", matches);
         account_from = matches[0];
         account_to = matches[1];
         
@@ -235,6 +235,9 @@ var account_transferws = (function(){
                 $form.find("#transfer_account_transfer option").eq(0).attr('selected', 'selected');
 
                 set_account_from_to();
+
+                console.log("the account_to is", account_to);
+                console.log("the account_from", account_from);
 
                 if((account_bal <=0) && (response.accounts.length > 1) ){
                     $("#client_message").show();
