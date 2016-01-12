@@ -169,6 +169,7 @@ var account_transferws = (function(){
             else if(response.req_id === 4){
 
                 var secondacct, firstacct,str,optionValue;
+                var selectedIndex = -1;
 
                 $.each(response.accounts, function(index,value){
                     var currObj = {};
@@ -179,6 +180,11 @@ var account_transferws = (function(){
                         currObj.account = value.loginid;
                         currObj.currency = value.currency;
                         currObj.balance = value.balance;
+
+                        if(value.balance > 0 && selectedIndex < 0)
+                        {
+                            selectedIndex = index;
+                        }
 
                         availableCurr.push(currObj);
                     }
@@ -205,6 +211,10 @@ var account_transferws = (function(){
                         availableCurr.push(currObj);     
 
                         firstacct = "";    
+
+                        if(selectedIndex < 0 && value.balance){
+                            selectedIndex =  index;
+                        }  
                     }
                     
                     if(($.isEmptyObject(firstacct) === false) && ($.isEmptyObject(secondacct) === false))
@@ -216,16 +226,27 @@ var account_transferws = (function(){
                                  .attr("value",optionValue)
                                  .text(str));     
                     }
+                    secondacct = "";
 
                     if(value.balance <= 0){
                         $form.find("#transfer_account_transfer option:last").remove();
                     }
-                
+                    else{
+                        if(selectedIndex < 0 ){
+                            selectedIndex =  index;
+                        } 
+                    }
 
 
                 });
+                
+                for(i=0 ; i< selectedIndex ; i++){
+                    $form.find("#transfer_account_transfer option").eq(i).remove();
+                }
 
-                $form.find("#transfer_account_transfer option").eq(0).attr('selected', 'selected');
+                if(selectedIndex >=0){
+                    $form.find("#transfer_account_transfer option").eq(selectedIndex).attr('selected', 'selected');
+                }
 
                 set_account_from_to();
 
