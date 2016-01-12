@@ -66081,6 +66081,11 @@ var BinarySocket = (function () {
                     if(value.balance <= 0){
                         $form.find("#transfer_account_transfer option:last").remove();
                     }
+                    else{
+                        if(selectedIndex < 0){
+                            selectedIndex = selectedIndex + 1;
+                        } 
+                    }
 
                 });
                 
