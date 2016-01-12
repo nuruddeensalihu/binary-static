@@ -247,6 +247,9 @@ var account_transferws = (function(){
                 }
                 else if(account_to === undefined || account_from === undefined || $.isEmptyObject(account_to))
                 {
+                    consolelog("What happened to my account",account_to);
+                    console.log("What happened to my account account_from", account_from);
+                    console.log("isEmptyObject", $.isEmptyObject(account_to));
                     $("#client_message").show();
                     $("#client_message p").html(text.localize("The account transfer is unavailable for your account."));
                     $("#success_form").hide();
