@@ -46,11 +46,11 @@
 
         <ul class="checked">
             <li><a href="#commision">[% l('Generous commission') %]</a>[% l(', awarding up to 35% of the net revenue for all trades purchased by your referred clients ') %] </li>
-            <li> <b>[% l('On-time payments ') %]</b>[% l(', without a single exception since our program’s official launch in March 2004, reliably credited to your account by the 15th of each month') %] </li>
-            <li><b>[% l('Dedicated international support') %] </b> [% l(', including an attentive multilingual team and multi-currency payment methods ') %]</li>
-            <li><b>[% l('Robust reporting and marketing tools') %]</b> [% l(', offering everything you need to promote our product and track your earnings') %]</li>
-            <li><b>[% l('High conversion rates and client retention')  %]</b> [% l(', based on the strength of our flexible, secure trading platform ') %]</li>
-            <li><b>[% l('Additional opportunities to earn revenue') %]</b> [% l('through our:') %]
+            <li>[% l('On-time payments, without a single exception since our program’s official launch in March 2004, reliably credited to your account by the 15th of each month') %] </li>
+            <li>[% l('Dedicated international support, including an attentive multilingual team and multi-currency payment methods ') %]</li>
+            <li>[% l('Robust reporting and marketing tools, offering everything you need to promote our product and track your earnings') %]</li>
+            <li>[% l('High conversion rates and client retention, based on the strength of our flexible, secure trading platform ') %]</li>
+            <li>[% l('Additional opportunities to earn revenue through our:') %]
                 <ul class="checked">
                     <li><a href="[% request.url_for('payment-agent') %] ">[% l('Payment agent program') %]</a></li>
                     <li><a href="https://developers.binary.com/">API</a></li>
