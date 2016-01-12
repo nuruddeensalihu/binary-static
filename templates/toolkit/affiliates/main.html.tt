@@ -43,21 +43,19 @@
             <li>[% l('Dedicated international support, including an attentive multilingual team and multi-currency payment methods ') %]</li>
             <li>[% l('Robust reporting and marketing tools, offering everything you need to promote our product and track your earnings') %]</li>
             <li>[% l('High conversion rates and client retention, based on the strength of our flexible, secure trading platform ') %]</li>
-            <li>[% l('Additional opportunities to earn revenue through our:') %]
-                
-                    <ul class="bullet">
-                        <li><a href="[% request.url_for('payment-agent') %] ">[% l('Payment agent program') %]</a></li>
-                        <li><a href="https://developers.binary.com/">API</a></li>
-                        <li><a href="[% request.url_for('open-source-projects') %]">[% l('Open-source projects') %]</li>
-                        <li><a href="[% request.url_for('white-labels') %]">[% l('White-label offerings') %]</a></li>
-                        <li>[% l('And more') %]</li>
-                    </ul>
-               
-            </li>
-
+            <li>[% l('Additional opportunities to earn revenue through our:') %]</li>
 
         </ul>
-
+        <span class="grd-grid-4"></span>
+        <span class="grd-grid-8">
+            <ul class="bullet">
+                <li><a href="[% request.url_for('payment-agent') %] ">[% l('Payment agent program') %]</a></li>
+                <li><a href="https://developers.binary.com/">API</a></li>
+                <li><a href="[% request.url_for('open-source-projects') %]">[% l('Open-source projects') %]</li>
+                <li><a href="[% request.url_for('white-labels') %]">[% l('White-label offerings') %]</a></li>
+                <li>[% l('And more') %]</li>
+            </ul>
+        </span>
 
      </p>
 
