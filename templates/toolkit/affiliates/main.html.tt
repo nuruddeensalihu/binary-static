@@ -38,11 +38,11 @@
         [% l('Apply to join us as an affiliate today. Benefits include:') %]
 
         <ul class="checked">
-            <li><a href="#commision">[% l('Generous commission') %]</a>[% l(', awarding up to 35% of the net revenue for all trades purchased by your referred clients ') %] </li>
-            <li><strong>[% l('On-time payments,') %]</strong>[% l('without a single exception since our program’s official launch in March 2004, reliably credited to your account by the 15th of each month') %] </li>
-            <li><strong>[% l('Dedicated international support,') %] </strong>[% l('including an attentive multilingual team and multi-currency payment methods ') %]</li>
+            <li><a href="#commision">[% l('Generous commission,') %]</a>[% l(' awarding up to 35% of the net revenue for all trades purchased by your referred clients ') %] </li>
+            <li><strong>[% l('On-time payments,') %]</strong>[% l(' without a single exception since our program’s official launch in March 2004, reliably credited to your account by the 15th of each month') %] </li>
+            <li><strong>[% l('Dedicated international support,') %] </strong>[% l(' including an attentive multilingual team and multi-currency payment methods ') %]</li>
             <li><strong>[% l('Robust reporting and marketing tools,') %] </strong> [% l(' offering everything you need to promote our product and track your earnings') %]</li>
-            <li><strong>[% l('High conversion rates and client retention, ')%]</strong>[% l('based on the strength of our flexible, secure trading platform ') %]</li>
+            <li><strong>[% l('High conversion rates and client retention,')%]</strong>[% l(' based on the strength of our flexible, secure trading platform ') %]</li>
             <li><strong>[% l('Additional opportunities to earn revenue through') %] </strong>[% l(' our:') %]</li>
 
         </ul>
