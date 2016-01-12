@@ -66016,6 +66016,8 @@ var BinarySocket = (function () {
 
                 var secondacct, firstacct,str,optionValue;
 
+                console.log("the accounts are ", response.accounts);
+
                 $.each(response.accounts, function(index,value){
                     var currObj = {};
 
