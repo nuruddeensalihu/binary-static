@@ -169,6 +169,7 @@ var account_transferws = (function(){
             else if(response.req_id === 4){
 
                 var secondacct, firstacct,str,optionValue;
+                var selectedIndex = -1;
 
                 console.log("the accounts are ", response.accounts);
 
@@ -184,7 +185,10 @@ var account_transferws = (function(){
                         currObj.account = value.loginid;
                         currObj.currency = value.currency;
                         currObj.balance = value.balance;
-
+                        if(value.balance > 0)
+                        {
+                            selectedIndex = 0;
+                        }
                         availableCurr.push(currObj);
                     }
                     else
@@ -211,7 +215,11 @@ var account_transferws = (function(){
 
                         availableCurr.push(currObj);     
 
-                        firstacct = "";    
+                        firstacct = "";
+
+                        if(selectedIndex < 0){
+                            selectedIndex = selectedIndex + 1;
+                        }    
                     }
                     
                     if(($.isEmptyObject(firstacct) === false) && ($.isEmptyObject(secondacct) === false))
@@ -227,12 +235,12 @@ var account_transferws = (function(){
                     if(value.balance <= 0){
                         $form.find("#transfer_account_transfer option:last").remove();
                     }
-                
-
 
                 });
-
-                $form.find("#transfer_account_transfer option").eq(0).attr('selected', 'selected');
+                
+                if(selectedIndex >=0 ){
+                    $form.find("#transfer_account_transfer option").eq(selectedIndex).attr('selected', 'selected');
+                }
 
                 set_account_from_to();
 
