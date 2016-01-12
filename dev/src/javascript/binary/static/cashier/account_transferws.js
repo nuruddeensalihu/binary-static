@@ -218,7 +218,7 @@ var account_transferws = (function(){
                         firstacct = "";
 
                         if(selectedIndex < 0){
-                            selectedIndex = selectedIndex + 1;
+                            selectedIndex =  index;
                         }    
                     }
                     
@@ -237,7 +237,7 @@ var account_transferws = (function(){
                     }
                     else{
                         if(selectedIndex < 0){
-                            selectedIndex = selectedIndex + 1;
+                            selectedIndex =  index;
                         } 
                     }
 
