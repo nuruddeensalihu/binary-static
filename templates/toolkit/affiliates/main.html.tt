@@ -46,8 +46,8 @@
             <li>[% l('Additional opportunities to earn revenue through our:') %]</li>
 
         </ul>
-        <span class="grd-grid-4"></span>
-        <span class="grd-grid-8">
+        <span class="grd-grid-1"></span>
+        <span class="grd-grid-11">
             <ul class="bullet">
                 <li><a href="[% request.url_for('payment-agent') %] ">[% l('Payment agent program') %]</a></li>
                 <li><a href="https://developers.binary.com/">API</a></li>
