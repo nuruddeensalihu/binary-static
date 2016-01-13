@@ -60966,9 +60966,11 @@ pjax_config_page("market_timesws", function() {
             if(validateForm($form) === false){
                 return false;
             }
-            BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "set_self_exclusion"}});
+            sendRequest();
+
         });
-        BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "get_self_exclusion"}});
+
+        BinarySocket.send({"get_self_exclusion": 1});
 
         self_exclusion_date_picker();
     };
@@ -61033,21 +61035,6 @@ pjax_config_page("market_timesws", function() {
         if(isValid === false){
 
             return false;
-        }
-    };
-
-    var isAuthorized =  function(response){
-        if(response.echo_req.passthrough){
-            var option= response.echo_req.passthrough.value ;
-
-            switch(option){
-                case   "get_self_exclusion" :
-                        BinarySocket.send({"get_self_exclusion": 1});
-                        break;
-                case   "set_self_exclusion" :
-                        sendRequest();
-                        break;                   
-            }
         }
     };
 
@@ -61267,9 +61254,6 @@ pjax_config_page("market_timesws", function() {
         }else if(type === "set_self_exclusion" || (type === "error" && "set_self_exclusion" in response.echo_req))
         {
             responseMessage(response);
-        }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
-        {
-            isAuthorized(response);
         }
     };
 
