@@ -98,12 +98,12 @@
                     <h1>[% l('Terms') %]</h1>
                     <ul>
                         <li class='ja-hide'>
-                            <a class="pjaxload" href="[% request.url_for('/terms-and-conditions', {filecode => 'legal'}) %]"[%
+                            <a class="pjaxload" href="[% request.url_for('/terms-and-conditions') %]"[%
                             IF
                             target %] target="[% target %]"[% END %]>[% l('Terms and Conditions') %]</a>
                         </li>
                         <li class='hidden ja-show-block'>
-                            <a class="pjaxload" href="[% request.url_for('/terms-and-conditions-jp', {filecode => 'legal_jp'}) %]"[%
+                            <a class="pjaxload" href="[% request.url_for('/terms-and-conditions-jp') %]"[%
                             IF
                             target %] target="[% target %]"[% END %]>[% l('Terms and Conditions') %]</a>
                         </li>
@@ -158,7 +158,7 @@
     <div id="footer-regulatory">
         <div class="grd-container grd-default-container">
             <div class="grd-parent grd-grid-12 ja-hide">
-                <div class="grd-grid-2 center">
+                <div class="grd-grid-2">
                     <a href="http://www.gov.im/gambling/" target="_blank">
                         <img id="iom_icon_footer" class="responsive" src="[% request.url_for('images/pages/footer/isle-of-man.png') %]"/>
                     </a>

@@ -61,6 +61,8 @@
         </div>
     </div>
 
+    <p id="no_paymentagent" class="error-msg hidden">[% l('Payment agent is unavailable in your country.') %]</p>
+
     <p>
         [% l('Apply to become a [_1] <a class="pjaxload" href="[_2]">payment agent</a>.', website, apply_payment_agent_url) %]
     </p>

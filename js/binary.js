@@ -53449,19 +53449,14 @@ BetAnalysis.tab_last_digit = new BetAnalysis.DigitInfo();
             }
         },
         get_live_chart: function() {
-          if (document.getElementById('underlying')){
-            showHighchart();
-            setUnderlyingTime();
-          } else {
             var that = this;
             $.ajax(ajax_loggedin({
-                  url     : '/d/trade_livechart.cgi?l=' + page.language(),
-                  dataType: 'html',
-                  success : function (data) {
+              url     : '/d/trade_livechart.cgi?l=' + page.language(),
+              dataType: 'html',
+              success : function (data) {
                     that.set_live_chart(data);
                   },
             }));
-          }
         },
         set_live_chart: function (data) {
             $('#trade_live_chart').html(data);
@@ -53768,9 +53763,6 @@ BetAnalysis.tab_last_digit = new BetAnalysis.DigitInfo();
                 },
                 on_underlying_change: function () {
                     var that = this;
-                    if (MenuContent.is_tab_selected($('#tab_graph')) && document.getElementById('underlying')) {
-                      setUnderlyingTime();
-                    }
                     $('#bet_underlying').on('change', function (event) {
                         BetForm.attributes.model.underlying($(this).val());
                         that.update_for_underlying($(this).val());
@@ -60960,31 +60952,15 @@ pjax_config_page("market_timesws", function() {
 
     var init = function(){
         $form   = $("#selfExclusion");
-        clearErrors();
         $form.find("button").on("click", function(e){
             e.preventDefault();
             e.stopPropagation();
-            clearErrors();
             if(validateForm($form) === false){
                 return false;
             }
-            sendRequest();
-
+            BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "set_self_exclusion"}});
         });
-
-        BinarySocket.send({"get_self_exclusion": 1});
-
-        self_exclusion_date_picker();
-    };
-
-    var clearErrors = function(){
-        $form.find("#exclusionMsg").hide();
-        $form.find("#exclusionMsg").text("");
-        $("#errorMsg").hide();
-        $form.show();
-        $("#exclusionText").show();
-        $("#exclusionTitle").show();
-        $("#errorMsg").text("");
+        BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "get_self_exclusion"}});
     };
 
     var isNormalInteger= function(str) {
@@ -61040,7 +61016,7 @@ pjax_config_page("market_timesws", function() {
             }
         });
 
-        if(validate_exclusion_date() ===false){
+        if(validateDate() ===false){
             isValid = false;
         }
 
@@ -61050,37 +61026,23 @@ pjax_config_page("market_timesws", function() {
         }
     };
 
-    var validate_exclusion_date = function() {
-        var exclusion_date = $('#EXCLUDEUNTIL').val();
-        var date_regex = /^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
-        var error_element_errorEXCLUDEUNTIL = clearInputErrorField('errorEXCLUDEUNTIL');
+    var isAuthorized =  function(response){
+        if(response.echo_req.passthrough){
+            var option= response.echo_req.passthrough.value ;
 
-        if (exclusion_date) {
-
-            if(date_regex.test($('#EXCLUDEUNTIL').val()) === false){
-                error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please select a valid date");
-                return false;
+            switch(option){
+                case   "get_self_exclusion" :
+                        BinarySocket.send({"get_self_exclusion": 1});
+                        break;
+                case   "set_self_exclusion" :
+                        sendRequest();
+                        break;                   
             }
-    
-            exclusion_date = new Date(exclusion_date);
-            // self exclusion date must >= 6 month from now
-            var six_month_date = new Date();
-            six_month_date.setMonth(six_month_date.getMonth() + 6);
-
-            if (exclusion_date < six_month_date) {
-                error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please enter a date that is at least 6 months from now.");
-                return false ;
-            }
-
-            if (confirm(text.localize("When you click 'Ok' you will be excluded from trading on the site until the selected date.")) === true) {
-                return true;
-            } else {
-                return false;
-            }
-
         }
+    };
 
-        return true;
+    var validateDate = function(){
+        return client_form.self_exclusion.validate_exclusion_date();
     };
 
     var populateForm = function(response){
@@ -61089,11 +61051,6 @@ pjax_config_page("market_timesws", function() {
         if("error" in response) {
             if("message" in response.error) {
                 console.log(response.error.message);
-                $("#errorMsg").show();
-                $("#errorMsg").text(text.localize(response.error.message));
-                $form.hide();
-                $("#exclusionText").hide();
-                $("#exclusionTitle").hide();
             }
             return false;
         }else{
@@ -61238,32 +61195,8 @@ pjax_config_page("market_timesws", function() {
             }
             return false;
         }else{
-            $form.find("#exclusionMsg").show();
-            $form.find("#exclusionMsg").text(text.localize('Your changes have been updated.'));
-            BinarySocket.send({"get_self_exclusion": 1});
-
+            window.location.href = window.location.href;
         }
-    };
-
-    var self_exclusion_date_picker = function () {
-        // 6 months from now
-        var start_date = new Date();
-        start_date.setMonth(start_date.getMonth() + 6);
-
-        // 5 years from now
-        var end_date = new Date();
-        end_date.setFullYear(end_date.getFullYear() + 5);
-
-        var id = $('#EXCLUDEUNTIL');
-
-        id.datepicker({
-            dateFormat: 'yy-mm-dd',
-            minDate: start_date,
-            maxDate: end_date,
-            onSelect: function(dateText, inst) {
-                id.attr("value", dateText);
-            },
-        });
     };
 
     var apiResponse = function(response){
@@ -61274,6 +61207,9 @@ pjax_config_page("market_timesws", function() {
         }else if(type === "set_self_exclusion" || (type === "error" && "set_self_exclusion" in response.echo_req))
         {
             responseMessage(response);
+        }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
+        {
+            isAuthorized(response);
         }
     };
 
@@ -61301,12 +61237,10 @@ pjax_config_page("user/self_exclusionws", function() {
                         SelfExlusionWS.apiResponse(response);
                           
                     }
-                },
-                onauth : function(){
-                    SelfExlusionWS.init();
                 }
             });	
-        
+            Exclusion.self_exclusion_date_picker();
+            SelfExlusionWS.init();
         }
     };
 });;onLoad.queue_for_url(function() {
@@ -61391,13 +61325,8 @@ var TradingAnalysis = (function(){
         toggleActiveAnalysisTabs();
 
         if (currentTab === 'tab_graph') {
-          if (document.getElementById('underlying')){
-            showHighchart();
-            setUnderlyingTime();
-          } else {
             BetAnalysis.tab_live_chart.reset();
             BetAnalysis.tab_live_chart.render(true);
-          }
         } else {
             var url = currentLink.getAttribute('href');
             $.ajax({
@@ -62514,8 +62443,8 @@ function showHighchart(){
   var div = document.createElement('div');
   div.className = 'grd-grid-12 chart_div';
 
-  div.innerHTML = '<table width="600px" align="center"><tr id="highchart_duration"><td align="right" width="25%">' +
-                  Content.localize().textDuration + ':</td><td align="left" width="25%"><select id="time_period"><option value="1t">1 ' +
+  div.innerHTML = '<table width="600px" align="center"><tr id="highchart_duration"><td width="25%">' +
+                  Content.localize().textDuration + ':</td><td width="25%"><select id="time_period"><option value="1t">1 ' +
                   Content.localize().textTickResultLabel.toLowerCase() + '</option><option value="1m">1 ' + text.localize("minute").toLowerCase() +
                   '</option><option value="2m">2 ' + Content.localize().textDurationMinutes.toLowerCase() + '</option><option value="3m">3 ' +
                   Content.localize().textDurationMinutes.toLowerCase() +'</option><option value="5m">5 ' + Content.localize().textDurationMinutes.toLowerCase() +
@@ -65316,7 +65245,6 @@ WSTickDisplay.updateChart = function(data) {
 
     var reality_check_url = page.url.url_for('user/reality_check');
     var reality_freq_url  = page.url.url_for('user/reality_check_frequency');
-    var logout_url        = page.url.url_for('logout');
 
     RealityCheck.prototype.setInterval = function (intv) {
         this.interval = intv * 60 * 1000; // convert minutes to millisec
@@ -65478,8 +65406,8 @@ WSTickDisplay.updateChart = function(data) {
             $('#reality-check').remove();
         });
 
-        $('#reality-check .blogout').on('click', function () {
-            window.location.href = logout_url;
+        $('#reality-check #btn_logout').unbind('click').click(function(){
+            BinarySocket.send({"logout": "1"});
         });
         
         var obj = document.getElementById('realityDuration');
@@ -65790,7 +65718,7 @@ var BinarySocket = (function () {
         $("#client_message").hide();
         account_bal = 0;
 
-        BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 1 });
+        BinarySocket.send({ "transfer_between_accounts": "1","req_id" : 4 });
 
         $form.find("button").on("click", function(e){
             e.preventDefault();
@@ -65799,8 +65727,16 @@ var BinarySocket = (function () {
             if(validateForm() === false){
                 return false;
             }
-            
-            BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 2 });
+
+            var amt = $form.find("#acc_transfer_amount").val();
+            BinarySocket.send({ 
+                        "transfer_between_accounts": "1",
+                        "account_from": account_from,
+                        "account_to": account_to,
+                        "currency": currType,
+                        "amount": amt
+            });
+
         });
 
         $form.find("#transfer_account_transfer").on("change",function(){
@@ -65808,7 +65744,7 @@ var BinarySocket = (function () {
            $form.find("#invalid_amount").text("");
            set_account_from_to();
 
-           BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 3});
+           BinarySocket.send({"payout_currencies": "1"});
 
         });
     };
@@ -65845,12 +65781,6 @@ var BinarySocket = (function () {
             isValid = false;
         }
 
-        if($.inArray(currType, payoutCurr) == -1)
-        {
-            $form.find("#invalid_amount").text(text.localize("Invalid currency."));
-            isValid = false;
-        }
-
         return isValid;
     };
 
@@ -65863,40 +65793,6 @@ var BinarySocket = (function () {
         else if(type === "payout_currencies" || (type === "error" && "payout_currencies" in response.echo_req))
         {
             responseMessage(response);
-        }
-        else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
-        {
-            isAuthorized(response);
-        }
-    };
-
-    var isAuthorized =  function(response){
-        if(response.req_id){
-            var option= response.req_id ;
-            var amt = $form.find("#acc_transfer_amount").val();
-
-            switch(option){
-                case    1:
-                        BinarySocket.send({ 
-                            "transfer_between_accounts": "1",
-                            "req_id" : 4
-                        });
-                        break;
-                case    2 :
-                        BinarySocket.send({ 
-                            "transfer_between_accounts": "1",
-                            "account_from": account_from,
-                            "account_to": account_to,
-                            "currency": currType,
-                            "amount": amt
-                        });
-                        break;  
-                case    3:
-                        BinarySocket.send({"payout_currencies": "1"});
-                        break;
-                                   
-            }
-
         }
     };
 
@@ -65947,6 +65843,7 @@ var BinarySocket = (function () {
             else if(response.req_id === 4){
 
                 var secondacct, firstacct,str,optionValue;
+                var selectedIndex = -1;
 
                 $.each(response.accounts, function(index,value){
                     var currObj = {};
@@ -65957,6 +65854,11 @@ var BinarySocket = (function () {
                         currObj.account = value.loginid;
                         currObj.currency = value.currency;
                         currObj.balance = value.balance;
+
+                        if(value.balance > 0 && selectedIndex < 0)
+                        {
+                            selectedIndex = index;
+                        }
 
                         availableCurr.push(currObj);
                     }
@@ -65983,6 +65885,10 @@ var BinarySocket = (function () {
                         availableCurr.push(currObj);     
 
                         firstacct = "";    
+
+                        if(selectedIndex < 0 && value.balance){
+                            selectedIndex =  index;
+                        }  
                     }
                     
                     if(($.isEmptyObject(firstacct) === false) && ($.isEmptyObject(secondacct) === false))
@@ -65994,16 +65900,28 @@ var BinarySocket = (function () {
                                  .attr("value",optionValue)
                                  .text(str));     
                     }
+                    secondacct = "";
 
                     if(value.balance <= 0){
                         $form.find("#transfer_account_transfer option:last").remove();
                     }
-                
+                    else{
+                        if(selectedIndex < 0 ){
+                            selectedIndex =  index;
+                        } 
+                    }
 
 
                 });
+                
+                for(var i = 0; i < selectedIndex; i++){
+                    $form.find("#transfer_account_transfer option").eq(i).remove();
+                }
 
-                $form.find("#transfer_account_transfer option").eq(0).attr('selected', 'selected');
+                if(selectedIndex >=0){
+                    $form.find("#transfer_account_transfer option").eq(selectedIndex).attr('selected', 'selected');
+                }
+        
 
                 set_account_from_to();
 
@@ -66068,22 +65986,46 @@ pjax_config_page("cashier/account_transferws", function() {
 });;var my_accountws = (function(){
 
     "use strict";
+    var currType;
 
     var init = function(){
     	$("#VRT_topup_link").hide();
+    	BinarySocket.send({"authorize": $.cookie('login'), "req_id": 1 });
+    };
 
-        var currType = TUser.get().currency;
-        var bal =  TUser.get().balance;
+    var isAuthorized = function(response){
+    	var str , bal ;
+    	if(response.echo_req.req_id){
+	    	if("error" in response) {
+	            if("message" in response.error) {
+	                console.log(message);
+	            }
+	            return false;
+	        }
+	    	else{
+	    		currType = response.authorize.currency;
+	    		bal =  response.authorize.balance;
+	    		if(parseInt(response.req_id) === 1 && bal < 1000){
+	    			str = "Deposit "+ currType + " 10000 virtual money into your account ";
+	    			$("#VRT_topup_link").show();
+	    			$("#VRT_topup_link a").text(text.localize(str));
+	    		}
+	    	}
+    	}
 
-        if(bal < 1000 && (/^VRT/.test(TUser.get().loginid) === true ) ){
-            var str = "Deposit "+ currType + " 10000 virtual money into your account ";
-            $("#VRT_topup_link").show();
-            $("#VRT_topup_link a").text(text.localize(str));
+    };
+
+    var apiResponse = function(response){
+    	var type = response.msg_type;
+    	if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
+        {
+            isAuthorized(response);
         }
     };
 
     return {
-    	init : init
+    	init : init,
+    	apiResponse : apiResponse
 
     };
 
@@ -66098,19 +66040,24 @@ pjax_config_page("user/my_account", function() {
                 window.location.href = page.url.url_for('login');
                 return;
             }
-
-            BinarySocket.init({
-                onauth : function(){
-                    my_accountws.init();
+        	BinarySocket.init({
+                onmessage: function(msg){
+                    var response = JSON.parse(msg.data);
+                    if (response) {
+                        my_accountws.apiResponse(response);
+                          
+                    }
                 }
+            });	
 
-            });
+            my_accountws.init();
         }
     };
 });;var PaymentAgentListWS = (function() {
     "use strict";
 
-    var ddlCountriesID,
+    var hiddenClass,
+        ddlCountriesID,
         $paListContainer;
 
     var residence,
@@ -66118,6 +66065,7 @@ pjax_config_page("user/my_account", function() {
 
 
     var init = function() {
+        hiddenClass = 'hidden';
         ddlCountriesID = '#target_country';
         $paListContainer = $('#pa_list');
         agentTemplate = $paListContainer.find('#accordion').html();
@@ -66154,28 +66102,32 @@ pjax_config_page("user/my_account", function() {
         $ddlCountries.empty();
 
         var cList = response.paymentagent_list.available_countries;
-        if(cList.length > 0) {
-            var requestedCountry = response.echo_req.paymentagent_list;
-            var found = false;
-            for(var i = 0; i < cList.length; i++) {
-                if(cList[i][0] === requestedCountry) {
-                    found = true;
-                }
-                insertListOption($ddlCountries, cList[i][1], cList[i][0]);
-            }
-
-            if(found) {
-                $ddlCountries.val(requestedCountry);
-                populateAgentsList(response.paymentagent_list.list);
-            }
-            else {
-                sendRequest($ddlCountries.val());
-            }
-
-            $ddlCountries.change(function() {
-                sendRequest();
-            });
+        if(cList.length === 0) {
+            $ddlCountries.parent().addClass(hiddenClass);
+            showEmptyListMsg();
+            return;
         }
+
+        var requestedCountry = response.echo_req.paymentagent_list;
+        var found = false;
+        cList.map(function(country) {
+            if(country === requestedCountry) {
+                found = true;
+            }
+            insertListOption($ddlCountries, country[1], country[0]);
+        });
+
+        if(found) {
+            $ddlCountries.val(requestedCountry);
+            populateAgentsList(response.paymentagent_list.list);
+        }
+        else {
+            sendRequest();
+        }
+
+        $ddlCountries.change(function() {
+            sendRequest();
+        });
     };
 
     var insertListOption = function($ddlObject, itemText, itemValue) {
@@ -66187,7 +66139,7 @@ pjax_config_page("user/my_account", function() {
     // -----------------------
     var populateAgentsList = function(list) {
         if(!list || list.length === 0) {
-            $paListContainer.append($('<p/>', {id: 'no_paymentagent', text: text.localize('There are no available Payment Agents.')}));
+            showEmptyListMsg();
             return;
         }
 
@@ -66229,6 +66181,9 @@ pjax_config_page("user/my_account", function() {
         });
     };
 
+    var showEmptyListMsg = function() {
+        $('#no_paymentagent').removeClass(hiddenClass);
+    };
 
     return {
         init: init,
@@ -66753,12 +66708,29 @@ pjax_config_page("user/settings/securityws", function() {
     	$("#VRT_topup_message").hide();
     	$("#VRT_title").hide();
     	$("#VRT_topup_errorMessage").hide();
-
-        account = TUser.get().loginid;
-        BinarySocket.send({"topup_virtual": 1 });
+    	BinarySocket.send({"authorize": $.cookie('login'), "req_id": 1 });
+    };
+    var isAuthorized = function(response){
+    	if(response.echo_req.req_id){
+	    	if("error" in response) {
+	            if("message" in response.error) {
+	                $("#VRT_topup_errorMessage").show();
+	                $("#VRT_topup_errorMessage").text(text.localize(response.error.message));
+	                $("#VRT_topup_message").hide();
+	                $("#VRT_title").hide();
+	            }
+	            return false;
+	        }
+	    	else{
+	    		if(parseInt(response.req_id) === 1){
+	    			account = response.authorize.loginid;
+	    			BinarySocket.send({"topup_virtual": 1 });
+	    		}
+	    
+	    	}
+    	}
 
     };
-
     var responseMessage = function(response){
     	var str, amt , currType;
 	 	if("error" in response) {
@@ -66788,6 +66760,9 @@ pjax_config_page("user/settings/securityws", function() {
     	if (type === "topup_virtual" || (type === "error" && "topup_virtual" in response.echo_req)){
            responseMessage(response);
 
+        }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
+        {
+            isAuthorized(response);
         }
     };
 
@@ -66812,11 +66787,10 @@ pjax_config_page("cashier/top_up_virtualws", function() {
                         top_up_virtualws.apiResponse(response);
                           
                     }
-                },
-                onauth : function(){
-                    top_up_virtualws.init();
                 }
             });	
+           
+            top_up_virtualws.init();
         }
     };
 });
