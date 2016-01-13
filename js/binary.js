@@ -61236,6 +61236,8 @@ pjax_config_page("market_timesws", function() {
         }else{
             $form.find("#exclusionMsg").show();
             $form.find("#exclusionMsg").text(text.localize('Your changes have been updated.'));
+            BinarySocket.send({"get_self_exclusion": 1});
+
         }
     };
 
