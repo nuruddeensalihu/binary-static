@@ -5,16 +5,19 @@ var my_accountws = (function(){
 
     var init = function(){
     	$("#VRT_topup_link").hide();
-        
+
         var user = TUser.get('login');
         currType = user.currency;
         var bal =  user.balance;
-
+        console.log("the balance is", bal);
+        
         if(bal < 1000){
-            str = "Deposit "+ currType + " 10000 virtual money into your account ";
+            var str = "Deposit "+ currType + " 10000 virtual money into your account ";
             $("#VRT_topup_link").show();
             $("#VRT_topup_link a").text(text.localize(str));
         }
+
+
     };
 
     return {
