@@ -7,10 +7,8 @@ var top_up_virtualws = (function(){
     	$("#VRT_topup_message").hide();
     	$("#VRT_title").hide();
     	$("#VRT_topup_errorMessage").hide();
-    	
-        var user = TUser.get();
 
-        account = user.loginid;
+        account = TUser.get().loginid;
         BinarySocket.send({"topup_virtual": 1 });
 
     };

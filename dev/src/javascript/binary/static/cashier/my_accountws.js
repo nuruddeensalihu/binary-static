@@ -6,9 +6,9 @@ var my_accountws = (function(){
     var init = function(){
     	$("#VRT_topup_link").hide();
 
-        var user = TUser.get();
-        currType = user.currency;
-        var bal =  user.balance;
+
+        currType = TUser.get().currency;
+        var bal =  TUser.get().balance;
         console.log("the balance is", bal);
 
         console.log("the user is ", TUser.get('login'));
