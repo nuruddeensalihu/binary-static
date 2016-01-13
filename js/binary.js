@@ -66056,7 +66056,7 @@ pjax_config_page("cashier/account_transferws", function() {
         var bal =  user.balance;
         console.log("the balance is", bal);
 
-        console.log("the user is ", TUser.login('login'));
+        console.log("the user is ", TUser.get('login'));
 
         if(bal < 1000){
             var str = "Deposit "+ currType + " 10000 virtual money into your account ";
@@ -66733,10 +66733,9 @@ pjax_config_page("user/settings/securityws", function() {
     	$("#VRT_topup_message").hide();
     	$("#VRT_title").hide();
     	$("#VRT_topup_errorMessage").hide();
-    	BinarySocket.send({"authorize": $.cookie('login'), "req_id": 1 });
-
+    	
         var user = TUser.get('login');
-        
+
         account = user.loginid;
         BinarySocket.send({"topup_virtual": 1 });
 
