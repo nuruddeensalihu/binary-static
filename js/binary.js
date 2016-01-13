@@ -65687,6 +65687,7 @@ var BinarySocket = (function () {
                     TUser.set(response.authorize);
                     if(typeof events.onauth === 'function'){
                         events.onauth();
+                        console.log("the events is ", events);
                     }
                     send({balance:1, subscribe: 1});
                     sendBufferedSends();
