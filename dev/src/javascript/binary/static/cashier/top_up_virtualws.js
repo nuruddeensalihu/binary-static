@@ -8,28 +8,16 @@ var top_up_virtualws = (function(){
     	$("#VRT_title").hide();
     	$("#VRT_topup_errorMessage").hide();
     	BinarySocket.send({"authorize": $.cookie('login'), "req_id": 1 });
-    };
-    var isAuthorized = function(response){
-    	if(response.echo_req.req_id){
-	    	if("error" in response) {
-	            if("message" in response.error) {
-	                $("#VRT_topup_errorMessage").show();
-	                $("#VRT_topup_errorMessage").text(text.localize(response.error.message));
-	                $("#VRT_topup_message").hide();
-	                $("#VRT_title").hide();
-	            }
-	            return false;
-	        }
-	    	else{
-	    		if(parseInt(response.req_id) === 1){
-	    			account = response.authorize.loginid;
-	    			BinarySocket.send({"topup_virtual": 1 });
-	    		}
-	    
-	    	}
-    	}
+
+        var user = TUser.get('login');
+        currType = user.currency;
+        bal =  user.balance;
+
+        account = user.loginid;
+        BinarySocket.send({"topup_virtual": 1 });
 
     };
+
     var responseMessage = function(response){
     	var str, amt , currType;
 	 	if("error" in response) {
@@ -59,9 +47,6 @@ var top_up_virtualws = (function(){
     	if (type === "topup_virtual" || (type === "error" && "topup_virtual" in response.echo_req)){
            responseMessage(response);
 
-        }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
-        {
-            isAuthorized(response);
         }
     };
 

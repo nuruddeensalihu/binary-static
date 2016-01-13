@@ -66051,41 +66051,20 @@ pjax_config_page("cashier/account_transferws", function() {
     var init = function(){
     	$("#VRT_topup_link").hide();
     	BinarySocket.send({"authorize": $.cookie('login'), "req_id": 1 });
-    };
 
-    var isAuthorized = function(response){
-    	var str , bal ;
-    	if(response.echo_req.req_id){
-	    	if("error" in response) {
-	            if("message" in response.error) {
-	                console.log(message);
-	            }
-	            return false;
-	        }
-	    	else{
-	    		currType = response.authorize.currency;
-	    		bal =  response.authorize.balance;
-	    		if(parseInt(response.req_id) === 1 && bal < 1000){
-	    			str = "Deposit "+ currType + " 10000 virtual money into your account ";
-	    			$("#VRT_topup_link").show();
-	    			$("#VRT_topup_link a").text(text.localize(str));
-	    		}
-	    	}
-    	}
+        var user = TUser.get('login');
+        currType = user.currency;
+        bal =  user.balance;
 
-    };
-
-    var apiResponse = function(response){
-    	var type = response.msg_type;
-    	if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
-        {
-            isAuthorized(response);
+        if(bal < 1000){
+            str = "Deposit "+ currType + " 10000 virtual money into your account ";
+            $("#VRT_topup_link").show();
+            $("#VRT_topup_link a").text(text.localize(str));
         }
     };
 
     return {
-    	init : init,
-    	apiResponse : apiResponse
+    	init : init
 
     };
 
@@ -66100,15 +66079,6 @@ pjax_config_page("user/my_account", function() {
                 window.location.href = page.url.url_for('login');
                 return;
             }
-        	BinarySocket.init({
-                onmessage: function(msg){
-                    var response = JSON.parse(msg.data);
-                    if (response) {
-                        my_accountws.apiResponse(response);
-                          
-                    }
-                }
-            });	
 
             my_accountws.init();
         }
@@ -66760,28 +66730,16 @@ pjax_config_page("user/settings/securityws", function() {
     	$("#VRT_title").hide();
     	$("#VRT_topup_errorMessage").hide();
     	BinarySocket.send({"authorize": $.cookie('login'), "req_id": 1 });
-    };
-    var isAuthorized = function(response){
-    	if(response.echo_req.req_id){
-	    	if("error" in response) {
-	            if("message" in response.error) {
-	                $("#VRT_topup_errorMessage").show();
-	                $("#VRT_topup_errorMessage").text(text.localize(response.error.message));
-	                $("#VRT_topup_message").hide();
-	                $("#VRT_title").hide();
-	            }
-	            return false;
-	        }
-	    	else{
-	    		if(parseInt(response.req_id) === 1){
-	    			account = response.authorize.loginid;
-	    			BinarySocket.send({"topup_virtual": 1 });
-	    		}
-	    
-	    	}
-    	}
+
+        var user = TUser.get('login');
+        currType = user.currency;
+        bal =  user.balance;
+
+        account = user.loginid;
+        BinarySocket.send({"topup_virtual": 1 });
 
     };
+
     var responseMessage = function(response){
     	var str, amt , currType;
 	 	if("error" in response) {
@@ -66811,9 +66769,6 @@ pjax_config_page("user/settings/securityws", function() {
     	if (type === "topup_virtual" || (type === "error" && "topup_virtual" in response.echo_req)){
            responseMessage(response);
 
-        }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
-        {
-            isAuthorized(response);
         }
     };
 
