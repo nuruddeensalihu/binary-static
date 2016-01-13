@@ -5,8 +5,7 @@ var my_accountws = (function(){
 
     var init = function(){
     	$("#VRT_topup_link").hide();
-    	BinarySocket.send({"authorize": $.cookie('login'), "req_id": 1 });
-
+        
         var user = TUser.get('login');
         currType = user.currency;
         var bal =  user.balance;
