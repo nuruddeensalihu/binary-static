@@ -9,9 +9,10 @@ var my_accountws = (function(){
 
         currType = TUser.get().currency;
         var bal =  TUser.get().balance;
+
         console.log("the balance is", bal);
 
-        console.log("the user is ", TUser.get('login'));
+        console.log("the user is ", TUser.get());
 
         if(bal < 1000){
             var str = "Deposit "+ currType + " 10000 virtual money into your account ";
