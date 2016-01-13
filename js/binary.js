@@ -60952,15 +60952,31 @@ pjax_config_page("market_timesws", function() {
 
     var init = function(){
         $form   = $("#selfExclusion");
+        clearErrors();
         $form.find("button").on("click", function(e){
             e.preventDefault();
             e.stopPropagation();
+            clearErrors();
             if(validateForm($form) === false){
                 return false;
             }
-            BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "set_self_exclusion"}});
+            sendRequest();
+
         });
-        BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "get_self_exclusion"}});
+
+        BinarySocket.send({"get_self_exclusion": 1});
+
+        self_exclusion_date_picker();
+    };
+
+    var clearErrors = function(){
+        $form.find("#exclusionMsg").hide();
+        $form.find("#exclusionMsg").text("");
+        $("#errorMsg").hide();
+        $form.show();
+        $("#exclusionText").show();
+        $("#exclusionTitle").show();
+        $("#errorMsg").text("");
     };
 
     var isNormalInteger= function(str) {
@@ -61016,7 +61032,7 @@ pjax_config_page("market_timesws", function() {
             }
         });
 
-        if(validateDate() ===false){
+        if(validate_exclusion_date() ===false){
             isValid = false;
         }
 
@@ -61026,23 +61042,37 @@ pjax_config_page("market_timesws", function() {
         }
     };
 
-    var isAuthorized =  function(response){
-        if(response.echo_req.passthrough){
-            var option= response.echo_req.passthrough.value ;
+    var validate_exclusion_date = function() {
+        var exclusion_date = $('#EXCLUDEUNTIL').val();
+        var date_regex = /^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
+        var error_element_errorEXCLUDEUNTIL = clearInputErrorField('errorEXCLUDEUNTIL');
 
-            switch(option){
-                case   "get_self_exclusion" :
-                        BinarySocket.send({"get_self_exclusion": 1});
-                        break;
-                case   "set_self_exclusion" :
-                        sendRequest();
-                        break;                   
+        if (exclusion_date) {
+
+            if(date_regex.test($('#EXCLUDEUNTIL').val()) === false){
+                error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please select a valid date");
+                return false;
             }
-        }
-    };
+    
+            exclusion_date = new Date(exclusion_date);
+            // self exclusion date must >= 6 month from now
+            var six_month_date = new Date();
+            six_month_date.setMonth(six_month_date.getMonth() + 6);
 
-    var validateDate = function(){
-        return client_form.self_exclusion.validate_exclusion_date();
+            if (exclusion_date < six_month_date) {
+                error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please enter a date that is at least 6 months from now.");
+                return false ;
+            }
+
+            if (confirm(text.localize("When you click 'Ok' you will be excluded from trading on the site until the selected date.")) === true) {
+                return true;
+            } else {
+                return false;
+            }
+
+        }
+
+        return true;
     };
 
     var populateForm = function(response){
@@ -61051,6 +61081,11 @@ pjax_config_page("market_timesws", function() {
         if("error" in response) {
             if("message" in response.error) {
                 console.log(response.error.message);
+                $("#errorMsg").show();
+                $("#errorMsg").text(text.localize(response.error.message));
+                $form.hide();
+                $("#exclusionText").hide();
+                $("#exclusionTitle").hide();
             }
             return false;
         }else{
@@ -61195,8 +61230,32 @@ pjax_config_page("market_timesws", function() {
             }
             return false;
         }else{
-            window.location.href = window.location.href;
+            $form.find("#exclusionMsg").show();
+            $form.find("#exclusionMsg").text(text.localize('Your changes have been updated.'));
+            BinarySocket.send({"get_self_exclusion": 1});
+
         }
+    };
+
+    var self_exclusion_date_picker = function () {
+        // 6 months from now
+        var start_date = new Date();
+        start_date.setMonth(start_date.getMonth() + 6);
+
+        // 5 years from now
+        var end_date = new Date();
+        end_date.setFullYear(end_date.getFullYear() + 5);
+
+        var id = $('#EXCLUDEUNTIL');
+
+        id.datepicker({
+            dateFormat: 'yy-mm-dd',
+            minDate: start_date,
+            maxDate: end_date,
+            onSelect: function(dateText, inst) {
+                id.attr("value", dateText);
+            },
+        });
     };
 
     var apiResponse = function(response){
@@ -61207,9 +61266,6 @@ pjax_config_page("market_timesws", function() {
         }else if(type === "set_self_exclusion" || (type === "error" && "set_self_exclusion" in response.echo_req))
         {
             responseMessage(response);
-        }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
-        {
-            isAuthorized(response);
         }
     };
 
@@ -61237,10 +61293,12 @@ pjax_config_page("user/self_exclusionws", function() {
                         SelfExlusionWS.apiResponse(response);
                           
                     }
+                },
+                onauth : function(){
+                    SelfExlusionWS.init();
                 }
             });	
-            Exclusion.self_exclusion_date_picker();
-            SelfExlusionWS.init();
+        
         }
     };
 });;onLoad.queue_for_url(function() {
@@ -65986,46 +66044,22 @@ pjax_config_page("cashier/account_transferws", function() {
 });;var my_accountws = (function(){
 
     "use strict";
-    var currType;
 
     var init = function(){
     	$("#VRT_topup_link").hide();
-    	BinarySocket.send({"authorize": $.cookie('login'), "req_id": 1 });
-    };
 
-    var isAuthorized = function(response){
-    	var str , bal ;
-    	if(response.echo_req.req_id){
-	    	if("error" in response) {
-	            if("message" in response.error) {
-	                console.log(message);
-	            }
-	            return false;
-	        }
-	    	else{
-	    		currType = response.authorize.currency;
-	    		bal =  response.authorize.balance;
-	    		if(parseInt(response.req_id) === 1 && bal < 1000){
-	    			str = "Deposit "+ currType + " 10000 virtual money into your account ";
-	    			$("#VRT_topup_link").show();
-	    			$("#VRT_topup_link a").text(text.localize(str));
-	    		}
-	    	}
-    	}
+        var currType = TUser.get().currency;
+        var bal =  TUser.get().balance;
 
-    };
-
-    var apiResponse = function(response){
-    	var type = response.msg_type;
-    	if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
-        {
-            isAuthorized(response);
+        if(bal < 1000 && (/^VRT/.test(TUser.get().loginid) === true ) ){
+            var str = "Deposit "+ currType + " 10000 virtual money into your account ";
+            $("#VRT_topup_link").show();
+            $("#VRT_topup_link a").text(text.localize(str));
         }
     };
 
     return {
-    	init : init,
-    	apiResponse : apiResponse
+    	init : init
 
     };
 
@@ -66040,17 +66074,13 @@ pjax_config_page("user/my_account", function() {
                 window.location.href = page.url.url_for('login');
                 return;
             }
-        	BinarySocket.init({
-                onmessage: function(msg){
-                    var response = JSON.parse(msg.data);
-                    if (response) {
-                        my_accountws.apiResponse(response);
-                          
-                    }
-                }
-            });	
 
-            my_accountws.init();
+            BinarySocket.init({
+                onauth : function(){
+                    my_accountws.init();
+                }
+
+            });
         }
     };
 });;var PaymentAgentListWS = (function() {
@@ -66708,29 +66738,12 @@ pjax_config_page("user/settings/securityws", function() {
     	$("#VRT_topup_message").hide();
     	$("#VRT_title").hide();
     	$("#VRT_topup_errorMessage").hide();
-    	BinarySocket.send({"authorize": $.cookie('login'), "req_id": 1 });
-    };
-    var isAuthorized = function(response){
-    	if(response.echo_req.req_id){
-	    	if("error" in response) {
-	            if("message" in response.error) {
-	                $("#VRT_topup_errorMessage").show();
-	                $("#VRT_topup_errorMessage").text(text.localize(response.error.message));
-	                $("#VRT_topup_message").hide();
-	                $("#VRT_title").hide();
-	            }
-	            return false;
-	        }
-	    	else{
-	    		if(parseInt(response.req_id) === 1){
-	    			account = response.authorize.loginid;
-	    			BinarySocket.send({"topup_virtual": 1 });
-	    		}
-	    
-	    	}
-    	}
+
+        account = TUser.get().loginid;
+        BinarySocket.send({"topup_virtual": 1 });
 
     };
+
     var responseMessage = function(response){
     	var str, amt , currType;
 	 	if("error" in response) {
@@ -66760,9 +66773,6 @@ pjax_config_page("user/settings/securityws", function() {
     	if (type === "topup_virtual" || (type === "error" && "topup_virtual" in response.echo_req)){
            responseMessage(response);
 
-        }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
-        {
-            isAuthorized(response);
         }
     };
 
@@ -66787,10 +66797,11 @@ pjax_config_page("cashier/top_up_virtualws", function() {
                         top_up_virtualws.apiResponse(response);
                           
                     }
+                },
+                onauth : function(){
+                    top_up_virtualws.init();
                 }
             });	
-           
-            top_up_virtualws.init();
         }
     };
 });
