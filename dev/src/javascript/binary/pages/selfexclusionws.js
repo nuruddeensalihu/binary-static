@@ -29,6 +29,7 @@ var SelfExlusionWS = (function(){
         $form.find("#exclusionMsg").text("");
         $("#errorMsg").hide();
         $form.show();
+        $("#exclusionText").show();
         $("#errorMsg").text("");
     };
 
@@ -137,6 +138,7 @@ var SelfExlusionWS = (function(){
                 $("#errorMsg").show();
                 $("#errorMsg").text(text.localize(response.error.message));
                 $form.hide();
+                $("#exclusionText").hide();
             }
             return false;
         }else{

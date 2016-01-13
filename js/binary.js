@@ -60982,6 +60982,7 @@ pjax_config_page("market_timesws", function() {
         $form.find("#exclusionMsg").text("");
         $("#errorMsg").hide();
         $form.show();
+        $("#exclusionText").show();
         $("#errorMsg").text("");
     };
 
@@ -61090,6 +61091,7 @@ pjax_config_page("market_timesws", function() {
                 $("#errorMsg").show();
                 $("#errorMsg").text(text.localize(response.error.message));
                 $form.hide();
+                $("#exclusionText").hide();
             }
             return false;
         }else{
