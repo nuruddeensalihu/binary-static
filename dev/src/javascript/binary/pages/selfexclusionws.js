@@ -27,8 +27,9 @@ var SelfExlusionWS = (function(){
     var clearErrors = function(){
         $form.find("#exclusionMsg").hide();
         $form.find("#exclusionMsg").text("");
-        $form.find("#errorMsg").hide();
-        $form.find("#errorMsg").text("");
+        $("#errorMsg").hide();
+        $form.show();
+        $("#errorMsg").text("");
     };
 
     var isNormalInteger= function(str) {
@@ -133,8 +134,9 @@ var SelfExlusionWS = (function(){
         if("error" in response) {
             if("message" in response.error) {
                 console.log(response.error.message);
-                $form.find("#errorMsg").show();
-                $form.find("#errorMsg").text(text.localize(response.error.message));
+                $("#errorMsg").show();
+                $("#errorMsg").text(text.localize(response.error.message));
+                $form.hide();
             }
             return false;
         }else{
