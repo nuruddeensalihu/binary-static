@@ -65687,7 +65687,6 @@ var BinarySocket = (function () {
                     TUser.set(response.authorize);
                     if(typeof events.onauth === 'function'){
                         events.onauth();
-                        console.log("the events is ", events);
                     }
                     send({balance:1, subscribe: 1});
                     sendBufferedSends();
@@ -66086,7 +66085,13 @@ pjax_config_page("user/my_account", function() {
                 return;
             }
 
-            my_accountws.init();
+            BinarySocket.init({
+                onauth : function(){
+                    my_accountws.init();
+                }
+
+            });
+           // my_accountws.init();
         }
     };
 });;var PaymentAgentListWS = (function() {
@@ -66797,10 +66802,13 @@ pjax_config_page("cashier/top_up_virtualws", function() {
                         top_up_virtualws.apiResponse(response);
                           
                     }
+                },
+                onauth : function(){
+                    top_up_virtualws.init();
                 }
             });	
            
-            top_up_virtualws.init();
+            //top_up_virtualws.init();
         }
     };
 });

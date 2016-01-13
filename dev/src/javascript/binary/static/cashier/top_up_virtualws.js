@@ -69,10 +69,13 @@ pjax_config_page("cashier/top_up_virtualws", function() {
                         top_up_virtualws.apiResponse(response);
                           
                     }
+                },
+                onauth : function(){
+                    top_up_virtualws.init();
                 }
             });	
            
-            top_up_virtualws.init();
+            //top_up_virtualws.init();
         }
     };
 });

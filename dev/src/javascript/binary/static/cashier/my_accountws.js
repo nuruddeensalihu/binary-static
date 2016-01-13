@@ -40,7 +40,13 @@ pjax_config_page("user/my_account", function() {
                 return;
             }
 
-            my_accountws.init();
+            BinarySocket.init({
+                onauth : function(){
+                    my_accountws.init();
+                }
+
+            });
+           // my_accountws.init();
         }
     };
 });
