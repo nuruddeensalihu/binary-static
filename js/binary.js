@@ -66054,7 +66054,7 @@ pjax_config_page("cashier/account_transferws", function() {
 
         var user = TUser.get('login');
         currType = user.currency;
-        bal =  user.balance;
+        var bal =  user.balance;
 
         if(bal < 1000){
             str = "Deposit "+ currType + " 10000 virtual money into your account ";
