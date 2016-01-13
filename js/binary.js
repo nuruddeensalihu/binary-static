@@ -61223,7 +61223,7 @@ pjax_config_page("market_timesws", function() {
             }
             return false;
         }else{
-            $form.find("#exclusionMsg").hide();
+            $form.find("#exclusionMsg").show();
         }
     };
 

@@ -270,7 +270,7 @@ var SelfExlusionWS = (function(){
             }
             return false;
         }else{
-            $form.find("#exclusionMsg").hide();
+            $form.find("#exclusionMsg").show();
         }
     };
 
