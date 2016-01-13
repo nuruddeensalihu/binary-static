@@ -61231,7 +61231,10 @@ pjax_config_page("market_timesws", function() {
 
             }
             return false;
-        }else{
+        }
+        else
+        {
+            clearErrors();
             $form.find("#exclusionMsg").show();
             $form.find("#exclusionMsg").text(text.localize('Your changes have been updated.'));
         }
