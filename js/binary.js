@@ -66735,8 +66735,11 @@ pjax_config_page("user/settings/securityws", function() {
     	$("#VRT_title").hide();
     	$("#VRT_topup_errorMessage").hide();
 
-        account = TUser.get().loginid;
         BinarySocket.send({"topup_virtual": 1 });
+
+
+        account = TUser.get().loginid;
+        console.log("the account is", account);
 
     };
 
