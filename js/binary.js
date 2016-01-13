@@ -66734,9 +66734,7 @@ pjax_config_page("user/settings/securityws", function() {
     	BinarySocket.send({"authorize": $.cookie('login'), "req_id": 1 });
 
         var user = TUser.get('login');
-        currType = user.currency;
-        bal =  user.balance;
-
+        
         account = user.loginid;
         BinarySocket.send({"topup_virtual": 1 });
 
