@@ -7,9 +7,11 @@ var SelfExlusionWS = (function(){
 
     var init = function(){
         $form   = $("#selfExclusion");
+        $form.find("#exclusionMsg").hide();
         $form.find("button").on("click", function(e){
             e.preventDefault();
             e.stopPropagation();
+            $form.find("#exclusionMsg").hide();
             if(validateForm($form) === false){
                 return false;
             }
@@ -268,7 +270,7 @@ var SelfExlusionWS = (function(){
             }
             return false;
         }else{
-            window.location.href = window.location.href;
+            $form.find("#exclusionMsg").hide();
         }
     };
 

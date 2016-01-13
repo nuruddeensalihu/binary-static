@@ -140,6 +140,7 @@
 		        		</span>
 		      		    <p class="errorfield" id="invalidinputfound">
 		       			</p>
+		       			<p class="success-msg" id="exclusionMsg">[% l('Your changes has been updated. ') %]</p>
 	       			</div>
 	      		</div>  
 

@@ -60960,9 +60960,11 @@ pjax_config_page("market_timesws", function() {
 
     var init = function(){
         $form   = $("#selfExclusion");
+        $form.find("#exclusionMsg").hide();
         $form.find("button").on("click", function(e){
             e.preventDefault();
             e.stopPropagation();
+            $form.find("#exclusionMsg").hide();
             if(validateForm($form) === false){
                 return false;
             }
@@ -61221,7 +61223,7 @@ pjax_config_page("market_timesws", function() {
             }
             return false;
         }else{
-            window.location.href = window.location.href;
+            $form.find("#exclusionMsg").hide();
         }
     };
 
