@@ -10,7 +10,9 @@ var my_accountws = (function(){
         currType = user.currency;
         var bal =  user.balance;
         console.log("the balance is", bal);
-        
+
+        console.log("the user is ", TUser.get('login'));
+
         if(bal < 1000){
             var str = "Deposit "+ currType + " 10000 virtual money into your account ";
             $("#VRT_topup_link").show();

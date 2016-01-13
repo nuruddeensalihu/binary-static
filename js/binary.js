@@ -66055,7 +66055,9 @@ pjax_config_page("cashier/account_transferws", function() {
         currType = user.currency;
         var bal =  user.balance;
         console.log("the balance is", bal);
-        
+
+        console.log("the user is ", TUser.login('login'));
+
         if(bal < 1000){
             var str = "Deposit "+ currType + " 10000 virtual money into your account ";
             $("#VRT_topup_link").show();
