@@ -60969,6 +60969,8 @@ pjax_config_page("market_timesws", function() {
             BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "set_self_exclusion"}});
         });
         BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "get_self_exclusion"}});
+
+        self_exclusion_date_picker();
     };
 
     var isNormalInteger= function(str) {
@@ -61024,7 +61026,7 @@ pjax_config_page("market_timesws", function() {
             }
         });
 
-        if(validateDate() ===false){
+        if(validate_exclusion_date() ===false){
             isValid = false;
         }
 
@@ -61049,8 +61051,37 @@ pjax_config_page("market_timesws", function() {
         }
     };
 
-    var validateDate = function(){
-        return client_form.self_exclusion.validate_exclusion_date();
+    validate_exclusion_date = function() {
+        var exclusion_date = $('#EXCLUDEUNTIL').val();
+        var date_regex = /^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
+        var error_element_errorEXCLUDEUNTIL = clearInputErrorField('errorEXCLUDEUNTIL');
+
+        if (exclusion_date) {
+
+            if(date_regex.test($('#EXCLUDEUNTIL').val()) === false){
+                error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please select a valid date");
+                return false;
+            }
+    
+            exclusion_date = new Date(exclusion_date);
+            // self exclusion date must >= 6 month from now
+            var six_month_date = new Date();
+            six_month_date.setMonth(six_month_date.getMonth() + 6);
+
+            if (exclusion_date < six_month_date) {
+                error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please enter a date that is at least 6 months from now.");
+                return false ;
+            }
+
+            if (confirm(text.localize("When you click 'Ok' you will be excluded from trading on the site until the selected date.")) === true) {
+                return true;
+            } else {
+                return false;
+            }
+
+        }
+
+        return true;
     };
 
     var populateForm = function(response){
@@ -61207,6 +61238,27 @@ pjax_config_page("market_timesws", function() {
         }
     };
 
+    var self_exclusion_date_picker = function () {
+        // 6 months from now
+        var start_date = new Date();
+        start_date.setMonth(start_date.getMonth() + 6);
+
+        // 5 years from now
+        var end_date = new Date();
+        end_date.setFullYear(end_date.getFullYear() + 5);
+
+        var id = $('#EXCLUDEUNTIL');
+
+        id.datepicker({
+            dateFormat: 'yy-mm-dd',
+            minDate: start_date,
+            maxDate: end_date,
+            onSelect: function(dateText, inst) {
+                id.attr("value", dateText);
+            },
+        });
+    };
+
     var apiResponse = function(response){
         var type = response.msg_type;
     
@@ -61247,7 +61299,7 @@ pjax_config_page("user/self_exclusionws", function() {
                     }
                 }
             });	
-            Exclusion.self_exclusion_date_picker();
+        
             SelfExlusionWS.init();
         }
     };
@@ -63589,7 +63641,7 @@ var TradingEvents = (function () {
         var durationAmountElement = document.getElementById('duration_amount');
         if (durationAmountElement) {
             // jquery needed for datepicker
-            $('#duration_amount').on('change', debounce(function (e) {
+            $('#duration_amount').on('input', debounce(function (e) {
                 if (e.target.value % 1 !== 0 ) {
                     e.target.value = Math.floor(e.target.value);
                 }
@@ -65889,7 +65941,6 @@ var BinarySocket = (function () {
             else if(response.req_id === 4){
 
                 var secondacct, firstacct,str,optionValue;
-                var selectedIndex = -1;
 
                 $.each(response.accounts, function(index,value){
                     var currObj = {};
@@ -65900,11 +65951,6 @@ var BinarySocket = (function () {
                         currObj.account = value.loginid;
                         currObj.currency = value.currency;
                         currObj.balance = value.balance;
-
-                        if(value.balance > 0 && selectedIndex < 0)
-                        {
-                            selectedIndex = index;
-                        }
 
                         availableCurr.push(currObj);
                     }
@@ -65931,10 +65977,6 @@ var BinarySocket = (function () {
                         availableCurr.push(currObj);     
 
                         firstacct = "";    
-
-                        if(selectedIndex < 0 && value.balance){
-                            selectedIndex =  index;
-                        }  
                     }
                     
                     if(($.isEmptyObject(firstacct) === false) && ($.isEmptyObject(secondacct) === false))
@@ -65946,28 +65988,16 @@ var BinarySocket = (function () {
                                  .attr("value",optionValue)
                                  .text(str));     
                     }
-                    secondacct = "";
 
                     if(value.balance <= 0){
                         $form.find("#transfer_account_transfer option:last").remove();
                     }
-                    else{
-                        if(selectedIndex < 0 ){
-                            selectedIndex =  index;
-                        } 
-                    }
+                
 
 
                 });
-                
-                for(var i = 0; i < selectedIndex; i++){
-                    $form.find("#transfer_account_transfer option").eq(i).remove();
-                }
 
-                if(selectedIndex >=0){
-                    $form.find("#transfer_account_transfer option").eq(selectedIndex).attr('selected', 'selected');
-                }
-        
+                $form.find("#transfer_account_transfer option").eq(0).attr('selected', 'selected');
 
                 set_account_from_to();
 

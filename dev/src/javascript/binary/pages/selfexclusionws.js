@@ -16,6 +16,8 @@ var SelfExlusionWS = (function(){
             BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "set_self_exclusion"}});
         });
         BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "get_self_exclusion"}});
+
+        self_exclusion_date_picker();
     };
 
     var isNormalInteger= function(str) {
@@ -71,7 +73,7 @@ var SelfExlusionWS = (function(){
             }
         });
 
-        if(validateDate() ===false){
+        if(validate_exclusion_date() ===false){
             isValid = false;
         }
 
@@ -96,8 +98,37 @@ var SelfExlusionWS = (function(){
         }
     };
 
-    var validateDate = function(){
-        return client_form.self_exclusion.validate_exclusion_date();
+    validate_exclusion_date = function() {
+        var exclusion_date = $('#EXCLUDEUNTIL').val();
+        var date_regex = /^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
+        var error_element_errorEXCLUDEUNTIL = clearInputErrorField('errorEXCLUDEUNTIL');
+
+        if (exclusion_date) {
+
+            if(date_regex.test($('#EXCLUDEUNTIL').val()) === false){
+                error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please select a valid date");
+                return false;
+            }
+    
+            exclusion_date = new Date(exclusion_date);
+            // self exclusion date must >= 6 month from now
+            var six_month_date = new Date();
+            six_month_date.setMonth(six_month_date.getMonth() + 6);
+
+            if (exclusion_date < six_month_date) {
+                error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please enter a date that is at least 6 months from now.");
+                return false ;
+            }
+
+            if (confirm(text.localize("When you click 'Ok' you will be excluded from trading on the site until the selected date.")) === true) {
+                return true;
+            } else {
+                return false;
+            }
+
+        }
+
+        return true;
     };
 
     var populateForm = function(response){
@@ -254,6 +285,27 @@ var SelfExlusionWS = (function(){
         }
     };
 
+    var self_exclusion_date_picker = function () {
+        // 6 months from now
+        var start_date = new Date();
+        start_date.setMonth(start_date.getMonth() + 6);
+
+        // 5 years from now
+        var end_date = new Date();
+        end_date.setFullYear(end_date.getFullYear() + 5);
+
+        var id = $('#EXCLUDEUNTIL');
+
+        id.datepicker({
+            dateFormat: 'yy-mm-dd',
+            minDate: start_date,
+            maxDate: end_date,
+            onSelect: function(dateText, inst) {
+                id.attr("value", dateText);
+            },
+        });
+    };
+
     var apiResponse = function(response){
         var type = response.msg_type;
     
@@ -294,7 +346,7 @@ pjax_config_page("user/self_exclusionws", function() {
                     }
                 }
             });	
-            Exclusion.self_exclusion_date_picker();
+        
             SelfExlusionWS.init();
         }
     };
