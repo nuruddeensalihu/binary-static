@@ -66051,7 +66051,7 @@ pjax_config_page("cashier/account_transferws", function() {
     var init = function(){
     	$("#VRT_topup_link").hide();
 
-        var user = TUser.get('login');
+        var user = TUser.get();
         currType = user.currency;
         var bal =  user.balance;
         console.log("the balance is", bal);
@@ -66734,7 +66734,7 @@ pjax_config_page("user/settings/securityws", function() {
     	$("#VRT_title").hide();
     	$("#VRT_topup_errorMessage").hide();
     	
-        var user = TUser.get('login');
+        var user = TUser.get();
 
         account = user.loginid;
         BinarySocket.send({"topup_virtual": 1 });
