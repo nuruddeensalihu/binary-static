@@ -8,11 +8,8 @@ var top_up_virtualws = (function(){
     	$("#VRT_title").hide();
     	$("#VRT_topup_errorMessage").hide();
 
-        BinarySocket.send({"topup_virtual": 1 });
-
-
         account = TUser.get().loginid;
-        console.log("the account is", account);
+        BinarySocket.send({"topup_virtual": 1 });
 
     };
 
@@ -74,8 +71,6 @@ pjax_config_page("cashier/top_up_virtualws", function() {
                     top_up_virtualws.init();
                 }
             });	
-           
-            //top_up_virtualws.init();
         }
     };
 });

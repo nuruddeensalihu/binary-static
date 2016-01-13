@@ -66059,7 +66059,7 @@ pjax_config_page("cashier/account_transferws", function() {
 
         console.log("the user is ", TUser.get());
 
-        if(bal < 1000){
+        if(bal < 1000 && (/^VRT/.test(TUser.get().loginid) === true ) ){
             var str = "Deposit "+ currType + " 10000 virtual money into your account ";
             $("#VRT_topup_link").show();
             $("#VRT_topup_link a").text(text.localize(str));
@@ -66091,7 +66091,6 @@ pjax_config_page("user/my_account", function() {
                 }
 
             });
-           // my_accountws.init();
         }
     };
 });;var PaymentAgentListWS = (function() {
@@ -66741,11 +66740,8 @@ pjax_config_page("user/settings/securityws", function() {
     	$("#VRT_title").hide();
     	$("#VRT_topup_errorMessage").hide();
 
-        BinarySocket.send({"topup_virtual": 1 });
-
-
         account = TUser.get().loginid;
-        console.log("the account is", account);
+        BinarySocket.send({"topup_virtual": 1 });
 
     };
 
@@ -66807,8 +66803,6 @@ pjax_config_page("cashier/top_up_virtualws", function() {
                     top_up_virtualws.init();
                 }
             });	
-           
-            //top_up_virtualws.init();
         }
     };
 });

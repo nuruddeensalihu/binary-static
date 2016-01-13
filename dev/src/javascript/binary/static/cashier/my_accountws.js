@@ -14,7 +14,7 @@ var my_accountws = (function(){
 
         console.log("the user is ", TUser.get());
 
-        if(bal < 1000){
+        if(bal < 1000 && (/^VRT/.test(TUser.get().loginid) === true ) ){
             var str = "Deposit "+ currType + " 10000 virtual money into your account ";
             $("#VRT_topup_link").show();
             $("#VRT_topup_link a").text(text.localize(str));
@@ -46,7 +46,6 @@ pjax_config_page("user/my_account", function() {
                 }
 
             });
-           // my_accountws.init();
         }
     };
 });
