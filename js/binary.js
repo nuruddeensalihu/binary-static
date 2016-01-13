@@ -60960,11 +60960,11 @@ pjax_config_page("market_timesws", function() {
 
     var init = function(){
         $form   = $("#selfExclusion");
-        $form.find("#exclusionMsg").hide();
+        clearErrors();
         $form.find("button").on("click", function(e){
             e.preventDefault();
             e.stopPropagation();
-            $form.find("#exclusionMsg").hide();
+            clearErrors();
             if(validateForm($form) === false){
                 return false;
             }
@@ -60975,6 +60975,13 @@ pjax_config_page("market_timesws", function() {
         BinarySocket.send({"get_self_exclusion": 1});
 
         self_exclusion_date_picker();
+    };
+
+    var clearErrors = function(){
+        $form.find("#exclusionMsg").hide();
+        $form.find("#exclusionMsg").text("");
+        $form.find("#errorMsg").hide();
+        $form.find("#errorMsg").text("");
     };
 
     var isNormalInteger= function(str) {
@@ -61079,6 +61086,8 @@ pjax_config_page("market_timesws", function() {
         if("error" in response) {
             if("message" in response.error) {
                 console.log(response.error.message);
+                $form.find("#errorMsg").show();
+                $form.find("#errorMsg").text(text.localize(response.error.message));
             }
             return false;
         }else{
@@ -61224,6 +61233,7 @@ pjax_config_page("market_timesws", function() {
             return false;
         }else{
             $form.find("#exclusionMsg").show();
+            $form.find("#exclusionMsg").text(text.localize('Your changes have been updated.'));
         }
     };
 
