@@ -66248,10 +66248,12 @@ pjax_config_page("user/my_account", function() {
 
             BinarySocket.init({
                 onauth : function(){
-                    my_account.init();
+                   // my_account.init();
                 }
 
             });
+
+            my_account.init();
         }
     };
 });;var my_accountws = (function(){
