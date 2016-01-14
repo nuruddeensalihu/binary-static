@@ -31,13 +31,7 @@ pjax_config_page("user/my_account", function() {
                 window.location.href = page.url.url_for('login');
                 return;
             }
-
-            BinarySocket.init({
-                onauth : function(){
-                    my_account.init();
-                }
-
-            });
+            my_account.init();
         }
     };
 });
