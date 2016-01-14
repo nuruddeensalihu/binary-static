@@ -61295,9 +61295,11 @@ pjax_config_page("user/self_exclusionws", function() {
                     }
                 },
                 onauth : function(){
-                    SelfExlusionWS.init();
+                    //SelfExlusionWS.init();
                 }
             });	
+
+             SelfExlusionWS.init();
         
         }
     };
