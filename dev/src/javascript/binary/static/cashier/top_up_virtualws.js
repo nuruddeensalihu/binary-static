@@ -33,8 +33,6 @@ var top_up_virtualws = (function(){
             $("#VRT_topup_message").show();
             $("#VRT_title").show();
             $("#VRT_topup_errorMessage").hide();
-
-            return false;
         }
 
     };
@@ -68,9 +66,11 @@ pjax_config_page("cashier/top_up_virtualws", function() {
                         top_up_virtualws.apiResponse(response);
                           
                     }
+                },
+                onauth : function(){
+                    top_up_virtualws.init();
                 }
             });	
-            top_up_virtualws.init();
         }
     };
 });
