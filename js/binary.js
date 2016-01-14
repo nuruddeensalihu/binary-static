@@ -60972,7 +60972,7 @@ pjax_config_page("market_timesws", function() {
     var clearErrors = function(){
         $form.find("#exclusionMsg").hide();
         $form.find("#exclusionMsg").text("");
-        $("#errorMsg").hide();
+       // $("#errorMsg").hide();
         $form.show();
         $("#exclusionText").show();
         $("#exclusionTitle").show();
@@ -61081,7 +61081,8 @@ pjax_config_page("market_timesws", function() {
         if("error" in response) {
             if("message" in response.error) {
                 console.log(response.error.message);
-                $("#errorMsg").show();
+                //$("#errorMsg").show();
+                $("#errorMsg").removeClass("hidden");
                 $("#errorMsg").text(text.localize(response.error.message));
                 $form.hide();
                 $("#exclusionText").hide();
@@ -61293,13 +61294,10 @@ pjax_config_page("user/self_exclusionws", function() {
                         SelfExlusionWS.apiResponse(response);
                           
                     }
-                },
-                onauth : function(){
-                    //SelfExlusionWS.init();
                 }
             });	
 
-             SelfExlusionWS.init();
+            SelfExlusionWS.init();
         
         }
     };
