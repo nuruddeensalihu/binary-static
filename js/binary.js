@@ -66238,7 +66238,7 @@ pjax_config_page("cashier/account_transferws", function() {
 pjax_config_page("user/my_account", function() {
     return {
         onLoad: function() {
-        	if (!getCookieItem('login')) {
+        	if (!$.cookie('login')) {
                 window.location.href = page.url.url_for('login');
                 return;
             }
@@ -67085,6 +67085,8 @@ pjax_config_page("user/settings/securityws", function() {
             $("#VRT_topup_message").show();
             $("#VRT_title").show();
             $("#VRT_topup_errorMessage").hide();
+
+            return false;
         }
 
     };
@@ -67093,7 +67095,6 @@ pjax_config_page("user/settings/securityws", function() {
     	var type = response.msg_type;
     	if (type === "topup_virtual" || (type === "error" && "topup_virtual" in response.echo_req)){
            responseMessage(response);
-
         }
     };
 
@@ -67108,6 +67109,8 @@ pjax_config_page("cashier/top_up_virtualws", function() {
     return {
         onLoad: function() {
         	if (!getCookieItem('login')) {
+                console.log("You are not log in buddy");
+                return false;
                 window.location.href = page.url.url_for('login');
                 return;
             }
@@ -67118,11 +67121,9 @@ pjax_config_page("cashier/top_up_virtualws", function() {
                         top_up_virtualws.apiResponse(response);
                           
                     }
-                },
-                onauth : function(){
-                    top_up_virtualws.init();
                 }
             });	
+            top_up_virtualws.init();
         }
     };
 });
