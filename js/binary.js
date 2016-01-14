@@ -66242,8 +66242,13 @@ pjax_config_page("user/my_account", function() {
                 window.location.href = page.url.url_for('login');
                 return;
             }
-            
-            my_account.init();
+
+            BinarySocket.init({
+                onauth : function(){
+                    my_account.init();
+                }
+
+            });
         }
     };
 });;var my_accountws = (function(){
