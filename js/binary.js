@@ -67111,7 +67111,7 @@ pjax_config_page("cashier/top_up_virtualws", function() {
         	if (!getCookieItem('login')) {
                 console.log("You are not log in buddy");
                 return false;
-                window.location.href = page.url.url_for('login');
+               // window.location.href = page.url.url_for('login');
                 return;
             }
         	BinarySocket.init({
