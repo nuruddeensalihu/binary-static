@@ -61464,12 +61464,9 @@ pjax_config_page("user/self_exclusionws", function() {
                         SelfExlusionWS.apiResponse(response);
                           
                     }
-                },
-                onauth : function(){
-                    SelfExlusionWS.init();
                 }
             });	
-        
+            SelfExlusionWS.init();
         }
     };
 });;/*
