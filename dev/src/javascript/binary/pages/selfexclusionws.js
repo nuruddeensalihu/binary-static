@@ -27,7 +27,7 @@ var SelfExlusionWS = (function(){
     var clearErrors = function(){
         $form.find("#exclusionMsg").hide();
         $form.find("#exclusionMsg").text("");
-       // $("#errorMsg").hide();
+        $("#errorMsg").hide();
         $form.show();
         $("#exclusionText").show();
         $("#exclusionTitle").show();
@@ -136,8 +136,7 @@ var SelfExlusionWS = (function(){
         if("error" in response) {
             if("message" in response.error) {
                 console.log(response.error.message);
-                //$("#errorMsg").show();
-                $("#errorMsg").removeClass("hidden");
+                $("#errorMsg").show();
                 $("#errorMsg").text(text.localize(response.error.message));
                 $form.hide();
                 $("#exclusionText").hide();
@@ -349,10 +348,11 @@ pjax_config_page("user/self_exclusionws", function() {
                         SelfExlusionWS.apiResponse(response);
                           
                     }
+                },
+                onauth : function(){
+                    SelfExlusionWS.init();
                 }
             });	
-
-            SelfExlusionWS.init();
         
         }
     };

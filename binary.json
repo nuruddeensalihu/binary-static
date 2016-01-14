@@ -38,6 +38,7 @@
     "src/javascript/binary/base/menu_content.js",
     "src/javascript/binary/base/onerror.js",
     "src/javascript/binary/base/page.js",
+    "src/javascript/binary/base/passwordmeter.js",
     "src/javascript/binary/base/pjax.js",
     "src/javascript/binary/base/spot_light.js",
     "src/javascript/binary/base/storage.js",
@@ -84,7 +85,6 @@
     "src/javascript/binary/pages/resources/asset_indexws.js",
     "src/javascript/binary/pages/resources/market_timesws.js",
     "src/javascript/binary/pages/selfexclusionws.js",
-    "src/javascript/binary/pages/statement.js",
     "src/javascript/binary/pages/trade/analysis.js",
     "src/javascript/binary/pages/trade/barriers.js",
     "src/javascript/binary/pages/trade/common.js",
@@ -106,6 +106,7 @@
     "src/javascript/binary/reality-check.js",
     "src/javascript/binary/socket.js",
     "src/javascript/binary/static/cashier/account_transferws.js",
+    "src/javascript/binary/static/cashier/my_account.js",
     "src/javascript/binary/static/cashier/my_accountws.js",
     "src/javascript/binary/static/cashier/payment_agent_listws.js",
     "src/javascript/binary/static/cashier/paymentagent_withdrawws.js",
@@ -137,6 +138,5 @@
     "src/javascript/binary/static/viewbalance/viewbalance.ui.js",
     "src/javascript/binary/static/virtual_acc_opening.js",
     "src/javascript/binary/static/virtual_acc_opening/virtual_acc_opening.data.js",
-    "src/javascript/binary/static/virtual_acc_opening/virtual_acc_opening.ui.js",
     "src/javascript/binary/utility.js"
 ]
