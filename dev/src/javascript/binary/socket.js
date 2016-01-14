@@ -132,9 +132,7 @@ var BinarySocket = (function () {
                 if (type === 'authorize') {
                     authorized = true;
                     TUser.set(response.authorize);
-                    if(typeof events.onauth === 'function'){
-                        events.onauth();
-                    }
+                    
                     send({balance:1, subscribe: 1});
                     sendBufferedSends();
                 } else if (type === 'balance') {
