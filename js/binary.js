@@ -67085,6 +67085,8 @@ pjax_config_page("user/settings/securityws", function() {
             $("#VRT_topup_message").show();
             $("#VRT_title").show();
             $("#VRT_topup_errorMessage").hide();
+
+            return false;
         }
 
     };

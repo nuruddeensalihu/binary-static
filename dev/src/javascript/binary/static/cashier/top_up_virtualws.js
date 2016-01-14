@@ -33,6 +33,8 @@ var top_up_virtualws = (function(){
             $("#VRT_topup_message").show();
             $("#VRT_title").show();
             $("#VRT_topup_errorMessage").hide();
+
+            return false;
         }
 
     };
