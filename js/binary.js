@@ -67048,7 +67048,7 @@ pjax_config_page("user/settings/securityws", function() {
         }
     };
 });
-;var top_up_virtualws = (function(){
+;var topup_virtualws = (function(){
 
 	"use strict";
     var account;
@@ -67116,12 +67116,12 @@ pjax_config_page("cashier/top_up_virtualws", function() {
                 onmessage: function(msg){
                     var response = JSON.parse(msg.data);
                     if (response) {
-                        top_up_virtualws.apiResponse(response);
+                        topup_virtualws.apiResponse(response);
                           
                     }
                 }
             });	
-            top_up_virtualws.init();
+            topup_virtualws.init();
         }
     };
 });
