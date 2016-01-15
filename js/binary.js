@@ -65882,7 +65882,7 @@ var BinarySocket = (function () {
             authorized = false;
             clearTimeouts();
 
-            if(manualClosed){
+            if(!manualClosed){
                 init(1);
             }
             if(typeof events.onclose === 'function'){
