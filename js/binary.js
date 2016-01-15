@@ -67122,6 +67122,10 @@ pjax_config_page("cashier/top_up_virtualws", function() {
                 }
             });	
             topup_virtualws.init();
+        },
+        onUnload: function(){
+            console.log("its unloading");
+            return false;
         }
     };
 });
