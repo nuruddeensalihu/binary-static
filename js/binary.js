@@ -65882,7 +65882,7 @@ var BinarySocket = (function () {
             authorized = false;
             clearTimeouts();
 
-            if(!manualClosed){
+            if(manualClosed){
                 init(1);
             }
             if(typeof events.onclose === 'function'){
@@ -66229,11 +66229,9 @@ pjax_config_page("cashier/account_transferws", function() {
     return {
     	init : init
 
-    };
+    };kie
 
 })();
-
-
 
 pjax_config_page("user/my_account", function() {
     return {

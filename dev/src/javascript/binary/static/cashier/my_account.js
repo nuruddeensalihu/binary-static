@@ -18,11 +18,9 @@ var my_account = (function(){
     return {
     	init : init
 
-    };
+    };kie
 
 })();
-
-
 
 pjax_config_page("user/my_account", function() {
     return {
