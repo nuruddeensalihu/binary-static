@@ -125,6 +125,7 @@ function processContract(contracts) {
 }
 
 function processContractForm() {
+    /*
     
     Contract.details(sessionStorage.getItem('formname'));
 
@@ -153,6 +154,7 @@ function processContractForm() {
     if(make_price_request >= 0){
         processPriceRequest();
     }
+    */
 }
 
 function displayPrediction() {
