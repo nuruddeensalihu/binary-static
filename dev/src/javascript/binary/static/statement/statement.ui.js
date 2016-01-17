@@ -46,7 +46,7 @@ var StatementUI = (function(){
         var amount = Number(parseFloat(transaction["amount"])).toFixed(2);
         var balance = Number(parseFloat(transaction["balance_after"])).toFixed(2);
 
-        var creditDebitType = (parseInt(amount) >= 0) ? "profit" : "loss";
+        var creditDebitType = (parseFloat(amount) >= 0) ? "profit" : "loss";
 
         var $statementRow = Table.createFlexTableRow([date, ref, action, desc, amount, balance], columns, "data");
         $statementRow.children(".credit").addClass(creditDebitType);

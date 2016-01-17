@@ -3,7 +3,6 @@ RealityCheck = (function ($) {
 
     var reality_check_url = page.url.url_for('user/reality_check');
     var reality_freq_url  = page.url.url_for('user/reality_check_frequency');
-    var logout_url        = page.url.url_for('logout');
 
     RealityCheck.prototype.setInterval = function (intv) {
         this.interval = intv * 60 * 1000; // convert minutes to millisec
@@ -165,8 +164,8 @@ RealityCheck = (function ($) {
             $('#reality-check').remove();
         });
 
-        $('#reality-check .blogout').on('click', function () {
-            window.location.href = logout_url;
+        $('#reality-check #btn_logout').unbind('click').click(function(){
+            BinarySocket.send({"logout": "1"});
         });
         
         var obj = document.getElementById('realityDuration');

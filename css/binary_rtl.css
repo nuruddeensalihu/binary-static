@@ -54,6 +54,16 @@ table {
 }
 
 /* GLOBAL RULES */
+/* 
+ * To simplify usage of a property 
+ * with different values for LTR and RTL languages
+ * sample usage: @include BIDIR_VALUE(float, left, right);
+ */
+/* 
+ * To simplify usage of different properties 
+ * with the same value for LTR and RTL languages
+ * sample usage: @include BIDIR_PROP(margin-left, margin-right, 5px);
+ */
 /* DO NOT include any rules for specific pages in this file. */
 /* theme elements */
 html {
@@ -280,7 +290,7 @@ label {
 }
 
 .form_label {
-  text-align: right;
+  text-align: left;
   line-height: 25px;
 }
 
@@ -543,7 +553,8 @@ ul.bullet li {
 
 ul.checked li {
   background: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNC4wLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDQzMzYzKSAgLS0+DQo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCINCgkgd2lkdGg9IjI0cHgiIGhlaWdodD0iMjBweCIgdmlld0JveD0iMCAwIDI0IDIwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAyNCAyMCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8Zz4NCgkJPGc+DQoJCQk8cG9seWdvbiBmaWxsPSIjRTk4MDI1IiBwb2ludHM9IjguNjIzLDE5LjU1NyAwLDEwLjkzNiAzLjczNiw3LjE5OCA4LjYyMywxMi4wODIgMjAuMjYyLDAuNDQzIDI0LDQuMTggOC42MjMsMTkuNTU3IAkJCSIvPg0KCQk8L2c+DQoJPC9nPg0KPC9nPg0KPC9zdmc+DQo=") no-repeat;
-  padding-left: 28px;
+  background-position: right;
+  padding-right: 28px;
   min-height: 24px;
 }
 
@@ -682,14 +693,14 @@ ul.checked li {
   color: #fff;
   line-height: 1;
   font-size: 70%;
-  text-align: right;
+  text-align: left;
   padding: 3px 0;
 }
 #topbar #virtual-text {
   font-weight: 700;
 }
 #topbar #topbar-info {
-  float: right;
+  float: left;
 }
 #topbar #gmt-clock, #topbar #contact-us {
   padding-top: 3px;
@@ -712,7 +723,7 @@ ul.checked li {
   font-size: 90%;
   padding: 2px 4px 2px 4px;
   text-transform: none;
-  margin: 0 0 0 10px;
+  margin: 0 10px 0 0;
 }
 #topbar .upgrademessage a:visited {
   color: #fff;
@@ -772,7 +783,7 @@ ul.checked li {
   margin-top: 10px;
 }
 #header #login-form, #header #loginid-switch-form {
-  text-align: right;
+  text-align: left;
 }
 #header #login-form #login-links, #header #loginid-switch-form #login-links {
   margin: 5px 0 0 0;
@@ -846,7 +857,7 @@ ul.checked li {
   background-repeat: no-repeat;
   padding: 6px;
   font-weight: normal;
-  margin-left: 0.4em;
+  margin-right: 0.4em;
   margin-top: 0.5em;
   text-transform: uppercase;
 }
@@ -950,7 +961,10 @@ ul.checked li {
 #footer #footer-regulatory #eighteen_plus {
   max-width: 45px;
 }
-#footer #footer-regulatory .social-network-icon {
+#footer #footer-regulatory .social-icons {
+  text-align: left;
+}
+#footer #footer-regulatory .social-icons .social-network-icon {
   width: 30px;
   height: 30px;
   padding-right: 5px;
@@ -967,7 +981,7 @@ ul.checked li {
   display: inline-block;
   top: 3px;
 }
-#footer #footer-regulatory #appcache-reload-message {
+#footer #footer-regulatory #appcache-reload-message, #footer #footer-regulatory #ratelimit-error-message {
   display: none;
   position: fixed;
   top: 0;
@@ -976,12 +990,12 @@ ul.checked li {
   z-index: 999;
   text-align: center;
 }
-#footer #footer-regulatory #appcache-reload-message .message {
+#footer #footer-regulatory #appcache-reload-message .message, #footer #footer-regulatory #ratelimit-error-message .message {
   margin: 12px;
   font-style: italic;
   color: #c03;
 }
-#footer #footer-regulatory #appcache-reload-message .message a {
+#footer #footer-regulatory #appcache-reload-message .message a, #footer #footer-regulatory #ratelimit-error-message .message a {
   color: #2E8836;
 }
 #footer #footer-last {
@@ -1020,6 +1034,9 @@ ul.checked li {
   background-color: #F2F2F2;
   border-bottom: 1px solid #DEDEDE;
   margin-bottom: 40px;
+}
+#main-menu ul ul {
+  width: 100%;
 }
 #main-menu a.a-active, #main-menu span.a-active {
   color: #e98024;
@@ -1072,13 +1089,13 @@ ul.checked li {
 }
 .tab-menu-wrap ul li ul.tm-ul-2 li.tm-li-2, #content .tab-menu-wrap ul li ul.tm-ul-2 li.tm-li-2 {
   font-size: 100%;
-  margin-right: 20px;
+  margin-left: 20px;
 }
 .tab-menu-wrap ul li.hover ul, .tab-menu-wrap ul li.active ul, #content .tab-menu-wrap ul li.active ul, #content .tab-menu-wrap ul li.hover ul, #content .tab-menu-wrap ul li.active ul {
   display: block;
   position: absolute;
   left: 1px;
-  width: 100%;
+  width: 99%;
   z-index: 10;
   margin-top: 3px solid transparent;
   background: #fff;
@@ -1116,7 +1133,7 @@ ul.checked li {
   list-style-image: none;
   background: #F2F2F2;
   border-radius: 4px 4px 0 0;
-  margin: 0 6px 0 0;
+  margin: 0 0 0 6px;
   padding: 0 10px;
 }
 #content ul.tm-ul li a, #content ul.tm-ul li a:visited {
@@ -1183,7 +1200,7 @@ ul.checked li {
   list-style-image: none;
   background: #F2F2F2;
   border-radius: 4px 4px 0 0;
-  margin: 0 6px 0 0;
+  margin: 0 0 0 6px;
   padding: 0 10px;
 }
 .has-tabs ul.ui-tabs-nav li a, .has-tabs ul.ui-tabs-nav li a:visited {
@@ -1229,7 +1246,8 @@ ul.checked li {
   text-decoration: underline;
 }
 .has-tabs ul.ui-tabs-nav li {
-  margin-right: 6px !important;
+  margin-left: 6px !important;
+  float: right;
 }
 .has-tabs .ui-tabs-panel {
   padding: 0 !important;
@@ -1443,7 +1461,8 @@ abbr {
 }
 
 .home-content #banner {
-  background: url("../images/pages/home/banner-background_1.png") no-repeat 0 0;
+  background: url("../images/pages/home/banner-background_1.png") no-repeat;
+  background-size: 100% 108%;
 }
 .home-content .xtopseparator {
   border: 0;
@@ -1454,25 +1473,21 @@ abbr {
   background-image: -o-linear-gradient(left, transparent, rgba(68, 72, 76, 0.5), transparent);
   display: block !important;
 }
-.home-content #open-account {
+.home-content #verify-email-form #open-account {
   background: #e98024;
-  color: #fff;
-  text-align: center;
-  border-radius: 0;
-  margin-top: -15px;
-  text-align: center;
-  padding: 10px 0;
 }
-.home-content #open-account h3 {
-  color: #15212d;
-  padding: 15px 10px 0 10px;
-}
-.home-content #open-account #virtual-fields input, .home-content #open-account #virtual-fields select, .home-content #open-account #virtual-fields textarea {
+.home-content #verify-email-form input {
   border-radius: 3px;
-  margin-top: 10px;
-  padding: 0px;
+  display: inline-block;
+  margin: 1em;
+  padding: 8px !important;
+  font-size: 14px;
 }
-.home-content #open-account input[type=submit] {
+.home-content #verify-email-form input#email {
+  height: 3em;
+  width: 55%;
+}
+.home-content #verify-email-form input[type=submit] {
   color: #fff;
   text-decoration: none;
   text-align: center;
@@ -1483,37 +1498,43 @@ abbr {
   padding: 10px 25px 10px 25px;
   display: inline-block;
   letter-spacing: 0.75px;
-  width: 88%;
   background: #2a3052;
   padding: 9px 10.83333%;
-  margin-top: 0;
-  margin-bottom: 15px;
+  margin: 0.7em 0;
   border: 0;
   white-space: normal;
   font-size: 18px;
+  height: 2.4em;
+  width: 38%;
 }
-.home-content #open-account input[type=submit]:visited {
+.home-content #verify-email-form input[type=submit]:visited {
   color: #fff;
 }
-.home-content #open-account input[type=submit]:hover, .home-content #open-account input[type=submit]:active {
+.home-content #verify-email-form input[type=submit]:hover, .home-content #verify-email-form input[type=submit]:active {
   text-decoration: none;
   background-color: #14602B;
 }
-.home-content #open-account input[type=submit]:hover {
+.home-content #verify-email-form input[type=submit]:hover {
   text-decoration: none;
   background-color: #14602B;
 }
-.home-content #open-account form {
+.home-content #verify-email-form form {
   font-size: 100%;
   margin: 5px 20px;
 }
-.home-content #open-account #signup_error {
+.home-content #verify-email-form #signup_error {
   background: #e98024;
   color: #fff;
   font-size: 85%;
+  margin-bottom: 1em;
+}
+.home-content #verify-email-form .error-message {
+  font-style: italic;
+  margin: 0;
+  margin-top: 8px;
 }
 .home-content #xsection1 {
-  padding: 30px 0;
+  padding: 0 0;
   display: inline-block;
 }
 .home-content #xsection1 ul li {
@@ -1546,32 +1567,23 @@ abbr {
 .home-content #xtop p {
   font-size: 110%;
 }
+.home-content #xtop p strong {
+  color: #2a3052;
+}
 .home-content #xtop ul li {
-  display: inline;
-  margin-left: 10px;
+  display: inline-block;
+}
+.home-content #xtop h1 {
+  color: #2a3052;
 }
 .home-content .break {
-  margin-top: 30px;
-}
-.home-content .no-break {
-  margin-top: 10px;
+  margin-top: 1em;
+  margin-bottom: 2em;
 }
 .home-content .boldtop {
   font-size: 170%;
 }
-.home-content #xbadges {
-  text-align: center;
-}
-.home-content #xbadges img {
-  text-align: center;
-  max-width: 100px;
-  position: relative;
-  top: 50px;
-  margin-right: 20px;
-}
 .home-content .xhead {
-  margin-bottom: 20px;
-  margin-top: 30px;
   padding-bottom: 15px;
   border-bottom: 1px solid #DEDEDE;
 }
@@ -1580,46 +1592,35 @@ abbr {
 }
 .home-content .xlist1 {
   background: url(../images/pages/home/xicon-1.png) no-repeat;
-  padding-left: 50px;
+  padding-left: 40px;
   min-height: 24px;
   background-size: 30px;
 }
 .home-content .xlist2 {
   background: url(../images/pages/home/xicon-2.png) no-repeat;
-  padding-left: 50px;
+  padding-left: 40px;
   min-height: 24px;
   background-size: 30px;
 }
 .home-content .xlist3 {
   background: url(../images/pages/home/xicon-3.png) no-repeat;
-  padding-left: 50px;
+  padding-left: 40px;
   min-height: 24px;
   background-size: 30px;
 }
-.home-content .xlist4 {
-  background: url(../images/pages/home/xicon-4.png) no-repeat;
-  padding-left: 50px;
-  min-height: 24px;
-  background-size: 30px;
+.home-content .xlist1, .home-content .xlist2, .home-content .xlist3 {
+  margin-left: 50px !important;
+  padding-bottom: 1em;
+  text-align: left;
+}
+.home-content .small-image {
+  width: 10%;
+  margin: 0 1em;
 }
 .home-content .xcta {
   position: relative;
   bottom: 30px;
   text-align: center;
-}
-.home-content .xcta .xreal {
-  margin-right: 10px;
-}
-.home-content .xcta .xreal span {
-  padding: 10px 25px;
-}
-.home-content .xcta .xvirtual span {
-  background-color: #2a3052;
-  padding: 10px 25px;
-}
-.home-content .xcta .xvirtual span:hover {
-  text-decoration: none;
-  background-color: #14602B;
 }
 .home-content .xquote {
   background-color: #F2F2F2;
@@ -1654,23 +1655,8 @@ abbr {
 .home-content .xquoter-right {
   text-align: right;
 }
-.home-content #virtual-acc-form input, .home-content #virtual-acc-form select {
-  width: 80%;
-  display: inline-block;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  padding: 8px !important;
-  font-size: 14px;
-}
-.home-content #virtual-acc-form #residence {
-  height: 35px;
-  line-height: 35px;
-  width: 87%;
-  vertical-align: middle;
-}
 .home-content #xacademy .head-academy {
   margin-bottom: 10px;
-  margin-top: 20px;
   padding-bottom: 15px;
   border-bottom: 1px solid #dedede;
 }
@@ -1685,13 +1671,6 @@ abbr {
   margin-top: 20px;
   margin-bottom: 0;
 }
-.home-content .xtopcta {
-  display: inline-block;
-  width: 50%;
-  margin-top: 5px;
-  margin-bottom: 15px;
-  padding: 15px !important;
-}
 .home-content .xquoter-left p span, .home-content .xquoter-right p span {
   font-size: 12px;
   font-style: italic;
@@ -1700,7 +1679,7 @@ abbr {
   text-decoration: none;
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 768px) {
   .home-content #xtop {
     padding-top: 30px;
     padding-left: 0;
@@ -1709,398 +1688,31 @@ abbr {
   .home-content #xtop ul li {
     margin-left: 5px;
   }
-  .home-content .break {
-    margin-top: 20px;
-    margin-bottom: 5px;
-  }
-  .home-content .no-break {
-    margin-top: 0px;
-  }
-  .home-content .xhead2 {
-    margin-top: 30px;
-  }
-  .home-content #open-account {
-    margin-left: 0;
-    margin-top: 20px;
-    padding: 0;
-  }
-  .home-content #open-account h3 {
-    background: #15212d;
-    color: #fff;
-    padding: 10px;
-  }
-  .home-content #open-account input[type=submit] {
-    width: 86% !important;
-  }
-  .home-content #open-account form {
-    margin: 5px 5px;
-  }
-  .home-content #residence {
-    width: 86% !important;
-  }
-  .home-content .virtual-acc-left {
-    width: 80% !important;
-    margin-right: 0;
-  }
-  .home-content .xtopcta {
-    width: 80%;
-  }
   .home-content .xtestimonial h1, .home-content .xhead {
     padding: 10px;
-  }
-  .home-content #xsection1 {
-    padding: 10px 0;
   }
   .home-content .xcta {
     position: initial;
   }
-  .home-content .xcta .xreal {
-    margin-right: 0px;
+  .home-content .xlist1, .home-content .xlist2, .home-content .xlist3 {
+    margin-left: 0 !important;
+    text-align: center;
   }
-  .home-content .xcta .xreal span {
-    font-weight: 300;
-    padding: 20px 20px;
-    width: 60%;
-    margin: 10px 0;
+  .home-content #verify-email-form input#email {
+    width: 92%;
   }
-  .home-content .xcta .xvirtual span {
-    background-color: #2a3052;
-    font-weight: 300;
-    padding: 20px 20px;
-    width: 60%;
+  .home-content #verify-email-form input[type=submit] {
+    width: 70% !important;
+    margin-left: 15%;
+    margin-top: 0;
+  }
+  .home-content #verify-email-form #open-account {
+    margin-top: 0.5em;
   }
 }
-/* HOME PAGE RULES */
-.home2-content#content {
-  width: 100%;
-}
-
-.home2-content #banner {
-  background: url("../images/pages/home/banner-background_1.png") no-repeat 0 0;
-}
-.home2-content .xtopseparator {
-  border: 0;
-  height: 2px;
-  background-image: -webkit-linear-gradient(left, transparent, rgba(68, 72, 76, 0.5), transparent);
-  background-image: -moz-linear-gradient(left, transparent, rgba(68, 72, 76, 0.5), transparent);
-  background-image: -ms-linear-gradient(left, transparent, rgba(68, 72, 76, 0.5), transparent);
-  background-image: -o-linear-gradient(left, transparent, rgba(68, 72, 76, 0.5), transparent);
-  display: block !important;
-}
-.home2-content #open-account {
-  background: #e98024;
-  color: #fff;
-  text-align: center;
-  border-radius: 0;
-  margin-top: 70px;
-  text-align: center;
-  padding: 0 0 10px;
-}
-.home2-content #open-account h3 {
-  background: #15212d;
-  color: #fff;
-  padding: 15px 10px;
-}
-.home2-content #open-account #virtual-fields input, .home2-content #open-account #virtual-fields select, .home2-content #open-account #virtual-fields textarea {
-  border-radius: 3px;
-  margin-top: 10px;
-  padding: 0px;
-}
-.home2-content #open-account input[type=submit] {
-  color: #fff;
-  text-decoration: none;
-  text-align: center;
-  line-height: 100%;
-  background: #2E8836;
-  border-radius: 4px;
-  text-transform: capitalize;
-  padding: 10px 25px 10px 25px;
-  display: inline-block;
-  letter-spacing: 0.75px;
-  width: 78%;
-  background: #2a3052;
-  padding: 9px 10.83333%;
-  margin-top: 0;
-  margin-bottom: 15px;
-  border: 0;
-  white-space: normal;
-  font-size: 18px;
-}
-.home2-content #open-account input[type=submit]:visited {
-  color: #fff;
-}
-.home2-content #open-account input[type=submit]:hover, .home2-content #open-account input[type=submit]:active {
-  text-decoration: none;
-  background-color: #14602B;
-}
-.home2-content #open-account input[type=submit]:hover {
-  text-decoration: none;
-  background-color: #14602B;
-}
-.home2-content #open-account form {
-  font-size: 100%;
-  margin: 5px 20px;
-}
-.home2-content #open-account #signup_error {
-  background: #e98024;
-  color: #fff;
-  font-size: 85%;
-}
-.home2-content #open-account .error-message {
-  font-style: italic;
-  margin: 0;
-  margin-top: 8px;
-}
-.home2-content #xsection1 {
-  padding: 30px 0;
-  display: inline-block;
-}
-.home2-content #xsection1 ul li {
-  padding-left: 10px;
-  margin: 1em 0 0;
-}
-.home2-content #xsection1 ul li span {
-  color: #2E8836;
-  font-weight: 700;
-}
-.home2-content #xsection1 ul li i {
-  color: #e98024;
-}
-.home2-content #xsection1 h1 {
-  margin-top: 20px;
-}
-.home2-content #xreason, .home2-content #xacademy, .home2-content #xtestimonial {
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-.home2-content #xreason {
-  background-color: #F2F2F2;
-}
-.home2-content #xtop {
-  padding-top: 30px;
-  padding-left: 10px;
-  text-align: center;
-  line-height: 1.5;
-}
-.home2-content #xtop p {
-  font-size: 110%;
-}
-.home2-content #xtop ul li {
-  display: inline;
-  margin-left: 10px;
-}
-.home2-content .break {
-  margin-top: 30px;
-}
-.home2-content .no-break {
-  margin-top: 10px;
-}
-.home2-content .boldtop {
-  font-size: 170%;
-}
-.home2-content #xbadges {
-  text-align: center;
-}
-.home2-content #xbadges img {
-  text-align: center;
-  max-width: 100px;
-  position: relative;
-  top: 50px;
-  margin-right: 20px;
-}
-.home2-content .xhead {
-  margin-bottom: 20px;
-  margin-top: 30px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #DEDEDE;
-}
-.home2-content .inlined {
-  display: inline-block;
-}
-.home2-content .xlist1 {
-  background: url(../images/pages/home/xicon-1.png) no-repeat;
-  padding-left: 50px;
-  min-height: 24px;
-  background-size: 30px;
-}
-.home2-content .xlist2 {
-  background: url(../images/pages/home/xicon-2.png) no-repeat;
-  padding-left: 50px;
-  min-height: 24px;
-  background-size: 30px;
-}
-.home2-content .xlist3 {
-  background: url(../images/pages/home/xicon-3.png) no-repeat;
-  padding-left: 50px;
-  min-height: 24px;
-  background-size: 30px;
-}
-.home2-content .xlist4 {
-  background: url(../images/pages/home/xicon-4.png) no-repeat;
-  padding-left: 50px;
-  min-height: 24px;
-  background-size: 30px;
-}
-.home2-content .xcta {
-  position: relative;
-  bottom: 30px;
-  text-align: center;
-}
-.home2-content .xcta .xreal {
-  margin-right: 10px;
-}
-.home2-content .xcta .xreal span {
-  padding: 10px 25px;
-}
-.home2-content .xcta .xvirtual span {
-  background-color: #2a3052;
-  padding: 10px 25px;
-}
-.home2-content .xcta .xvirtual span:hover {
-  text-decoration: none;
-  background-color: #14602B;
-}
-.home2-content .xquote {
-  background-color: #F2F2F2;
-  padding: 20px 40px;
-}
-.home2-content .xquote p {
-  font-style: italic;
-}
-.home2-content .xbubble-right {
-  content: '';
-  width: 0px;
-  height: 0px;
-  border-style: solid;
-  border-width: 25px 5px 0 10px;
-  border-color: #F2F2F2 transparent transparent transparent;
-  position: relative;
-  left: 80%;
-}
-.home2-content .xbubble-left {
-  content: '';
-  width: 0px;
-  height: 0px;
-  border-style: solid;
-  border-width: 25px 10px 0 5px;
-  border-color: #F2F2F2 transparent transparent transparent;
-  position: relative;
-  left: 10%;
-}
-.home2-content .xquoter-left {
-  text-align: left;
-}
-.home2-content .xquoter-right {
-  text-align: right;
-}
-.home2-content #verify-email-form input, .home2-content #verify-email-form select {
-  width: 70%;
-  display: inline-block;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  padding: 8px !important;
-  font-size: 14px;
-}
-.home2-content #xacademy .head-academy {
-  margin-bottom: 10px;
-  margin-top: 20px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #dedede;
-}
-.home2-content #xacademy ul {
-  margin-top: 20px;
-  margin-left: 10px;
-}
-.home2-content #xacademy img {
-  max-width: 180px;
-}
-.home2-content #xacademy .academy-cta {
-  margin-top: 20px;
-  margin-bottom: 0;
-}
-.home2-content .xtopcta {
-  display: inline-block;
-  width: 50%;
-  margin-top: 5px;
-  margin-bottom: 15px;
-  padding: 15px !important;
-}
-.home2-content .xquoter-left p span, .home2-content .xquoter-right p span {
-  font-size: 12px;
-  font-style: italic;
-}
-.home2-content #xpayment a:hover {
-  text-decoration: none;
-}
-
-@media screen and (max-width: 767px) {
-  .home2-content #xtop {
-    padding-top: 30px;
-    padding-left: 0;
-    line-height: 1;
-  }
-  .home2-content #xtop ul li {
-    margin-left: 5px;
-  }
-  .home2-content .break {
-    margin-top: 20px;
-    margin-bottom: 5px;
-  }
-  .home2-content .no-break {
-    margin-top: 0px;
-  }
-  .home2-content .xhead2 {
-    margin-top: 30px;
-  }
-  .home2-content #open-account {
-    margin-left: 0;
-    margin-top: 20px;
-    padding: 0;
-  }
-  .home2-content #open-account h3 {
-    background: #15212d;
-    color: #fff;
-    padding: 10px;
-  }
-  .home2-content #open-account input[type=submit] {
-    width: 86% !important;
-  }
-  .home2-content #open-account form {
-    margin: 5px 5px;
-  }
-  .home2-content #residence {
-    width: 86% !important;
-  }
-  .home2-content .virtual-acc-left {
-    width: 80% !important;
-    margin-right: 0;
-  }
-  .home2-content .xtopcta {
-    width: 80%;
-  }
-  .home2-content .xtestimonial h1, .home2-content .xhead {
-    padding: 10px;
-  }
-  .home2-content #xsection1 {
-    padding: 10px 0;
-  }
-  .home2-content .xcta {
-    position: initial;
-  }
-  .home2-content .xcta .xreal {
-    margin-right: 0px;
-  }
-  .home2-content .xcta .xreal span {
-    font-weight: 300;
-    padding: 20px 20px;
-    width: 60%;
-    margin: 10px 0;
-  }
-  .home2-content .xcta .xvirtual span {
-    background-color: #2a3052;
-    font-weight: 300;
-    padding: 20px 20px;
-    width: 60%;
+@media screen and (max-width: 480px) {
+  .home-content .small-image {
+    width: 30%;
   }
 }
 #login #content {
@@ -2798,7 +2410,7 @@ a.spread_250, a.spread_260, a.spread_buy, a.spread_sell {
 }
 
 #bet_bottom_content {
-  padding-top: 2em;
+  padding-top: 1em;
 }
 #bet_bottom_content input {
   border: 1px solid #DEDEDE;
@@ -5531,7 +5143,7 @@ div.kineticjs-content {
 }
 #trading_socket_container #contract_symbol_container #contract_markets_container {
   text-align: right;
-  margin-right: 1rem;
+  margin-left: 1rem;
 }
 #trading_socket_container #contract_symbol_container #spot_label {
   margin: 0 5px 0 15px;
@@ -5544,7 +5156,7 @@ div.kineticjs-content {
   flex: 1 0 auto;
 }
 #trading_socket_container #contract_container #contract_form_container .col {
-  margin-right: 1rem;
+  margin-left: 1rem;
 }
 #trading_socket_container #contract_container .overlay_container {
   width: 100%;
@@ -5560,9 +5172,17 @@ div.kineticjs-content {
   height: 100%;
   margin-top: -25px;
 }
+#trading_socket_container #contract_container input[type=number]::-webkit-inner-spin-button,
+#trading_socket_container #contract_container input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+#trading_socket_container #contract_container input[type=number] {
+  -moz-appearance: textfield;
+}
 #trading_socket_container #contract_prices_container {
   position: relative;
-  margin-left: 1em;
+  margin-right: 1em;
   margin-top: 28px;
 }
 #trading_socket_container #contract_prices_container .price_container {
@@ -5707,7 +5327,7 @@ div.kineticjs-content {
   background-size: 40%;
 }
 #trading_socket_container #contract_prices_container .contract_amount, #trading_socket_container #contract_prices_container .contract_description {
-  padding: 10px 10px 10px 5px;
+  padding: 10px 5px 10px 10px;
   line-height: 1.5;
   font-size: 90%;
   flex: 1 0 auto;
@@ -5773,8 +5393,8 @@ div.kineticjs-content {
 #trading_socket_container #period_row, #trading_socket_container #jbarrier_row, #trading_socket_container #jhigh_barrier_row, #trading_socket_container #jlow_barrier_row {
   display: none;
 }
-#trading_socket_container #duration_units {
-  margin-left: 5px;
+#trading_socket_container #duration_amount {
+  margin-right: 5px;
 }
 #trading_socket_container #duration_units {
   margin-right: 10px;
@@ -5813,11 +5433,11 @@ div.kineticjs-content {
   margin-top: -1px;
 }
 #trading_socket_container #underlying {
-  margin-right: 10px;
+  margin-left: 10px;
   margin-bottom: 5px;
 }
 #trading_socket_container #symbol_tip {
-  padding-right: 8px;
+  padding-left: 8px;
   padding-bottom: 5px;
   cursor: pointer;
 }
@@ -5828,6 +5448,17 @@ div.kineticjs-content {
   margin: 0 10px;
 }
 
+@media all and (max-width: 480px) {
+  #trading_socket_container #contract_market_form_container ul#contract_form_name_nav a.tm-a {
+    font-size: 65%;
+  }
+  #trading_socket_container #contract_form_content #expiry_type {
+    max-width: 100%;
+  }
+  #trading_socket_container #contract_form_content #duration_amount {
+    margin-bottom: 5px;
+  }
+}
 @media all and (max-width: 640px) {
   #trading_socket_container #contract_market_form_container {
     height: auto;
@@ -5879,12 +5510,20 @@ div.kineticjs-content {
     margin: 0;
   }
 
-  ul#contract_form_name_nav {
-    height: auto;
+  div#contract_market_form_container ul#contract_form_name_nav {
+    white-space: nowrap !important;
   }
-  ul#contract_form_name_nav > li {
-    float: none;
-    width: 100%;
+  div#contract_market_form_container ul#contract_form_name_nav > li.tm-li {
+    /*float: none;
+    width: 100%; */
+  }
+  div#contract_market_form_container ul#contract_form_name_nav > li.tm-li ul.tm-ul-2 {
+    position: absolute !important;
+    top: 28px !important;
+    display: none !important;
+  }
+  div#contract_market_form_container ul#contract_form_name_nav > li.tm-li.hover ul, div#contract_market_form_container .tab-menu-wrap ul#contract_form_name_nav > li.tm-li.active ul, .tab-menu-wrap div#contract_market_form_container ul#contract_form_name_nav > li.tm-li.active ul, div#contract_market_form_container ul#contract_form_name_nav > li.tm-li.active ul {
+    display: block !important;
   }
 
   #trading_socket_container #contract_prices_container .price_container .price_wrapper {
@@ -5913,7 +5552,7 @@ div.kineticjs-content {
   white-space: nowrap;
   padding: 3px;
   border-radius: 5px;
-  margin-right: 8px;
+  margin-left: 8px;
 }
 #spot.error {
   font-style: italic;
@@ -6057,8 +5696,8 @@ div.kineticjs-content {
 }
 
 #balance {
-  float: left;
-  padding-left: 8px;
+  float: right;
+  padding-right: 8px;
   margin-top: 1em;
 }
 
@@ -6067,13 +5706,13 @@ div.kineticjs-content {
 }
 
 .flex-table-container th {
-  text-align: left !important;
+  text-align: right !important;
   border-bottom: none !important;
   overflow: hidden;
 }
 .flex-table-container td {
-  text-align: left !important;
-  padding-left: 10px;
+  text-align: right !important;
+  padding-right: 10px;
   overflow: hidden;
 }
 .flex-table-container .pre {
@@ -6112,6 +5751,26 @@ div.kineticjs-content {
   }
 }
 
+.time_amount {
+  width: 80%;
+}
+
+iframe#chart_frame {
+  width: 1px;
+  min-width: 100%;
+  *width: 100%;
+}
+
+tr#highchart_duration td {
+  padding-top: 0;
+}
+tr#highchart_duration td:nth-child(1) {
+  text-align: left;
+}
+tr#highchart_duration td:nth-child(2) {
+  text-align: right;
+}
+
 #profit-table-ws-container th {
   padding-right: 8px;
 }
@@ -6137,10 +5796,46 @@ div.kineticjs-content {
   margin-left: 5px;
 }
 #limits-ws-container thead {
-  text-align: left;
+  text-align: right;
 }
 #limits-ws-container td {
   padding: 3px 8px;
+}
+
+#virtual-form input, #virtual-form select, #change-password input, #change-password select, .usersettingssecurityws-content input, .usersettingssecurityws-content select {
+  outline: none;
+}
+#virtual-form #tooltip-password, #change-password #tooltip-password, .usersettingssecurityws-content #tooltip-password {
+  text-decoration: none;
+}
+#virtual-form meter#password-meter, #change-password meter#password-meter, .usersettingssecurityws-content meter#password-meter {
+  width: 10.9em;
+  height: .5em;
+  -webkit-appearance: none;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  vertical-align: top;
+  display: block;
+}
+#virtual-form meter#password-meter::-webkit-meter-bar, #change-password meter#password-meter::-webkit-meter-bar, .usersettingssecurityws-content meter#password-meter::-webkit-meter-bar {
+  background: #f5f5f5;
+  box-shadow: 0 5px 5px -5px #333 inset;
+}
+#virtual-form div.hint, #change-password div.hint, .usersettingssecurityws-content div.hint {
+  margin-top: 10px;
+  font-size: 15px;
+}
+#virtual-form div.hint ul.disc, #change-password div.hint ul.disc, .usersettingssecurityws-content div.hint ul.disc {
+  margin-top: 10px;
+  margin-bottom: 0;
+  list-style-type: disc;
+}
+#virtual-form div.hint ul.disc li, #change-password div.hint ul.disc li, .usersettingssecurityws-content div.hint ul.disc li {
+  font-size: 14px;
+  margin: .5em 0 0 1em;
+}
+#virtual-form p.error-message-password, #change-password p.error-message-password, .usersettingssecurityws-content p.error-message-password {
+  margin: 0.5em 0;
 }
 
 /* Language based rules */
@@ -6149,22 +5844,8 @@ body .calls_recording {
   display: none;
   font-style: italic;
 }
-body .contactus_time {
-  display: none;
-  font-style: italic;
-}
-body .opening_hours {
-  display: none;
-  font-weight: bold;
-}
 
 body.EN .calls_recording {
-  display: inline !important;
-}
-body.EN .contactus_time {
-  display: inline !important;
-}
-body.EN .opening_hours {
   display: inline !important;
 }
 
@@ -6255,12 +5936,6 @@ body.AR .ar-hide {
 body.ID .calls_recording {
   display: inline !important;
 }
-body.ID .contactus_time {
-  display: inline !important;
-}
-body.ID .opening_hours {
-  display: inline !important;
-}
 body.ID .regulatory-logo {
   display: none !important;
 }
@@ -6309,12 +5984,6 @@ body.RU #trading_socket_container .contract_heading {
   padding-top: 2.7em;
 }
 body.RU .calls_recording {
-  display: inline !important;
-}
-body.RU .contactus_time {
-  display: inline !important;
-}
-body.RU .opening_hours {
   display: inline !important;
 }
 

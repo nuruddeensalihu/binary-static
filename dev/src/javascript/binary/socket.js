@@ -10,7 +10,7 @@
  * `BinarySocket.init()` to initiate the connection
  * `BinarySocket.send({contracts_for : 1})` to send message to server
  */
-var BinarySocket = (function () {
+function BinarySocketClass() {
     'use strict';
 
     var binarySocket,
@@ -63,7 +63,7 @@ var BinarySocket = (function () {
             bufferedSends.push(data);
             init(1);
         } else if (isReady()) {
-            if(!data.hasOwnProperty('passthrough')){
+            if(!data.hasOwnProperty('passthrough') && !data.hasOwnProperty('verify_email')){
                 data.passthrough = {};
             }
             // temporary check
@@ -103,7 +103,7 @@ var BinarySocket = (function () {
 
         binarySocket.onopen = function (){
             var loginToken = getCookieItem('login');
-            if(loginToken) {
+            if(loginToken && !authorized) {
                 binarySocket.send(JSON.stringify({authorize: loginToken}));
             }
             else {
@@ -143,6 +143,14 @@ var BinarySocket = (function () {
                     page.header.time_counter(response);
                 } else if (type === 'logout') {
                     page.header.do_logout(response);
+                } else if (type === 'error') {
+                    if(response.error.code === 'RateLimit') {
+                        $('#ratelimit-error-message')
+                            .css('display', 'block')
+                            .on('click', '#ratelimit-refresh-link', function () {
+                                window.location.reload();
+                            });
+                    }
                 }
 
                 if(typeof events.onmessage === 'function'){
@@ -192,4 +200,6 @@ var BinarySocket = (function () {
         clearTimeouts: clearTimeouts
     };
 
-})();
+}
+
+var BinarySocket = new BinarySocketClass();

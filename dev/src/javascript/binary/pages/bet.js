@@ -119,8 +119,8 @@ pjax_config_page('rise_fall_table', function() {
     };
 });
 
-pjax_config_page('openpositionsws|portfolio|trade.cgi|statement|f_manager_statement|f_manager_history|' +
-    'f_profit_table|profit_table|trading|legacy-statement|legacy-profittable', function() {
+pjax_config_page('openpositionsws|trade.cgi|statement|f_manager_statement|f_manager_history|' +
+    'f_profit_table|profit_table|trading', function() {
     return {
         onLoad: function() {
             BetSell.register();

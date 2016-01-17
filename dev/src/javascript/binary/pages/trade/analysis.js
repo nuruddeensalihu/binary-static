@@ -10,28 +10,28 @@
  * or underlying to load bet analysis for that particular event
  */
 
-var TradingAnalysis = (function(){
-    var trading_digit_info;
+var TradingAnalysis = (function() {
+    var trading_digit_info, tab_japan_info;
 
     var requestTradeAnalysis = function() {
         'use strict';
         $.ajax({
-            method: 'POST',
-            url: page.url.url_for('trade/trading_analysis'),
-            data: {
-                underlying: sessionStorage.getItem('underlying'),
-                formname: sessionStorage.getItem('formname'),
-                contract_category: Contract.form(),
-                barrier: Contract.barrier()
-            }
-        })
-        .done(function(data) {
-            var contentId = document.getElementById('trading_bottom_content');
-            contentId.innerHTML = data;
-            sessionStorage.setItem('currentAnalysisTab', getActiveTab());
-            bindAnalysisTabEvent();
-            loadAnalysisTab();
-        });
+                method: 'POST',
+                url: page.url.url_for('trade/trading_analysis'),
+                data: {
+                    underlying: sessionStorage.getItem('underlying'),
+                    formname: sessionStorage.getItem('formname'),
+                    contract_category: Contract.form(),
+                    barrier: Contract.barrier()
+                }
+            })
+            .done(function(data) {
+                var contentId = document.getElementById('trading_bottom_content');
+                contentId.innerHTML = data;
+                sessionStorage.setItem('currentAnalysisTab', getActiveTab());
+                bindAnalysisTabEvent();
+                loadAnalysisTab();
+            });
     };
 
     /*
@@ -74,34 +74,42 @@ var TradingAnalysis = (function(){
         toggleActiveNavMenuElement(analysisNavElement, currentLink.parentElement);
         toggleActiveAnalysisTabs();
 
-        if (currentTab === 'tab_graph') {
-          if (document.getElementById('underlying')){
-            showHighchart();
-            setUnderlyingTime();
-          } else {
-            BetAnalysis.tab_live_chart.reset();
-            BetAnalysis.tab_live_chart.render(true);
-          }
-        } else {
-            var url = currentLink.getAttribute('href');
-            $.ajax({
-                method: 'GET',
-                url: url,
-            })
-            .done(function(data) {
-                contentId.innerHTML = data;
-                if (currentTab === 'tab_intradayprices') {
-                    bindSubmitForIntradayPrices();
-                } else if (currentTab === 'tab_ohlc') {
-                    bindSubmitForDailyPrices();
-                } else if (currentTab == 'tab_last_digit') {
-                    trading_digit_info = new BetAnalysis.DigitInfo();
-                    trading_digit_info.on_latest();
-                    trading_digit_info.show_chart(sessionStorage.getItem('underlying'));
-                }
+        tab_japan_info = new BetAnalysis.JapanInfo();
 
-            });
+        if (currentTab === 'tab_japan_info') {
+            tab_japan_info.show();
+        } else {
+            tab_japan_info.hide();
+            if (currentTab === 'tab_graph') {
+                if (document.getElementById('underlying')){
+                    showHighchart();
+                    setUnderlyingTime();
+                } else {
+                    BetAnalysis.tab_live_chart.reset();
+                    BetAnalysis.tab_live_chart.render(true);
+                }
+            } else {
+                var url = currentLink.getAttribute('href');
+                $.ajax({
+                        method: 'GET',
+                        url: url,
+                    })
+                    .done(function(data) {
+                        contentId.innerHTML = data;
+                        if (currentTab === 'tab_intradayprices') {
+                            bindSubmitForIntradayPrices();
+                        } else if (currentTab === 'tab_ohlc') {
+                            bindSubmitForDailyPrices();
+                        } else if (currentTab == 'tab_last_digit') {
+                            trading_digit_info = new BetAnalysis.DigitInfo();
+                            trading_digit_info.on_latest();
+                            trading_digit_info.show_chart(sessionStorage.getItem('underlying'));
+                        }
+
+                    });
+            }
         }
+
     };
 
     /*
@@ -118,7 +126,7 @@ var TradingAnalysis = (function(){
                 currentTabElement = document.getElementById(currentTab + '-content'),
                 classes = currentTabElement.classList;
 
-            for (var i = 0, len = childElements.length; i < len; i++){
+            for (var i = 0, len = childElements.length; i < len; i++) {
                 childElements[i].classList.remove('selectedTab');
                 childElements[i].classList.add('invisible');
             }
@@ -149,21 +157,21 @@ var TradingAnalysis = (function(){
     var bindSubmitForIntradayPrices = function() {
         var elm = document.getElementById('intraday_prices_submit');
         if (elm) {
-            elm.addEventListener('click', function (e) {
+            elm.addEventListener('click', function(e) {
                 e.preventDefault();
                 var formElement = document.getElementById('analysis_intraday_prices_form'),
-                   contentTab = document.querySelector('#tab_intradayprices-content'),
-                   underlyingSelected = contentTab.querySelector('select[name="underlying"]'),
-                   dateSelected = contentTab.querySelector('select[name="date"]');
+                    contentTab = document.querySelector('#tab_intradayprices-content'),
+                    underlyingSelected = contentTab.querySelector('select[name="underlying"]'),
+                    dateSelected = contentTab.querySelector('select[name="date"]');
 
                 $.ajax({
-                    method: 'GET',
-                    url: formElement.getAttribute('action') + '&underlying=' + underlyingSelected.value + '&date=' + dateSelected.value,
-                })
-                .done(function(data) {
-                    contentTab.innerHTML = data;
-                    bindSubmitForIntradayPrices();
-                });
+                        method: 'GET',
+                        url: formElement.getAttribute('action') + '&underlying=' + underlyingSelected.value + '&date=' + dateSelected.value,
+                    })
+                    .done(function(data) {
+                        contentTab.innerHTML = data;
+                        bindSubmitForIntradayPrices();
+                    });
             });
         }
     };
@@ -174,28 +182,34 @@ var TradingAnalysis = (function(){
     var bindSubmitForDailyPrices = function() {
         var elm = document.getElementById('daily_prices_submit');
         if (elm) {
-            elm.addEventListener('click', function (e) {
+            elm.addEventListener('click', function(e) {
                 e.preventDefault();
                 var formElement = document.getElementById('analysis_daily_prices_form'),
-                   contentTab = document.querySelector('#tab_ohlc-content'),
-                   underlyingSelected = sessionStorage.getItem('underlying'),
-                   daysSelected = contentTab.querySelector('input[name="days_to_display"]');
+                    contentTab = document.querySelector('#tab_ohlc-content'),
+                    underlyingSelected = sessionStorage.getItem('underlying'),
+                    daysSelected = contentTab.querySelector('input[name="days_to_display"]');
 
                 $.ajax({
-                    method: 'GET',
-                    url: formElement.getAttribute('action') + '&underlying_symbol=' + underlyingSelected + '&days_to_display=' + daysSelected.value,
-                })
-                .done(function(data) {
-                    contentTab.innerHTML = data;
-                    bindSubmitForDailyPrices();
-                });
+                        method: 'GET',
+                        url: formElement.getAttribute('action') + '&underlying_symbol=' + underlyingSelected + '&days_to_display=' + daysSelected.value,
+                    })
+                    .done(function(data) {
+                        contentTab.innerHTML = data;
+                        bindSubmitForDailyPrices();
+                    });
             });
         }
     };
 
     return {
-        request:requestTradeAnalysis,
-        digit_info: function(){return trading_digit_info;}
+        request: requestTradeAnalysis,
+        digit_info: function() {
+            return trading_digit_info;
+        },
+        japan_info: function() {
+            return tab_japan_info;
+        },
+        getActiveTab: getActiveTab
     };
 
 })();

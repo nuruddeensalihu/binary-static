@@ -1,9 +1,9 @@
 var VerifyEmailWS = (function(){
     "use strict";
 
-    function emailHandler(error) {
-    	error.textContent = Content.localize().textEmailSent;
-    	error.setAttribute('style', 'display:block');
+    function emailHandler(msg) {
+      msg.textContent = Content.localize().textEmailSent;
+      msg.style.display = 'inline-block';
     }
 
     function initPage(email){
@@ -11,7 +11,7 @@ var VerifyEmailWS = (function(){
     }
 
     return {
-    	emailHandler: emailHandler,
+      emailHandler: emailHandler,
         init: initPage
     };
 }());

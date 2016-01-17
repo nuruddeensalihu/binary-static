@@ -287,8 +287,8 @@ var on_click_signup = function() {
 
 function check_login_hide_signup() {
     if (page.client.is_logged_in) {
-        $('#open-account').remove();
-        $('#stretch').removeClass('grd-grid-7 grd-grid-mobile-12 grd-grid-phablet-12');
+        $('#verify-email-form').remove();
+        $('.break').attr('style', 'margin-bottom:1em');
     }
 }
 
@@ -445,6 +445,12 @@ if (page.language() === 'JA' && !$.cookie('MyJACookie')) {
   window.location = window.location.pathname + str;
 }
 
+
+// returns true if internet explorer browser
+function isIE() {
+  return /(msie|trident|edge)/i.test(window.navigator.userAgent) && !window.opera;
+}
+
 pjax_config_page('/$|/home', function() {
     return {
         onLoad: function() {
@@ -541,6 +547,7 @@ pjax_config_page('/careers', function() {
         },
     };
 });
+
 pjax_config_page('/bulk-trader-facility', function() {
     return {
         onLoad: function() {
@@ -550,5 +557,16 @@ pjax_config_page('/bulk-trader-facility', function() {
         onUnload: function() {
             $(window).off('scroll');
         }
+    };
+});
+
+pjax_config_page('/terms-and-condition', function() {
+    return {
+        onLoad: function() {
+            var year = document.getElementsByClassName('currentYear');
+            for (i = 0; i < year.length; i++){
+              year[i].innerHTML = new Date().getFullYear();
+            }
+        },
     };
 });

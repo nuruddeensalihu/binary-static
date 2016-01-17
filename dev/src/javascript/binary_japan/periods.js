@@ -1,7 +1,9 @@
 if(typeof is_japan === 'function'){
 	var Periods = (function(){
 		var barrier = 0,
-			barrier2 = 0;
+			barrier2 = 0,
+			barriers1 = [],
+			barriers2 = [];
 
 		var displayPeriods = function(){
 
@@ -124,6 +126,8 @@ if(typeof is_japan === 'function'){
 				});
 				target1.appendChild(fragment);
 				barrier = target1.value = periods[formName][underlying][period].barrier;
+				barriers1 = periods[formName][underlying][period].available_barriers;
+				barriers2 = [];
 			}
 			else{
 				document.getElementById('jbarrier_row').style.display = 'none';
@@ -155,12 +159,16 @@ if(typeof is_japan === 'function'){
 				});
 				target3.appendChild(fragment);
 				barrier2 = target3.value = periods[formName][underlying][period].low_barrier;
+				barriers1 = periods[formName][underlying][period].available_barriers[1];
+				barriers2 = periods[formName][underlying][period].available_barriers[0];
 			}
 		};
 
 		return {
 			barrier: function(){return barrier;},
 			barrier2: function(){return barrier2;},
+			barriers1: function(){return barriers1;},
+			barriers2: function(){return barriers2;},
 			displayPeriods: displayPeriods,
 			displayBarriers: displayBarriers
 		};

@@ -7,28 +7,43 @@ var SelfExlusionWS = (function(){
 
     var init = function(){
         $form   = $("#selfExclusion");
+        clearErrors();
         $form.find("button").on("click", function(e){
             e.preventDefault();
             e.stopPropagation();
+            clearErrors();
             if(validateForm($form) === false){
                 return false;
             }
-            BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "set_self_exclusion"}});
+            sendRequest();
+
         });
-        BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "get_self_exclusion"}});
+
+        BinarySocket.send({"get_self_exclusion": 1});
+
+        self_exclusion_date_picker();
+    };
+
+    var clearErrors = function(){
+        $form.find("#exclusionMsg").hide();
+        $form.find("#exclusionMsg").text("");
+        $form.show();
+        $("#exclusionText").show();
+        $("#exclusionTitle").show();
+        $("#errorMsg").text("");
     };
 
     var isNormalInteger= function(str) {
         return /^\+?\d+$/.test(str);
     };
 
-    var validateForm = function(frm){
+    var validateForm = function($frm){
         var isValid = true;
         $("p.errorfield").each(function(ind,element){
             $(element).text("");
         });
    
-        $(":text").each(function(ind,element){
+        $frm.find(":text").each(function(ind,element){
             var ele = $(element).val().replace(/ /g, "");
             var id = $(element).attr("id");
        
@@ -71,7 +86,7 @@ var SelfExlusionWS = (function(){
             }
         });
 
-        if(validateDate() ===false){
+        if(validate_exclusion_date() ===false){
             isValid = false;
         }
 
@@ -81,23 +96,37 @@ var SelfExlusionWS = (function(){
         }
     };
 
-    var isAuthorized =  function(response){
-        if(response.echo_req.passthrough){
-            var option= response.echo_req.passthrough.value ;
+    var validate_exclusion_date = function() {
+        var exclusion_date = $('#EXCLUDEUNTIL').val();
+        var date_regex = /^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
+        var error_element_errorEXCLUDEUNTIL = clearInputErrorField('errorEXCLUDEUNTIL');
 
-            switch(option){
-                case   "get_self_exclusion" :
-                        BinarySocket.send({"get_self_exclusion": 1});
-                        break;
-                case   "set_self_exclusion" :
-                        sendRequest();
-                        break;                   
+        if (exclusion_date) {
+
+            if(date_regex.test($('#EXCLUDEUNTIL').val()) === false){
+                error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please select a valid date");
+                return false;
             }
-        }
-    };
+    
+            exclusion_date = new Date(exclusion_date);
+            // self exclusion date must >= 6 month from now
+            var six_month_date = new Date();
+            six_month_date.setMonth(six_month_date.getMonth() + 6);
 
-    var validateDate = function(){
-        return client_form.self_exclusion.validate_exclusion_date();
+            if (exclusion_date < six_month_date) {
+                error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please enter a date that is at least 6 months from now.");
+                return false ;
+            }
+
+            if (confirm(text.localize("When you click 'Ok' you will be excluded from trading on the site until the selected date.")) === true) {
+                return true;
+            } else {
+                return false;
+            }
+
+        }
+
+        return true;
     };
 
     var populateForm = function(response){
@@ -106,6 +135,11 @@ var SelfExlusionWS = (function(){
         if("error" in response) {
             if("message" in response.error) {
                 console.log(response.error.message);
+                $("#errorMsg").removeClass("hidden");
+                $("#errorMsg").text(text.localize(response.error.message));
+                $form.hide();
+                $("#exclusionText").hide();
+                $("#exclusionTitle").hide();
             }
             return false;
         }else{
@@ -250,8 +284,32 @@ var SelfExlusionWS = (function(){
             }
             return false;
         }else{
-            window.location.href = window.location.href;
+            $form.find("#exclusionMsg").show();
+            $form.find("#exclusionMsg").text(text.localize('Your changes have been updated.'));
+            BinarySocket.send({"get_self_exclusion": 1});
+
         }
+    };
+
+    var self_exclusion_date_picker = function () {
+        // 6 months from now
+        var start_date = new Date();
+        start_date.setMonth(start_date.getMonth() + 6);
+
+        // 5 years from now
+        var end_date = new Date();
+        end_date.setFullYear(end_date.getFullYear() + 5);
+
+        var id = $('#EXCLUDEUNTIL');
+
+        id.datepicker({
+            dateFormat: 'yy-mm-dd',
+            minDate: start_date,
+            maxDate: end_date,
+            onSelect: function(dateText, inst) {
+                id.attr("value", dateText);
+            },
+        });
     };
 
     var apiResponse = function(response){
@@ -262,9 +320,6 @@ var SelfExlusionWS = (function(){
         }else if(type === "set_self_exclusion" || (type === "error" && "set_self_exclusion" in response.echo_req))
         {
             responseMessage(response);
-        }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
-        {
-            isAuthorized(response);
         }
     };
 
@@ -294,8 +349,9 @@ pjax_config_page("user/self_exclusionws", function() {
                     }
                 }
             });	
-            Exclusion.self_exclusion_date_picker();
+
             SelfExlusionWS.init();
+        
         }
     };
 });

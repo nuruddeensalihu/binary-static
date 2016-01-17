@@ -12,7 +12,7 @@ var account_transferws = (function(){
         $("#client_message").hide();
         account_bal = 0;
 
-        BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 1 });
+        BinarySocket.send({ "transfer_between_accounts": "1","req_id" : 4 });
 
         $form.find("button").on("click", function(e){
             e.preventDefault();
@@ -21,8 +21,16 @@ var account_transferws = (function(){
             if(validateForm() === false){
                 return false;
             }
-            
-            BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 2 });
+
+            var amt = $form.find("#acc_transfer_amount").val();
+            BinarySocket.send({ 
+                        "transfer_between_accounts": "1",
+                        "account_from": account_from,
+                        "account_to": account_to,
+                        "currency": currType,
+                        "amount": amt
+            });
+
         });
 
         $form.find("#transfer_account_transfer").on("change",function(){
@@ -30,7 +38,7 @@ var account_transferws = (function(){
            $form.find("#invalid_amount").text("");
            set_account_from_to();
 
-           BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 3});
+           BinarySocket.send({"payout_currencies": "1"});
 
         });
     };
@@ -67,12 +75,6 @@ var account_transferws = (function(){
             isValid = false;
         }
 
-        if($.inArray(currType, payoutCurr) == -1)
-        {
-            $form.find("#invalid_amount").text(text.localize("Invalid currency."));
-            isValid = false;
-        }
-
         return isValid;
     };
 
@@ -85,40 +87,6 @@ var account_transferws = (function(){
         else if(type === "payout_currencies" || (type === "error" && "payout_currencies" in response.echo_req))
         {
             responseMessage(response);
-        }
-        else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
-        {
-            isAuthorized(response);
-        }
-    };
-
-    var isAuthorized =  function(response){
-        if(response.req_id){
-            var option= response.req_id ;
-            var amt = $form.find("#acc_transfer_amount").val();
-
-            switch(option){
-                case    1:
-                        BinarySocket.send({ 
-                            "transfer_between_accounts": "1",
-                            "req_id" : 4
-                        });
-                        break;
-                case    2 :
-                        BinarySocket.send({ 
-                            "transfer_between_accounts": "1",
-                            "account_from": account_from,
-                            "account_to": account_to,
-                            "currency": currType,
-                            "amount": amt
-                        });
-                        break;  
-                case    3:
-                        BinarySocket.send({"payout_currencies": "1"});
-                        break;
-                                   
-            }
-
         }
     };
 
@@ -169,6 +137,7 @@ var account_transferws = (function(){
             else if(response.req_id === 4){
 
                 var secondacct, firstacct,str,optionValue;
+                var selectedIndex = -1;
 
                 $.each(response.accounts, function(index,value){
                     var currObj = {};
@@ -179,6 +148,11 @@ var account_transferws = (function(){
                         currObj.account = value.loginid;
                         currObj.currency = value.currency;
                         currObj.balance = value.balance;
+
+                        if(value.balance > 0 && selectedIndex < 0)
+                        {
+                            selectedIndex = index;
+                        }
 
                         availableCurr.push(currObj);
                     }
@@ -205,6 +179,10 @@ var account_transferws = (function(){
                         availableCurr.push(currObj);     
 
                         firstacct = "";    
+
+                        if(selectedIndex < 0 && value.balance){
+                            selectedIndex =  index;
+                        }  
                     }
                     
                     if(($.isEmptyObject(firstacct) === false) && ($.isEmptyObject(secondacct) === false))
@@ -216,16 +194,28 @@ var account_transferws = (function(){
                                  .attr("value",optionValue)
                                  .text(str));     
                     }
+                    secondacct = "";
 
                     if(value.balance <= 0){
                         $form.find("#transfer_account_transfer option:last").remove();
                     }
-                
+                    else{
+                        if(selectedIndex < 0 ){
+                            selectedIndex =  index;
+                        } 
+                    }
 
 
                 });
+                
+                for(var i = 0; i < selectedIndex; i++){
+                    $form.find("#transfer_account_transfer option").eq(i).remove();
+                }
 
-                $form.find("#transfer_account_transfer option").eq(0).attr('selected', 'selected');
+                if(selectedIndex >=0){
+                    $form.find("#transfer_account_transfer option").eq(selectedIndex).attr('selected', 'selected');
+                }
+        
 
                 set_account_from_to();
 

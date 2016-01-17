@@ -9,6 +9,9 @@ if (window.applicationCache) {
                         window.location.reload();
                         return false;
                     });
+                    setTimeout(function() {
+                      $('#appcache-refresh-link').trigger('click');
+                    }, 30000);
                 } catch (err) {}
             }
         }, false);
