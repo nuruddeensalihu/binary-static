@@ -21,11 +21,11 @@ BetAnalysis.tab_live_chart = function () {
         get_live_chart: function() {
             var that = this;
             $.ajax(ajax_loggedin({
-              url     : '/d/trade_livechart.cgi?l=' + page.language(),
-              dataType: 'html',
-              success : function (data) {
-                    that.set_live_chart(data);
-                  },
+                url     : '/d/trade_livechart.cgi?l=' + page.language(),
+                dataType: 'html',
+                success : function (data) {
+                            that.set_live_chart(data);
+                          },
             }));
         },
         set_live_chart: function (data) {

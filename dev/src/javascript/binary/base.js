@@ -219,7 +219,6 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
 
         LocalStore.set('active_loginid', match);
         var start_time;
-        var time_now;
         var tabChanged = function() {
             if(clock_started === true){
                 if (document.hidden || document.webkitHidden) {

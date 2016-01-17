@@ -1,10 +1,6 @@
-pjax_config_page("limitsws", function(){
+pjax_config_page("limitws", function(){
     return {
         onLoad: function() {
-            if (!$.cookie('login')) {
-                window.location.href = page.url.url_for('login');
-                return;
-            }
             Content.populate();
             document.getElementById('client_message').setAttribute('style', 'display:none');
 
@@ -22,7 +18,7 @@ pjax_config_page("limitsws", function(){
                             LimitsWS.limitsHandler(response);
                         } else if (error) {
                             LimitsWS.limitsError();
-                        }
+                        } 
                     }
                 }
             });

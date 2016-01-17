@@ -36379,1047 +36379,7 @@ Chart.prototype.callbacks.push(function (chart) {
   }
 
 }(this));
-;// https://github.com/xbsoftware/enjoyhint
-// (+ some custom changes for binary.com)
-
-var EnjoyHint = function (_options) {
-    var that = this;
-    // Some options
-    var defaults = {
-        onStart: function () {
-
-        },
-        onEnd: function () {
-
-        }
-    };
-    var options = $.extend(defaults, _options);
-
-
-    var data = [];
-    var current_step = 0;
-
-    $body = $('body');
-
-    /********************* PRIVAT METHODS ***************************************/
-    var init = function () {
-        if ($('.enjoyhint'))
-            $('.enjoyhint').remove();
-        $("html, body").css({'overflow':'hidden'});
-        $(document).on("touchmove",lockTouch);
-
-        $body.enjoyhint({
-            onNextClick: function () {
-                current_step++;
-                stepAction();
-            },
-            onSkipClick: function () {
-                var step_data = data[current_step];
-                var $element = $(step_data.selector);
-                off(step_data.event);
-                $element.off(makeEventName(step_data.event));
-                destroyEnjoy();
-            }
-        });
-    };
-
-    var lockTouch = function(e) {
-        e.preventDefault();
-    };
-
-    var destroyEnjoy = function () {
-        $body = $('body');
-        $('.enjoyhint').remove();
-        $("html, body").css({'overflow':'auto'});
-        $("html, body").css({'overflow-x':'hidden'});
-        $(document).off("touchmove", lockTouch);
-
-    };
-
-    that.clear = function(){
-        //Remove userClass and set default text
-        $(".enjoyhint_next_btn").removeClass(that.nextUserClass);
-        $(".enjoyhint_next_btn").text("Next");
-        $(".enjoyhint_skip_btn").removeClass(that.skipUserClass);
-        $(".enjoyhint_skip_btn").text("Skip");
-    }
-
-    var $body = $('body');
-    var stepAction = function () {
-        if (data && data[current_step]) {
-            $(".enjoyhint").removeClass("enjoyhint-step-"+current_step);
-            $(".enjoyhint").addClass("enjoyhint-step-"+(current_step+1));
-            var step_data = data[current_step];
-            if (step_data.onBeforeStart && typeof step_data.onBeforeStart === 'function') {
-                step_data.onBeforeStart();
-            }
-            var timeout = step_data.timeout || 0;
-            setTimeout(function () {
-                if (!step_data.selector) {
-                    for (var prop in step_data) {
-                        if (step_data.hasOwnProperty(prop) && prop.split(" ")[1]) {
-                            step_data.selector = prop.split(" ")[1];
-                            step_data.event = prop.split(" ")[0];
-                            if (prop.split(" ")[0] == 'next' || prop.split(" ")[0] == 'auto' || prop.split(" ")[0] == 'custom') {
-                                step_data.event_type = prop.split(" ")[0];
-                            }
-                            step_data.description = step_data[prop];
-                        }
-                    }
-                }
-                setTimeout(function(){
-                    that.clear();
-                }, 250);
-                $(document.body).scrollTo(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -100});
-                setTimeout(function () {
-                    var $element = $(step_data.selector);
-                    var event = makeEventName(step_data.event);
-
-                    $body.enjoyhint('show');
-                    $body.enjoyhint('hide_next');
-                    var $event_element = $element;
-                    if (step_data.event_selector) {
-                        $event_element = $(step_data.event_selector);
-                    }
-                    if (!step_data.event_type && step_data.event == "key"){
-                        $element.keydown(function( event ) {
-                            if ( event.which == step_data.keyCode ) {
-                                current_step++;
-                                stepAction();
-                            }
-                        });
-                    }
-                    if (step_data.showNext == true){
-                        $body.enjoyhint('show_next');
-                    }
-                    if (step_data.showSkip == true){
-                        $body.enjoyhint('show_skip');
-                    }else{
-                        $body.enjoyhint('hide_skip');
-                    }
-                    if (step_data.showSkip == true){
-
-                    }
-
-
-                    if (step_data.nextButton){
-                        $(".enjoyhint_next_btn").addClass(step_data.nextButton.className || "");
-                        $(".enjoyhint_next_btn").html(step_data.nextButton.html || "Next");
-                        that.nextUserClass = step_data.nextButton.className
-                    }
-
-                    if (step_data.skipButton){
-                        $(".enjoyhint_skip_btn").addClass(step_data.skipButton.className || "");
-                        $(".enjoyhint_skip_btn").html(step_data.skipButton.html || "Skip");
-                        that.skipUserClass = step_data.skipButton.className
-                    }
-
-                    if (step_data.event_type) {
-                        switch (step_data.event_type) {
-                            case 'auto':
-                                $element[step_data.event]();
-                                switch (step_data.event) {
-                                    case 'click':
-                                        break;
-                                }
-                                current_step++;
-                                stepAction();
-                                return;
-                                break;
-                            case 'custom':
-                                on(step_data.event, function () {
-                                    current_step++;
-                                    off(step_data.event);
-                                    stepAction();
-                                });
-                                break;
-                            case 'next':
-                                $body.enjoyhint('show_next');
-                                break;
-
-                        }
-
-                    } else {
-                        $event_element.on(event, function (e) {
-                            if (step_data.keyCode && e.keyCode != step_data.keyCode) {
-                                return;
-                            }
-                            current_step++;
-                            $(this).off(event);
-
-                            stepAction();
-                        });
-
-                    }
-                    var max_habarites = Math.max($element.outerWidth(), $element.outerHeight());
-                    var radius = step_data.radius  || Math.round(max_habarites / 2) + 5;
-                    var offset = $element.offset();
-                    var w = $element.outerWidth();
-                    var h = $element.outerHeight();
-                    var shape_margin = (step_data.margin !== undefined) ? step_data.margin : 10;
-                    var coords = {
-                        x: offset.left + Math.round(w / 2) ,
-                        y: offset.top + Math.round(h / 2)  - $(document).scrollTop()
-                    };
-                    var shape_data = {
-                        center_x: coords.x,
-                        center_y: coords.y,
-                        text: step_data.description,
-                        top: step_data.top,
-                        bottom: step_data.bottom,
-                        left: step_data.left,
-                        right: step_data.right,
-                        margin: step_data.margin,
-                        scroll: step_data.scroll
-                    };
-
-                    if (step_data.shape && step_data.shape == 'circle') {
-                        shape_data.shape = 'circle';
-                        shape_data.radius = radius;
-                    } else {
-                        shape_data.radius = 0;
-                        shape_data.width = w + shape_margin;
-                        shape_data.height = h + shape_margin;
-                    }
-                    $body.enjoyhint('render_label_with_shape', shape_data);
-                }, step_data.scrollAnimationSpeed + 20 || 270);
-            }, timeout);
-        } else {
-            $body.enjoyhint('hide');
-            options.onEnd();
-            destroyEnjoy();
-        }
-
-    };
-
-    var makeEventName = function (name, is_custom) {
-        return name + (is_custom ? 'custom' : '') + '.enjoy_hint';
-    };
-
-    var on = function (event_name, callback) {
-        $body.on(makeEventName(event_name, true), callback);
-    };
-    var off = function (event_name) {
-        $body.off(makeEventName(event_name, true));
-    };
-
-    /********************* PUBLIC METHODS ***************************************/
-    that.runScript = function () {
-        current_step = 0;
-        options.onStart();
-        stepAction();
-    };
-
-    that.resumeScript = function () {
-        stepAction();
-    };
-
-    that.getCurrentStep = function () {
-        return current_step;
-    };
-
-
-    that.trigger = function (event_name) {
-        $body.trigger(makeEventName(event_name, true));
-    };
-
-    that.setScript = function (_data) {
-        if (_data) {
-            data = _data;
-        }
-    };
-
-    //support deprecated API methods
-    that.set = function (_data) {
-        that.setScript(_data);
-    };
-
-    that.setSteps = function (_data) {
-        that.setScript(_data);
-    };
-
-    that.run = function () {
-        that.runScript();
-    };
-
-    that.resume = function () {
-        that.resumeScript();
-    };
-
-
-    init();
-};
-;CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
-    if (w < 2 * r) r = w / 2;
-    if (h < 2 * r) r = h / 2;
-    this.beginPath();
-    this.moveTo(x + r, y);
-    this.arcTo(x + w, y, x + w, y + h, r);
-    this.arcTo(x + w, y + h, x, y + h, r);
-    this.arcTo(x, y + h, x, y, r);
-    this.arcTo(x, y, x + w, y, r);
-    this.closePath();
-    return this;
-};
-
-(function ($) {
-    var methods = {
-        init: function (options) {
-            //console.log(options,'-------------');
-            return this.each(function () {
-                var defaults = {
-                    onNextClick: function () {
-                    },
-                    onSkipClick: function () {
-                    },
-                    animation_time: 800
-                };
-
-
-                this.enjoyhint_obj = {};
-                var that = this.enjoyhint_obj;
-                var $that = $(this);
-                var $body = $('body');
-                that.options = jQuery.extend(defaults, options);
-
-                //general classes
-                that.gcl = {
-                    chooser: 'enjoyhint'
-                };
-
-                // classes
-                that.cl = {
-                    enjoy_hint: 'enjoyhint',
-                    hide: 'enjoyhint_hide',
-                    disable_events_element: 'enjoyhint_disable_events',
-                    btn: 'enjoyhint_btn',
-                    skip_btn: 'enjoyhint_skip_btn',
-                    close_btn: 'enjoyhint_close_btn',
-                    next_btn: 'enjoyhint_next_btn',
-                    main_canvas: 'enjoyhint_canvas',
-                    main_svg: 'enjoyhint_svg',
-                    svg_wrapper: 'enjoyhint_svg_wrapper',
-                    svg_transparent: 'enjoyhint_svg_transparent',
-                    kinetic_container: 'kinetic_container'
-                };
-                function makeSVG(tag, attrs) {
-                    var el = document.createElementNS('http://www.w3.org/2000/svg', tag);
-                    for (var k in attrs)
-                        el.setAttribute(k, attrs[k]);
-                    return el;
-                }
-
-                // =======================================================================
-                // ========================---- enjoyhint ----==============================
-                // =======================================================================
-                that.canvas_size = {
-                    w: $(window).width()*1.4,
-                    h: $(window).height()*1.4
-                };
-                var canvas_id = "enj_canvas";
-
-                that.enjoyhint = $('<div>', {'class': that.cl.enjoy_hint + ' ' + that.cl.svg_transparent}).appendTo($that);
-                that.enjoyhint_svg_wrapper = $('<div>', {'class': that.cl.svg_wrapper + ' ' + that.cl.svg_transparent}).appendTo(that.enjoyhint);
-                that.$stage_container = $('<div id="' + that.cl.kinetic_container + '">').appendTo(that.enjoyhint);
-                that.$canvas = $('<canvas id="' + canvas_id + '" width="' + that.canvas_size.w + '" height="' + that.canvas_size.h + '" class="' + that.cl.main_canvas + '">').appendTo(that.enjoyhint);
-                that.$svg = $('<svg width="' + that.canvas_size.w + '" height="' + that.canvas_size.h + '" class="' + that.cl.main_canvas + ' ' + that.cl.main_svg + '">').appendTo(that.enjoyhint_svg_wrapper);
-                var defs = $(makeSVG('defs'));
-                var marker = $(makeSVG('marker', {id: "arrowMarker", viewBox: "0 0 36 21", refX: "21", refY: "10", markerUnits: "strokeWidth", orient: "auto", markerWidth: "16", markerHeight: "12"}));
-                var polilyne = $(makeSVG('path', {style: "fill:none; stroke:rgb(255,255,255); stroke-width:2", d: "M0,0 c30,11 30,9 0,20"}));
-                defs.append(marker.append(polilyne)).appendTo(that.$svg);
-                that.kinetic_stage = new Kinetic.Stage({
-                    container: that.cl.kinetic_container,
-                    width: that.canvas_size.w,
-                    height: that.canvas_size.h
-                });
-                //console.log(that.enjoyhint);
-
-                that.layer = new Kinetic.Layer();
-                that.rect = new Kinetic.Rect({
-//          x: 0,
-//          y: 0,
-                    fill: 'rgba(0,0,0,0.6)',
-                    width: that.canvas_size.w,
-                    height: that.canvas_size.h
-                });
-
-                var $top_dis_events = $('<div>', {'class': that.cl.disable_events_element}).appendTo(that.enjoyhint);
-                var $bottom_dis_events = $top_dis_events.clone().appendTo(that.enjoyhint);
-                var $left_dis_events = $top_dis_events.clone().appendTo(that.enjoyhint);
-                var $right_dis_events = $top_dis_events.clone().appendTo(that.enjoyhint);
-
-                that.$skip_btn = $('<div>', {'class': that.cl.skip_btn}).appendTo(that.enjoyhint).html('Skip').click(function (e) {
-                    that.hide();
-                    that.options.onSkipClick();
-                });
-                that.$next_btn = $('<div>', {'class': that.cl.next_btn}).appendTo(that.enjoyhint).html('Next').click(function (e) {
-                    that.options.onNextClick();
-                });
-
-                that.$close_btn = $('<div>', {'class': that.cl.close_btn}).appendTo(that.enjoyhint).html('').click(function (e){
-                    that.hide();
-                    that.options.onSkipClick();
-                });
-
-                that.$canvas.mousedown(function (e) {
-                    //console.log('cl')
-                    $('canvas').css({left: '4000px'});
-
-                    var BottomElement = document.elementFromPoint(e.clientX, e.clientY);
-                    //console.log(BottomElement.tagName)
-                    $('canvas').css({left: '0px'});
-
-                    $(BottomElement).click();
-//          that.$canvas.show();
-                    return false;
-                });
-
-
-                var circle_r = 0;
-                var shape_init_shift = 130;
-                that.shape = new Kinetic.Shape({
-                    radius: circle_r,
-                    center_x: -shape_init_shift,
-                    center_y: -shape_init_shift,
-                    width: 0,
-                    height: 0,
-                    sceneFunc: function (context) {
-                        var ctx = this.getContext("2d")._context;
-                        var pos = this.pos;
-                        var def_comp = ctx.globalCompositeOperation;
-                        ctx.globalCompositeOperation = 'destination-out';
-                        ctx.beginPath();
-
-                        var x = this.attrs.center_x - Math.round(this.attrs.width / 2);
-                        var y = this.attrs.center_y - Math.round(this.attrs.height / 2);
-                        ctx.roundRect(x, y, this.attrs.width, this.attrs.height, this.attrs.radius);
-                        ctx.fillStyle = "red";
-                        ctx.fill();
-
-                        ctx.globalCompositeOperation = def_comp;
-                    }
-                });
-                that.shape.radius = circle_r;
-                that.layer.add(that.rect);
-                that.layer.add(that.shape);
-                that.kinetic_stage.add(that.layer);
-
-                var enjoyhint_elements = [
-                    that.enjoyhint,
-                    $top_dis_events,
-                    $bottom_dis_events,
-                    $left_dis_events,
-                    $right_dis_events
-                ];
-
-                that.show = function () {
-                    that.enjoyhint.removeClass(that.cl.hide);
-                };
-
-                that.hide = function () {
-                    that.enjoyhint.addClass(that.cl.hide);
-                    var tween = new Kinetic.Tween({
-                        node: that.shape,
-                        duration: 0.002,
-                        center_x: -shape_init_shift,
-                        center_y: -shape_init_shift
-                    });
-                    tween.play();
-                };
-
-                that.hide();
-
-                that.hideNextBtn = function () {
-                    that.$next_btn.addClass(that.cl.hide);
-                    that.nextBtn = "hide";
-                };
-                that.showNextBtn = function () {
-                    that.$next_btn.removeClass(that.cl.hide);
-                    that.nextBtn = "show";
-                };
-
-                that.hideSkipBtn = function () {
-                    that.$skip_btn.addClass(that.cl.hide);
-                };
-                that.showSkipBtn = function () {
-                    that.$skip_btn.removeClass(that.cl.hide);
-                };
-
-
-
-
-
-                that.renderCircle = function (data) {
-                    var r = data.r || 0;
-                    var x = data.x || 0;
-                    var y = data.y || 0;
-
-                    var tween = new Kinetic.Tween({
-                        node: that.shape,
-                        duration: 0.2,
-                        center_x: x,
-                        center_y: y,
-                        width: r * 2,
-                        height: r * 2,
-                        radius: r
-                    });
-                    tween.play();
-
-                    var left = x - r;
-                    var right = x + r;
-                    var top = y - r;
-                    var bottom = y + r;
-                    var margin = 20;
-                    return {
-                        x: x,
-                        y: y,
-                        left: left,
-                        right: right,
-                        top: top,
-                        bottom: bottom,
-                        conn: {
-                            left: {
-                                x: left - margin,
-                                y: y
-                            },
-                            right: {
-                                x: right + margin,
-                                y: y
-                            },
-                            top: {
-                                x: x,
-                                y: top - margin
-                            },
-                            bottom: {
-                                x: x,
-                                y: bottom + margin
-                            }
-                        }
-                    };
-
-                };
-
-
-                that.renderRect = function (data) {
-                    var r = data.r || 0;
-                    var x = data.x || 0;
-                    var y = data.y || 0;
-                    var w = data.w || 0;
-                    var h = data.h || 0;
-                    var margin = 20;
-                    var tween = new Kinetic.Tween({
-                        node: that.shape,
-                        duration: 0.2,
-                        center_x: x,
-                        center_y: y,
-                        width: w,
-                        height: h,
-                        radius: r
-                    });
-                    tween.play();
-                    var half_w = Math.round(w / 2);
-                    var half_h = Math.round(h / 2);
-                    var left = x - half_w;
-                    var right = x + half_w;
-                    var top = y - half_h;
-                    var bottom = y + half_h;
-                    return {
-                        x: x,
-                        y: y,
-                        left: left,
-                        right: right,
-                        top: top,
-                        bottom: bottom,
-                        conn: {
-                            left: {
-                                x: left - margin,
-                                y: y
-                            },
-                            right: {
-                                x: right + margin,
-                                y: y
-                            },
-                            top: {
-                                x: x,
-                                y: top - margin
-                            },
-                            bottom: {
-                                x: x,
-                                y: bottom + margin
-                            }
-                        }
-                    };
-
-                };
-                that.renderLabel = function (data) {
-                    var x = data.x || 0;
-                    var y = data.y || 0;
-                    var text = data.text || 0;
-
-                    var label = that.getLabelElement({
-                        x: x,
-                        y: y,
-                        text: data.text
-                    });
-                    var label_w = label.width();
-                    var label_h = label.height();
-                    var label_left = label.offset().left;
-                    var label_right = label.offset().left + label_w;
-                    var label_top = label.offset().top - $(document).scrollTop();;
-                    var label_bottom = label.offset().top + label_h;
-
-                    var margin = 10;
-                    var conn_left = {
-                        x: label_left - margin,
-                        y: label_top + Math.round(label_h / 2)
-                    };
-                    var conn_right = {
-                        x: label_right + margin,
-                        y: label_top + Math.round(label_h / 2)
-                    };
-                    var conn_top = {
-                        x: label_left + Math.round(label_w / 2),
-                        y: label_top - margin
-                    };
-                    var conn_bottom = {
-                        x: label_left + Math.round(label_w / 2),
-                        y: label_bottom + margin
-                    };
-                    label.detach();
-                    setTimeout(function () {
-                        $('#enjoyhint_label').remove();
-                        label.appendTo(that.enjoyhint);
-
-                    }, that.options.animation_time / 2);
-                    return {
-                        label: label,
-                        left: label_left,
-                        right: label_right,
-                        top: label_top,
-                        bottom: label_bottom,
-                        conn: {
-                            left: conn_left,
-                            right: conn_right,
-                            top: conn_top,
-                            bottom: conn_bottom
-                        }
-
-                    };
-                };
-                that.renderArrow = function (data) {
-                    var x_from = data.x_from || 0;
-                    var y_from = data.y_from || 0;
-                    var x_to = data.x_to || 0;
-                    var y_to = data.y_to || 0;
-                    var by_top_side = data.by_top_side;
-                    var control_point_x = 0;
-                    var control_point_y = 0;
-                    if (by_top_side) {
-                        if (y_from >= y_to) {
-                            control_point_y = y_to;
-                            control_point_x = x_from;
-                        } else {
-                            control_point_y = y_from;
-                            control_point_x = x_to;
-                        }
-                    } else {
-                        if (y_from >= y_to) {
-                            control_point_y = y_from;
-                            control_point_x = x_to;
-                        } else {
-                            control_point_y = y_to;
-                            control_point_x = x_from;
-                        }
-                    }
-
-                    var text = data.text || '';
-                    that.enjoyhint.addClass(that.cl.svg_transparent);
-                    setTimeout(function () {
-                        $('#enjoyhint_arrpw_line').remove();
-                        var d = 'M' + x_from + ',' + y_from + ' Q' + control_point_x + ',' + control_point_y + ' ' + x_to + ',' + y_to;
-                        that.$svg.append(makeSVG('path', {style: "fill:none; stroke:rgb(255,255,255); stroke-width:3", 'marker-end': "url(#arrowMarker)", d: d, id: 'enjoyhint_arrpw_line'}));
-                        that.enjoyhint.removeClass(that.cl.svg_transparent);
-
-                    }, that.options.animation_time / 2);
-                };
-
-
-                that.getLabelElement = function (data) {
-                    return $('<div>', {"class": 'enjoy_hint_label', id: 'enjoyhint_label'})
-                        .css({
-                            'top': data.y + 'px',
-                            'left': data.x + 'px'
-                        })
-                        .html(data.text).appendTo(that.enjoyhint);
-
-                };
-
-
-                that.disableEventsNearRect = function (rect) {
-                    $top_dis_events.css({
-                        top: '0',
-                        left: '0'
-                    }).height(rect.top);
-                    $bottom_dis_events.css({
-                        top: rect.bottom + 'px',
-                        left: '0'
-                    });
-                    $left_dis_events.css({
-                        top: '0',
-                        left: 0 + 'px'
-                    }).width(rect.left);
-                    $right_dis_events.css({
-                        top: '0',
-                        left: rect.right + 'px'
-                    });
-                };
-
-
-                that.renderLabelWithShape = function (data) {
-                    var shape_type = data.shape || 'rect';
-                    var shape_data = {};
-
-
-                    var half_w = 0;
-                    var half_h = 0;
-
-                    var shape_offsets = {
-                        top: data.top || 0,
-                        bottom: data.bottom || 0,
-                        left: data.left || 0,
-                        right: data.right || 0
-                    };
-
-                    switch (shape_type) {
-                        case 'circle':
-                            half_w = half_h = data.radius;
-                            var sides_pos = {
-                                top: data.center_y - half_h + shape_offsets.top,
-                                bottom: data.center_y + half_h - shape_offsets.bottom,
-                                left: data.center_x - half_w + shape_offsets.left,
-                                right: data.center_x + half_w - shape_offsets.right
-                            };
-                            var width = sides_pos.right - sides_pos.left;
-                            var height = sides_pos.bottom - sides_pos.top;
-                            data.radius = Math.round(Math.min(width, height) / 2);
-                            //new half habarites
-                            half_w = half_h = Math.round(data.radius / 2);
-
-                            var new_half_w = Math.round(width / 2);
-                            var new_half_h = Math.round(height / 2);
-                            //new center_x and center_y
-                            data.center_x = sides_pos.left + new_half_w;
-                            data.center_y = sides_pos.top + new_half_h;
-
-                            shape_data = that.renderCircle({
-                                x: data.center_x,
-                                y: data.center_y,
-                                r: data.radius
-                            });
-
-                            break;
-                        case 'rect':
-                            half_w = Math.round(data.width / 2);
-                            half_h = Math.round(data.height / 2);
-
-                            var sides_pos = {
-                                top: data.center_y - half_h + shape_offsets.top,
-                                bottom: data.center_y + half_h - shape_offsets.bottom,
-                                left: data.center_x - half_w + shape_offsets.left,
-                                right: data.center_x + half_w - shape_offsets.right
-                            };
-                            data.width = sides_pos.right - sides_pos.left;
-                            data.height = sides_pos.bottom - sides_pos.top;
-
-                            half_w = Math.round(data.width / 2);
-                            half_h = Math.round(data.height / 2);
-                            //new center_x and center_y
-                            data.center_x = sides_pos.left + half_w;
-                            data.center_y = sides_pos.top + half_h;
-                            shape_data = that.renderRect({
-                                x: data.center_x,
-                                y: data.center_y,
-                                w: data.width,
-                                h: data.height,
-                                r: data.radius,
-                            });
-                            break;
-                    }
-
-
-                    var body_size = {
-                        w: that.enjoyhint.width(),
-                        h: that.enjoyhint.height()
-                    };
-                    //temp label used for detect label width and height
-                    var label = that.getLabelElement({
-                        x: 0,
-                        y: 0,
-                        text: data.text
-                    });
-                    var label_width = label.outerWidth();
-                    var label_height = label.outerHeight();
-                    label.remove();
-                    var top_offset = data.center_y - half_h;
-                    var bottom_offset = body_size.h - (data.center_y + half_h);
-                    var left_offset = data.center_x - half_w;
-                    var right_offset = body_size.w - (data.center_x + half_w);
-
-                    var label_hor_side = (body_size.w - data.center_x) < data.center_x ? 'left' : 'right';
-                    var label_ver_side = (body_size.h - data.center_y) < data.center_y ? 'top' : 'bottom';
-                    var label_shift = 150;
-                    var label_margin = 40;
-                    var label_shift_with_label_width = label_shift + label_width + label_margin;
-                    var label_shift_with_label_height = label_shift + label_height + label_margin;
-                    var label_hor_offset = half_w + label_shift;
-                    var label_ver_offset = half_h + label_shift;
-
-                    var label_x = (label_hor_side == 'left') ? data.center_x - label_hor_offset - label_width : data.center_x + label_hor_offset;
-                    var label_y = (label_ver_side == 'top') ? data.center_y - label_ver_offset - label_height : data.center_y + label_ver_offset;
-                    if (top_offset < label_shift_with_label_height && bottom_offset < label_shift_with_label_height) {
-                        label_y = data.center_y + label_margin;
-                    }
-                    if (left_offset < label_shift_with_label_width && right_offset < label_shift_with_label_width) {
-                        label_x = data.center_x;
-                    }
-
-                    var label_data = that.renderLabel({
-                        x: label_x,
-                        y: label_y,
-                        text: data.text
-                    });
-
-                    that.$next_btn.css({
-                        left: label_x,
-                        top: label_y + label_height + 15
-                    });
-                    var left_skip = label_x + that.$next_btn.width() + 10;
-                    //console.log(that.nextBtn);
-                    if (that.nextBtn == "hide"){
-                        left_skip = label_x;
-                    }
-
-                    that.$skip_btn.css({
-                        left: left_skip,
-                        top: label_y + label_height + 15
-                    });
-                    that.$close_btn.css({
-                        right : 10,
-                        top: 10
-                    });
-
-
-                    that.disableEventsNearRect({
-                        top: shape_data.top,
-                        bottom: shape_data.bottom,
-                        left: shape_data.left,
-                        right: shape_data.right
-                    });
-
-
-                    var x_to = 0;
-                    var y_to = 0;
-                    var arrow_side = false;
-                    var conn_label_side = 'left';
-                    var conn_circle_side = 'left';
-
-                    var is_center = (label_data.left <= shape_data.x && label_data.right >= shape_data.x);
-                    var is_left = (label_data.right < shape_data.x);
-                    var is_right = (label_data.left > shape_data.x);
-
-                    var is_abs_left = (label_data.right < shape_data.left);
-                    var is_abs_right = (label_data.left > shape_data.right);
-
-                    var is_top = (label_data.bottom < shape_data.top);
-                    var is_bottom = (label_data.top > shape_data.bottom);
-                    var is_mid = (label_data.bottom >= shape_data.y && label_data.top <= shape_data.y);
-                    var is_mid_top = (label_data.bottom <= shape_data.y && !is_top);
-                    var is_mid_bottom = (label_data.top >= shape_data.y && !is_bottom);
-
-
-                    function setArrowData(l_s, c_s, a_s) {
-                        conn_label_side = l_s;
-                        conn_circle_side = c_s;
-                        arrow_side = a_s;
-                    }
-
-                    function sideStatements(top_s, mid_top_s, mid_s, mid_bottom_s, bottom_s) {
-                        var statement = [];
-                        if (is_top) {
-                            statement = top_s;
-                        } else if (is_mid_top) {
-                            statement = mid_top_s;
-                        } else if (is_mid) {
-                            statement = mid_s;
-                        } else if (is_mid_bottom) {
-                            statement = mid_bottom_s;
-                        } else {//bottom
-                            statement = bottom_s;
-                        }
-                        if (!statement) {
-                            return;
-                        } else {
-                            setArrowData(statement[0], statement[1], statement[2]);
-                        }
-                    }
-
-
-                    if (is_center) {
-                        if (is_top) {
-                            setArrowData('bottom', 'top', 'top');
-                        } else if (is_bottom) {
-                            setArrowData('top', 'bottom', 'bottom');
-                        } else {
-                            return;
-                        }
-                    } else if (is_left) {
-                        sideStatements(
-                            ['right', 'top', 'top'],//top
-                            ['bottom', 'left', 'bottom'],//mid_top
-                            ['right', 'left', 'top'],//mid
-                            ['top', 'left', 'top'],//mid_bot
-                            ['right', 'bottom', 'bottom']//bot
-                        );
-                    } else {//right
-                        sideStatements(
-                            ['left', 'top', 'top'],//top
-                            ['bottom', 'right', 'bottom'],//mid_top
-                            ['left', 'right', 'top'],//mid
-                            ['top', 'right', 'top'],//mid_bot
-                            ['left', 'bottom', 'bottom']//bot
-                        );
-                    }
-
-                    var label_conn_coordinates = label_data.conn[conn_label_side];
-                    var circle_conn_coordinates = shape_data.conn[conn_circle_side];
-                    var by_top_side = (arrow_side == 'top') ? true : false;
-                    that.renderArrow({
-                        x_from: label_conn_coordinates.x,
-                        y_from: label_conn_coordinates.y,
-                        x_to: circle_conn_coordinates.x,
-                        y_to: circle_conn_coordinates.y,
-                        by_top_side: by_top_side
-                    });
-
-                };
-
-                that.clear = function () {
-                    that.ctx.clearRect(0, 0, 3000, 2000);
-                };
-
-                return this;
-            });
-        },
-
-        set: function (val) {
-            this.each(function () {
-                this.enjoyhint_obj.setValue(val);
-            });
-            return this;
-        },
-
-        show: function () {
-            this.each(function () {
-                this.enjoyhint_obj.show();
-            });
-            return this;
-        },
-
-        hide: function () {
-            this.each(function () {
-                this.enjoyhint_obj.hide();
-            });
-            return this;
-        },
-
-        hide_next: function () {
-            this.each(function () {
-                this.enjoyhint_obj.hideNextBtn();
-            });
-            return this;
-        },
-
-        show_next: function () {
-            this.each(function () {
-                this.enjoyhint_obj.showNextBtn();
-            });
-            return this;
-        },
-
-        hide_skip: function () {
-            this.each(function () {
-                this.enjoyhint_obj.hideSkipBtn();
-            });
-            return this;
-        },
-
-        show_skip: function () {
-            this.each(function () {
-                this.enjoyhint_obj.showSkipBtn();
-            });
-            return this;
-        },
-
-        render_circle: function (x, y, r) {
-            this.each(function () {
-                this.enjoyhint_obj.renderCircle(x, y, r);
-            });
-            return this;
-        },
-
-        render_label: function (x, y, r) {
-            this.each(function () {
-                this.enjoyhint_obj.renderLabel(x, y, r);
-            });
-            return this;
-        },
-
-        render_label_with_shape: function (data) {
-            this.each(function () {
-                this.enjoyhint_obj.renderLabelWithShape(data);
-            });
-            return this;
-        },
-
-        clear: function () {
-            this.each(function () {
-                this.enjoyhint_obj.clear();
-            });
-            return this;
-        },
-
-        close: function (val) {
-            this.each(function () {
-                this.enjoyhint_obj.closePopdown();
-            });
-            return this;
-        }
-    };
-
-    $.fn.enjoyhint = function (method) {
-        //console.log(method);
-        if (methods[method]) {
-            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-        } else if (typeof method === 'object' || !method) {
-            return methods.init.apply(this, arguments);
-        } else {
-            $.error('Method ' + method + ' does not exist on $.numinput');
-        }
-        return this;
-    };
-})(window.jQuery);
-
-;/*! KineticJS v5.2.0 2015-01-22 http://lavrton.github.io/KineticJS/ by Eric Rowell @ericdrowell, Anton Lavrenov @lavrton - MIT License https://github.com/lavrton/KineticJS/wiki/License*/
-var Kinetic={};!function(a){var b=Math.PI/180;Kinetic={version:"5.2.0",stages:[],idCounter:0,ids:{},names:{},shapes:{},listenClickTap:!1,inDblClickWindow:!1,enableTrace:!1,traceArrMax:100,dblClickWindow:400,pixelRatio:void 0,dragDistance:0,angleDeg:!0,showWarnings:!0,Filters:{},Node:function(a){this._init(a)},Shape:function(a){this.__init(a)},Container:function(a){this.__init(a)},Stage:function(a){this.___init(a)},BaseLayer:function(a){this.___init(a)},Layer:function(a){this.____init(a)},FastLayer:function(a){this.____init(a)},Group:function(a){this.___init(a)},isDragging:function(){var a=Kinetic.DD;return a?a.isDragging:!1},isDragReady:function(){var a=Kinetic.DD;return a?!!a.node:!1},_addId:function(a,b){void 0!==b&&(this.ids[b]=a)},_removeId:function(a){void 0!==a&&delete this.ids[a]},_addName:function(a,b){if(void 0!==b)for(var c=b.split(/\s/g),d=0;d<c.length;d++){var e=c[d];e&&(void 0===this.names[e]&&(this.names[e]=[]),this.names[e].push(a))}},_removeName:function(a,b){if(void 0!==a){var c=this.names[a];if(void 0!==c){for(var d=0;d<c.length;d++){var e=c[d];e._id===b&&c.splice(d,1)}0===c.length&&delete this.names[a]}}},getAngle:function(a){return this.angleDeg?a*b:a},_parseUA:function(a){var b=a.toLowerCase(),c=/(chrome)[ \/]([\w.]+)/.exec(b)||/(webkit)[ \/]([\w.]+)/.exec(b)||/(opera)(?:.*version|)[ \/]([\w.]+)/.exec(b)||/(msie) ([\w.]+)/.exec(b)||b.indexOf("compatible")<0&&/(mozilla)(?:.*? rv:([\w.]+)|)/.exec(b)||[],d=!!a.match(/Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile/i),e=!!a.match(/IEMobile/i);return{browser:c[1]||"",version:c[2]||"0",mobile:d,ieMobile:e}},UA:void 0},Kinetic.UA=Kinetic._parseUA(a.navigator&&a.navigator.userAgent||"")}(this),function(a,b){if("object"==typeof exports){var c=b();if(global.window===global)Kinetic.document=global.document,Kinetic.window=global;else{var d=require("canvas"),e=require("jsdom").jsdom;Kinetic.document=e("<!DOCTYPE html><html><head></head><body></body></html>"),Kinetic.window=Kinetic.document.createWindow(),Kinetic.window.Image=d.Image,Kinetic._nodeCanvas=d}return Kinetic.root=a,void(module.exports=c)}"function"==typeof define&&define.amd&&define(b),Kinetic.document=document,Kinetic.window=window,Kinetic.root=a}(this,function(){return Kinetic}),function(){Kinetic.Collection=function(){var a=[].slice.call(arguments),b=a.length,c=0;for(this.length=b;b>c;c++)this[c]=a[c];return this},Kinetic.Collection.prototype=[],Kinetic.Collection.prototype.each=function(a){for(var b=0;b<this.length;b++)a(this[b],b)},Kinetic.Collection.prototype.toArray=function(){var a,b=[],c=this.length;for(a=0;c>a;a++)b.push(this[a]);return b},Kinetic.Collection.toCollection=function(a){var b,c=new Kinetic.Collection,d=a.length;for(b=0;d>b;b++)c.push(a[b]);return c},Kinetic.Collection._mapMethod=function(a){Kinetic.Collection.prototype[a]=function(){var b,c=this.length,d=[].slice.call(arguments);for(b=0;c>b;b++)this[b][a].apply(this[b],d);return this}},Kinetic.Collection.mapMethods=function(a){var b=a.prototype;for(var c in b)Kinetic.Collection._mapMethod(c)},Kinetic.Transform=function(a){this.m=a&&a.slice()||[1,0,0,1,0,0]},Kinetic.Transform.prototype={copy:function(){return new Kinetic.Transform(this.m)},point:function(a){var b=this.m;return{x:b[0]*a.x+b[2]*a.y+b[4],y:b[1]*a.x+b[3]*a.y+b[5]}},translate:function(a,b){return this.m[4]+=this.m[0]*a+this.m[2]*b,this.m[5]+=this.m[1]*a+this.m[3]*b,this},scale:function(a,b){return this.m[0]*=a,this.m[1]*=a,this.m[2]*=b,this.m[3]*=b,this},rotate:function(a){var b=Math.cos(a),c=Math.sin(a),d=this.m[0]*b+this.m[2]*c,e=this.m[1]*b+this.m[3]*c,f=this.m[0]*-c+this.m[2]*b,g=this.m[1]*-c+this.m[3]*b;return this.m[0]=d,this.m[1]=e,this.m[2]=f,this.m[3]=g,this},getTranslation:function(){return{x:this.m[4],y:this.m[5]}},skew:function(a,b){var c=this.m[0]+this.m[2]*b,d=this.m[1]+this.m[3]*b,e=this.m[2]+this.m[0]*a,f=this.m[3]+this.m[1]*a;return this.m[0]=c,this.m[1]=d,this.m[2]=e,this.m[3]=f,this},multiply:function(a){var b=this.m[0]*a.m[0]+this.m[2]*a.m[1],c=this.m[1]*a.m[0]+this.m[3]*a.m[1],d=this.m[0]*a.m[2]+this.m[2]*a.m[3],e=this.m[1]*a.m[2]+this.m[3]*a.m[3],f=this.m[0]*a.m[4]+this.m[2]*a.m[5]+this.m[4],g=this.m[1]*a.m[4]+this.m[3]*a.m[5]+this.m[5];return this.m[0]=b,this.m[1]=c,this.m[2]=d,this.m[3]=e,this.m[4]=f,this.m[5]=g,this},invert:function(){var a=1/(this.m[0]*this.m[3]-this.m[1]*this.m[2]),b=this.m[3]*a,c=-this.m[1]*a,d=-this.m[2]*a,e=this.m[0]*a,f=a*(this.m[2]*this.m[5]-this.m[3]*this.m[4]),g=a*(this.m[1]*this.m[4]-this.m[0]*this.m[5]);return this.m[0]=b,this.m[1]=c,this.m[2]=d,this.m[3]=e,this.m[4]=f,this.m[5]=g,this},getMatrix:function(){return this.m},setAbsolutePosition:function(a,b){var c=this.m[0],d=this.m[1],e=this.m[2],f=this.m[3],g=this.m[4],h=this.m[5],i=(c*(b-h)-d*(a-g))/(c*f-d*e),j=(a-g-e*i)/c;return this.translate(j,i)}};var a="2d",b="[object Array]",c="[object Number]",d="[object String]",e=Math.PI/180,f=180/Math.PI,g="#",h="",i="0",j="Kinetic warning: ",k="Kinetic error: ",l="rgb(",m={aqua:[0,255,255],lime:[0,255,0],silver:[192,192,192],black:[0,0,0],maroon:[128,0,0],teal:[0,128,128],blue:[0,0,255],navy:[0,0,128],white:[255,255,255],fuchsia:[255,0,255],olive:[128,128,0],yellow:[255,255,0],orange:[255,165,0],gray:[128,128,128],purple:[128,0,128],green:[0,128,0],red:[255,0,0],pink:[255,192,203],cyan:[0,255,255],transparent:[255,255,255,0]},n=/rgb\((\d{1,3}),(\d{1,3}),(\d{1,3})\)/;Kinetic.Util={_isElement:function(a){return!(!a||1!=a.nodeType)},_isFunction:function(a){return!!(a&&a.constructor&&a.call&&a.apply)},_isObject:function(a){return!!a&&a.constructor==Object},_isArray:function(a){return Object.prototype.toString.call(a)==b},_isNumber:function(a){return Object.prototype.toString.call(a)==c},_isString:function(a){return Object.prototype.toString.call(a)==d},_throttle:function(a,b,c){var d,e,f,g=null,h=0,i=c||{},j=function(){h=i.leading===!1?0:(new Date).getTime(),g=null,f=a.apply(d,e),d=e=null};return function(){var c=(new Date).getTime();h||i.leading!==!1||(h=c);var k=b-(c-h);return d=this,e=arguments,0>=k?(clearTimeout(g),g=null,h=c,f=a.apply(d,e),d=e=null):g||i.trailing===!1||(g=setTimeout(j,k)),f}},_hasMethods:function(a){var b,c=[];for(b in a)this._isFunction(a[b])&&c.push(b);return c.length>0},createCanvasElement:function(){var a=Kinetic.document.createElement("canvas");try{a.style=a.style||{}}catch(b){}return a},isBrowser:function(){return"object"!=typeof exports},_isInDocument:function(a){for(;a=a.parentNode;)if(a==Kinetic.document)return!0;return!1},_simplifyArray:function(a){var b,c,d=[],e=a.length,f=Kinetic.Util;for(b=0;e>b;b++)c=a[b],f._isNumber(c)?c=Math.round(1e3*c)/1e3:f._isString(c)||(c=c.toString()),d.push(c);return d},_getImage:function(b,c){var d,e;if(b)if(this._isElement(b))c(b);else if(this._isString(b))d=new Kinetic.window.Image,d.onload=function(){c(d)},d.src=b;else if(b.data){e=Kinetic.Util.createCanvasElement(),e.width=b.width,e.height=b.height;var f=e.getContext(a);f.putImageData(b,0,0),this._getImage(e.toDataURL(),c)}else c(null);else c(null)},_getRGBAString:function(a){var b=a.red||0,c=a.green||0,d=a.blue||0,e=a.alpha||1;return["rgba(",b,",",c,",",d,",",e,")"].join(h)},_rgbToHex:function(a,b,c){return((1<<24)+(a<<16)+(b<<8)+c).toString(16).slice(1)},_hexToRgb:function(a){a=a.replace(g,h);var b=parseInt(a,16);return{r:b>>16&255,g:b>>8&255,b:255&b}},getRandomColor:function(){for(var a=(16777215*Math.random()<<0).toString(16);a.length<6;)a=i+a;return g+a},get:function(a,b){return void 0===a?b:a},getRGB:function(a){var b;return a in m?(b=m[a],{r:b[0],g:b[1],b:b[2]}):a[0]===g?this._hexToRgb(a.substring(1)):a.substr(0,4)===l?(b=n.exec(a.replace(/ /g,"")),{r:parseInt(b[1],10),g:parseInt(b[2],10),b:parseInt(b[3],10)}):{r:0,g:0,b:0}},_merge:function(a,b){var c=this._clone(b);for(var d in a)c[d]=this._isObject(a[d])?this._merge(a[d],c[d]):a[d];return c},cloneObject:function(a){var b={};for(var c in a)b[c]=this._isObject(a[c])?this.cloneObject(a[c]):this._isArray(a[c])?this.cloneArray(a[c]):a[c];return b},cloneArray:function(a){return a.slice(0)},_degToRad:function(a){return a*e},_radToDeg:function(a){return a*f},_capitalize:function(a){return a.charAt(0).toUpperCase()+a.slice(1)},error:function(a){throw new Error(k+a)},warn:function(a){Kinetic.root.console&&console.warn&&Kinetic.showWarnings&&console.warn(j+a)},extend:function(a,b){function c(){this.constructor=a}c.prototype=b.prototype;var d=a.prototype;a.prototype=new c;for(var e in d)d.hasOwnProperty(e)&&(a.prototype[e]=d[e]);a.__super__=b.prototype},addMethods:function(a,b){var c;for(c in b)a.prototype[c]=b[c]},_getControlPoints:function(a,b,c,d,e,f,g){var h=Math.sqrt(Math.pow(c-a,2)+Math.pow(d-b,2)),i=Math.sqrt(Math.pow(e-c,2)+Math.pow(f-d,2)),j=g*h/(h+i),k=g*i/(h+i),l=c-j*(e-a),m=d-j*(f-b),n=c+k*(e-a),o=d+k*(f-b);return[l,m,n,o]},_expandPoints:function(a,b){var c,d,e=a.length,f=[];for(c=2;e-2>c;c+=2)d=Kinetic.Util._getControlPoints(a[c-2],a[c-1],a[c],a[c+1],a[c+2],a[c+3],b),f.push(d[0]),f.push(d[1]),f.push(a[c]),f.push(a[c+1]),f.push(d[2]),f.push(d[3]);return f},_removeLastLetter:function(a){return a.substring(0,a.length-1)}}}(),function(){var a=Kinetic.Util.createCanvasElement(),b=a.getContext("2d"),c=Kinetic.UA.mobile?function(){var a=window.devicePixelRatio||1,c=b.webkitBackingStorePixelRatio||b.mozBackingStorePixelRatio||b.msBackingStorePixelRatio||b.oBackingStorePixelRatio||b.backingStorePixelRatio||1;return a/c}():1;Kinetic.Canvas=function(a){this.init(a)},Kinetic.Canvas.prototype={init:function(a){var b=a||{},d=b.pixelRatio||Kinetic.pixelRatio||c;this.pixelRatio=d,this._canvas=Kinetic.Util.createCanvasElement(),this._canvas.style.padding=0,this._canvas.style.margin=0,this._canvas.style.border=0,this._canvas.style.background="transparent",this._canvas.style.position="absolute",this._canvas.style.top=0,this._canvas.style.left=0},getContext:function(){return this.context},getPixelRatio:function(){return this.pixelRatio},setPixelRatio:function(a){this.pixelRatio=a,this.setSize(this.getWidth(),this.getHeight())},setWidth:function(a){this.width=this._canvas.width=a*this.pixelRatio,this._canvas.style.width=a+"px"},setHeight:function(a){this.height=this._canvas.height=a*this.pixelRatio,this._canvas.style.height=a+"px"},getWidth:function(){return this.width},getHeight:function(){return this.height},setSize:function(a,b){this.setWidth(a),this.setHeight(b)},toDataURL:function(a,b){try{return this._canvas.toDataURL(a,b)}catch(c){try{return this._canvas.toDataURL()}catch(d){return Kinetic.Util.warn("Unable to get data URL. "+d.message),""}}}},Kinetic.SceneCanvas=function(a){var b=a||{},c=b.width||0,d=b.height||0;Kinetic.Canvas.call(this,b),this.context=new Kinetic.SceneContext(this),this.setSize(c,d)},Kinetic.SceneCanvas.prototype={setWidth:function(a){var b=this.pixelRatio,c=this.getContext()._context;Kinetic.Canvas.prototype.setWidth.call(this,a),c.scale(b,b)},setHeight:function(a){var b=this.pixelRatio,c=this.getContext()._context;Kinetic.Canvas.prototype.setHeight.call(this,a),c.scale(b,b)}},Kinetic.Util.extend(Kinetic.SceneCanvas,Kinetic.Canvas),Kinetic.HitCanvas=function(a){var b=a||{},c=b.width||0,d=b.height||0;Kinetic.Canvas.call(this,b),this.context=new Kinetic.HitContext(this),this.setSize(c,d),this.hitCanvas=!0},Kinetic.Util.extend(Kinetic.HitCanvas,Kinetic.Canvas)}(),function(){var a=",",b="(",c=")",d="([",e="])",f=";",g="()",h="=",i=["arc","arcTo","beginPath","bezierCurveTo","clearRect","clip","closePath","createLinearGradient","createPattern","createRadialGradient","drawImage","fill","fillText","getImageData","createImageData","lineTo","moveTo","putImageData","quadraticCurveTo","rect","restore","rotate","save","scale","setLineDash","setTransform","stroke","strokeText","transform","translate"];Kinetic.Context=function(a){this.init(a)},Kinetic.Context.prototype={init:function(a){this.canvas=a,this._context=a._canvas.getContext("2d"),Kinetic.enableTrace&&(this.traceArr=[],this._enableTrace())},fillShape:function(a){a.getFillEnabled()&&this._fill(a)},strokeShape:function(a){a.getStrokeEnabled()&&this._stroke(a)},fillStrokeShape:function(a){var b=a.getFillEnabled();b&&this._fill(a),a.getStrokeEnabled()&&this._stroke(a)},getTrace:function(i){var j,k,l,m,n=this.traceArr,o=n.length,p="";for(j=0;o>j;j++)k=n[j],l=k.method,l?(m=k.args,p+=l,p+=i?g:Kinetic.Util._isArray(m[0])?d+m.join(a)+e:b+m.join(a)+c):(p+=k.property,i||(p+=h+k.val)),p+=f;return p},clearTrace:function(){this.traceArr=[]},_trace:function(a){var b,c=this.traceArr;c.push(a),b=c.length,b>=Kinetic.traceArrMax&&c.shift()},reset:function(){var a=this.getCanvas().getPixelRatio();this.setTransform(1*a,0,0,1*a,0,0)},getCanvas:function(){return this.canvas},clear:function(a){var b=this.getCanvas();a?this.clearRect(a.x||0,a.y||0,a.width||0,a.height||0):this.clearRect(0,0,b.getWidth(),b.getHeight())},_applyLineCap:function(a){var b=a.getLineCap();b&&this.setAttr("lineCap",b)},_applyOpacity:function(a){var b=a.getAbsoluteOpacity();1!==b&&this.setAttr("globalAlpha",b)},_applyLineJoin:function(a){var b=a.getLineJoin();b&&this.setAttr("lineJoin",b)},setAttr:function(a,b){this._context[a]=b},arc:function(){var a=arguments;this._context.arc(a[0],a[1],a[2],a[3],a[4],a[5])},beginPath:function(){this._context.beginPath()},bezierCurveTo:function(){var a=arguments;this._context.bezierCurveTo(a[0],a[1],a[2],a[3],a[4],a[5])},clearRect:function(){var a=arguments;this._context.clearRect(a[0],a[1],a[2],a[3])},clip:function(){this._context.clip()},closePath:function(){this._context.closePath()},createImageData:function(){var a=arguments;return 2===a.length?this._context.createImageData(a[0],a[1]):1===a.length?this._context.createImageData(a[0]):void 0},createLinearGradient:function(){var a=arguments;return this._context.createLinearGradient(a[0],a[1],a[2],a[3])},createPattern:function(){var a=arguments;return this._context.createPattern(a[0],a[1])},createRadialGradient:function(){var a=arguments;return this._context.createRadialGradient(a[0],a[1],a[2],a[3],a[4],a[5])},drawImage:function(){var a=arguments,b=this._context;3===a.length?b.drawImage(a[0],a[1],a[2]):5===a.length?b.drawImage(a[0],a[1],a[2],a[3],a[4]):9===a.length&&b.drawImage(a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a[8])},fill:function(){this._context.fill()},fillText:function(){var a=arguments;this._context.fillText(a[0],a[1],a[2])},getImageData:function(){var a=arguments;return this._context.getImageData(a[0],a[1],a[2],a[3])},lineTo:function(){var a=arguments;this._context.lineTo(a[0],a[1])},moveTo:function(){var a=arguments;this._context.moveTo(a[0],a[1])},rect:function(){var a=arguments;this._context.rect(a[0],a[1],a[2],a[3])},putImageData:function(){var a=arguments;this._context.putImageData(a[0],a[1],a[2])},quadraticCurveTo:function(){var a=arguments;this._context.quadraticCurveTo(a[0],a[1],a[2],a[3])},restore:function(){this._context.restore()},rotate:function(){var a=arguments;this._context.rotate(a[0])},save:function(){this._context.save()},scale:function(){var a=arguments;this._context.scale(a[0],a[1])},setLineDash:function(){var a=arguments,b=this._context;this._context.setLineDash?b.setLineDash(a[0]):"mozDash"in b?b.mozDash=a[0]:"webkitLineDash"in b&&(b.webkitLineDash=a[0])},setTransform:function(){var a=arguments;this._context.setTransform(a[0],a[1],a[2],a[3],a[4],a[5])},stroke:function(){this._context.stroke()},strokeText:function(){var a=arguments;this._context.strokeText(a[0],a[1],a[2])},transform:function(){var a=arguments;this._context.transform(a[0],a[1],a[2],a[3],a[4],a[5])},translate:function(){var a=arguments;this._context.translate(a[0],a[1])},_enableTrace:function(){var a,b,c=this,d=i.length,e=Kinetic.Util._simplifyArray,f=this.setAttr,g=function(a){var d,f=c[a];c[a]=function(){return b=e(Array.prototype.slice.call(arguments,0)),d=f.apply(c,arguments),c._trace({method:a,args:b}),d}};for(a=0;d>a;a++)g(i[a]);c.setAttr=function(){f.apply(c,arguments),c._trace({property:arguments[0],val:arguments[1]})}}},Kinetic.SceneContext=function(a){Kinetic.Context.call(this,a)},Kinetic.SceneContext.prototype={_fillColor:function(a){var b=a.fill()||Kinetic.Util._getRGBAString({red:a.fillRed(),green:a.fillGreen(),blue:a.fillBlue(),alpha:a.fillAlpha()});this.setAttr("fillStyle",b),a._fillFunc(this)},_fillPattern:function(a){var b=a.getFillPatternImage(),c=a.getFillPatternX(),d=a.getFillPatternY(),e=a.getFillPatternScale(),f=Kinetic.getAngle(a.getFillPatternRotation()),g=a.getFillPatternOffset(),h=a.getFillPatternRepeat();(c||d)&&this.translate(c||0,d||0),f&&this.rotate(f),e&&this.scale(e.x,e.y),g&&this.translate(-1*g.x,-1*g.y),this.setAttr("fillStyle",this.createPattern(b,h||"repeat")),this.fill()},_fillLinearGradient:function(a){var b=a.getFillLinearGradientStartPoint(),c=a.getFillLinearGradientEndPoint(),d=a.getFillLinearGradientColorStops(),e=this.createLinearGradient(b.x,b.y,c.x,c.y);if(d){for(var f=0;f<d.length;f+=2)e.addColorStop(d[f],d[f+1]);this.setAttr("fillStyle",e),this.fill()}},_fillRadialGradient:function(a){for(var b=a.getFillRadialGradientStartPoint(),c=a.getFillRadialGradientEndPoint(),d=a.getFillRadialGradientStartRadius(),e=a.getFillRadialGradientEndRadius(),f=a.getFillRadialGradientColorStops(),g=this.createRadialGradient(b.x,b.y,d,c.x,c.y,e),h=0;h<f.length;h+=2)g.addColorStop(f[h],f[h+1]);this.setAttr("fillStyle",g),this.fill()},_fill:function(a){var b=a.fill()||a.fillRed()||a.fillGreen()||a.fillBlue(),c=a.getFillPatternImage(),d=a.getFillLinearGradientColorStops(),e=a.getFillRadialGradientColorStops(),f=a.getFillPriority();b&&"color"===f?this._fillColor(a):c&&"pattern"===f?this._fillPattern(a):d&&"linear-gradient"===f?this._fillLinearGradient(a):e&&"radial-gradient"===f?this._fillRadialGradient(a):b?this._fillColor(a):c?this._fillPattern(a):d?this._fillLinearGradient(a):e&&this._fillRadialGradient(a)},_stroke:function(a){var b=a.dash(),c=a.getStrokeScaleEnabled();a.hasStroke()&&(c||(this.save(),this.setTransform(1,0,0,1,0,0)),this._applyLineCap(a),b&&a.dashEnabled()&&this.setLineDash(b),this.setAttr("lineWidth",a.strokeWidth()),this.setAttr("strokeStyle",a.stroke()||Kinetic.Util._getRGBAString({red:a.strokeRed(),green:a.strokeGreen(),blue:a.strokeBlue(),alpha:a.strokeAlpha()})),a._strokeFunc(this),c||this.restore())},_applyShadow:function(a){var b=Kinetic.Util,c=a.getAbsoluteOpacity(),d=b.get(a.getShadowColor(),"black"),e=b.get(a.getShadowBlur(),5),f=b.get(a.getShadowOpacity(),1),g=b.get(a.getShadowOffset(),{x:0,y:0});f&&this.setAttr("globalAlpha",f*c),this.setAttr("shadowColor",d),this.setAttr("shadowBlur",e),this.setAttr("shadowOffsetX",g.x),this.setAttr("shadowOffsetY",g.y)}},Kinetic.Util.extend(Kinetic.SceneContext,Kinetic.Context),Kinetic.HitContext=function(a){Kinetic.Context.call(this,a)},Kinetic.HitContext.prototype={_fill:function(a){this.save(),this.setAttr("fillStyle",a.colorKey),a._fillFuncHit(this),this.restore()},_stroke:function(a){a.hasStroke()&&(this._applyLineCap(a),this.setAttr("lineWidth",a.strokeWidth()),this.setAttr("strokeStyle",a.colorKey),a._strokeFuncHit(this))}},Kinetic.Util.extend(Kinetic.HitContext,Kinetic.Context)}(),function(){var a="get",b="set";Kinetic.Factory={addGetterSetter:function(a,b,c,d,e){this.addGetter(a,b,c),this.addSetter(a,b,d,e),this.addOverloadedGetterSetter(a,b)},addGetter:function(b,c,d){var e=a+Kinetic.Util._capitalize(c);b.prototype[e]=function(){var a=this.attrs[c];return void 0===a?d:a}},addSetter:function(a,c,d,e){var f=b+Kinetic.Util._capitalize(c);a.prototype[f]=function(a){return d&&(a=d.call(this,a)),this._setAttr(c,a),e&&e.call(this),this}},addComponentsGetterSetter:function(c,d,e,f,g){var h,i,j=e.length,k=Kinetic.Util._capitalize,l=a+k(d),m=b+k(d);c.prototype[l]=function(){var a={};for(h=0;j>h;h++)i=e[h],a[i]=this.getAttr(d+k(i));return a},c.prototype[m]=function(a){var b,c=this.attrs[d];f&&(a=f.call(this,a));for(b in a)this._setAttr(d+k(b),a[b]);return this._fireChangeEvent(d,c,a),g&&g.call(this),this},this.addOverloadedGetterSetter(c,d)},addOverloadedGetterSetter:function(c,d){var e=Kinetic.Util._capitalize(d),f=b+e,g=a+e;c.prototype[d]=function(){return arguments.length?(this[f](arguments[0]),this):this[g]()}},backCompat:function(a,b){var c;for(c in b)a.prototype[c]=a.prototype[b[c]]},afterSetFilter:function(){this._filterUpToDate=!1}},Kinetic.Validators={RGBComponent:function(a){return a>255?255:0>a?0:Math.round(a)},alphaComponent:function(a){return a>1?1:1e-4>a?1e-4:a}}}(),function(){var a="absoluteOpacity",b="absoluteTransform",c="Change",d="children",e=".",f="",g="get",h="id",i="kinetic",j="listening",k="mouseenter",l="mouseleave",m="name",n="set",o="Shape",p=" ",q="stage",r="transform",s="Stage",t="visible",u=["id"],v=["xChange.kinetic","yChange.kinetic","scaleXChange.kinetic","scaleYChange.kinetic","skewXChange.kinetic","skewYChange.kinetic","rotationChange.kinetic","offsetXChange.kinetic","offsetYChange.kinetic","transformsEnabledChange.kinetic"].join(p);Kinetic.Util.addMethods(Kinetic.Node,{_init:function(c){var d=this;this._id=Kinetic.idCounter++,this.eventListeners={},this.attrs={},this._cache={},this._filterUpToDate=!1,this.setAttrs(c),this.on(v,function(){this._clearCache(r),d._clearSelfAndDescendantCache(b)}),this.on("visibleChange.kinetic",function(){d._clearSelfAndDescendantCache(t)}),this.on("listeningChange.kinetic",function(){d._clearSelfAndDescendantCache(j)}),this.on("opacityChange.kinetic",function(){d._clearSelfAndDescendantCache(a)})},_clearCache:function(a){a?delete this._cache[a]:this._cache={}},_getCache:function(a,b){var c=this._cache[a];return void 0===c&&(this._cache[a]=b.call(this)),this._cache[a]},_clearSelfAndDescendantCache:function(a){this._clearCache(a),this.children&&this.getChildren().each(function(b){b._clearSelfAndDescendantCache(a)})},clearCache:function(){return delete this._cache.canvas,this._filterUpToDate=!1,this},cache:function(a){var b=a||{},c=b.x||0,d=b.y||0,e=b.width||this.width(),f=b.height||this.height(),g=b.drawBorder||!1;if(0===e||0===f)return void Kinetic.Util.warn("Width or height of caching configuration equals 0. Cache is ignored.");var h=new Kinetic.SceneCanvas({pixelRatio:1,width:e,height:f}),i=new Kinetic.SceneCanvas({pixelRatio:1,width:e,height:f}),j=new Kinetic.HitCanvas({width:e,height:f}),k=h.getContext(),l=j.getContext();return j.isCache=!0,this.clearCache(),k.save(),l.save(),g&&(k.save(),k.beginPath(),k.rect(0,0,e,f),k.closePath(),k.setAttr("strokeStyle","red"),k.setAttr("lineWidth",5),k.stroke(),k.restore()),k.translate(-1*c,-1*d),l.translate(-1*c,-1*d),"Shape"===this.nodeType&&(k.translate(-1*this.x(),-1*this.y()),l.translate(-1*this.x(),-1*this.y())),this.drawScene(h,this),this.drawHit(j,this),k.restore(),l.restore(),this._cache.canvas={scene:h,filter:i,hit:j},this},_drawCachedSceneCanvas:function(a){a.save(),this.getLayer()._applyTransform(this,a),a._applyOpacity(this),a.drawImage(this._getCachedSceneCanvas()._canvas,0,0),a.restore()},_getCachedSceneCanvas:function(){var a,b,c,d,e=this.filters(),f=this._cache.canvas,g=f.scene,h=f.filter,i=h.getContext();if(e){if(!this._filterUpToDate){try{for(a=e.length,i.clear(),i.drawImage(g._canvas,0,0),b=i.getImageData(0,0,h.getWidth(),h.getHeight()),c=0;a>c;c++)d=e[c],d.call(this,b),i.putImageData(b,0,0)}catch(j){Kinetic.Util.warn("Unable to apply filter. "+j.message)}this._filterUpToDate=!0}return h}return g},_drawCachedHitCanvas:function(a){var b=this._cache.canvas,c=b.hit;a.save(),this.getLayer()._applyTransform(this,a),a.drawImage(c._canvas,0,0),a.restore()},on:function(a,b){var c,d,g,h,i,j=a.split(p),k=j.length;for(c=0;k>c;c++)d=j[c],g=d.split(e),h=g[0],i=g[1]||f,this.eventListeners[h]||(this.eventListeners[h]=[]),this.eventListeners[h].push({name:i,handler:b});return this},off:function(a){var b,c,d,f,g,h,i=(a||"").split(p),j=i.length;if(!a)for(c in this.eventListeners)this._off(c);for(b=0;j>b;b++)if(d=i[b],f=d.split(e),g=f[0],h=f[1],g)this.eventListeners[g]&&this._off(g,h);else for(c in this.eventListeners)this._off(c,h);return this},dispatchEvent:function(a){var b={target:this,type:a.type,evt:a};this.fire(a.type,b)},addEventListener:function(a,b){this.on(a,function(a){b.call(this,a.evt)})},removeEventListener:function(a){this.off(a)},remove:function(){var c=this.getParent();return c&&c.children&&(c.children.splice(this.index,1),c._setChildrenIndices(),delete this.parent),this._clearSelfAndDescendantCache(q),this._clearSelfAndDescendantCache(b),this._clearSelfAndDescendantCache(t),this._clearSelfAndDescendantCache(j),this._clearSelfAndDescendantCache(a),this},destroy:function(){Kinetic._removeId(this.getId()),Kinetic._removeName(this.getName(),this._id),this.remove()},getAttr:function(a){var b=g+Kinetic.Util._capitalize(a);return Kinetic.Util._isFunction(this[b])?this[b]():this.attrs[a]},getAncestors:function(){for(var a=this.getParent(),b=new Kinetic.Collection;a;)b.push(a),a=a.getParent();return b},getAttrs:function(){return this.attrs||{}},setAttrs:function(a){var b,c;if(a)for(b in a)b===d||a[b]instanceof Kinetic.Node||(c=n+Kinetic.Util._capitalize(b),Kinetic.Util._isFunction(this[c])?this[c](a[b]):this._setAttr(b,a[b]));return this},isListening:function(){return this._getCache(j,this._isListening)},_isListening:function(){var a=this.getListening(),b=this.getParent();return"inherit"===a?b?b.isListening():!0:a},isVisible:function(){return this._getCache(t,this._isVisible)},_isVisible:function(){var a=this.getVisible(),b=this.getParent();return"inherit"===a?b?b.isVisible():!0:a},shouldDrawHit:function(a){var b=this.getLayer();return a&&a.isCache||b&&b.hitGraphEnabled()&&this.isListening()&&this.isVisible()},show:function(){return this.setVisible(!0),this},hide:function(){return this.setVisible(!1),this},getZIndex:function(){return this.index||0},getAbsoluteZIndex:function(){function a(i){for(b=[],c=i.length,d=0;c>d;d++)e=i[d],h++,e.nodeType!==o&&(b=b.concat(e.getChildren().toArray())),e._id===g._id&&(d=c);b.length>0&&b[0].getDepth()<=f&&a(b)}var b,c,d,e,f=this.getDepth(),g=this,h=0;return g.nodeType!==s&&a(g.getStage().getChildren()),h},getDepth:function(){for(var a=0,b=this.parent;b;)a++,b=b.parent;return a},setPosition:function(a){return this.setX(a.x),this.setY(a.y),this},getPosition:function(){return{x:this.getX(),y:this.getY()}},getAbsolutePosition:function(){var a=this.getAbsoluteTransform().getMatrix(),b=new Kinetic.Transform,c=this.offset();return b.m=a.slice(),b.translate(c.x,c.y),b.getTranslation()},setAbsolutePosition:function(a){var b,c=this._clearTransform();return this.attrs.x=c.x,this.attrs.y=c.y,delete c.x,delete c.y,b=this.getAbsoluteTransform(),b.invert(),b.translate(a.x,a.y),a={x:this.attrs.x+b.getTranslation().x,y:this.attrs.y+b.getTranslation().y},this.setPosition({x:a.x,y:a.y}),this._setTransform(c),this},_setTransform:function(a){var c;for(c in a)this.attrs[c]=a[c];this._clearCache(r),this._clearSelfAndDescendantCache(b)},_clearTransform:function(){var a={x:this.getX(),y:this.getY(),rotation:this.getRotation(),scaleX:this.getScaleX(),scaleY:this.getScaleY(),offsetX:this.getOffsetX(),offsetY:this.getOffsetY(),skewX:this.getSkewX(),skewY:this.getSkewY()};return this.attrs.x=0,this.attrs.y=0,this.attrs.rotation=0,this.attrs.scaleX=1,this.attrs.scaleY=1,this.attrs.offsetX=0,this.attrs.offsetY=0,this.attrs.skewX=0,this.attrs.skewY=0,this._clearCache(r),this._clearSelfAndDescendantCache(b),a},move:function(a){var b=a.x,c=a.y,d=this.getX(),e=this.getY();return void 0!==b&&(d+=b),void 0!==c&&(e+=c),this.setPosition({x:d,y:e}),this},_eachAncestorReverse:function(a,b){var c,d,e=[],f=this.getParent();if(b&&b._id===this._id)return a(this),!0;for(e.unshift(this);f&&(!b||f._id!==b._id);)e.unshift(f),f=f.parent;for(c=e.length,d=0;c>d;d++)a(e[d])},rotate:function(a){return this.setRotation(this.getRotation()+a),this},moveToTop:function(){if(!this.parent)return void Kinetic.Util.warn("Node has no parent. moveToTop function is ignored.");var a=this.index;return this.parent.children.splice(a,1),this.parent.children.push(this),this.parent._setChildrenIndices(),!0},moveUp:function(){if(!this.parent)return void Kinetic.Util.warn("Node has no parent. moveUp function is ignored.");var a=this.index,b=this.parent.getChildren().length;return b-1>a?(this.parent.children.splice(a,1),this.parent.children.splice(a+1,0,this),this.parent._setChildrenIndices(),!0):!1},moveDown:function(){if(!this.parent)return void Kinetic.Util.warn("Node has no parent. moveDown function is ignored.");var a=this.index;return a>0?(this.parent.children.splice(a,1),this.parent.children.splice(a-1,0,this),this.parent._setChildrenIndices(),!0):!1},moveToBottom:function(){if(!this.parent)return void Kinetic.Util.warn("Node has no parent. moveToBottom function is ignored.");var a=this.index;return a>0?(this.parent.children.splice(a,1),this.parent.children.unshift(this),this.parent._setChildrenIndices(),!0):!1},setZIndex:function(a){if(!this.parent)return void Kinetic.Util.warn("Node has no parent. zIndex parameter is ignored.");var b=this.index;return this.parent.children.splice(b,1),this.parent.children.splice(a,0,this),this.parent._setChildrenIndices(),this},getAbsoluteOpacity:function(){return this._getCache(a,this._getAbsoluteOpacity)},_getAbsoluteOpacity:function(){var a=this.getOpacity();return this.getParent()&&(a*=this.getParent().getAbsoluteOpacity()),a},moveTo:function(a){return this.getParent()!==a&&(this.remove(),a.add(this)),this},toObject:function(){var a,b,c,d,e=Kinetic.Util,f={},g=this.getAttrs();f.attrs={};for(a in g)b=g[a],e._isFunction(b)||e._isElement(b)||e._isObject(b)&&e._hasMethods(b)||(c=this[a],delete g[a],d=c?c.call(this):null,g[a]=b,d!==b&&(f.attrs[a]=b));return f.className=this.getClassName(),f},toJSON:function(){return JSON.stringify(this.toObject())},getParent:function(){return this.parent},getLayer:function(){var a=this.getParent();return a?a.getLayer():null},getStage:function(){return this._getCache(q,this._getStage)},_getStage:function(){var a=this.getParent();return a?a.getStage():void 0},fire:function(a,b,c){return c?this._fireAndBubble(a,b||{}):this._fire(a,b||{}),this},getAbsoluteTransform:function(a){return a?this._getAbsoluteTransform(a):this._getCache(b,this._getAbsoluteTransform)},_getAbsoluteTransform:function(a){var b,c,d=new Kinetic.Transform;return this._eachAncestorReverse(function(a){b=a.transformsEnabled(),c=a.getTransform(),"all"===b?d.multiply(c):"position"===b&&d.translate(a.x(),a.y())},a),d},getTransform:function(){return this._getCache(r,this._getTransform)},_getTransform:function(){var a=new Kinetic.Transform,b=this.getX(),c=this.getY(),d=Kinetic.getAngle(this.getRotation()),e=this.getScaleX(),f=this.getScaleY(),g=this.getSkewX(),h=this.getSkewY(),i=this.getOffsetX(),j=this.getOffsetY();return(0!==b||0!==c)&&a.translate(b,c),0!==d&&a.rotate(d),(0!==g||0!==h)&&a.skew(g,h),(1!==e||1!==f)&&a.scale(e,f),(0!==i||0!==j)&&a.translate(-1*i,-1*j),a},clone:function(a){var b,c,d,e,f,g=this.getClassName(),h=Kinetic.Util.cloneObject(this.attrs);for(var j in u){var k=u[j];delete h[k]}for(b in a)h[b]=a[b];var l=new Kinetic[g](h);for(b in this.eventListeners)for(c=this.eventListeners[b],d=c.length,e=0;d>e;e++)f=c[e],f.name.indexOf(i)<0&&(l.eventListeners[b]||(l.eventListeners[b]=[]),l.eventListeners[b].push(f));return l},toDataURL:function(a){a=a||{};var b=a.mimeType||null,c=a.quality||null,d=this.getStage(),e=a.x||0,f=a.y||0,g=new Kinetic.SceneCanvas({width:a.width||this.getWidth()||(d?d.getWidth():0),height:a.height||this.getHeight()||(d?d.getHeight():0),pixelRatio:1}),h=g.getContext();return h.save(),(e||f)&&h.translate(-1*e,-1*f),this.drawScene(g),h.restore(),g.toDataURL(b,c)},toImage:function(a){Kinetic.Util._getImage(this.toDataURL(a),function(b){a.callback(b)})},setSize:function(a){return this.setWidth(a.width),this.setHeight(a.height),this},getSize:function(){return{width:this.getWidth(),height:this.getHeight()}},getWidth:function(){return this.attrs.width||0},getHeight:function(){return this.attrs.height||0},getClassName:function(){return this.className||this.nodeType},getType:function(){return this.nodeType},getDragDistance:function(){return void 0!==this.attrs.dragDistance?this.attrs.dragDistance:this.parent?this.parent.getDragDistance():Kinetic.dragDistance
-},_get:function(a){return this.className===a||this.nodeType===a?[this]:[]},_off:function(a,b){var c,d,e=this.eventListeners[a];for(c=0;c<e.length;c++)if(d=e[c].name,!("kinetic"===d&&"kinetic"!==b||b&&d!==b)){if(e.splice(c,1),0===e.length){delete this.eventListeners[a];break}c--}},_fireChangeEvent:function(a,b,d){this._fire(a+c,{oldVal:b,newVal:d})},setId:function(a){var b=this.getId();return Kinetic._removeId(b),Kinetic._addId(this,a),this._setAttr(h,a),this},setName:function(a){var b=this.getName();return Kinetic._removeName(b,this._id),Kinetic._addName(this,a),this._setAttr(m,a),this},setAttr:function(a,b){var c=n+Kinetic.Util._capitalize(a),d=this[c];return Kinetic.Util._isFunction(d)?d.call(this,b):this._setAttr(a,b),this},_setAttr:function(a,b){var c;void 0!==b&&(c=this.attrs[a],this.attrs[a]=b,this._fireChangeEvent(a,c,b))},_setComponentAttr:function(a,b,c){var d;void 0!==c&&(d=this.attrs[a],d||(this.attrs[a]=this.getAttr(a)),this.attrs[a][b]=c,this._fireChangeEvent(a,d,c))},_fireAndBubble:function(a,b,c){var d=!0;if(b&&this.nodeType===o&&(b.target=this),a===k&&c&&(this._id===c._id||this.isAncestorOf&&this.isAncestorOf(c))?d=!1:a===l&&c&&(this._id===c._id||this.isAncestorOf&&this.isAncestorOf(c))&&(d=!1),d){this._fire(a,b);var e=(a===k||a===l)&&(c&&c.isAncestorOf&&c.isAncestorOf(this)||!(!c||!c.isAncestorOf));b&&!b.cancelBubble&&this.parent&&this.parent.isListening()&&!e&&(c&&c.parent?this._fireAndBubble.call(this.parent,a,b,c.parent):this._fireAndBubble.call(this.parent,a,b))}},_fire:function(a,b){var c,d=this.eventListeners[a];if(b.type=a,d)for(c=0;c<d.length;c++)d[c].handler.call(this,b)},draw:function(){return this.drawScene(),this.drawHit(),this}}),Kinetic.Node.create=function(a,b){return this._createNode(JSON.parse(a),b)},Kinetic.Node._createNode=function(a,b){var c,d,e,f=Kinetic.Node.prototype.getClassName.call(a),g=a.children;if(b&&(a.attrs.container=b),c=new Kinetic[f](a.attrs),g)for(d=g.length,e=0;d>e;e++)c.add(this._createNode(g[e]));return c},Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node,"position"),Kinetic.Factory.addGetterSetter(Kinetic.Node,"x",0),Kinetic.Factory.addGetterSetter(Kinetic.Node,"y",0),Kinetic.Factory.addGetterSetter(Kinetic.Node,"opacity",1),Kinetic.Factory.addGetter(Kinetic.Node,"name"),Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node,"name"),Kinetic.Factory.addGetter(Kinetic.Node,"id"),Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node,"id"),Kinetic.Factory.addGetterSetter(Kinetic.Node,"rotation",0),Kinetic.Factory.addComponentsGetterSetter(Kinetic.Node,"scale",["x","y"]),Kinetic.Factory.addGetterSetter(Kinetic.Node,"scaleX",1),Kinetic.Factory.addGetterSetter(Kinetic.Node,"scaleY",1),Kinetic.Factory.addComponentsGetterSetter(Kinetic.Node,"skew",["x","y"]),Kinetic.Factory.addGetterSetter(Kinetic.Node,"skewX",0),Kinetic.Factory.addGetterSetter(Kinetic.Node,"skewY",0),Kinetic.Factory.addComponentsGetterSetter(Kinetic.Node,"offset",["x","y"]),Kinetic.Factory.addGetterSetter(Kinetic.Node,"offsetX",0),Kinetic.Factory.addGetterSetter(Kinetic.Node,"offsetY",0),Kinetic.Factory.addSetter(Kinetic.Node,"dragDistance"),Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node,"dragDistance"),Kinetic.Factory.addSetter(Kinetic.Node,"width",0),Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node,"width"),Kinetic.Factory.addSetter(Kinetic.Node,"height",0),Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node,"height"),Kinetic.Factory.addGetterSetter(Kinetic.Node,"listening","inherit"),Kinetic.Factory.addGetterSetter(Kinetic.Node,"filters",void 0,function(a){return this._filterUpToDate=!1,a}),Kinetic.Factory.addGetterSetter(Kinetic.Node,"visible","inherit"),Kinetic.Factory.addGetterSetter(Kinetic.Node,"transformsEnabled","all"),Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node,"size"),Kinetic.Factory.backCompat(Kinetic.Node,{rotateDeg:"rotate",setRotationDeg:"setRotation",getRotationDeg:"getRotation"}),Kinetic.Collection.mapMethods(Kinetic.Node)}(),function(){Kinetic.Filters.Grayscale=function(a){var b,c,d=a.data,e=d.length;for(b=0;e>b;b+=4)c=.34*d[b]+.5*d[b+1]+.16*d[b+2],d[b]=c,d[b+1]=c,d[b+2]=c}}(),function(){Kinetic.Filters.Brighten=function(a){var b,c=255*this.brightness(),d=a.data,e=d.length;for(b=0;e>b;b+=4)d[b]+=c,d[b+1]+=c,d[b+2]+=c},Kinetic.Factory.addGetterSetter(Kinetic.Node,"brightness",0,null,Kinetic.Factory.afterSetFilter)}(),function(){Kinetic.Filters.Invert=function(a){var b,c=a.data,d=c.length;for(b=0;d>b;b+=4)c[b]=255-c[b],c[b+1]=255-c[b+1],c[b+2]=255-c[b+2]}}(),function(){function a(){this.r=0,this.g=0,this.b=0,this.a=0,this.next=null}function b(b,e){var f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D=b.data,E=b.width,F=b.height,G=e+e+1,H=E-1,I=F-1,J=e+1,K=J*(J+1)/2,L=new a,M=null,N=L,O=null,P=null,Q=c[e],R=d[e];for(h=1;G>h;h++)N=N.next=new a,h==J&&(M=N);for(N.next=L,l=k=0,g=0;F>g;g++){for(u=v=w=x=m=n=o=p=0,q=J*(y=D[k]),r=J*(z=D[k+1]),s=J*(A=D[k+2]),t=J*(B=D[k+3]),m+=K*y,n+=K*z,o+=K*A,p+=K*B,N=L,h=0;J>h;h++)N.r=y,N.g=z,N.b=A,N.a=B,N=N.next;for(h=1;J>h;h++)i=k+((h>H?H:h)<<2),m+=(N.r=y=D[i])*(C=J-h),n+=(N.g=z=D[i+1])*C,o+=(N.b=A=D[i+2])*C,p+=(N.a=B=D[i+3])*C,u+=y,v+=z,w+=A,x+=B,N=N.next;for(O=L,P=M,f=0;E>f;f++)D[k+3]=B=p*Q>>R,0!==B?(B=255/B,D[k]=(m*Q>>R)*B,D[k+1]=(n*Q>>R)*B,D[k+2]=(o*Q>>R)*B):D[k]=D[k+1]=D[k+2]=0,m-=q,n-=r,o-=s,p-=t,q-=O.r,r-=O.g,s-=O.b,t-=O.a,i=l+((i=f+e+1)<H?i:H)<<2,u+=O.r=D[i],v+=O.g=D[i+1],w+=O.b=D[i+2],x+=O.a=D[i+3],m+=u,n+=v,o+=w,p+=x,O=O.next,q+=y=P.r,r+=z=P.g,s+=A=P.b,t+=B=P.a,u-=y,v-=z,w-=A,x-=B,P=P.next,k+=4;l+=E}for(f=0;E>f;f++){for(v=w=x=u=n=o=p=m=0,k=f<<2,q=J*(y=D[k]),r=J*(z=D[k+1]),s=J*(A=D[k+2]),t=J*(B=D[k+3]),m+=K*y,n+=K*z,o+=K*A,p+=K*B,N=L,h=0;J>h;h++)N.r=y,N.g=z,N.b=A,N.a=B,N=N.next;for(j=E,h=1;e>=h;h++)k=j+f<<2,m+=(N.r=y=D[k])*(C=J-h),n+=(N.g=z=D[k+1])*C,o+=(N.b=A=D[k+2])*C,p+=(N.a=B=D[k+3])*C,u+=y,v+=z,w+=A,x+=B,N=N.next,I>h&&(j+=E);for(k=f,O=L,P=M,g=0;F>g;g++)i=k<<2,D[i+3]=B=p*Q>>R,B>0?(B=255/B,D[i]=(m*Q>>R)*B,D[i+1]=(n*Q>>R)*B,D[i+2]=(o*Q>>R)*B):D[i]=D[i+1]=D[i+2]=0,m-=q,n-=r,o-=s,p-=t,q-=O.r,r-=O.g,s-=O.b,t-=O.a,i=f+((i=g+J)<I?i:I)*E<<2,m+=u+=O.r=D[i],n+=v+=O.g=D[i+1],o+=w+=O.b=D[i+2],p+=x+=O.a=D[i+3],O=O.next,q+=y=P.r,r+=z=P.g,s+=A=P.b,t+=B=P.a,u-=y,v-=z,w-=A,x-=B,P=P.next,k+=E}}var c=[512,512,456,512,328,456,335,512,405,328,271,456,388,335,292,512,454,405,364,328,298,271,496,456,420,388,360,335,312,292,273,512,482,454,428,405,383,364,345,328,312,298,284,271,259,496,475,456,437,420,404,388,374,360,347,335,323,312,302,292,282,273,265,512,497,482,468,454,441,428,417,405,394,383,373,364,354,345,337,328,320,312,305,298,291,284,278,271,265,259,507,496,485,475,465,456,446,437,428,420,412,404,396,388,381,374,367,360,354,347,341,335,329,323,318,312,307,302,297,292,287,282,278,273,269,265,261,512,505,497,489,482,475,468,461,454,447,441,435,428,422,417,411,405,399,394,389,383,378,373,368,364,359,354,350,345,341,337,332,328,324,320,316,312,309,305,301,298,294,291,287,284,281,278,274,271,268,265,262,259,257,507,501,496,491,485,480,475,470,465,460,456,451,446,442,437,433,428,424,420,416,412,408,404,400,396,392,388,385,381,377,374,370,367,363,360,357,354,350,347,344,341,338,335,332,329,326,323,320,318,315,312,310,307,304,302,299,297,294,292,289,287,285,282,280,278,275,273,271,269,267,265,263,261,259],d=[9,11,12,13,13,14,14,15,15,15,15,16,16,16,16,17,17,17,17,17,17,17,18,18,18,18,18,18,18,18,18,19,19,19,19,19,19,19,19,19,19,19,19,19,19,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24];Kinetic.Filters.Blur=function(a){var c=Math.round(this.blurRadius());c>0&&b(a,c)},Kinetic.Factory.addGetterSetter(Kinetic.Node,"blurRadius",0,null,Kinetic.Factory.afterSetFilter)}(),function(){function a(a,b,c){var d=4*(c*a.width+b),e=[];return e.push(a.data[d++],a.data[d++],a.data[d++],a.data[d++]),e}function b(a,b){return Math.sqrt(Math.pow(a[0]-b[0],2)+Math.pow(a[1]-b[1],2)+Math.pow(a[2]-b[2],2))}function c(a){for(var b=[0,0,0],c=0;c<a.length;c++)b[0]+=a[c][0],b[1]+=a[c][1],b[2]+=a[c][2];return b[0]/=a.length,b[1]/=a.length,b[2]/=a.length,b}function d(d,e){var f=a(d,0,0),g=a(d,d.width-1,0),h=a(d,0,d.height-1),i=a(d,d.width-1,d.height-1),j=e||10;if(b(f,g)<j&&b(g,i)<j&&b(i,h)<j&&b(h,f)<j){for(var k=c([g,f,i,h]),l=[],m=0;m<d.width*d.height;m++){var n=b(k,[d.data[4*m],d.data[4*m+1],d.data[4*m+2]]);l[m]=j>n?0:255}return l}}function e(a,b){for(var c=0;c<a.width*a.height;c++)a.data[4*c+3]=b[c]}function f(a,b,c){for(var d=[1,1,1,1,0,1,1,1,1],e=Math.round(Math.sqrt(d.length)),f=Math.floor(e/2),g=[],h=0;c>h;h++)for(var i=0;b>i;i++){for(var j=h*b+i,k=0,l=0;e>l;l++)for(var m=0;e>m;m++){var n=h+l-f,o=i+m-f;if(n>=0&&c>n&&o>=0&&b>o){var p=n*b+o,q=d[l*e+m];k+=a[p]*q}}g[j]=2040===k?255:0}return g}function g(a,b,c){for(var d=[1,1,1,1,1,1,1,1,1],e=Math.round(Math.sqrt(d.length)),f=Math.floor(e/2),g=[],h=0;c>h;h++)for(var i=0;b>i;i++){for(var j=h*b+i,k=0,l=0;e>l;l++)for(var m=0;e>m;m++){var n=h+l-f,o=i+m-f;if(n>=0&&c>n&&o>=0&&b>o){var p=n*b+o,q=d[l*e+m];k+=a[p]*q}}g[j]=k>=1020?255:0}return g}function h(a,b,c){for(var d=[1/9,1/9,1/9,1/9,1/9,1/9,1/9,1/9,1/9],e=Math.round(Math.sqrt(d.length)),f=Math.floor(e/2),g=[],h=0;c>h;h++)for(var i=0;b>i;i++){for(var j=h*b+i,k=0,l=0;e>l;l++)for(var m=0;e>m;m++){var n=h+l-f,o=i+m-f;if(n>=0&&c>n&&o>=0&&b>o){var p=n*b+o,q=d[l*e+m];k+=a[p]*q}}g[j]=k}return g}Kinetic.Filters.Mask=function(a){var b=this.threshold(),c=d(a,b);return c&&(c=f(c,a.width,a.height),c=g(c,a.width,a.height),c=h(c,a.width,a.height),e(a,c)),a},Kinetic.Factory.addGetterSetter(Kinetic.Node,"threshold",0,null,Kinetic.Factory.afterSetFilter)}(),function(){Kinetic.Filters.RGB=function(a){var b,c,d=a.data,e=d.length,f=this.red(),g=this.green(),h=this.blue();for(b=0;e>b;b+=4)c=(.34*d[b]+.5*d[b+1]+.16*d[b+2])/255,d[b]=c*f,d[b+1]=c*g,d[b+2]=c*h,d[b+3]=d[b+3]},Kinetic.Factory.addGetterSetter(Kinetic.Node,"red",0,function(a){return this._filterUpToDate=!1,a>255?255:0>a?0:Math.round(a)}),Kinetic.Factory.addGetterSetter(Kinetic.Node,"green",0,function(a){return this._filterUpToDate=!1,a>255?255:0>a?0:Math.round(a)}),Kinetic.Factory.addGetterSetter(Kinetic.Node,"blue",0,Kinetic.Validators.RGBComponent,Kinetic.Factory.afterSetFilter)}(),function(){Kinetic.Filters.HSV=function(a){var b,c,d,e,f,g=a.data,h=g.length,i=Math.pow(2,this.value()),j=Math.pow(2,this.saturation()),k=Math.abs(this.hue()+360)%360,l=i*j*Math.cos(k*Math.PI/180),m=i*j*Math.sin(k*Math.PI/180),n=.299*i+.701*l+.167*m,o=.587*i-.587*l+.33*m,p=.114*i-.114*l-.497*m,q=.299*i-.299*l-.328*m,r=.587*i+.413*l+.035*m,s=.114*i-.114*l+.293*m,t=.299*i-.3*l+1.25*m,u=.587*i-.586*l-1.05*m,v=.114*i+.886*l-.2*m;for(b=0;h>b;b+=4)c=g[b+0],d=g[b+1],e=g[b+2],f=g[b+3],g[b+0]=n*c+o*d+p*e,g[b+1]=q*c+r*d+s*e,g[b+2]=t*c+u*d+v*e,g[b+3]=f},Kinetic.Factory.addGetterSetter(Kinetic.Node,"hue",0,null,Kinetic.Factory.afterSetFilter),Kinetic.Factory.addGetterSetter(Kinetic.Node,"saturation",0,null,Kinetic.Factory.afterSetFilter),Kinetic.Factory.addGetterSetter(Kinetic.Node,"value",0,null,Kinetic.Factory.afterSetFilter)}(),function(){Kinetic.Factory.addGetterSetter(Kinetic.Node,"hue",0,null,Kinetic.Factory.afterSetFilter),Kinetic.Factory.addGetterSetter(Kinetic.Node,"saturation",0,null,Kinetic.Factory.afterSetFilter),Kinetic.Factory.addGetterSetter(Kinetic.Node,"luminance",0,null,Kinetic.Factory.afterSetFilter),Kinetic.Filters.HSL=function(a){var b,c,d,e,f,g=a.data,h=g.length,i=1,j=Math.pow(2,this.saturation()),k=Math.abs(this.hue()+360)%360,l=127*this.luminance(),m=i*j*Math.cos(k*Math.PI/180),n=i*j*Math.sin(k*Math.PI/180),o=.299*i+.701*m+.167*n,p=.587*i-.587*m+.33*n,q=.114*i-.114*m-.497*n,r=.299*i-.299*m-.328*n,s=.587*i+.413*m+.035*n,t=.114*i-.114*m+.293*n,u=.299*i-.3*m+1.25*n,v=.587*i-.586*m-1.05*n,w=.114*i+.886*m-.2*n;for(b=0;h>b;b+=4)c=g[b+0],d=g[b+1],e=g[b+2],f=g[b+3],g[b+0]=o*c+p*d+q*e+l,g[b+1]=r*c+s*d+t*e+l,g[b+2]=u*c+v*d+w*e+l,g[b+3]=f}}(),function(){Kinetic.Filters.Emboss=function(a){var b=10*this.embossStrength(),c=255*this.embossWhiteLevel(),d=this.embossDirection(),e=this.embossBlend(),f=0,g=0,h=a.data,i=a.width,j=a.height,k=4*i,l=j;switch(d){case"top-left":f=-1,g=-1;break;case"top":f=-1,g=0;break;case"top-right":f=-1,g=1;break;case"right":f=0,g=1;break;case"bottom-right":f=1,g=1;break;case"bottom":f=1,g=0;break;case"bottom-left":f=1,g=-1;break;case"left":f=0,g=-1}do{var m=(l-1)*k,n=f;1>l+n&&(n=0),l+n>j&&(n=0);var o=(l-1+n)*i*4,p=i;do{var q=m+4*(p-1),r=g;1>p+r&&(r=0),p+r>i&&(r=0);var s=o+4*(p-1+r),t=h[q]-h[s],u=h[q+1]-h[s+1],v=h[q+2]-h[s+2],w=t,x=w>0?w:-w,y=u>0?u:-u,z=v>0?v:-v;if(y>x&&(w=u),z>x&&(w=v),w*=b,e){var A=h[q]+w,B=h[q+1]+w,C=h[q+2]+w;h[q]=A>255?255:0>A?0:A,h[q+1]=B>255?255:0>B?0:B,h[q+2]=C>255?255:0>C?0:C}else{var D=c-w;0>D?D=0:D>255&&(D=255),h[q]=h[q+1]=h[q+2]=D}}while(--p)}while(--l)},Kinetic.Factory.addGetterSetter(Kinetic.Node,"embossStrength",.5,null,Kinetic.Factory.afterSetFilter),Kinetic.Factory.addGetterSetter(Kinetic.Node,"embossWhiteLevel",.5,null,Kinetic.Factory.afterSetFilter),Kinetic.Factory.addGetterSetter(Kinetic.Node,"embossDirection","top-left",null,Kinetic.Factory.afterSetFilter),Kinetic.Factory.addGetterSetter(Kinetic.Node,"embossBlend",!1,null,Kinetic.Factory.afterSetFilter)}(),function(){function a(a,b,c,d,e){var f,g=c-b,h=e-d;return 0===g?d+h/2:0===h?d:(f=(a-b)/g,f=h*f+d)}Kinetic.Filters.Enhance=function(b){var c,d,e,f,g=b.data,h=g.length,i=g[0],j=i,k=g[1],l=k,m=g[2],n=m,o=this.enhance();if(0!==o){for(f=0;h>f;f+=4)c=g[f+0],i>c?i=c:c>j&&(j=c),d=g[f+1],k>d?k=d:d>l&&(l=d),e=g[f+2],m>e?m=e:e>n&&(n=e);j===i&&(j=255,i=0),l===k&&(l=255,k=0),n===m&&(n=255,m=0);var p,q,r,s,t,u,v,w,x;for(o>0?(q=j+o*(255-j),r=i-o*(i-0),t=l+o*(255-l),u=k-o*(k-0),w=n+o*(255-n),x=m-o*(m-0)):(p=.5*(j+i),q=j+o*(j-p),r=i+o*(i-p),s=.5*(l+k),t=l+o*(l-s),u=k+o*(k-s),v=.5*(n+m),w=n+o*(n-v),x=m+o*(m-v)),f=0;h>f;f+=4)g[f+0]=a(g[f+0],i,j,r,q),g[f+1]=a(g[f+1],k,l,u,t),g[f+2]=a(g[f+2],m,n,x,w)}},Kinetic.Factory.addGetterSetter(Kinetic.Node,"enhance",0,null,Kinetic.Factory.afterSetFilter)}(),function(){Kinetic.Filters.Posterize=function(a){var b,c=Math.round(254*this.levels())+1,d=a.data,e=d.length,f=255/c;for(b=0;e>b;b+=1)d[b]=Math.floor(d[b]/f)*f},Kinetic.Factory.addGetterSetter(Kinetic.Node,"levels",.5,null,Kinetic.Factory.afterSetFilter)}(),function(){Kinetic.Filters.Noise=function(a){var b,c=255*this.noise(),d=a.data,e=d.length,f=c/2;for(b=0;e>b;b+=4)d[b+0]+=f-2*f*Math.random(),d[b+1]+=f-2*f*Math.random(),d[b+2]+=f-2*f*Math.random()},Kinetic.Factory.addGetterSetter(Kinetic.Node,"noise",.2,null,Kinetic.Factory.afterSetFilter)}(),function(){Kinetic.Filters.Pixelate=function(a){var b,c,d,e,f,g,h,i,j,k,l,m,n,o,p=Math.ceil(this.pixelSize()),q=a.width,r=a.height,s=Math.ceil(q/p),t=Math.ceil(r/p);for(a=a.data,m=0;s>m;m+=1)for(n=0;t>n;n+=1){for(e=0,f=0,g=0,h=0,i=m*p,j=i+p,k=n*p,l=k+p,o=0,b=i;j>b;b+=1)if(!(b>=q))for(c=k;l>c;c+=1)c>=r||(d=4*(q*c+b),e+=a[d+0],f+=a[d+1],g+=a[d+2],h+=a[d+3],o+=1);for(e/=o,f/=o,g/=o,b=i;j>b;b+=1)if(!(b>=q))for(c=k;l>c;c+=1)c>=r||(d=4*(q*c+b),a[d+0]=e,a[d+1]=f,a[d+2]=g,a[d+3]=h)}},Kinetic.Factory.addGetterSetter(Kinetic.Node,"pixelSize",8,null,Kinetic.Factory.afterSetFilter)}(),function(){Kinetic.Filters.Threshold=function(a){var b,c=255*this.threshold(),d=a.data,e=d.length;for(b=0;e>b;b+=1)d[b]=d[b]<c?0:255},Kinetic.Factory.addGetterSetter(Kinetic.Node,"threshold",.5,null,Kinetic.Factory.afterSetFilter)}(),function(){Kinetic.Filters.Sepia=function(a){var b,c,d,e,f,g,h,i,j,k=a.data,l=a.width,m=a.height,n=4*l;do{b=(m-1)*n,c=l;do d=b+4*(c-1),e=k[d],f=k[d+1],g=k[d+2],h=.393*e+.769*f+.189*g,i=.349*e+.686*f+.168*g,j=.272*e+.534*f+.131*g,k[d]=h>255?255:h,k[d+1]=i>255?255:i,k[d+2]=j>255?255:j,k[d+3]=k[d+3];while(--c)}while(--m)}}(),function(){Kinetic.Filters.Solarize=function(a){var b=a.data,c=a.width,d=a.height,e=4*c,f=d;do{var g=(f-1)*e,h=c;do{var i=g+4*(h-1),j=b[i],k=b[i+1],l=b[i+2];j>127&&(j=255-j),k>127&&(k=255-k),l>127&&(l=255-l),b[i]=j,b[i+1]=k,b[i+2]=l}while(--h)}while(--f)}}(),function(){var a=function(a,b,c){var d,e,f,g,h=a.data,i=b.data,j=a.width,k=a.height,l=c.polarCenterX||j/2,m=c.polarCenterY||k/2,n=0,o=0,p=0,q=0,r=Math.sqrt(l*l+m*m);e=j-l,f=k-m,g=Math.sqrt(e*e+f*f),r=g>r?g:r;var s,t,u,v,w=k,x=j,y=360/x*Math.PI/180;for(t=0;x>t;t+=1)for(u=Math.sin(t*y),v=Math.cos(t*y),s=0;w>s;s+=1)e=Math.floor(l+r*s/w*v),f=Math.floor(m+r*s/w*u),d=4*(f*j+e),n=h[d+0],o=h[d+1],p=h[d+2],q=h[d+3],d=4*(t+s*j),i[d+0]=n,i[d+1]=o,i[d+2]=p,i[d+3]=q},b=function(a,b,c){var d,e,f,g,h,i,j=a.data,k=b.data,l=a.width,m=a.height,n=c.polarCenterX||l/2,o=c.polarCenterY||m/2,p=0,q=0,r=0,s=0,t=Math.sqrt(n*n+o*o);e=l-n,f=m-o,i=Math.sqrt(e*e+f*f),t=i>t?i:t;var u,v,w,x,y=m,z=l,A=c.polarRotation||0;for(e=0;l>e;e+=1)for(f=0;m>f;f+=1)g=e-n,h=f-o,u=Math.sqrt(g*g+h*h)*y/t,v=(180*Math.atan2(h,g)/Math.PI+360+A)%360,v=v*z/360,w=Math.floor(v),x=Math.floor(u),d=4*(x*l+w),p=j[d+0],q=j[d+1],r=j[d+2],s=j[d+3],d=4*(f*l+e),k[d+0]=p,k[d+1]=q,k[d+2]=r,k[d+3]=s},c=Kinetic.Util.createCanvasElement();Kinetic.Filters.Kaleidoscope=function(d){var e,f,g,h,i,j,k,l,m,n,o=d.width,p=d.height,q=Math.round(this.kaleidoscopePower()),r=Math.round(this.kaleidoscopeAngle()),s=Math.floor(o*(r%360)/360);if(!(1>q)){c.width=o,c.height=p;var t=c.getContext("2d").getImageData(0,0,o,p);a(d,t,{polarCenterX:o/2,polarCenterY:p/2});for(var u=o/Math.pow(2,q);8>=u;)u=2*u,q-=1;u=Math.ceil(u);var v=u,w=0,x=v,y=1;for(s+u>o&&(w=v,x=0,y=-1),f=0;p>f;f+=1)for(e=w;e!==x;e+=y)g=Math.round(e+s)%o,m=4*(o*f+g),i=t.data[m+0],j=t.data[m+1],k=t.data[m+2],l=t.data[m+3],n=4*(o*f+e),t.data[n+0]=i,t.data[n+1]=j,t.data[n+2]=k,t.data[n+3]=l;for(f=0;p>f;f+=1)for(v=Math.floor(u),h=0;q>h;h+=1){for(e=0;v+1>e;e+=1)m=4*(o*f+e),i=t.data[m+0],j=t.data[m+1],k=t.data[m+2],l=t.data[m+3],n=4*(o*f+2*v-e-1),t.data[n+0]=i,t.data[n+1]=j,t.data[n+2]=k,t.data[n+3]=l;v*=2}b(t,d,{polarRotation:0})}},Kinetic.Factory.addGetterSetter(Kinetic.Node,"kaleidoscopePower",2,null,Kinetic.Factory.afterSetFilter),Kinetic.Factory.addGetterSetter(Kinetic.Node,"kaleidoscopeAngle",0,null,Kinetic.Factory.afterSetFilter)}(),function(){function a(a){setTimeout(a,1e3/60)}function b(){return e.apply(Kinetic.root,arguments)}var c=500,d=function(){return Kinetic.root.performance&&Kinetic.root.performance.now?function(){return Kinetic.root.performance.now()}:function(){return(new Date).getTime()}}(),e=function(){return Kinetic.root.requestAnimationFrame||Kinetic.root.webkitRequestAnimationFrame||Kinetic.root.mozRequestAnimationFrame||Kinetic.root.oRequestAnimationFrame||Kinetic.root.msRequestAnimationFrame||a}();Kinetic.Animation=function(a,b){var c=Kinetic.Animation;this.func=a,this.setLayers(b),this.id=c.animIdCounter++,this.frame={time:0,timeDiff:0,lastTime:d()}},Kinetic.Animation.prototype={setLayers:function(a){var b=[];b=a?a.length>0?a:[a]:[],this.layers=b},getLayers:function(){return this.layers},addLayer:function(a){var b,c,d=this.layers;if(d){for(b=d.length,c=0;b>c;c++)if(d[c]._id===a._id)return!1}else this.layers=[];return this.layers.push(a),!0},isRunning:function(){var a,b=Kinetic.Animation,c=b.animations,d=c.length;for(a=0;d>a;a++)if(c[a].id===this.id)return!0;return!1},start:function(){var a=Kinetic.Animation;this.stop(),this.frame.timeDiff=0,this.frame.lastTime=d(),a._addAnimation(this)},stop:function(){Kinetic.Animation._removeAnimation(this)},_updateFrameObject:function(a){this.frame.timeDiff=a-this.frame.lastTime,this.frame.lastTime=a,this.frame.time+=this.frame.timeDiff,this.frame.frameRate=1e3/this.frame.timeDiff}},Kinetic.Animation.animations=[],Kinetic.Animation.animIdCounter=0,Kinetic.Animation.animRunning=!1,Kinetic.Animation._addAnimation=function(a){this.animations.push(a),this._handleAnimation()},Kinetic.Animation._removeAnimation=function(a){var b,c=a.id,d=this.animations,e=d.length;for(b=0;e>b;b++)if(d[b].id===c){this.animations.splice(b,1);break}},Kinetic.Animation._runFrames=function(){var a,b,c,e,f,g,h,i,j,k={},l=this.animations;for(e=0;e<l.length;e++)if(a=l[e],b=a.layers,c=a.func,a._updateFrameObject(d()),g=b.length,j=c?c.call(a,a.frame)!==!1:!0)for(f=0;g>f;f++)h=b[f],void 0!==h._id&&(k[h._id]=h);for(i in k)k[i].draw()},Kinetic.Animation._animationLoop=function(){var a=Kinetic.Animation;a.animations.length?(b(a._animationLoop),a._runFrames()):a.animRunning=!1},Kinetic.Animation._handleAnimation=function(){var a=this;this.animRunning||(this.animRunning=!0,a._animationLoop())};var f=Kinetic.Node.prototype.moveTo;Kinetic.Node.prototype.moveTo=function(a){f.call(this,a)},Kinetic.BaseLayer.prototype.batchDraw=function(){var a=this,b=Kinetic.Animation;this.batchAnim||(this.batchAnim=new b(function(){a.lastBatchDrawTime&&d()-a.lastBatchDrawTime>c&&a.batchAnim.stop()},this)),this.lastBatchDrawTime=d(),this.batchAnim.isRunning()||(this.draw(),this.batchAnim.start())},Kinetic.Stage.prototype.batchDraw=function(){this.getChildren().each(function(a){a.batchDraw()})}}(this),function(){var a={node:1,duration:1,easing:1,onFinish:1,yoyo:1},b=1,c=2,d=3,e=0;Kinetic.Tween=function(b){var c,d,g=this,h=b.node,i=h._id,j=b.easing||Kinetic.Easings.Linear,k=!!b.yoyo;c="undefined"==typeof b.duration?1:0===b.duration?.001:b.duration,this.node=h,this._id=e++,this.anim=new Kinetic.Animation(function(){g.tween.onEnterFrame()},h.getLayer()||(h instanceof Kinetic.Stage?h.getLayers():null)),this.tween=new f(d,function(a){g._tweenFunc(a)},j,0,1,1e3*c,k),this._addListeners(),Kinetic.Tween.attrs[i]||(Kinetic.Tween.attrs[i]={}),Kinetic.Tween.attrs[i][this._id]||(Kinetic.Tween.attrs[i][this._id]={}),Kinetic.Tween.tweens[i]||(Kinetic.Tween.tweens[i]={});for(d in b)void 0===a[d]&&this._addAttr(d,b[d]);this.reset(),this.onFinish=b.onFinish,this.onReset=b.onReset},Kinetic.Tween.attrs={},Kinetic.Tween.tweens={},Kinetic.Tween.prototype={_addAttr:function(a,b){var c,d,e,f,g,h=this.node,i=h._id;if(e=Kinetic.Tween.tweens[i][a],e&&delete Kinetic.Tween.attrs[i][e][a],c=h.getAttr(a),Kinetic.Util._isArray(b))for(d=[],g=b.length,f=0;g>f;f++)d.push(b[f]-c[f]);else d=b-c;Kinetic.Tween.attrs[i][this._id][a]={start:c,diff:d},Kinetic.Tween.tweens[i][a]=this._id},_tweenFunc:function(a){var b,c,d,e,f,g,h,i=this.node,j=Kinetic.Tween.attrs[i._id][this._id];for(b in j){if(c=j[b],d=c.start,e=c.diff,Kinetic.Util._isArray(d))for(f=[],h=d.length,g=0;h>g;g++)f.push(d[g]+e[g]*a);else f=d+e*a;i.setAttr(b,f)}},_addListeners:function(){var a=this;this.tween.onPlay=function(){a.anim.start()},this.tween.onReverse=function(){a.anim.start()},this.tween.onPause=function(){a.anim.stop()},this.tween.onFinish=function(){a.onFinish&&a.onFinish()},this.tween.onReset=function(){a.onReset&&a.onReset()}},play:function(){return this.tween.play(),this},reverse:function(){return this.tween.reverse(),this},reset:function(){return this.tween.reset(),this},seek:function(a){return this.tween.seek(1e3*a),this},pause:function(){return this.tween.pause(),this},finish:function(){return this.tween.finish(),this},destroy:function(){var a,b=this.node._id,c=this._id,d=Kinetic.Tween.tweens[b];this.pause();for(a in d)delete Kinetic.Tween.tweens[b][a];delete Kinetic.Tween.attrs[b][c]}};var f=function(a,b,c,d,e,f,g){this.prop=a,this.propFunc=b,this.begin=d,this._pos=d,this.duration=f,this._change=0,this.prevPos=0,this.yoyo=g,this._time=0,this._position=0,this._startTime=0,this._finish=0,this.func=c,this._change=e-this.begin,this.pause()};f.prototype={fire:function(a){var b=this[a];b&&b()},setTime:function(a){a>this.duration?this.yoyo?(this._time=this.duration,this.reverse()):this.finish():0>a?this.yoyo?(this._time=0,this.play()):this.reset():(this._time=a,this.update())},getTime:function(){return this._time},setPosition:function(a){this.prevPos=this._pos,this.propFunc(a),this._pos=a},getPosition:function(a){return void 0===a&&(a=this._time),this.func(a,this.begin,this._change,this.duration)},play:function(){this.state=c,this._startTime=this.getTimer()-this._time,this.onEnterFrame(),this.fire("onPlay")},reverse:function(){this.state=d,this._time=this.duration-this._time,this._startTime=this.getTimer()-this._time,this.onEnterFrame(),this.fire("onReverse")},seek:function(a){this.pause(),this._time=a,this.update(),this.fire("onSeek")},reset:function(){this.pause(),this._time=0,this.update(),this.fire("onReset")},finish:function(){this.pause(),this._time=this.duration,this.update(),this.fire("onFinish")},update:function(){this.setPosition(this.getPosition(this._time))},onEnterFrame:function(){var a=this.getTimer()-this._startTime;this.state===c?this.setTime(a):this.state===d&&this.setTime(this.duration-a)},pause:function(){this.state=b,this.fire("onPause")},getTimer:function(){return(new Date).getTime()}},Kinetic.Easings={BackEaseIn:function(a,b,c,d){var e=1.70158;return c*(a/=d)*a*((e+1)*a-e)+b},BackEaseOut:function(a,b,c,d){var e=1.70158;return c*((a=a/d-1)*a*((e+1)*a+e)+1)+b},BackEaseInOut:function(a,b,c,d){var e=1.70158;return(a/=d/2)<1?c/2*a*a*(((e*=1.525)+1)*a-e)+b:c/2*((a-=2)*a*(((e*=1.525)+1)*a+e)+2)+b},ElasticEaseIn:function(a,b,c,d,e,f){var g=0;return 0===a?b:1==(a/=d)?b+c:(f||(f=.3*d),!e||e<Math.abs(c)?(e=c,g=f/4):g=f/(2*Math.PI)*Math.asin(c/e),-(e*Math.pow(2,10*(a-=1))*Math.sin(2*(a*d-g)*Math.PI/f))+b)},ElasticEaseOut:function(a,b,c,d,e,f){var g=0;return 0===a?b:1==(a/=d)?b+c:(f||(f=.3*d),!e||e<Math.abs(c)?(e=c,g=f/4):g=f/(2*Math.PI)*Math.asin(c/e),e*Math.pow(2,-10*a)*Math.sin(2*(a*d-g)*Math.PI/f)+c+b)},ElasticEaseInOut:function(a,b,c,d,e,f){var g=0;return 0===a?b:2==(a/=d/2)?b+c:(f||(f=.3*d*1.5),!e||e<Math.abs(c)?(e=c,g=f/4):g=f/(2*Math.PI)*Math.asin(c/e),1>a?-.5*e*Math.pow(2,10*(a-=1))*Math.sin(2*(a*d-g)*Math.PI/f)+b:e*Math.pow(2,-10*(a-=1))*Math.sin(2*(a*d-g)*Math.PI/f)*.5+c+b)},BounceEaseOut:function(a,b,c,d){return(a/=d)<1/2.75?7.5625*c*a*a+b:2/2.75>a?c*(7.5625*(a-=1.5/2.75)*a+.75)+b:2.5/2.75>a?c*(7.5625*(a-=2.25/2.75)*a+.9375)+b:c*(7.5625*(a-=2.625/2.75)*a+.984375)+b},BounceEaseIn:function(a,b,c,d){return c-Kinetic.Easings.BounceEaseOut(d-a,0,c,d)+b},BounceEaseInOut:function(a,b,c,d){return d/2>a?.5*Kinetic.Easings.BounceEaseIn(2*a,0,c,d)+b:.5*Kinetic.Easings.BounceEaseOut(2*a-d,0,c,d)+.5*c+b},EaseIn:function(a,b,c,d){return c*(a/=d)*a+b},EaseOut:function(a,b,c,d){return-c*(a/=d)*(a-2)+b},EaseInOut:function(a,b,c,d){return(a/=d/2)<1?c/2*a*a+b:-c/2*(--a*(a-2)-1)+b},StrongEaseIn:function(a,b,c,d){return c*(a/=d)*a*a*a*a+b},StrongEaseOut:function(a,b,c,d){return c*((a=a/d-1)*a*a*a*a+1)+b},StrongEaseInOut:function(a,b,c,d){return(a/=d/2)<1?c/2*a*a*a*a*a+b:c/2*((a-=2)*a*a*a*a+2)+b},Linear:function(a,b,c,d){return c*a/d+b}}}(),function(){Kinetic.DD={anim:new Kinetic.Animation(function(){var a=this.dirty;return this.dirty=!1,a}),isDragging:!1,justDragged:!1,offset:{x:0,y:0},node:null,_drag:function(a){var b=Kinetic.DD,c=b.node;if(c){if(!b.isDragging){var d=c.getStage().getPointerPosition(),e=c.dragDistance(),f=Math.max(Math.abs(d.x-b.startPointerPos.x),Math.abs(d.y-b.startPointerPos.y));if(e>f)return}c._setDragPosition(a),b.isDragging||(b.isDragging=!0,c.fire("dragstart",{type:"dragstart",target:c,evt:a},!0)),c.fire("dragmove",{type:"dragmove",target:c,evt:a},!0)}},_endDragBefore:function(a){var b,c,d=Kinetic.DD,e=d.node;e&&(b=e.nodeType,c=e.getLayer(),d.anim.stop(),d.isDragging&&(d.isDragging=!1,d.justDragged=!0,Kinetic.listenClickTap=!1,a&&(a.dragEndNode=e)),delete d.node,(c||e).draw())},_endDragAfter:function(a){a=a||{};var b=a.dragEndNode;a&&b&&b.fire("dragend",{type:"dragend",target:b,evt:a},!0)}},Kinetic.Node.prototype.startDrag=function(){var a=Kinetic.DD,b=this.getStage(),c=this.getLayer(),d=b.getPointerPosition(),e=this.getAbsolutePosition();d&&(a.node&&a.node.stopDrag(),a.node=this,a.startPointerPos=d,a.offset.x=d.x-e.x,a.offset.y=d.y-e.y,a.anim.setLayers(c||this.getLayers()),a.anim.start(),this._setDragPosition())},Kinetic.Node.prototype._setDragPosition=function(a){var b=Kinetic.DD,c=this.getStage().getPointerPosition(),d=this.getDragBoundFunc();if(c){var e={x:c.x-b.offset.x,y:c.y-b.offset.y};void 0!==d&&(e=d.call(this,e,a)),this.setAbsolutePosition(e),this._lastPos&&this._lastPos.x===e.x&&this._lastPos.y===e.y||(b.anim.dirty=!0),this._lastPos=e}},Kinetic.Node.prototype.stopDrag=function(){var a=Kinetic.DD,b={};a._endDragBefore(b),a._endDragAfter(b)},Kinetic.Node.prototype.setDraggable=function(a){this._setAttr("draggable",a),this._dragChange()};var a=Kinetic.Node.prototype.destroy;Kinetic.Node.prototype.destroy=function(){var b=Kinetic.DD;b.node&&b.node._id===this._id&&this.stopDrag(),a.call(this)},Kinetic.Node.prototype.isDragging=function(){var a=Kinetic.DD;return!(!a.node||a.node._id!==this._id||!a.isDragging)},Kinetic.Node.prototype._listenDrag=function(){var a=this;this._dragCleanup(),"Stage"===this.getClassName()?this.on("contentMousedown.kinetic contentTouchstart.kinetic",function(b){Kinetic.DD.node||a.startDrag(b)}):this.on("mousedown.kinetic touchstart.kinetic",function(b){1!==b.evt.button&&2!==b.evt.button&&(Kinetic.DD.node||a.startDrag(b))})},Kinetic.Node.prototype._dragChange=function(){if(this.attrs.draggable)this._listenDrag();else{this._dragCleanup();var a=this.getStage(),b=Kinetic.DD;a&&b.node&&b.node._id===this._id&&b.node.stopDrag()}},Kinetic.Node.prototype._dragCleanup=function(){"Stage"===this.getClassName()?(this.off("contentMousedown.kinetic"),this.off("contentTouchstart.kinetic")):(this.off("mousedown.kinetic"),this.off("touchstart.kinetic"))},Kinetic.Factory.addGetterSetter(Kinetic.Node,"dragBoundFunc"),Kinetic.Factory.addGetter(Kinetic.Node,"draggable",!1),Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node,"draggable");var b=Kinetic.document.documentElement;b.addEventListener("mouseup",Kinetic.DD._endDragBefore,!0),b.addEventListener("touchend",Kinetic.DD._endDragBefore,!0),b.addEventListener("mouseup",Kinetic.DD._endDragAfter,!1),b.addEventListener("touchend",Kinetic.DD._endDragAfter,!1)}(),function(){Kinetic.Util.addMethods(Kinetic.Container,{__init:function(a){this.children=new Kinetic.Collection,Kinetic.Node.call(this,a)},getChildren:function(a){if(a){var b=new Kinetic.Collection;return this.children.each(function(c){a(c)&&b.push(c)}),b}return this.children},hasChildren:function(){return this.getChildren().length>0},removeChildren:function(){for(var a,b=Kinetic.Collection.toCollection(this.children),c=0;c<b.length;c++)a=b[c],delete a.parent,a.index=0,a.hasChildren()&&a.removeChildren(),a.remove();return b=null,this.children=new Kinetic.Collection,this},destroyChildren:function(){for(var a,b=Kinetic.Collection.toCollection(this.children),c=0;c<b.length;c++)a=b[c],delete a.parent,a.index=0,a.destroy();return b=null,this.children=new Kinetic.Collection,this},add:function(a){if(arguments.length>1){for(var b=0;b<arguments.length;b++)this.add(arguments[b]);return this}if(a.getParent())return a.moveTo(this),this;var c=this.children;return this._validateAdd(a),a.index=c.length,a.parent=this,c.push(a),this._fire("add",{child:a}),a.isDragging()&&Kinetic.DD.anim.setLayers(a.getLayer()),this},destroy:function(){this.hasChildren()&&this.destroyChildren(),Kinetic.Node.prototype.destroy.call(this)},find:function(a){var b,c,d,e,f,g,h,i=[],j=a.replace(/ /g,"").split(","),k=j.length;for(b=0;k>b;b++)if(d=j[b],"#"===d.charAt(0))f=this._getNodeById(d.slice(1)),f&&i.push(f);else if("."===d.charAt(0))e=this._getNodesByName(d.slice(1)),i=i.concat(e);else for(g=this.getChildren(),h=g.length,c=0;h>c;c++)i=i.concat(g[c]._get(d));return Kinetic.Collection.toCollection(i)},_getNodeById:function(a){var b=Kinetic.ids[a];return void 0!==b&&this.isAncestorOf(b)?b:null},_getNodesByName:function(a){var b=Kinetic.names[a]||[];return this._getDescendants(b)},_get:function(a){for(var b=Kinetic.Node.prototype._get.call(this,a),c=this.getChildren(),d=c.length,e=0;d>e;e++)b=b.concat(c[e]._get(a));return b},toObject:function(){var a=Kinetic.Node.prototype.toObject.call(this);
-a.children=[];for(var b=this.getChildren(),c=b.length,d=0;c>d;d++){var e=b[d];a.children.push(e.toObject())}return a},_getDescendants:function(a){for(var b=[],c=a.length,d=0;c>d;d++){var e=a[d];this.isAncestorOf(e)&&b.push(e)}return b},isAncestorOf:function(a){for(var b=a.getParent();b;){if(b._id===this._id)return!0;b=b.getParent()}return!1},clone:function(a){var b=Kinetic.Node.prototype.clone.call(this,a);return this.getChildren().each(function(a){b.add(a.clone())}),b},getAllIntersections:function(a){var b=[];return this.find("Shape").each(function(c){c.isVisible()&&c.intersects(a)&&b.push(c)}),b},_setChildrenIndices:function(){this.children.each(function(a,b){a.index=b})},drawScene:function(a,b){var c=this.getLayer(),d=a||c&&c.getCanvas(),e=d&&d.getContext(),f=this._cache.canvas,g=f&&f.scene;return this.isVisible()&&(g?this._drawCachedSceneCanvas(e):this._drawChildren(d,"drawScene",b)),this},drawHit:function(a,b){var c=this.getLayer(),d=a||c&&c.hitCanvas,e=d&&d.getContext(),f=this._cache.canvas,g=f&&f.hit;return this.shouldDrawHit(d)&&(c&&c.clearHitCache(),g?this._drawCachedHitCanvas(e):this._drawChildren(d,"drawHit",b)),this},_drawChildren:function(a,b,c){var d,e,f=this.getLayer(),g=a&&a.getContext(),h=this.getClipWidth(),i=this.getClipHeight(),j=h&&i;j&&f&&(d=this.getClipX(),e=this.getClipY(),g.save(),f._applyTransform(this,g),g.beginPath(),g.rect(d,e,h,i),g.clip(),g.reset()),this.children.each(function(d){d[b](a,c)}),j&&g.restore()},shouldDrawHit:function(a){var b=this.getLayer(),c=Kinetic.DD,d=c&&Kinetic.isDragging()&&-1!==Kinetic.DD.anim.getLayers().indexOf(b);return a&&a.isCache||b&&b.hitGraphEnabled()&&this.isVisible()&&!d}}),Kinetic.Util.extend(Kinetic.Container,Kinetic.Node),Kinetic.Container.prototype.get=Kinetic.Container.prototype.find,Kinetic.Factory.addComponentsGetterSetter(Kinetic.Container,"clip",["x","y","width","height"]),Kinetic.Factory.addGetterSetter(Kinetic.Container,"clipX"),Kinetic.Factory.addGetterSetter(Kinetic.Container,"clipY"),Kinetic.Factory.addGetterSetter(Kinetic.Container,"clipWidth"),Kinetic.Factory.addGetterSetter(Kinetic.Container,"clipHeight"),Kinetic.Collection.mapMethods(Kinetic.Container)}(),function(){function a(a){a.fill()}function b(a){a.stroke()}function c(a){a.fill()}function d(a){a.stroke()}function e(){this._clearCache(f)}var f="hasShadow";Kinetic.Util.addMethods(Kinetic.Shape,{__init:function(f){this.nodeType="Shape",this._fillFunc=a,this._strokeFunc=b,this._fillFuncHit=c,this._strokeFuncHit=d;for(var g,h=Kinetic.shapes;;)if(g=Kinetic.Util.getRandomColor(),g&&!(g in h))break;this.colorKey=g,h[g]=this,Kinetic.Node.call(this,f),this.on("shadowColorChange.kinetic shadowBlurChange.kinetic shadowOffsetChange.kinetic shadowOpacityChange.kinetic shadowEnabledChange.kinetic",e)},hasChildren:function(){return!1},getChildren:function(){return[]},getContext:function(){return this.getLayer().getContext()},getCanvas:function(){return this.getLayer().getCanvas()},hasShadow:function(){return this._getCache(f,this._hasShadow)},_hasShadow:function(){return this.getShadowEnabled()&&0!==this.getShadowOpacity()&&!!(this.getShadowColor()||this.getShadowBlur()||this.getShadowOffsetX()||this.getShadowOffsetY())},hasFill:function(){return!!(this.getFill()||this.getFillPatternImage()||this.getFillLinearGradientColorStops()||this.getFillRadialGradientColorStops())},hasStroke:function(){return!!(this.stroke()||this.strokeRed()||this.strokeGreen()||this.strokeBlue())},intersects:function(a){var b,c=this.getStage(),d=c.bufferHitCanvas;return d.getContext().clear(),this.drawScene(d),b=d.context.getImageData(Math.round(a.x),Math.round(a.y),1,1).data,b[3]>0},destroy:function(){Kinetic.Node.prototype.destroy.call(this),delete Kinetic.shapes[this.colorKey]},_useBufferCanvas:function(){return(this.hasShadow()||1!==this.getAbsoluteOpacity())&&this.hasFill()&&this.hasStroke()&&this.getStage()},drawScene:function(a,b){var c,d,e,f=this.getLayer(),g=a||f.getCanvas(),h=g.getContext(),i=this._cache.canvas,j=this.sceneFunc(),k=this.hasShadow();if(this.isVisible())if(i)this._drawCachedSceneCanvas(h);else if(j){if(h.save(),this._useBufferCanvas()){if(c=this.getStage(),d=c.bufferCanvas,e=d.getContext(),e.clear(),e.save(),e._applyLineJoin(this),f)f._applyTransform(this,e,b);else{var l=this.getAbsoluteTransform(b).getMatrix();h.transform(l[0],l[1],l[2],l[3],l[4],l[5])}j.call(this,e),e.restore(),k&&!g.hitCanvas&&(h.save(),h._applyShadow(this),h.drawImage(d._canvas,0,0),h.restore()),h._applyOpacity(this),h.drawImage(d._canvas,0,0)}else{if(h._applyLineJoin(this),f)f._applyTransform(this,h,b);else{var m=this.getAbsoluteTransform(b).getMatrix();h.transform(m[0],m[1],m[2],m[3],m[4],m[5])}k&&!g.hitCanvas&&(h.save(),h._applyShadow(this),j.call(this,h),h.restore()),h._applyOpacity(this),j.call(this,h)}h.restore()}return this},drawHit:function(a,b){var c=this.getLayer(),d=a||c.hitCanvas,e=d.getContext(),f=this.hitFunc()||this.sceneFunc(),g=this._cache.canvas,h=g&&g.hit;if(this.shouldDrawHit(d))if(c&&c.clearHitCache(),h)this._drawCachedHitCanvas(e);else if(f){if(e.save(),e._applyLineJoin(this),c)c._applyTransform(this,e,b);else{var i=this.getAbsoluteTransform(b).getMatrix();e.transform(i[0],i[1],i[2],i[3],i[4],i[5])}f.call(this,e),e.restore()}return this},drawHitFromCache:function(a){var b,c,d,e,f,g,h,i,j=a||0,k=this._cache.canvas,l=this._getCachedSceneCanvas(),m=l.getContext(),n=k.hit,o=n.getContext(),p=l.getWidth(),q=l.getHeight();o.clear();try{for(b=m.getImageData(0,0,p,q),c=b.data,d=o.getImageData(0,0,p,q),e=d.data,f=c.length,g=Kinetic.Util._hexToRgb(this.colorKey),h=0;f>h;h+=4)i=c[h+3],i>j&&(e[h]=g.r,e[h+1]=g.g,e[h+2]=g.b,e[h+3]=255);o.putImageData(d,0,0)}catch(r){Kinetic.Util.warn("Unable to draw hit graph from cached scene canvas. "+r.message)}return this}}),Kinetic.Util.extend(Kinetic.Shape,Kinetic.Node),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"stroke"),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"strokeRed",0,Kinetic.Validators.RGBComponent),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"strokeGreen",0,Kinetic.Validators.RGBComponent),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"strokeBlue",0,Kinetic.Validators.RGBComponent),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"strokeAlpha",1,Kinetic.Validators.alphaComponent),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"strokeWidth",2),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"lineJoin"),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"lineCap"),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"sceneFunc"),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"hitFunc"),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"dash"),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"shadowColor"),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"shadowRed",0,Kinetic.Validators.RGBComponent),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"shadowGreen",0,Kinetic.Validators.RGBComponent),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"shadowBlue",0,Kinetic.Validators.RGBComponent),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"shadowAlpha",1,Kinetic.Validators.alphaComponent),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"shadowBlur"),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"shadowOpacity"),Kinetic.Factory.addComponentsGetterSetter(Kinetic.Shape,"shadowOffset",["x","y"]),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"shadowOffsetX",0),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"shadowOffsetY",0),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillPatternImage"),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fill"),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillRed",0,Kinetic.Validators.RGBComponent),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillGreen",0,Kinetic.Validators.RGBComponent),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillBlue",0,Kinetic.Validators.RGBComponent),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillAlpha",1,Kinetic.Validators.alphaComponent),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillPatternX",0),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillPatternY",0),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillLinearGradientColorStops"),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillRadialGradientStartRadius",0),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillRadialGradientEndRadius",0),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillRadialGradientColorStops"),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillPatternRepeat","repeat"),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillEnabled",!0),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"strokeEnabled",!0),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"shadowEnabled",!0),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"dashEnabled",!0),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"strokeScaleEnabled",!0),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillPriority","color"),Kinetic.Factory.addComponentsGetterSetter(Kinetic.Shape,"fillPatternOffset",["x","y"]),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillPatternOffsetX",0),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillPatternOffsetY",0),Kinetic.Factory.addComponentsGetterSetter(Kinetic.Shape,"fillPatternScale",["x","y"]),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillPatternScaleX",1),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillPatternScaleY",1),Kinetic.Factory.addComponentsGetterSetter(Kinetic.Shape,"fillLinearGradientStartPoint",["x","y"]),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillLinearGradientStartPointX",0),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillLinearGradientStartPointY",0),Kinetic.Factory.addComponentsGetterSetter(Kinetic.Shape,"fillLinearGradientEndPoint",["x","y"]),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillLinearGradientEndPointX",0),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillLinearGradientEndPointY",0),Kinetic.Factory.addComponentsGetterSetter(Kinetic.Shape,"fillRadialGradientStartPoint",["x","y"]),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillRadialGradientStartPointX",0),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillRadialGradientStartPointY",0),Kinetic.Factory.addComponentsGetterSetter(Kinetic.Shape,"fillRadialGradientEndPoint",["x","y"]),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillRadialGradientEndPointX",0),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillRadialGradientEndPointY",0),Kinetic.Factory.addGetterSetter(Kinetic.Shape,"fillPatternRotation",0),Kinetic.Factory.backCompat(Kinetic.Shape,{dashArray:"dash",getDashArray:"getDash",setDashArray:"getDash",drawFunc:"sceneFunc",getDrawFunc:"getSceneFunc",setDrawFunc:"setSceneFunc",drawHitFunc:"hitFunc",getDrawHitFunc:"getHitFunc",setDrawHitFunc:"setHitFunc"}),Kinetic.Collection.mapMethods(Kinetic.Shape)}(),function(){function a(a,b){a.content.addEventListener(b,function(c){a[L+b](c)},!1)}var b="Stage",c="string",d="px",e="mouseout",f="mouseleave",g="mouseover",h="mouseenter",i="mousemove",j="mousedown",k="mouseup",l="click",m="dblclick",n="touchstart",o="touchend",p="tap",q="dbltap",r="touchmove",s="DOMMouseScroll",t="mousewheel",u="wheel",v="contentMouseout",w="contentMouseover",x="contentMousemove",y="contentMousedown",z="contentMouseup",A="contentClick",B="contentDblclick",C="contentTouchstart",D="contentTouchend",E="contentDbltap",F="contentTouchmove",G="div",H="relative",I="inline-block",J="kineticjs-content",K=" ",L="_",M="container",N="",O=[j,i,k,e,n,r,o,g,s,t,u],P=O.length;Kinetic.Util.addMethods(Kinetic.Stage,{___init:function(a){this.nodeType=b,Kinetic.Container.call(this,a),this._id=Kinetic.idCounter++,this._buildDOM(),this._bindContentEvents(),this._enableNestedTransforms=!1,Kinetic.stages.push(this)},_validateAdd:function(a){"Layer"!==a.getType()&&Kinetic.Util.error("You may only add layers to the stage.")},setContainer:function(a){if(typeof a===c){var b=a;if(a=Kinetic.document.getElementById(a),!a)throw"Can not find container in document with id "+b}return this._setAttr(M,a),this},shouldDrawHit:function(){return!0},draw:function(){return Kinetic.Node.prototype.draw.call(this),this},setHeight:function(a){return Kinetic.Node.prototype.setHeight.call(this,a),this._resizeDOM(),this},setWidth:function(a){return Kinetic.Node.prototype.setWidth.call(this,a),this._resizeDOM(),this},clear:function(){var a,b=this.children,c=b.length;for(a=0;c>a;a++)b[a].clear();return this},clone:function(a){return a||(a={}),a.container=Kinetic.document.createElement(G),Kinetic.Container.prototype.clone.call(this,a)},destroy:function(){var a=this.content;Kinetic.Container.prototype.destroy.call(this),a&&Kinetic.Util._isInDocument(a)&&this.getContainer().removeChild(a);var b=Kinetic.stages.indexOf(this);b>-1&&Kinetic.stages.splice(b,1)},getPointerPosition:function(){return this.pointerPos},getStage:function(){return this},getContent:function(){return this.content},toDataURL:function(a){function b(e){var f=i[e],j=f.toDataURL(),k=new Kinetic.window.Image;k.onload=function(){h.drawImage(k,0,0),e<i.length-1?b(e+1):a.callback(g.toDataURL(c,d))},k.src=j}a=a||{};var c=a.mimeType||null,d=a.quality||null,e=a.x||0,f=a.y||0,g=new Kinetic.SceneCanvas({width:a.width||this.getWidth(),height:a.height||this.getHeight(),pixelRatio:1}),h=g.getContext()._context,i=this.children;(e||f)&&h.translate(-1*e,-1*f),b(0)},toImage:function(a){var b=a.callback;a.callback=function(a){Kinetic.Util._getImage(a,function(a){b(a)})},this.toDataURL(a)},getIntersection:function(a){var b,c,d=this.getChildren(),e=d.length,f=e-1;for(b=f;b>=0;b--)if(c=d[b].getIntersection(a))return c;return null},_resizeDOM:function(){if(this.content){var a,b,c=this.getWidth(),e=this.getHeight(),f=this.getChildren(),g=f.length;for(this.content.style.width=c+d,this.content.style.height=e+d,this.bufferCanvas.setSize(c,e),this.bufferHitCanvas.setSize(c,e),a=0;g>a;a++)b=f[a],b.setSize(c,e),b.draw()}},add:function(a){if(!(arguments.length>1))return Kinetic.Container.prototype.add.call(this,a),a._setCanvasSize(this.width(),this.height()),a.draw(),this.content.appendChild(a.canvas._canvas),this;for(var b=0;b<arguments.length;b++)this.add(arguments[b])},getParent:function(){return null},getLayer:function(){return null},getLayers:function(){return this.getChildren()},_bindContentEvents:function(){for(var b=0;P>b;b++)a(this,O[b])},_mouseover:function(a){Kinetic.UA.mobile||(this._setPointerPosition(a),this._fire(w,{evt:a}))},_mouseout:function(a){if(!Kinetic.UA.mobile){this._setPointerPosition(a);var b=this.targetShape;b&&!Kinetic.isDragging()&&(b._fireAndBubble(e,{evt:a}),b._fireAndBubble(f,{evt:a}),this.targetShape=null),this.pointerPos=void 0,this._fire(v,{evt:a})}},_mousemove:function(a){if(Kinetic.UA.ieMobile)return this._touchmove(a);if(("undefined"==typeof a.webkitMovementX&&"undefined"==typeof a.webkitMovementY||0!==a.webkitMovementY||0!==a.webkitMovementX)&&!Kinetic.UA.mobile){this._setPointerPosition(a);var b,c=Kinetic.DD;Kinetic.isDragging()||(b=this.getIntersection(this.getPointerPosition()),b&&b.isListening()?Kinetic.isDragging()||this.targetShape&&this.targetShape._id===b._id?b._fireAndBubble(i,{evt:a}):(this.targetShape&&(this.targetShape._fireAndBubble(e,{evt:a},b),this.targetShape._fireAndBubble(f,{evt:a},b)),b._fireAndBubble(g,{evt:a},this.targetShape),b._fireAndBubble(h,{evt:a},this.targetShape),this.targetShape=b):this.targetShape&&!Kinetic.isDragging()&&(this.targetShape._fireAndBubble(e,{evt:a}),this.targetShape._fireAndBubble(f,{evt:a}),this.targetShape=null),this._fire(x,{evt:a})),c&&c._drag(a),a.preventDefault&&a.preventDefault()}},_mousedown:function(a){if(Kinetic.UA.ieMobile)return this._touchstart(a);if(!Kinetic.UA.mobile){this._setPointerPosition(a);var b=this.getIntersection(this.getPointerPosition());Kinetic.listenClickTap=!0,b&&b.isListening()&&(this.clickStartShape=b,b._fireAndBubble(j,{evt:a})),this._fire(y,{evt:a})}a.preventDefault&&a.preventDefault()},_mouseup:function(a){if(Kinetic.UA.ieMobile)return this._touchend(a);if(!Kinetic.UA.mobile){this._setPointerPosition(a);var b=this.getIntersection(this.getPointerPosition()),c=this.clickStartShape,d=!1,e=Kinetic.DD;Kinetic.inDblClickWindow?(d=!0,Kinetic.inDblClickWindow=!1):e&&e.justDragged?e&&(e.justDragged=!1):Kinetic.inDblClickWindow=!0,setTimeout(function(){Kinetic.inDblClickWindow=!1},Kinetic.dblClickWindow),b&&b.isListening()&&(b._fireAndBubble(k,{evt:a}),Kinetic.listenClickTap&&c&&c._id===b._id&&(b._fireAndBubble(l,{evt:a}),d&&b._fireAndBubble(m,{evt:a}))),this._fire(z,{evt:a}),Kinetic.listenClickTap&&(this._fire(A,{evt:a}),d&&this._fire(B,{evt:a})),Kinetic.listenClickTap=!1}a.preventDefault&&a.preventDefault()},_touchstart:function(a){this._setPointerPosition(a);var b=this.getIntersection(this.getPointerPosition());Kinetic.listenClickTap=!0,b&&b.isListening()&&(this.tapStartShape=b,b._fireAndBubble(n,{evt:a}),b.isListening()&&a.preventDefault&&a.preventDefault()),this._fire(C,{evt:a})},_touchend:function(a){this._setPointerPosition(a);var b=this.getIntersection(this.getPointerPosition()),c=!1;Kinetic.inDblClickWindow?(c=!0,Kinetic.inDblClickWindow=!1):Kinetic.inDblClickWindow=!0,setTimeout(function(){Kinetic.inDblClickWindow=!1},Kinetic.dblClickWindow),b&&b.isListening()&&(b._fireAndBubble(o,{evt:a}),Kinetic.listenClickTap&&b._id===this.tapStartShape._id&&(b._fireAndBubble(p,{evt:a}),c&&b._fireAndBubble(q,{evt:a})),b.isListening()&&a.preventDefault&&a.preventDefault()),Kinetic.listenClickTap&&(this._fire(D,{evt:a}),c&&this._fire(E,{evt:a})),Kinetic.listenClickTap=!1},_touchmove:function(a){this._setPointerPosition(a);var b,c=Kinetic.DD;Kinetic.isDragging()||(b=this.getIntersection(this.getPointerPosition()),b&&b.isListening()&&(b._fireAndBubble(r,{evt:a}),b.isListening()&&a.preventDefault&&a.preventDefault()),this._fire(F,{evt:a})),c&&(c._drag(a),Kinetic.isDragging()&&a.preventDefault())},_DOMMouseScroll:function(a){this._mousewheel(a)},_mousewheel:function(a){this._setPointerPosition(a);var b=this.getIntersection(this.getPointerPosition());b&&b.isListening()&&b._fireAndBubble(t,{evt:a})},_wheel:function(a){this._mousewheel(a)},_setPointerPosition:function(a){var b,c=this._getContentPosition(),d=a.offsetX,e=a.clientX,f=null,g=null;a=a?a:window.event,void 0!==a.touches?a.touches.length>0&&(b=a.touches[0],f=b.clientX-c.left,g=b.clientY-c.top):void 0!==d?(f=d,g=a.offsetY):"mozilla"===Kinetic.UA.browser?(f=a.layerX,g=a.layerY):void 0!==e&&c&&(f=e-c.left,g=a.clientY-c.top),null!==f&&null!==g&&(this.pointerPos={x:f,y:g})},_getContentPosition:function(){var a=this.content.getBoundingClientRect?this.content.getBoundingClientRect():{top:0,left:0};return{top:a.top,left:a.left}},_buildDOM:function(){var a=this.getContainer();if(!a){if(Kinetic.Util.isBrowser())throw"Stage has no container. A container is required.";a=Kinetic.document.createElement(G)}a.innerHTML=N,this.content=Kinetic.document.createElement(G),this.content.style.position=H,this.content.style.display=I,this.content.className=J,this.content.setAttribute("role","presentation"),a.appendChild(this.content),this.bufferCanvas=new Kinetic.SceneCanvas({pixelRatio:1}),this.bufferHitCanvas=new Kinetic.HitCanvas,this._resizeDOM()},_onContent:function(a,b){var c,d,e=a.split(K),f=e.length;for(c=0;f>c;c++)d=e[c],this.content.addEventListener(d,b,!1)},cache:function(){Kinetic.Util.warn("Cache function is not allowed for stage. You may use cache only for layers, groups and shapes.")},clearCache:function(){}}),Kinetic.Util.extend(Kinetic.Stage,Kinetic.Container),Kinetic.Factory.addGetter(Kinetic.Stage,"container"),Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Stage,"container")}(),function(){Kinetic.Util.addMethods(Kinetic.BaseLayer,{___init:function(a){this.nodeType="Layer",Kinetic.Container.call(this,a)},createPNGStream:function(){return this.canvas._canvas.createPNGStream()},getCanvas:function(){return this.canvas},getHitCanvas:function(){return this.hitCanvas},getContext:function(){return this.getCanvas().getContext()},clear:function(a){return this.getContext().clear(a),this.getHitCanvas().getContext().clear(a),this},clearHitCache:function(){this._hitImageData=void 0},setZIndex:function(a){Kinetic.Node.prototype.setZIndex.call(this,a);var b=this.getStage();return b&&(b.content.removeChild(this.getCanvas()._canvas),a<b.getChildren().length-1?b.content.insertBefore(this.getCanvas()._canvas,b.getChildren()[a+1].getCanvas()._canvas):b.content.appendChild(this.getCanvas()._canvas)),this},moveToTop:function(){Kinetic.Node.prototype.moveToTop.call(this);var a=this.getStage();a&&(a.content.removeChild(this.getCanvas()._canvas),a.content.appendChild(this.getCanvas()._canvas))},moveUp:function(){if(Kinetic.Node.prototype.moveUp.call(this)){var a=this.getStage();a&&(a.content.removeChild(this.getCanvas()._canvas),this.index<a.getChildren().length-1?a.content.insertBefore(this.getCanvas()._canvas,a.getChildren()[this.index+1].getCanvas()._canvas):a.content.appendChild(this.getCanvas()._canvas))}},moveDown:function(){if(Kinetic.Node.prototype.moveDown.call(this)){var a=this.getStage();if(a){var b=a.getChildren();a.content.removeChild(this.getCanvas()._canvas),a.content.insertBefore(this.getCanvas()._canvas,b[this.index+1].getCanvas()._canvas)}}},moveToBottom:function(){if(Kinetic.Node.prototype.moveToBottom.call(this)){var a=this.getStage();if(a){var b=a.getChildren();a.content.removeChild(this.getCanvas()._canvas),a.content.insertBefore(this.getCanvas()._canvas,b[1].getCanvas()._canvas)}}},getLayer:function(){return this},remove:function(){var a=this.getCanvas()._canvas;return Kinetic.Node.prototype.remove.call(this),a&&a.parentNode&&Kinetic.Util._isInDocument(a)&&a.parentNode.removeChild(a),this},getStage:function(){return this.parent},setSize:function(a,b){this.canvas.setSize(a,b)},getWidth:function(){return this.parent?this.parent.getWidth():void 0},setWidth:function(){Kinetic.Util.warn('Can not change width of layer. Use "stage.width(value)" function instead.')},getHeight:function(){return this.parent?this.parent.getHeight():void 0},setHeight:function(){Kinetic.Util.warn('Can not change height of layer. Use "stage.height(value)" function instead.')}}),Kinetic.Util.extend(Kinetic.BaseLayer,Kinetic.Container),Kinetic.Factory.addGetterSetter(Kinetic.BaseLayer,"clearBeforeDraw",!0),Kinetic.Collection.mapMethods(Kinetic.BaseLayer)}(),function(){var a="#",b="beforeDraw",c="draw",d=[{x:0,y:0},{x:-1,y:0},{x:-1,y:-1},{x:0,y:-1},{x:1,y:-1},{x:1,y:0},{x:1,y:1},{x:0,y:1},{x:-1,y:1}],e=d.length;Kinetic.Util.addMethods(Kinetic.Layer,{____init:function(a){this.nodeType="Layer",this.canvas=new Kinetic.SceneCanvas,this.hitCanvas=new Kinetic.HitCanvas,Kinetic.BaseLayer.call(this,a)},_setCanvasSize:function(a,b){this.canvas.setSize(a,b),this.hitCanvas.setSize(a,b)},_validateAdd:function(a){var b=a.getType();"Group"!==b&&"Shape"!==b&&Kinetic.Util.error("You may only add groups and shapes to a layer.")},getIntersection:function(a){var b,c,f,g;if(!this.hitGraphEnabled()||!this.isVisible())return null;for(var h=1,i=!1;;){for(c=0;e>c;c++){if(f=d[c],b=this._getIntersection({x:a.x+f.x*h,y:a.y+f.y*h}),g=b.shape)return g;b.antialiased&&(i=!0)}if(!i)return;h+=1}},_getImageData:function(a,b){var c=this.hitCanvas.width||1,d=this.hitCanvas.height||1,e=Math.round(b)*c+Math.round(a);return this._hitImageData||(this._hitImageData=this.hitCanvas.context.getImageData(0,0,c,d)),[this._hitImageData.data[4*e+0],this._hitImageData.data[4*e+1],this._hitImageData.data[4*e+2],this._hitImageData.data[4*e+3]]},_getIntersection:function(b){var c,d,e=this.hitCanvas.context.getImageData(b.x,b.y,1,1).data,f=e[3];return 255===f?(c=Kinetic.Util._rgbToHex(e[0],e[1],e[2]),d=Kinetic.shapes[a+c],{shape:d}):f>0?{antialiased:!0}:{}},drawScene:function(a,d){var e=this.getLayer(),f=a||e&&e.getCanvas();return this._fire(b,{node:this}),this.getClearBeforeDraw()&&f.getContext().clear(),Kinetic.Container.prototype.drawScene.call(this,f,d),this._fire(c,{node:this}),this},_applyTransform:function(a,b,c){var d=a.getAbsoluteTransform(c).getMatrix();b.transform(d[0],d[1],d[2],d[3],d[4],d[5])},drawHit:function(a,b){var c=this.getLayer(),d=a||c&&c.hitCanvas;return c&&c.getClearBeforeDraw()&&c.getHitCanvas().getContext().clear(),Kinetic.Container.prototype.drawHit.call(this,d,b),this.imageData=null,this},clear:function(a){return this.getContext().clear(a),this.getHitCanvas().getContext().clear(a),this.imageData=null,this},setVisible:function(a){return Kinetic.Node.prototype.setVisible.call(this,a),a?(this.getCanvas()._canvas.style.display="block",this.hitCanvas._canvas.style.display="block"):(this.getCanvas()._canvas.style.display="none",this.hitCanvas._canvas.style.display="none"),this},enableHitGraph:function(){return this.setHitGraphEnabled(!0),this},disableHitGraph:function(){return this.setHitGraphEnabled(!1),this},setSize:function(a,b){Kinetic.BaseLayer.prototype.setSize.call(this,a,b),this.hitCanvas.setSize(a,b)}}),Kinetic.Util.extend(Kinetic.Layer,Kinetic.BaseLayer),Kinetic.Factory.addGetterSetter(Kinetic.Layer,"hitGraphEnabled",!0),Kinetic.Collection.mapMethods(Kinetic.Layer)}(),function(){Kinetic.Util.addMethods(Kinetic.FastLayer,{____init:function(a){this.nodeType="Layer",this.canvas=new Kinetic.SceneCanvas,Kinetic.BaseLayer.call(this,a)},_validateAdd:function(a){var b=a.getType();"Shape"!==b&&Kinetic.Util.error("You may only add shapes to a fast layer.")},_setCanvasSize:function(a,b){this.canvas.setSize(a,b)},hitGraphEnabled:function(){return!1},getIntersection:function(){return null},drawScene:function(a){var b=this.getLayer(),c=a||b&&b.getCanvas();return this.getClearBeforeDraw()&&c.getContext().clear(),Kinetic.Container.prototype.drawScene.call(this,c),this},_applyTransform:function(a,b,c){if(!c||c._id!==this._id){var d=a.getTransform().getMatrix();b.transform(d[0],d[1],d[2],d[3],d[4],d[5])}},draw:function(){return this.drawScene(),this},clear:function(a){return this.getContext().clear(a),this},setVisible:function(a){return Kinetic.Node.prototype.setVisible.call(this,a),this.getCanvas()._canvas.style.display=a?"block":"none",this}}),Kinetic.Util.extend(Kinetic.FastLayer,Kinetic.BaseLayer),Kinetic.Collection.mapMethods(Kinetic.FastLayer)}(),function(){Kinetic.Util.addMethods(Kinetic.Group,{___init:function(a){this.nodeType="Group",Kinetic.Container.call(this,a)},_validateAdd:function(a){var b=a.getType();"Group"!==b&&"Shape"!==b&&Kinetic.Util.error("You may only add groups and shapes to groups.")}}),Kinetic.Util.extend(Kinetic.Group,Kinetic.Container),Kinetic.Collection.mapMethods(Kinetic.Group)}(),function(){Kinetic.Rect=function(a){this.___init(a)},Kinetic.Rect.prototype={___init:function(a){Kinetic.Shape.call(this,a),this.className="Rect",this.sceneFunc(this._sceneFunc)},_sceneFunc:function(a){var b=this.getCornerRadius(),c=this.getWidth(),d=this.getHeight();a.beginPath(),b?(a.moveTo(b,0),a.lineTo(c-b,0),a.arc(c-b,b,b,3*Math.PI/2,0,!1),a.lineTo(c,d-b),a.arc(c-b,d-b,b,0,Math.PI/2,!1),a.lineTo(b,d),a.arc(b,d-b,b,Math.PI/2,Math.PI,!1),a.lineTo(0,b),a.arc(b,b,b,Math.PI,3*Math.PI/2,!1)):a.rect(0,0,c,d),a.closePath(),a.fillStrokeShape(this)}},Kinetic.Util.extend(Kinetic.Rect,Kinetic.Shape),Kinetic.Factory.addGetterSetter(Kinetic.Rect,"cornerRadius",0),Kinetic.Collection.mapMethods(Kinetic.Rect)}(),function(){var a=2*Math.PI-1e-4,b="Circle";Kinetic.Circle=function(a){this.___init(a)},Kinetic.Circle.prototype={___init:function(a){Kinetic.Shape.call(this,a),this.className=b,this.sceneFunc(this._sceneFunc)},_sceneFunc:function(b){b.beginPath(),b.arc(0,0,this.getRadius(),0,a,!1),b.closePath(),b.fillStrokeShape(this)},getWidth:function(){return 2*this.getRadius()},getHeight:function(){return 2*this.getRadius()},setWidth:function(a){Kinetic.Node.prototype.setWidth.call(this,a),this.radius()!==a/2&&this.setRadius(a/2)},setHeight:function(a){Kinetic.Node.prototype.setHeight.call(this,a),this.radius()!==a/2&&this.setRadius(a/2)},setRadius:function(a){this._setAttr("radius",a),this.setWidth(2*a),this.setHeight(2*a)}},Kinetic.Util.extend(Kinetic.Circle,Kinetic.Shape),Kinetic.Factory.addGetter(Kinetic.Circle,"radius",0),Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Circle,"radius"),Kinetic.Collection.mapMethods(Kinetic.Circle)}(),function(){var a=2*Math.PI-1e-4,b="Ellipse";Kinetic.Ellipse=function(a){this.___init(a)},Kinetic.Ellipse.prototype={___init:function(a){Kinetic.Shape.call(this,a),this.className=b,this.sceneFunc(this._sceneFunc)},_sceneFunc:function(b){var c=this.getRadiusX(),d=this.getRadiusY();b.beginPath(),b.save(),c!==d&&b.scale(1,d/c),b.arc(0,0,c,0,a,!1),b.restore(),b.closePath(),b.fillStrokeShape(this)},getWidth:function(){return 2*this.getRadiusX()},getHeight:function(){return 2*this.getRadiusY()},setWidth:function(a){Kinetic.Node.prototype.setWidth.call(this,a),this.setRadius({x:a/2})},setHeight:function(a){Kinetic.Node.prototype.setHeight.call(this,a),this.setRadius({y:a/2})}},Kinetic.Util.extend(Kinetic.Ellipse,Kinetic.Shape),Kinetic.Factory.addComponentsGetterSetter(Kinetic.Ellipse,"radius",["x","y"]),Kinetic.Factory.addGetterSetter(Kinetic.Ellipse,"radiusX",0),Kinetic.Factory.addGetterSetter(Kinetic.Ellipse,"radiusY",0),Kinetic.Collection.mapMethods(Kinetic.Ellipse)}(),function(){var a=2*Math.PI-1e-4;Kinetic.Ring=function(a){this.___init(a)},Kinetic.Ring.prototype={___init:function(a){Kinetic.Shape.call(this,a),this.className="Ring",this.sceneFunc(this._sceneFunc)},_sceneFunc:function(b){b.beginPath(),b.arc(0,0,this.getInnerRadius(),0,a,!1),b.moveTo(this.getOuterRadius(),0),b.arc(0,0,this.getOuterRadius(),a,0,!0),b.closePath(),b.fillStrokeShape(this)},getWidth:function(){return 2*this.getOuterRadius()},getHeight:function(){return 2*this.getOuterRadius()},setWidth:function(a){Kinetic.Node.prototype.setWidth.call(this,a),this.outerRadius()!==a/2&&this.setOuterRadius(a/2)},setHeight:function(a){Kinetic.Node.prototype.setHeight.call(this,a),this.outerRadius()!==a/2&&this.setOuterRadius(a/2)},setOuterRadius:function(a){this._setAttr("outerRadius",a),this.setWidth(2*a),this.setHeight(2*a)}},Kinetic.Util.extend(Kinetic.Ring,Kinetic.Shape),Kinetic.Factory.addGetterSetter(Kinetic.Ring,"innerRadius",0),Kinetic.Factory.addGetter(Kinetic.Ring,"outerRadius",0),Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Ring,"outerRadius"),Kinetic.Collection.mapMethods(Kinetic.Ring)}(),function(){Kinetic.Wedge=function(a){this.___init(a)},Kinetic.Wedge.prototype={___init:function(a){Kinetic.Shape.call(this,a),this.className="Wedge",this.sceneFunc(this._sceneFunc)},_sceneFunc:function(a){a.beginPath(),a.arc(0,0,this.getRadius(),0,Kinetic.getAngle(this.getAngle()),this.getClockwise()),a.lineTo(0,0),a.closePath(),a.fillStrokeShape(this)}},Kinetic.Util.extend(Kinetic.Wedge,Kinetic.Shape),Kinetic.Factory.addGetterSetter(Kinetic.Wedge,"radius",0),Kinetic.Factory.addGetterSetter(Kinetic.Wedge,"angle",0),Kinetic.Factory.addGetterSetter(Kinetic.Wedge,"clockwise",!1),Kinetic.Factory.backCompat(Kinetic.Wedge,{angleDeg:"angle",getAngleDeg:"getAngle",setAngleDeg:"setAngle"}),Kinetic.Collection.mapMethods(Kinetic.Wedge)}(),function(){Kinetic.Arc=function(a){this.___init(a)},Kinetic.Arc.prototype={___init:function(a){Kinetic.Shape.call(this,a),this.className="Arc",this.sceneFunc(this._sceneFunc)},_sceneFunc:function(a){var b=Kinetic.getAngle(this.angle()),c=this.clockwise();a.beginPath(),a.arc(0,0,this.getOuterRadius(),0,b,c),a.arc(0,0,this.getInnerRadius(),b,0,!c),a.closePath(),a.fillStrokeShape(this)}},Kinetic.Util.extend(Kinetic.Arc,Kinetic.Shape),Kinetic.Factory.addGetterSetter(Kinetic.Arc,"innerRadius",0),Kinetic.Factory.addGetterSetter(Kinetic.Arc,"outerRadius",0),Kinetic.Factory.addGetterSetter(Kinetic.Arc,"angle",0),Kinetic.Factory.addGetterSetter(Kinetic.Arc,"clockwise",!1),Kinetic.Collection.mapMethods(Kinetic.Arc)}(),function(){var a="Image";Kinetic.Image=function(a){this.___init(a)},Kinetic.Image.prototype={___init:function(b){Kinetic.Shape.call(this,b),this.className=a,this.sceneFunc(this._sceneFunc),this.hitFunc(this._hitFunc)},_useBufferCanvas:function(){return(this.hasShadow()||1!==this.getAbsoluteOpacity())&&this.hasStroke()&&this.getStage()},_sceneFunc:function(a){var b,c,d,e=this.getWidth(),f=this.getHeight(),g=this.getImage();g&&(b=this.getCropWidth(),c=this.getCropHeight(),d=b&&c?[g,this.getCropX(),this.getCropY(),b,c,0,0,e,f]:[g,0,0,e,f]),(this.hasFill()||this.hasStroke()||this.hasShadow())&&(a.beginPath(),a.rect(0,0,e,f),a.closePath(),a.fillStrokeShape(this)),g&&a.drawImage.apply(a,d)
-},_hitFunc:function(a){var b=this.getWidth(),c=this.getHeight();a.beginPath(),a.rect(0,0,b,c),a.closePath(),a.fillStrokeShape(this)},getWidth:function(){var a=this.getImage();return this.attrs.width||(a?a.width:0)},getHeight:function(){var a=this.getImage();return this.attrs.height||(a?a.height:0)}},Kinetic.Util.extend(Kinetic.Image,Kinetic.Shape),Kinetic.Factory.addGetterSetter(Kinetic.Image,"image"),Kinetic.Factory.addComponentsGetterSetter(Kinetic.Image,"crop",["x","y","width","height"]),Kinetic.Factory.addGetterSetter(Kinetic.Image,"cropX",0),Kinetic.Factory.addGetterSetter(Kinetic.Image,"cropY",0),Kinetic.Factory.addGetterSetter(Kinetic.Image,"cropWidth",0),Kinetic.Factory.addGetterSetter(Kinetic.Image,"cropHeight",0),Kinetic.Collection.mapMethods(Kinetic.Image)}(),function(){function a(a){a.fillText(this.partialText,0,0)}function b(a){a.strokeText(this.partialText,0,0)}var c="auto",d="center",e="Change.kinetic",f="2d",g="-",h="",i="left",j="text",k="Text",l="middle",m="normal",n="px ",o=" ",p="right",q="word",r="char",s="none",t=["fontFamily","fontSize","fontStyle","fontVariant","padding","align","lineHeight","text","width","height","wrap"],u=t.length,v=Kinetic.Util.createCanvasElement().getContext(f);Kinetic.Text=function(a){this.___init(a)},Kinetic.Text.prototype={___init:function(d){d=d||{},d.fill=d.fill||"black",void 0===d.width&&(d.width=c),void 0===d.height&&(d.height=c),Kinetic.Shape.call(this,d),this._fillFunc=a,this._strokeFunc=b,this.className=k;for(var f=0;u>f;f++)this.on(t[f]+e,this._setTextData);this._setTextData(),this.sceneFunc(this._sceneFunc),this.hitFunc(this._hitFunc)},_sceneFunc:function(a){var b,c=this.getPadding(),e=this.getTextHeight(),f=this.getLineHeight()*e,g=this.textArr,h=g.length,j=this.getWidth();for(a.setAttr("font",this._getContextFont()),a.setAttr("textBaseline",l),a.setAttr("textAlign",i),a.save(),a.translate(c,0),a.translate(0,c+e/2),b=0;h>b;b++){var k=g[b],m=k.text,n=k.width;a.save(),this.getAlign()===p?a.translate(j-n-2*c,0):this.getAlign()===d&&a.translate((j-n-2*c)/2,0),this.partialText=m,a.fillStrokeShape(this),a.restore(),a.translate(0,f)}a.restore()},_hitFunc:function(a){var b=this.getWidth(),c=this.getHeight();a.beginPath(),a.rect(0,0,b,c),a.closePath(),a.fillStrokeShape(this)},setText:function(a){var b=Kinetic.Util._isString(a)?a:a.toString();return this._setAttr(j,b),this},getWidth:function(){return this.attrs.width===c?this.getTextWidth()+2*this.getPadding():this.attrs.width},getHeight:function(){return this.attrs.height===c?this.getTextHeight()*this.textArr.length*this.getLineHeight()+2*this.getPadding():this.attrs.height},getTextWidth:function(){return this.textWidth},getTextHeight:function(){return this.textHeight},_getTextSize:function(a){var b,c=v,d=this.getFontSize();return c.save(),c.font=this._getContextFont(),b=c.measureText(a),c.restore(),{width:b.width,height:parseInt(d,10)}},_getContextFont:function(){return this.getFontStyle()+o+this.getFontVariant()+o+this.getFontSize()+n+this.getFontFamily()},_addTextLine:function(a,b){return this.textArr.push({text:a,width:b})},_getTextWidth:function(a){return v.measureText(a).width},_setTextData:function(){var a=this.getText().split("\n"),b=+this.getFontSize(),d=0,e=this.getLineHeight()*b,f=this.attrs.width,h=this.attrs.height,i=f!==c,j=h!==c,k=this.getPadding(),l=f-2*k,m=h-2*k,n=0,p=this.getWrap(),q=p!==s,t=p!==r&&q;this.textArr=[],v.save(),v.font=this._getContextFont();for(var u=0,w=a.length;w>u;++u){var x=a[u],y=this._getTextWidth(x);if(i&&y>l)for(;x.length>0;){for(var z=0,A=x.length,B="",C=0;A>z;){var D=z+A>>>1,E=x.slice(0,D+1),F=this._getTextWidth(E);l>=F?(z=D+1,B=E,C=F):A=D}if(!B)break;if(t){var G=Math.max(B.lastIndexOf(o),B.lastIndexOf(g))+1;G>0&&(z=G,B=B.slice(0,z),C=this._getTextWidth(B))}if(this._addTextLine(B,C),d=Math.max(d,C),n+=e,!q||j&&n+e>m)break;if(x=x.slice(z),x.length>0&&(y=this._getTextWidth(x),l>=y)){this._addTextLine(x,y),n+=e,d=Math.max(d,y);break}}else this._addTextLine(x,y),n+=e,d=Math.max(d,y);if(j&&n+e>m)break}v.restore(),this.textHeight=b,this.textWidth=d}},Kinetic.Util.extend(Kinetic.Text,Kinetic.Shape),Kinetic.Factory.addGetterSetter(Kinetic.Text,"fontFamily","Arial"),Kinetic.Factory.addGetterSetter(Kinetic.Text,"fontSize",12),Kinetic.Factory.addGetterSetter(Kinetic.Text,"fontStyle",m),Kinetic.Factory.addGetterSetter(Kinetic.Text,"fontVariant",m),Kinetic.Factory.addGetterSetter(Kinetic.Text,"padding",0),Kinetic.Factory.addGetterSetter(Kinetic.Text,"align",i),Kinetic.Factory.addGetterSetter(Kinetic.Text,"lineHeight",1),Kinetic.Factory.addGetterSetter(Kinetic.Text,"wrap",q),Kinetic.Factory.addGetter(Kinetic.Text,"text",h),Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Text,"text"),Kinetic.Collection.mapMethods(Kinetic.Text)}(),function(){Kinetic.Line=function(a){this.___init(a)},Kinetic.Line.prototype={___init:function(a){Kinetic.Shape.call(this,a),this.className="Line",this.on("pointsChange.kinetic tensionChange.kinetic closedChange.kinetic",function(){this._clearCache("tensionPoints")}),this.sceneFunc(this._sceneFunc)},_sceneFunc:function(a){var b,c,d,e=this.getPoints(),f=e.length,g=this.getTension(),h=this.getClosed();if(f){if(a.beginPath(),a.moveTo(e[0],e[1]),0!==g&&f>4){for(b=this.getTensionPoints(),c=b.length,d=h?0:4,h||a.quadraticCurveTo(b[0],b[1],b[2],b[3]);c-2>d;)a.bezierCurveTo(b[d++],b[d++],b[d++],b[d++],b[d++],b[d++]);h||a.quadraticCurveTo(b[c-2],b[c-1],e[f-2],e[f-1])}else for(d=2;f>d;d+=2)a.lineTo(e[d],e[d+1]);h?(a.closePath(),a.fillStrokeShape(this)):a.strokeShape(this)}},getTensionPoints:function(){return this._getCache("tensionPoints",this._getTensionPoints)},_getTensionPoints:function(){return this.getClosed()?this._getTensionPointsClosed():Kinetic.Util._expandPoints(this.getPoints(),this.getTension())},_getTensionPointsClosed:function(){var a=this.getPoints(),b=a.length,c=this.getTension(),d=Kinetic.Util,e=d._getControlPoints(a[b-2],a[b-1],a[0],a[1],a[2],a[3],c),f=d._getControlPoints(a[b-4],a[b-3],a[b-2],a[b-1],a[0],a[1],c),g=Kinetic.Util._expandPoints(a,c),h=[e[2],e[3]].concat(g).concat([f[0],f[1],a[b-2],a[b-1],f[2],f[3],e[0],e[1],a[0],a[1]]);return h}},Kinetic.Util.extend(Kinetic.Line,Kinetic.Shape),Kinetic.Factory.addGetterSetter(Kinetic.Line,"closed",!1),Kinetic.Factory.addGetterSetter(Kinetic.Line,"tension",0),Kinetic.Factory.addGetterSetter(Kinetic.Line,"points",[]),Kinetic.Collection.mapMethods(Kinetic.Line)}(),function(){Kinetic.Sprite=function(a){this.___init(a)},Kinetic.Sprite.prototype={___init:function(a){Kinetic.Shape.call(this,a),this.className="Sprite",this._updated=!0;var b=this;this.anim=new Kinetic.Animation(function(){var a=b._updated;return b._updated=!1,a}),this.on("animationChange.kinetic",function(){this.frameIndex(0)}),this.on("frameIndexChange.kinetic",function(){this._updated=!0}),this.on("frameRateChange.kinetic",function(){this.anim.isRunning()&&(clearInterval(this.interval),this._setInterval())}),this.sceneFunc(this._sceneFunc),this.hitFunc(this._hitFunc)},_sceneFunc:function(a){var b=this.getAnimation(),c=this.frameIndex(),d=4*c,e=this.getAnimations()[b],f=this.frameOffsets(),g=e[d+0],h=e[d+1],i=e[d+2],j=e[d+3],k=this.getImage();if(k)if(f){var l=f[b],m=2*c;a.drawImage(k,g,h,i,j,l[m+0],l[m+1],i,j)}else a.drawImage(k,g,h,i,j,0,0,i,j)},_hitFunc:function(a){var b=this.getAnimation(),c=this.frameIndex(),d=4*c,e=this.getAnimations()[b],f=this.frameOffsets(),g=e[d+2],h=e[d+3];if(a.beginPath(),f){var i=f[b],j=2*c;a.rect(i[j+0],i[j+1],g,h)}else a.rect(0,0,g,h);a.closePath(),a.fillShape(this)},_useBufferCanvas:function(){return(this.hasShadow()||1!==this.getAbsoluteOpacity())&&this.hasStroke()},_setInterval:function(){var a=this;this.interval=setInterval(function(){a._updateIndex()},1e3/this.getFrameRate())},start:function(){var a=this.getLayer();this.anim.setLayers(a),this._setInterval(),this.anim.start()},stop:function(){this.anim.stop(),clearInterval(this.interval)},isRunning:function(){return this.anim.isRunning()},_updateIndex:function(){var a=this.frameIndex(),b=this.getAnimation(),c=this.getAnimations(),d=c[b],e=d.length/4;this.frameIndex(e-1>a?a+1:0)}},Kinetic.Util.extend(Kinetic.Sprite,Kinetic.Shape),Kinetic.Factory.addGetterSetter(Kinetic.Sprite,"animation"),Kinetic.Factory.addGetterSetter(Kinetic.Sprite,"animations"),Kinetic.Factory.addGetterSetter(Kinetic.Sprite,"frameOffsets"),Kinetic.Factory.addGetterSetter(Kinetic.Sprite,"image"),Kinetic.Factory.addGetterSetter(Kinetic.Sprite,"frameIndex",0),Kinetic.Factory.addGetterSetter(Kinetic.Sprite,"frameRate",17),Kinetic.Factory.backCompat(Kinetic.Sprite,{index:"frameIndex",getIndex:"getFrameIndex",setIndex:"setFrameIndex"}),Kinetic.Collection.mapMethods(Kinetic.Sprite)}(),function(){Kinetic.Path=function(a){this.___init(a)},Kinetic.Path.prototype={___init:function(a){this.dataArray=[];var b=this;Kinetic.Shape.call(this,a),this.className="Path",this.dataArray=Kinetic.Path.parsePathData(this.getData()),this.on("dataChange.kinetic",function(){b.dataArray=Kinetic.Path.parsePathData(this.getData())}),this.sceneFunc(this._sceneFunc)},_sceneFunc:function(a){var b=this.dataArray,c=!1;a.beginPath();for(var d=0;d<b.length;d++){var e=b[d].command,f=b[d].points;switch(e){case"L":a.lineTo(f[0],f[1]);break;case"M":a.moveTo(f[0],f[1]);break;case"C":a.bezierCurveTo(f[0],f[1],f[2],f[3],f[4],f[5]);break;case"Q":a.quadraticCurveTo(f[0],f[1],f[2],f[3]);break;case"A":var g=f[0],h=f[1],i=f[2],j=f[3],k=f[4],l=f[5],m=f[6],n=f[7],o=i>j?i:j,p=i>j?1:i/j,q=i>j?j/i:1;a.translate(g,h),a.rotate(m),a.scale(p,q),a.arc(0,0,o,k,k+l,1-n),a.scale(1/p,1/q),a.rotate(-m),a.translate(-g,-h);break;case"z":a.closePath(),c=!0}}c?a.fillStrokeShape(this):a.strokeShape(this)}},Kinetic.Util.extend(Kinetic.Path,Kinetic.Shape),Kinetic.Path.getLineLength=function(a,b,c,d){return Math.sqrt((c-a)*(c-a)+(d-b)*(d-b))},Kinetic.Path.getPointOnLine=function(a,b,c,d,e,f,g){void 0===f&&(f=b),void 0===g&&(g=c);var h=(e-c)/(d-b+1e-8),i=Math.sqrt(a*a/(1+h*h));b>d&&(i*=-1);var j,k=h*i;if(d===b)j={x:f,y:g+k};else if((g-c)/(f-b+1e-8)===h)j={x:f+i,y:g+k};else{var l,m,n=this.getLineLength(b,c,d,e);if(1e-8>n)return void 0;var o=(f-b)*(d-b)+(g-c)*(e-c);o/=n*n,l=b+o*(d-b),m=c+o*(e-c);var p=this.getLineLength(f,g,l,m),q=Math.sqrt(a*a-p*p);i=Math.sqrt(q*q/(1+h*h)),b>d&&(i*=-1),k=h*i,j={x:l+i,y:m+k}}return j},Kinetic.Path.getPointOnCubicBezier=function(a,b,c,d,e,f,g,h,i){function j(a){return a*a*a}function k(a){return 3*a*a*(1-a)}function l(a){return 3*a*(1-a)*(1-a)}function m(a){return(1-a)*(1-a)*(1-a)}var n=h*j(a)+f*k(a)+d*l(a)+b*m(a),o=i*j(a)+g*k(a)+e*l(a)+c*m(a);return{x:n,y:o}},Kinetic.Path.getPointOnQuadraticBezier=function(a,b,c,d,e,f,g){function h(a){return a*a}function i(a){return 2*a*(1-a)}function j(a){return(1-a)*(1-a)}var k=f*h(a)+d*i(a)+b*j(a),l=g*h(a)+e*i(a)+c*j(a);return{x:k,y:l}},Kinetic.Path.getPointOnEllipticalArc=function(a,b,c,d,e,f){var g=Math.cos(f),h=Math.sin(f),i={x:c*Math.cos(e),y:d*Math.sin(e)};return{x:a+(i.x*g-i.y*h),y:b+(i.x*h+i.y*g)}},Kinetic.Path.parsePathData=function(a){if(!a)return[];var b=a,c=["m","M","l","L","v","V","h","H","z","Z","c","C","q","Q","t","T","s","S","a","A"];b=b.replace(new RegExp(" ","g"),",");for(var d=0;d<c.length;d++)b=b.replace(new RegExp(c[d],"g"),"|"+c[d]);var e=b.split("|"),f=[],g=0,h=0;for(d=1;d<e.length;d++){var i=e[d],j=i.charAt(0);i=i.slice(1),i=i.replace(new RegExp(",-","g"),"-"),i=i.replace(new RegExp("-","g"),",-"),i=i.replace(new RegExp("e,-","g"),"e-");var k=i.split(",");k.length>0&&""===k[0]&&k.shift();for(var l=0;l<k.length;l++)k[l]=parseFloat(k[l]);for(;k.length>0&&!isNaN(k[0]);){var m,n,o,p,q,r,s,t,u,v,w=null,x=[],y=g,z=h;switch(j){case"l":g+=k.shift(),h+=k.shift(),w="L",x.push(g,h);break;case"L":g=k.shift(),h=k.shift(),x.push(g,h);break;case"m":var A=k.shift(),B=k.shift();if(g+=A,h+=B,w="M",f.length>2&&"z"===f[f.length-1].command)for(var C=f.length-2;C>=0;C--)if("M"===f[C].command){g=f[C].points[0]+A,h=f[C].points[1]+B;break}x.push(g,h),j="l";break;case"M":g=k.shift(),h=k.shift(),w="M",x.push(g,h),j="L";break;case"h":g+=k.shift(),w="L",x.push(g,h);break;case"H":g=k.shift(),w="L",x.push(g,h);break;case"v":h+=k.shift(),w="L",x.push(g,h);break;case"V":h=k.shift(),w="L",x.push(g,h);break;case"C":x.push(k.shift(),k.shift(),k.shift(),k.shift()),g=k.shift(),h=k.shift(),x.push(g,h);break;case"c":x.push(g+k.shift(),h+k.shift(),g+k.shift(),h+k.shift()),g+=k.shift(),h+=k.shift(),w="C",x.push(g,h);break;case"S":n=g,o=h,m=f[f.length-1],"C"===m.command&&(n=g+(g-m.points[2]),o=h+(h-m.points[3])),x.push(n,o,k.shift(),k.shift()),g=k.shift(),h=k.shift(),w="C",x.push(g,h);break;case"s":n=g,o=h,m=f[f.length-1],"C"===m.command&&(n=g+(g-m.points[2]),o=h+(h-m.points[3])),x.push(n,o,g+k.shift(),h+k.shift()),g+=k.shift(),h+=k.shift(),w="C",x.push(g,h);break;case"Q":x.push(k.shift(),k.shift()),g=k.shift(),h=k.shift(),x.push(g,h);break;case"q":x.push(g+k.shift(),h+k.shift()),g+=k.shift(),h+=k.shift(),w="Q",x.push(g,h);break;case"T":n=g,o=h,m=f[f.length-1],"Q"===m.command&&(n=g+(g-m.points[0]),o=h+(h-m.points[1])),g=k.shift(),h=k.shift(),w="Q",x.push(n,o,g,h);break;case"t":n=g,o=h,m=f[f.length-1],"Q"===m.command&&(n=g+(g-m.points[0]),o=h+(h-m.points[1])),g+=k.shift(),h+=k.shift(),w="Q",x.push(n,o,g,h);break;case"A":p=k.shift(),q=k.shift(),r=k.shift(),s=k.shift(),t=k.shift(),u=g,v=h,g=k.shift(),h=k.shift(),w="A",x=this.convertEndpointToCenterParameterization(u,v,g,h,s,t,p,q,r);break;case"a":p=k.shift(),q=k.shift(),r=k.shift(),s=k.shift(),t=k.shift(),u=g,v=h,g+=k.shift(),h+=k.shift(),w="A",x=this.convertEndpointToCenterParameterization(u,v,g,h,s,t,p,q,r)}f.push({command:w||j,points:x,start:{x:y,y:z},pathLength:this.calcLength(y,z,w||j,x)})}("z"===j||"Z"===j)&&f.push({command:"z",points:[],start:void 0,pathLength:0})}return f},Kinetic.Path.calcLength=function(a,b,c,d){var e,f,g,h,i=Kinetic.Path;switch(c){case"L":return i.getLineLength(a,b,d[0],d[1]);case"C":for(e=0,f=i.getPointOnCubicBezier(0,a,b,d[0],d[1],d[2],d[3],d[4],d[5]),h=.01;1>=h;h+=.01)g=i.getPointOnCubicBezier(h,a,b,d[0],d[1],d[2],d[3],d[4],d[5]),e+=i.getLineLength(f.x,f.y,g.x,g.y),f=g;return e;case"Q":for(e=0,f=i.getPointOnQuadraticBezier(0,a,b,d[0],d[1],d[2],d[3]),h=.01;1>=h;h+=.01)g=i.getPointOnQuadraticBezier(h,a,b,d[0],d[1],d[2],d[3]),e+=i.getLineLength(f.x,f.y,g.x,g.y),f=g;return e;case"A":e=0;var j=d[4],k=d[5],l=d[4]+k,m=Math.PI/180;if(Math.abs(j-l)<m&&(m=Math.abs(j-l)),f=i.getPointOnEllipticalArc(d[0],d[1],d[2],d[3],j,0),0>k)for(h=j-m;h>l;h-=m)g=i.getPointOnEllipticalArc(d[0],d[1],d[2],d[3],h,0),e+=i.getLineLength(f.x,f.y,g.x,g.y),f=g;else for(h=j+m;l>h;h+=m)g=i.getPointOnEllipticalArc(d[0],d[1],d[2],d[3],h,0),e+=i.getLineLength(f.x,f.y,g.x,g.y),f=g;return g=i.getPointOnEllipticalArc(d[0],d[1],d[2],d[3],l,0),e+=i.getLineLength(f.x,f.y,g.x,g.y)}return 0},Kinetic.Path.convertEndpointToCenterParameterization=function(a,b,c,d,e,f,g,h,i){var j=i*(Math.PI/180),k=Math.cos(j)*(a-c)/2+Math.sin(j)*(b-d)/2,l=-1*Math.sin(j)*(a-c)/2+Math.cos(j)*(b-d)/2,m=k*k/(g*g)+l*l/(h*h);m>1&&(g*=Math.sqrt(m),h*=Math.sqrt(m));var n=Math.sqrt((g*g*h*h-g*g*l*l-h*h*k*k)/(g*g*l*l+h*h*k*k));e===f&&(n*=-1),isNaN(n)&&(n=0);var o=n*g*l/h,p=n*-h*k/g,q=(a+c)/2+Math.cos(j)*o-Math.sin(j)*p,r=(b+d)/2+Math.sin(j)*o+Math.cos(j)*p,s=function(a){return Math.sqrt(a[0]*a[0]+a[1]*a[1])},t=function(a,b){return(a[0]*b[0]+a[1]*b[1])/(s(a)*s(b))},u=function(a,b){return(a[0]*b[1]<a[1]*b[0]?-1:1)*Math.acos(t(a,b))},v=u([1,0],[(k-o)/g,(l-p)/h]),w=[(k-o)/g,(l-p)/h],x=[(-1*k-o)/g,(-1*l-p)/h],y=u(w,x);return t(w,x)<=-1&&(y=Math.PI),t(w,x)>=1&&(y=0),0===f&&y>0&&(y-=2*Math.PI),1===f&&0>y&&(y+=2*Math.PI),[q,r,g,h,v,y,j,f]},Kinetic.Factory.addGetterSetter(Kinetic.Path,"data"),Kinetic.Collection.mapMethods(Kinetic.Path)}(),function(){function a(a){a.fillText(this.partialText,0,0)}function b(a){a.strokeText(this.partialText,0,0)}var c="",d="normal";Kinetic.TextPath=function(a){this.___init(a)},Kinetic.TextPath.prototype={___init:function(c){var d=this;this.dummyCanvas=Kinetic.Util.createCanvasElement(),this.dataArray=[],Kinetic.Shape.call(this,c),this._fillFunc=a,this._strokeFunc=b,this._fillFuncHit=a,this._strokeFuncHit=b,this.className="TextPath",this.dataArray=Kinetic.Path.parsePathData(this.attrs.data),this.on("dataChange.kinetic",function(){d.dataArray=Kinetic.Path.parsePathData(this.attrs.data)}),this.on("textChange.kinetic textStroke.kinetic textStrokeWidth.kinetic",d._setTextData),d._setTextData(),this.sceneFunc(this._sceneFunc)},_sceneFunc:function(a){a.setAttr("font",this._getContextFont()),a.setAttr("textBaseline","middle"),a.setAttr("textAlign","left"),a.save();for(var b=this.glyphInfo,c=0;c<b.length;c++){a.save();var d=b[c].p0;a.translate(d.x,d.y),a.rotate(b[c].rotation),this.partialText=b[c].text,a.fillStrokeShape(this),a.restore()}a.restore()},getTextWidth:function(){return this.textWidth},getTextHeight:function(){return this.textHeight},setText:function(a){Kinetic.Text.prototype.setText.call(this,a)},_getTextSize:function(a){var b=this.dummyCanvas,c=b.getContext("2d");c.save(),c.font=this._getContextFont();var d=c.measureText(a);return c.restore(),{width:d.width,height:parseInt(this.attrs.fontSize,10)}},_setTextData:function(){var a=this,b=this._getTextSize(this.attrs.text);this.textWidth=b.width,this.textHeight=b.height,this.glyphInfo=[];for(var c,d,e,f=this.attrs.text.split(""),g=-1,h=0,i=function(){h=0;for(var b=a.dataArray,d=g+1;d<b.length;d++){if(b[d].pathLength>0)return g=d,b[d];"M"==b[d].command&&(c={x:b[d].points[0],y:b[d].points[1]})}return{}},j=function(b){var f=a._getTextSize(b).width,g=0,j=0;for(d=void 0;Math.abs(f-g)/f>.01&&25>j;){j++;for(var k=g;void 0===e;)e=i(),e&&k+e.pathLength<f&&(k+=e.pathLength,e=void 0);if(e==={}||void 0===c)return void 0;var l=!1;switch(e.command){case"L":Kinetic.Path.getLineLength(c.x,c.y,e.points[0],e.points[1])>f?d=Kinetic.Path.getPointOnLine(f,c.x,c.y,e.points[0],e.points[1],c.x,c.y):e=void 0;break;case"A":var m=e.points[4],n=e.points[5],o=e.points[4]+n;0===h?h=m+1e-8:f>g?h+=Math.PI/180*n/Math.abs(n):h-=Math.PI/360*n/Math.abs(n),(0>n&&o>h||n>=0&&h>o)&&(h=o,l=!0),d=Kinetic.Path.getPointOnEllipticalArc(e.points[0],e.points[1],e.points[2],e.points[3],h,e.points[6]);break;case"C":0===h?h=f>e.pathLength?1e-8:f/e.pathLength:f>g?h+=(f-g)/e.pathLength:h-=(g-f)/e.pathLength,h>1&&(h=1,l=!0),d=Kinetic.Path.getPointOnCubicBezier(h,e.start.x,e.start.y,e.points[0],e.points[1],e.points[2],e.points[3],e.points[4],e.points[5]);break;case"Q":0===h?h=f/e.pathLength:f>g?h+=(f-g)/e.pathLength:h-=(g-f)/e.pathLength,h>1&&(h=1,l=!0),d=Kinetic.Path.getPointOnQuadraticBezier(h,e.start.x,e.start.y,e.points[0],e.points[1],e.points[2],e.points[3])}void 0!==d&&(g=Kinetic.Path.getLineLength(c.x,c.y,d.x,d.y)),l&&(l=!1,e=void 0)}},k=0;k<f.length&&(j(f[k]),void 0!==c&&void 0!==d);k++){var l=Kinetic.Path.getLineLength(c.x,c.y,d.x,d.y),m=0,n=Kinetic.Path.getPointOnLine(m+l/2,c.x,c.y,d.x,d.y),o=Math.atan2(d.y-c.y,d.x-c.x);this.glyphInfo.push({transposeX:n.x,transposeY:n.y,text:f[k],rotation:o,p0:c,p1:d}),c=d}}},Kinetic.TextPath.prototype._getContextFont=Kinetic.Text.prototype._getContextFont,Kinetic.Util.extend(Kinetic.TextPath,Kinetic.Shape),Kinetic.Factory.addGetterSetter(Kinetic.TextPath,"fontFamily","Arial"),Kinetic.Factory.addGetterSetter(Kinetic.TextPath,"fontSize",12),Kinetic.Factory.addGetterSetter(Kinetic.TextPath,"fontStyle",d),Kinetic.Factory.addGetterSetter(Kinetic.TextPath,"fontVariant",d),Kinetic.Factory.addGetter(Kinetic.TextPath,"text",c),Kinetic.Collection.mapMethods(Kinetic.TextPath)}(),function(){Kinetic.RegularPolygon=function(a){this.___init(a)},Kinetic.RegularPolygon.prototype={___init:function(a){Kinetic.Shape.call(this,a),this.className="RegularPolygon",this.sceneFunc(this._sceneFunc)},_sceneFunc:function(a){var b,c,d,e=this.attrs.sides,f=this.attrs.radius;for(a.beginPath(),a.moveTo(0,0-f),b=1;e>b;b++)c=f*Math.sin(2*b*Math.PI/e),d=-1*f*Math.cos(2*b*Math.PI/e),a.lineTo(c,d);a.closePath(),a.fillStrokeShape(this)}},Kinetic.Util.extend(Kinetic.RegularPolygon,Kinetic.Shape),Kinetic.Factory.addGetterSetter(Kinetic.RegularPolygon,"radius",0),Kinetic.Factory.addGetterSetter(Kinetic.RegularPolygon,"sides",0),Kinetic.Collection.mapMethods(Kinetic.RegularPolygon)}(),function(){Kinetic.Star=function(a){this.___init(a)},Kinetic.Star.prototype={___init:function(a){Kinetic.Shape.call(this,a),this.className="Star",this.sceneFunc(this._sceneFunc)},_sceneFunc:function(a){var b=this.innerRadius(),c=this.outerRadius(),d=this.numPoints();a.beginPath(),a.moveTo(0,0-c);for(var e=1;2*d>e;e++){var f=e%2===0?c:b,g=f*Math.sin(e*Math.PI/d),h=-1*f*Math.cos(e*Math.PI/d);a.lineTo(g,h)}a.closePath(),a.fillStrokeShape(this)}},Kinetic.Util.extend(Kinetic.Star,Kinetic.Shape),Kinetic.Factory.addGetterSetter(Kinetic.Star,"numPoints",5),Kinetic.Factory.addGetterSetter(Kinetic.Star,"innerRadius",0),Kinetic.Factory.addGetterSetter(Kinetic.Star,"outerRadius",0),Kinetic.Collection.mapMethods(Kinetic.Star)}(),function(){var a=["fontFamily","fontSize","fontStyle","padding","lineHeight","text"],b="Change.kinetic",c="none",d="up",e="right",f="down",g="left",h="Label",i=a.length;Kinetic.Label=function(a){this.____init(a)},Kinetic.Label.prototype={____init:function(a){var b=this;Kinetic.Group.call(this,a),this.className=h,this.on("add.kinetic",function(a){b._addListeners(a.child),b._sync()})},getText:function(){return this.find("Text")[0]},getTag:function(){return this.find("Tag")[0]},_addListeners:function(c){var d,e=this,f=function(){e._sync()};for(d=0;i>d;d++)c.on(a[d]+b,f)},getWidth:function(){return this.getText().getWidth()},getHeight:function(){return this.getText().getHeight()},_sync:function(){var a,b,c,h,i,j,k,l=this.getText(),m=this.getTag();if(l&&m){switch(a=l.getWidth(),b=l.getHeight(),c=m.getPointerDirection(),h=m.getPointerWidth(),k=m.getPointerHeight(),i=0,j=0,c){case d:i=a/2,j=-1*k;break;case e:i=a+h,j=b/2;break;case f:i=a/2,j=b+k;break;case g:i=-1*h,j=b/2}m.setAttrs({x:-1*i,y:-1*j,width:a,height:b}),l.setAttrs({x:-1*i,y:-1*j})}}},Kinetic.Util.extend(Kinetic.Label,Kinetic.Group),Kinetic.Collection.mapMethods(Kinetic.Label),Kinetic.Tag=function(a){this.___init(a)},Kinetic.Tag.prototype={___init:function(a){Kinetic.Shape.call(this,a),this.className="Tag",this.sceneFunc(this._sceneFunc)},_sceneFunc:function(a){var b=this.getWidth(),c=this.getHeight(),h=this.getPointerDirection(),i=this.getPointerWidth(),j=this.getPointerHeight(),k=this.getCornerRadius();a.beginPath(),a.moveTo(0,0),h===d&&(a.lineTo((b-i)/2,0),a.lineTo(b/2,-1*j),a.lineTo((b+i)/2,0)),k?(a.lineTo(b-k,0),a.arc(b-k,k,k,3*Math.PI/2,0,!1)):a.lineTo(b,0),h===e&&(a.lineTo(b,(c-j)/2),a.lineTo(b+i,c/2),a.lineTo(b,(c+j)/2)),k?(a.lineTo(b,c-k),a.arc(b-k,c-k,k,0,Math.PI/2,!1)):a.lineTo(b,c),h===f&&(a.lineTo((b+i)/2,c),a.lineTo(b/2,c+j),a.lineTo((b-i)/2,c)),k?(a.lineTo(k,c),a.arc(k,c-k,k,Math.PI/2,Math.PI,!1)):a.lineTo(0,c),h===g&&(a.lineTo(0,(c+j)/2),a.lineTo(-1*i,c/2),a.lineTo(0,(c-j)/2)),k&&(a.lineTo(0,k),a.arc(k,k,k,Math.PI,3*Math.PI/2,!1)),a.closePath(),a.fillStrokeShape(this)}},Kinetic.Util.extend(Kinetic.Tag,Kinetic.Shape),Kinetic.Factory.addGetterSetter(Kinetic.Tag,"pointerDirection",c),Kinetic.Factory.addGetterSetter(Kinetic.Tag,"pointerWidth",0),Kinetic.Factory.addGetterSetter(Kinetic.Tag,"pointerHeight",0),Kinetic.Factory.addGetterSetter(Kinetic.Tag,"cornerRadius",0),Kinetic.Collection.mapMethods(Kinetic.Tag)}(),function(){Kinetic.Arrow=function(a){this.____init(a)},Kinetic.Arrow.prototype={____init:function(a){Kinetic.Line.call(this,a),this.className="Arrow"},_sceneFunc:function(a){var b=2*Math.PI,c=this.points(),d=c.length,e=c[d-2]-c[d-4],f=c[d-1]-c[d-3],g=(Math.atan2(f,e)+b)%b,h=this.pointerLength(),i=this.pointerWidth();a.save(),a.beginPath(),a.translate(c[d-2],c[d-1]),a.rotate(g),a.moveTo(0,0),a.lineTo(-h,i/2),a.lineTo(-h,-i/2),a.closePath(),a.restore(),this.pointerAtBeginning()&&(a.save(),a.translate(c[0],c[1]),e=c[2]-c[0],f=c[3]-c[1],a.rotate((Math.atan2(-f,-e)+b)%b),a.moveTo(0,0),a.lineTo(-10,6),a.lineTo(-10,-6),a.closePath(),a.restore()),a.fillStrokeShape(this),Kinetic.Line.prototype._sceneFunc.apply(this,arguments)}},Kinetic.Util.extend(Kinetic.Arrow,Kinetic.Line),Kinetic.Factory.addGetterSetter(Kinetic.Arrow,"pointerLength",10),Kinetic.Factory.addGetterSetter(Kinetic.Arrow,"pointerWidth",10),Kinetic.Factory.addGetterSetter(Kinetic.Arrow,"pointerAtBeginning",!1),Kinetic.Collection.mapMethods(Kinetic.Arrow)}();;/**
- * Copyright (c) 2007-2014 Ariel Flesler - aflesler<a>gmail<d>com | http://flesler.blogspot.com
- * Licensed under MIT
- * @author Ariel Flesler
- * @version 1.4.14
- */
-;(function(k){'use strict';k(['jquery'],function($){var j=$.scrollTo=function(a,b,c){return $(window).scrollTo(a,b,c)};j.defaults={axis:'xy',duration:0,limit:!0};j.window=function(a){return $(window)._scrollable()};$.fn._scrollable=function(){return this.map(function(){var a=this,isWin=!a.nodeName||$.inArray(a.nodeName.toLowerCase(),['iframe','#document','html','body'])!=-1;if(!isWin)return a;var b=(a.contentWindow||a).document||a.ownerDocument||a;return/webkit/i.test(navigator.userAgent)||b.compatMode=='BackCompat'?b.body:b.documentElement})};$.fn.scrollTo=function(f,g,h){if(typeof g=='object'){h=g;g=0}if(typeof h=='function')h={onAfter:h};if(f=='max')f=9e9;h=$.extend({},j.defaults,h);g=g||h.duration;h.queue=h.queue&&h.axis.length>1;if(h.queue)g/=2;h.offset=both(h.offset);h.over=both(h.over);return this._scrollable().each(function(){if(f==null)return;var d=this,$elem=$(d),targ=f,toff,attr={},win=$elem.is('html,body');switch(typeof targ){case'number':case'string':if(/^([+-]=?)?\d+(\.\d+)?(px|%)?$/.test(targ)){targ=both(targ);break}targ=win?$(targ):$(targ,this);if(!targ.length)return;case'object':if(targ.is||targ.style)toff=(targ=$(targ)).offset()}var e=$.isFunction(h.offset)&&h.offset(d,targ)||h.offset;$.each(h.axis.split(''),function(i,a){var b=a=='x'?'Left':'Top',pos=b.toLowerCase(),key='scroll'+b,old=d[key],max=j.max(d,a);if(toff){attr[key]=toff[pos]+(win?0:old-$elem.offset()[pos]);if(h.margin){attr[key]-=parseInt(targ.css('margin'+b))||0;attr[key]-=parseInt(targ.css('border'+b+'Width'))||0}attr[key]+=e[pos]||0;if(h.over[pos])attr[key]+=targ[a=='x'?'width':'height']()*h.over[pos]}else{var c=targ[pos];attr[key]=c.slice&&c.slice(-1)=='%'?parseFloat(c)/100*max:c}if(h.limit&&/^\d+$/.test(attr[key]))attr[key]=attr[key]<=0?0:Math.min(attr[key],max);if(!i&&h.queue){if(old!=attr[key])animate(h.onAfterFirst);delete attr[key]}});animate(h.onAfter);function animate(a){$elem.animate(attr,g,h.easing,a&&function(){a.call(this,targ,h)})}}).end()};j.max=function(a,b){var c=b=='x'?'Width':'Height',scroll='scroll'+c;if(!$(a).is('html,body'))return a[scroll]-$(a)[c.toLowerCase()]();var d='client'+c,html=a.ownerDocument.documentElement,body=a.ownerDocument.body;return Math.max(html[scroll],body[scroll])-Math.min(html[d],body[d])};function both(a){return $.isFunction(a)||$.isPlainObject(a)?a:{top:a,left:a}}return j})}(typeof define==='function'&&define.amd?define:function(a,b){if(typeof module!=='undefined'&&module.exports){module.exports=b(require('jquery'))}else{b(jQuery)}}));;/**
+;/**
  * A small plugin for getting the CSV of a rendered chart
  */
 /*global Highcharts, document */
@@ -49562,20 +48522,20 @@ function loadJS( src ){
 
 }).call({});
 ;var idd_codes = {"ne":"227","gg":null,"bd":"880","ki":"686","mm":"95","mc":"377","tr":"90","sj":null,"gl":"299","hn":"504","ug":"256","my":"60","nu":"683","ci":"225","ro":"40","tn":"216","dk":"45","nc":"687","co":"57","rw":"250","br":"55","aq":"672","bo":"591","cy":"357","st":"239","ck":"682","hm":null,"tc":"1649","bv":null,"ke":"254","mo":"853","ps":"970","gq":"240","ge":"995","dm":"1767","bf":"226","km":null,"ao":"244","af":"93","gr":"30","va":"379","ls":"266","mv":"960","tm":"993","is":"354","jm":"1876","mt":"356","pg":"675","ky":"1345","ga":"241","la":"856","gi":"350","bh":"973","ms":"1664","bt":"975","gb":"44","pn":"649","sv":"503","it":"39","wf":"681","mq":"596","sb":"677","hu":"36","za":"27","ly":"218","ng":"234","se":"46","gt":"502","uy":"598","ai":"1264","iq":"964","lu":"352","na":"264","ve":"58","pt":"351","il":"972","mh":"692","ba":"387","eg":"20","ph":"63","kg":"996","pf":"689","no":"47","um":null,"lv":"371","tf":null,"fr":"33","kz":"7","ma":"212","in":"91","id":"62","sr":"597","si":"386","re":null,"me":null,"om":"968","vg":"1284","by":"375","fi":"358","gs":null,"fj":"679","ir":"98","py":"595","pm":"508","sn":"221","li":"417","tz":"255","td":"235","sd":"249","cg":"242","pa":"507","au":"61","sl":"232","am":"374","tv":"688","gh":"233","us":"1","jo":"962","mr":"222","bi":"257","ee":"372","cd":"243","ye":"967","dz":"213","pk":"92","kn":"1869","cm":"237","bw":"267","mn":"976","lk":"94","gd":"1473","nz":"64","as":"684","ae":"971","lc":"1758","mg":"261","tk":"690","sc":"248","rs":"381","cn":"86","ru":null,"ag":"1268","mx":"52","cx":"618","sy":"963","cr":"506","vi":"1340","az":"994","ec":"593","sg":"65","kh":"855","mz":"258","bm":"1441","lb":"961","nr":"674","bz":"501","vu":"678","kw":"965","ml":"223","bj":"229","gf":"594","al":"355","mf":null,"uz":"998","pr":"1787","fk":"500","lr":"231","eh":"21","nf":null,"np":"977","do":"1809","ht":"509","mp":"1670","bs":"1242","gm":"220","mw":"265","to":"676","cu":"53","ch":"41","mu":"230","ni":"505","gu":"671","bg":"359","pw":"680","aw":"297","gy":"592","pl":"48","ca":null,"sk":"421","pe":"51","an":"599","ua":"380","ax":null,"gw":"245","es":"34","kr":"82","je":"441534","tt":"1868","fo":"298","yt":"269","cc":null,"kp":"850","bb":"1246","sh":"290","sa":"966","zm":"260","io":"246","th":"66","hk":"852","et":"251","ie":"353","so":"252","tl":"670","er":"291","tj":"992","cf":"236","im":"441624","cz":"420","mk":"389","lt":"370","de":"49","hr":"385","gn":"224","be":"32","qa":"974","vc":"1784","cv":"238","fm":"691","md":"373","jp":"81","cl":"56","tw":"886","ws":"685","ad":"376","sz":"268","bn":"673","at":"43","tg":"228","vn":"84","zw":"263","gp":"590","ar":"54","sm":"378","nl":"31","dj":"253","bl":null};;var texts_json = {};
-texts_json['EN'] = {"[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"min"};
-texts_json['ID'] = {"Euro_50_Index":"Indeks Euro 50","Please_select":"Tolong pilih","This_contract_won":"Kontrak ini untung","October":"Oktober","Oil/EUR":"Minyak/EUR","Spot":"Posisi","US_Index":"Indeks AS","Payout":"Hasil","period":"periode","Stays_In/Goes_Out":"Tetap Di Dalam/Luar","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"Mewakili jumlah kontrak pada portopolio Anda. Setiap baris pada portopolio Anda dihitung sebagai satu posisi. Jika jumlah maksimum tercapai maka Anda perlu menutup salah satu posisi untuk membeli kontrak atau posisi lainnya.","stays_between":"tetap antara","Italian_30_Index":"Indeks Italia 30","Deposit_of":"Deposit dari","Wednesday":"Rabu","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"Mewakili jumlah maksimum pembelian kontrak dalam satu hari trading.","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"Alamat email yang Anda ajukan telah digunakan oleh Login ID lain","Dubai_Index":"Indeks Dubai","month":"bulan","Hong_Kong_Index":"Indeks Hong Kong","Sorry,_account_opening_is_unavailable_":"Maaf, pembukaan akun tidak tersedia.","In/Out":"Di Dalam/Luar","Barrier":"Batasan","Potential_Payout":"Potensi Hasil","Low_Barrier":"Batasan Rendah","Previous_Day":"Hari Sebelumnya","Points":"Poin","Tu":"Kam","Therefore_you_may_not_withdraw_any_additional_funds_":"Maka Anda tidak dapat melakukan penarikan dana selanjutnya.","Sale_Price":"Harga Jual","touches":"menyentuh","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"Masukan batasan yang merupakan selisih harga spot. Jika Anda memasukan +0.005, maka Anda akan membeli kontrak dengan batasan 0.005 lebih tinggi dari spot masuk. Spot masuk adalah tik setelah kontrak Anda diproses","Short":"Pendek","Random_75_Index":"Indeks Random 75","Please_confirm_the_trade_on_your_statement_before_proceeding_":"Mohon konfirmasikan kontrak pada bagian pernyataan sebelum melanjutkan.","Year":"Tahun","Purchase_Time":"Waktu Beli","No_Live_price_update":"Tidak tersedia harga Live","Real_Account":"Akun Riil","Day":"Hari","Europe/Africa":"Eropa/Afrika","Trading_and_Withdrawal_Limits":"Batasan Penarikan - ","High_barrier_offset":"Batasan offset tinggi","Aug":"Agustus","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"Akun Anda telah terbukti dan batasan penarikan Anda telah dihapuskan.","GBP_Index":"Indeks GBP","KBC_Groep":"KBC Group","ends_outside":"berakhir di luar","minimum_available_duration":"durasi minimal yang tersedia","Russian_Regular_Index":"Indeks Reguler Rusia","Feb":"Peb","Now":"Sekarang","The_two_passwords_that_you_entered_do_not_match_":"Kedua-dua password yang Anda masukkan tidak cocok.","This_field_is_required_":"Bagian ini diperlukan.","Return":"Laba","Norwegian_Index":"Indeks Norwegia","Swiss_Index":"Indeks Swis","asian_up":"asian naik","Asians":"Asian","Random_100_Index":"Indeks Random 100","Save_as_PDF":"Simpan dalam PDF","Contract_Confirmation":"Konfirmasi Kontrak","numbers":"nomor","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"min","day":"hari","Save_as_JPEG":"Simpan dalam JPEG","hours":"jam","Euro_100_Index":"Indeks Euro 100","second":"detik","spread_down":"spread turun","Belgian_Stocks":"Saham Belgia","Date":"Tanggal","AUD_Index":"Indeks AUD","lower":"lebih rendah","Digits":"Digit","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"Saat ini kami tidak menerima pembukaan akun dari penduduk negara berikut.","Australian_Index":"Indeks Australia","Last_Digit_Prediction":"Analisa Digit Terakhir","Start_time":"Waktu mulai","Americas":"Amerika","Japanese_Index":"Indeks Jepang","US_Tech_100_Index":"Indeks US 100 Tech","matches":"cocok","Long":"Panjang","Jakarta_Index":"Indeks Jakarta","is_required__Current_spread":"dibutuhkan. Spread saat ini","Purchase_Price":"Harga Beli","Mr":"Bapak","days":"hari","March":"Maret","(Bejing/CST_-8_hours)":"(Bejing/CST -8 jam)","Save_as_PNG":"Simpan dalam PNG","New_Zealand_Index":"Indeks Selandia Baru","hyphen":"tanda penghubung","Smart_FX":"FX Smart","Week_of":"Minggu ke","Entry_Spot":"Spot entri","Major_Pairs":"Pasangan Utama","Su":"Mgg","Nov":"Nop","spread_up":"spread naik","Jump_To":"Lompat Ke","Dutch_Index":"Indeks Belanda","loading___":"pemuatan...","French_Index":"Indeks Perancis","Metals":"Logam","We":"Kami","To":"Kepada","Tuesday":"Selasa","Sorry,_this_feature_is_not_available_":"Maaf, fasilitas ini tidak tersedia.","High_barrier":"Batasan Tinggi","Gaming_Account":"Akun Trading","You_must_accept_the_terms_and_conditions_to_open_an_account_":"Anda harus menyetujui syarat dan ketentuan untuk mendaftar akun.","July":"Juli","June":"Juni","Purchase_Date":"Tanggal Beli","Dec":"Des","Thursday":"Kamis","Portuguese_Index":"Indeks Portugis","Limit":"Batas","higher":"lebih tinggi","Smart_Indices":"Indeks Smart","in_aggregate_over_the_last":"rata-rata selama","Monday":"Senin","differs":"berbeda","Randoms":"Random","Oil/AUD":"Minyak/AUD","USD_Index":"Indeks USD","password":"kata sandi","Action":"Aksi","comma":"koma","minutes":"menit","Indian_50_Index":"Indeks India 50","Oil/GBP":"Minyak/GBP","Wall_Street_Index":"Indeks Wall Street","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"Setelah mengklik 'Ok' Anda akan dikecualikan dari trading hingga tanggal yang dipilih.","ticks":"tik","months":"bulan","Potential_Profit":"Potensi Hasil","Previous":"Sebelumnya","Random":"Secara Acak","Contract_period":"Masa kontrak","Sale_Date":"Tanggal Jual","Exercise_period":"Periode latihan","Euro_150_Index":"Indeks Euro 150","Failed_to_update_trade_description_":"Gagal memperbarui deskripsi kontrak.","February":"Pebruari","Your_current_balance_is":"Saldo Anda saat ini","This_contract_lost":"Kontrak ini rugi","Duration":"Durasi","Singapore_Index":"Indeks Singapura","Stocks":"Saham","Buy":"Beli","Next":"Lanjutkan","Friday":"Jum'at","Your_password_cannot_be_the_same_as_your_email":"Kata sandi tidak boleh sama dengan alamat email","EUR_Index":"Indeks EUR","Egypt_Index":"Indeks Egypt","Net_profit":"Laba bersih","points":"nilai","There_was_a_problem_accessing_the_server_during_purchase_":"Terjadi masalah mengakses server saat pembelian berlangsung.","Random_25_Index":"Indeks Random 25","December":"Desember","Dutch_Stocks":"Saham Belanda","Th":"Kam","Oct":"Oktober","Stake":"Modal","Higher/Lower":"Lebih Tinggi/Rendah","Barrier_offset":"Diluar Batasan","Amount_per_point":"Jumlah per poin","in_aggregate_over_the_lifetime_of_your_account_":"rata-rata selama akun Anda berlangsung.","Next_Day":"Hari Berikutnya","Save_as_CSV":"Simpan dalam CSV","Total_Profit/Loss":"Total Untung/Rugi","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"Mewakili jumlah maksimum saldo tunai pada akun anda. Jika jumlah maksimum tercapai, maka anda perlu menarik dana anda.","Mo":"Sen","Jun":"Juni","Loss":"Rugi","Quotidians":"Harian","Tick":"Tik","Balance":"Saldo","Statement":"Pernyataan","ends_between":"berakhir antara","letters":"huruf","asian_down":"asian turun","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"Kami tidak dapat memberikan striming harga live untuk saat ini. Untuk menikmati striming harga live silahkan coba merefresh halaman, atau coba browser lain","Low_barrier":"Batasan rendah","Minor_Pairs":"Pasangan Ringan","Energy":"Energi","Spreads":"Spread","From":"Dari","Virtual_Account":"Akun Virtual","does_not_touch":"tidak menyentuh","hour":"jam","View":"Lihat","French_Stocks":"Saham Perancis","years":"tahun","Sunday":"Minggu","Please_input_a_valid_date":"Masukkan tanggal yang benar","Trading_Limits":"Batasan Trading","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"Oleh karena itu jumlah maksimal yang dapat Anda cairkan langsung (jika saldo mencukupi) adalah EUR","Vanilla_Options":"Opsi Vanila","Please_wait_<br_/>Your_request_is_being_processed_":"Silahkan tunggu.<br />Permohonan Anda sedang diproses.","Irish_Index":"Indeks Irlandia","minute":"menit","Belgian_Index":"Indeks Belgia","January":"Januari","August":"Agustus","Maximum_account_cash_balance":"Maksimum saldo tunai","Bombay_Index":"Bombay Indeks","Maximum_number_of_open_positions":"Maksimal jumlah posisi terbuka","Sa":"Sab","Start_Time":"Waktu Mulai","US_Tech_Composite_Index":"Indeks Gabungan Tech US","seconds":"detik","apostrophe":"apostrof","Up/Down":"Atas/Bawah","Ends_In/Out":"Berakhir Di Dalam/Luar","Indices":"Indeks","Mrs":"Ibu","Maximum_aggregate_payouts_on_open_positions":"Jumlah maksimal hasil rata-rata pada posisi terbuka","Purchase":"Beli","Profit_Table":"Tabel Laba Rugi","End_Time":"Waktu berakhir","Credit/Debit":"Kredit/Debit","There_was_a_problem_accessing_the_server_":"Terjadi masalah pada saat mengakses server.","Invalid_email_address":"Invalid alamat email","year":"tahun","German_Index":"Indeks Jerman","November":"Nopember","Contract":"Kontrak","South_African_Index":"Indeks Afrika Selatan","Random_50_Index":"Indeks Random 50","Investment_Account":"Akun Investasi","Miss":"Nona","Please_enter_a_date_that_is_at_least_6_months_from_now_":"Masukkan tanggal setidaknya 6 bulan dari sekarang.","Ms":"Sdri.","May":"Mei","Profit":"Keuntungan","Rise/Fall":"Naik/Turun","Print_chart":"Cetak grafik","Please_try_again_":"Silahkan coba kembali.","Withdrawal_Limits":"Batas Penarikan","Total_Cost":"Total Biaya","Your_transaction_reference_is":"Referensi transaksi Anda adalah","Touch/No_Touch":"Menyentuh/Tidak","Save_as_SVG":"Simpan dalam SVG","Profit/Loss":"Untung/Rugi","Maximum_daily_turnover":"Maksimum turnover harian","Please_check_your_email_for_the_next_step_":"Cek email Anda untuk langkah selanjutnya.","Commodities":"Komoditi","Fr":"Jum","goes_outside":"bergerak keluar","Month":"Bulan","Item":"Bagian","High_Barrier":"Batasan Tinggi","space":"ruang","Middle_East":"Timur Tengah","Portuguese_Smart_Index":"Indeks Smart Portugis","Saturday":"Sabtu","Low_barrier_offset":"Batasan offset rendah","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"Mewakili jumlah maksimum hasil kontrak pada portopolio Anda. Jika jumlah maksimum tercapai maka Anda tidak dapat membeli kontrak baru tanpa menyelesaikan salah satu posisi Anda.","Sell":"Jual","Description":"Deskripsi","Abu_Dhabi_Index":"Indeks Abu Dhabi"};
-texts_json['RU'] = {"Please_select":"Выберите","This_contract_won":"Контракт выиграл","October":"Октябрь","Oil/EUR":"Нефть/EUR","Spot":"Спот-котировка","US_Index":"Амер. индекс","Payout":"Выплата","period":"период","Stays_In/Goes_Out":"Останется Внутри/Выйдет за пределы","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"Представляет собой максимальное количество открытых контрактов в Вашем портфолио. Каждая линия в Вашем портфолио считается как открытая позиция. Когда Вы достигаете лимита, Вы не можете создавать новые контракты, пока не закроете существующие.","stays_between":"останется между","Random_Bear":"Random медведи","Italian_30_Index":"Итальянский индекс 30","Deposit_of":"Пополнение в размере","odd":"нечётное число","Wednesday":"Среда","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"Представляет собой максимальный объём контрактов, который Вы можете приобрести в течение любого торгового дня.","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"Указанный Вами электронный адрес уже используется на другом счету","Dubai_Index":"Дубайский индекс","month":"мес.","Hong_Kong_Index":"Гонг-Конгский индекс","Sorry,_account_opening_is_unavailable_":"Извините, но открытие счёта недоступно.","In/Out":"Внутри/Вне","Barrier":"Барьер","Potential_Payout":"Потенциальная выплата","Low_Barrier":"Нижний Барьер","Previous_Day":"Предыдущ. день","Points":"Пункты","Tu":"Вт","Therefore_you_may_not_withdraw_any_additional_funds_":"Это означает, что Вы не можете снять дополнительные средства со счета.","Gold/AUD":"Золото/AUD","Sale_Price":"Цена прод.","touches":"коснется","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"Внесите барьер для изменения спот-котировки. Если Вы внесете +0.005, Вы покупаете контракт с барьером на 0.005 выше, чем спот-котировка. Спот-котировкой считается следующий тик после покупки контракта","Short":"Короткая поз.","Random_75_Index":"Random 75 индекс","Please_confirm_the_trade_on_your_statement_before_proceeding_":"Пожалуйста, подтвердите контракт в своей истории счета, прежде чем продолжить.","Year":"год","Purchase_Time":"Время покупки","No_Live_price_update":"Нет обновления настоящей котировки","Real_Account":"Реальный счет","Day":"День","Europe/Africa":"Европа/Африка","Trading_and_Withdrawal_Limits":"Лимиты на торговлю и вывод","High_barrier_offset":"Изменение высшего барьера","Aug":"Авг","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"Ваш счет полностью авторизован, и лимит на вывод был снят.","Swedish_Index":"Шведский индекс","GBP_Index":"GBP индекс","Jul":"Июл","ends_outside":"закончится вне","minimum_available_duration":"мин. доступный период","Russian_Regular_Index":"Российский станд.инд.","Feb":"Фев","Gold/EUR":"Золото/EUR","Now":"Сейчас","The_two_passwords_that_you_entered_do_not_match_":"Введенные пароли не совпадают.","Stop-loss":"Стоп-лосс","This_field_is_required_":"Данное поле является необходимым.","Return":"Прибыль","Norwegian_Index":"Норвежский индекс","Swiss_Index":"Швейцарский индекс","asian_up":"азиатские вверх","Asians":"Азиатские","Random_100_Index":"Random 100 индекс","September":"Сентябрь","Save_as_PDF":"Сохранить в формате PDF","Contract_Confirmation":"Подтверждение контракта","numbers":"цифры","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"мин.","day":"дн.","Save_as_JPEG":"Сохранить в формате JPEG","Platinum/USD":"Платина/USD","hours":"час.","second":"секунд(ы)","spread_down":"спред вниз","Belgian_Stocks":"Бельгийские акции","Date":"Дата","AUD_Index":"AUD индекс","Asia/Oceania":"Азия","Italian_Index":"Итальянский индекс","lower":"ниже","Digits":"Цифров.","April":"Апрель","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"В настоящее время мы не открываем счета для резидентов этой страны.","Australian_Index":"Австралийский индекс","Last_Digit_Prediction":"Прогноз последней десятичной","Start_time":"Время начала","Americas":"Америка","Japanese_Index":"Японский индекс","Sep":"Сен","matches":"Совпадет","Long":"Длинная позиция","Jakarta_Index":"Индекс Джакарты","is_required__Current_spread":"необходимо. Текущий спред","Purchase_Price":"Цена покупки","Mr":"Господин","days":"дн.","March":"Март","(Bejing/CST_-8_hours)":"(Пекин/CST -8 часов)","Save_as_PNG":"Сохранить в формате PNG","New_Zealand_Index":"Новозеландский индекс","hyphen":"дефис","Week_of":"Нед.","Entry_Spot":"Входная котировка","Major_Pairs":"Основные пары","Su":"Вс","Nov":"Ноя","Ref_":"Номер","spread_up":"спред вверх","Jump_To":"Перейти к","Dutch_Index":"Голландский индекс","loading___":"загружается...","French_Index":"Французский индекс","Metals":"Металлы","We":"Ср","To":"До","Tuesday":"Вторник","even":"чётное число","Sorry,_this_feature_is_not_available_":"Извините, данная функция недоступна.","High_barrier":"Высший барьер","Gaming_Account":"Игровой счет","You_must_accept_the_terms_and_conditions_to_open_an_account_":"Для открытия счета необходимо согласиться с правилами и условиями.","July":"Июль","June":"Июнь","Mar":"Мар","Purchase_Date":"Дата покупки","Dec":"Дек","Thursday":"Четверг","Portuguese_Index":"Португальский индекс","Limit":"Лимит","higher":"выше","Smart_Indices":"Smart-индексы","Jan":"Янв","in_aggregate_over_the_last":"в совокупности за последний(ие)","Monday":"Понедельник","differs":"отличается","Randoms":"Random","Oil/AUD":"Нефть/AUD","USD_Index":"USD индекс","password":"пароль","Stop-type":"Тип стопа","Action":"Акт","Random_Moon":"Random луна","Random_Bull":"Random быки","comma":"запятая","minutes":"минут(ы)","Oil/GBP":"Нефть/GBP","Indian_50_Index":"Индия 50 индекс","ticks":"тиков","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"Когда Вы нажимаете на \"ОК\", Вы будете отстранены от работы на сайте до окончания выбранной даты.","Apr":"Апр","months":"мес.","Potential_Profit":"Потенциальная прибыль","over":"больше","Previous":"Предыдущ.","Random":"Индексы Random","Sale_Date":"Дата продажи","Contract_period":"Период контракта","Nocturnes":"Ночные","Exercise_period":"Период исполнения","February":"Февраль","Failed_to_update_trade_description_":"Невозможно обновить описание контракта.","Your_current_balance_is":"Текущий баланс Вашего счета составляет","Stocks":"Акции","Singapore_Index":"Сингапурский индекс","Duration":"Продолжительность","This_contract_lost":"Контракт проиграл","Buy":"Покупка","Next":"Далее","Friday":"пятница","Random_Yin":"Random инь","Your_password_cannot_be_the_same_as_your_email":"Ваш пароль не может быть таким же, как Ваш эл.адрес","EUR_Index":"EUR индекс","Egypt_Index":"Египетский индекс","Net_profit":"Чистая прибыль","points":"пункты","There_was_a_problem_accessing_the_server_during_purchase_":"Возникла проблема с доступом к серверу во время процесса покупки.","Random_25_Index":"Random 25 индекс","December":"Декабрь","Dutch_Stocks":"Голландские акции","Th":"Чт","Oct":"Окт","Higher/Lower":"Выше/Ниже","Stake":"Ставка","Dr":"Доктор","Barrier_offset":"Изменение барьера","Amount_per_point":"Сумма за пункт","in_aggregate_over_the_lifetime_of_your_account_":"в совокупности, за время существования Вашего счета.","Gold/USD":"Золото/USD","Next_Day":"Следующий день","Total_Profit/Loss":"Общая прибыль/потери","Save_as_CSV":"Сохранить в формате CSV","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"Представляет максимальную сумму средств на Вашем счету. Когда Вы достигаете лимита, Вас попросят вывести часть средств.","Quotidians":"Ежедневные","Loss":"Потери","Mo":"Пн","Jun":"Июн","Tick":"Тики","Balance":"Баланс","Statement":"История счета","ends_between":"закончится между","letters":"буквы","under":"меньше","asian_down":"азиатские вниз","Silver/USD":"Серебро/USD","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"Мы не в состоянии предложить живые цены в данный момент. Чтобы посмотреть живые цены, попробуйте перезагрузить страницу. Если вы получаете это сообщение повторно, используйте другой браузер","Low_barrier":"Нижний барьер","Forex":"Форекс","Minor_Pairs":"Вторичные пары","Spreads":"Спреды","Energy":"Энергия","Virtual_Account":"Демо-счет","From":"от","does_not_touch":"не коснется","hour":"час.","View":"Просмотр","French_Stocks":"Французские акции","Please_input_a_valid_date":"Пожалуйста, введите правильную дату","years":"год(а)/лет","Sunday":"Воскресенье","Trading_Limits":"Торговые лимиты","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"Следовательно, Ваш максимальный лимит на вывод на данный момент составляет EUR","Vanilla_Options":"Ванильные опционы","Please_wait_<br_/>Your_request_is_being_processed_":"Пожалуйста, подождите.<br/>Запрос в обработке.","Irish_Index":"Ирландский индекс","Belgian_Index":"Бельгийский индекс","minute":"минут(ы)","Palladium/USD":"Палладий/USD","Random_Venus":"Random Венера","January":"Январь","Maximum_account_cash_balance":"Максимальный баланс на счету","August":"Август","Bombay_Index":"Бомбейский индекс","Maximum_number_of_open_positions":"Максимальное количество открытых позиций","Sa":"Сб","Start_Time":"Время начала","seconds":"секунд(ы)","apostrophe":"апостроф","Gold/GBP":"Золото/GBP","Oil/USD":"Нефть/USD","Ends_In/Out":"Заканчивается Внутри/Вне","Up/Down":"Вверх/Вниз","Indices":"Индексы","Mrs":"Госпожа","Maximum_aggregate_payouts_on_open_positions":"Максимальная совокупная выплата по открытым позициям","Profit_Table":"Анализ счета","Purchase":"Покупка","Credit/Debit":"Кредит/Дебет","End_Time":"Окончание","There_was_a_problem_accessing_the_server_":"Возникла проблема с доступом к серверу.","Invalid_email_address":"Недействительный e-mail","year":"год(а)/лет","German_Index":"Немецкий индекс","November":"Ноябрь","Random_Sun":"Random солнце","Random_50_Index":"Random 50 индекс","South_African_Index":"Южно-Африк.инд.","Contract":"Контракт","Investment_Account":"Инвестиционный счет","Miss":"Госпожа","Please_enter_a_date_that_is_at_least_6_months_from_now_":"Внесите дату, по меньшей мере, в 6 месяцах от настоящей.","Zoom":"Приблизить","Ms":"Госпожа","May":"Май","Profit":"Прибыль","Rise/Fall":"Повышение/Падение","Withdrawal_Limits":"Лимиты на вывод","Print_chart":"Напечатать график","Please_try_again_":"Пожалуйста, попробуйте снова.","Total_Cost":"Общая стоимость","Your_transaction_reference_is":"Ссылка на Вашу сделку","Touch/No_Touch":"Касание/Нет касания","Save_as_SVG":"Сохранить в формате SVG","Profit/Loss":"Плюс/Минус","Maximum_daily_turnover":"Максимальный дневной оборот","Commodities":"Сырьевые товары","Please_check_your_email_for_the_next_step_":"Пожалуйста, проверьте свой email для выполнения дальнейших шагов.","Fr":"Пт","goes_outside":"выйдет за пределы","Item":"Описание","Month":"Месяц","High_Barrier":"Высший Барьер","Random_Mars":"Random Марс","Middle_East":"Ближний Восток","space":"пробел","Portuguese_Smart_Index":"Португальский Smart индекс","Prof":"Проф.","Saturday":"Суббота","Random_Yang":"Random янь","Low_barrier_offset":"Изменение нижнего барьера","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"Представляет общую максимальную сумму выплат по открытым ставкам в Вашем портфолио. Когда будет достигнута максимальная сумма, Вы не сможете приобретать новые контракты без закрытия действующих.","Description":"Описание","Sell":"Продажа","Abu_Dhabi_Index":"Индекс Абу-Даби"};
-texts_json['ES'] = {"Euro_50_Index":"Índice Euro 50","Please_select":"Seleccione","This_contract_won":"Este contrato ganó","October":"Octubre","Oil/EUR":"Petróleo/EUR","Spot":"Precio actual del mercado","US_Index":"Índice EEUU","Payout":"Pago","period":"período","Stays_In/Goes_Out":"Queda Dentro/Sale Fuera","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"Representa el número máximo de contratos pendientes en su cartera. Cada línea de su cartera cuenta para una posición abierta. Una vez que se alcanza el máximo no podrá abrir nuevas posiciones sin cerrar las posiciones existentes primero.","stays_between":"queda dentro","Random_Bear":"Random Osos","Italian_30_Index":"Índice Italia 30","Deposit_of":"Depósito de","odd":"impar","Wednesday":"Miércoles","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"Representa el volumen máximo de contratos que puede comprar en un día de comercialización determinado.","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"La dirección de correo electrónico que usted ha proporcionado ya está utilizado por otro usuario","Dubai_Index":"Índice Dubai","month":"mes","Hong_Kong_Index":"Índice Hong Kong","Sorry,_account_opening_is_unavailable_":"Lo sentimos, apertura de una cuenta actualmente no está disponible.","In/Out":"Dentro/Fuera","Barrier":"Límite","Potential_Payout":"Pago potencial","Low_Barrier":"Barrera Inferior","Previous_Day":"Día Anterior","Points":"Puntos","Tu":"MA","Therefore_you_may_not_withdraw_any_additional_funds_":"Por lo tanto, es posible que no pueda retirar más fondos.","Gold/AUD":"Oro/AUD","Sale_Price":"Precio venta","touches":"toca","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"Introduzca el límite en términos de la diferencia con el precio al contado. Si usted introduce +0.005, estará adquiriendo un contrato con un límite 0.005 por encima del precio al contado. El precio al contado es el precio recibido una vez ejecutada la orden de la compra","Short":"Cortos","Random_75_Index":"Random 75","Please_confirm_the_trade_on_your_statement_before_proceeding_":"Por favor, confirme el contrato en su cartera antes de proceder.","Year":"Año","Purchase_Time":"Hora de compra","No_Live_price_update":"Falta de actualización de precios en tiempo real","Real_Account":"Cuenta real","Day":"Día","Europe/Africa":"Europa/África","Trading_and_Withdrawal_Limits":"Límites de comercialización y de retiro","High_barrier_offset":"Desplazamiento de la barrera superior","Aug":"Ago","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"Su cuenta está totalmente autenticada y su límite de extracciones ha sido aumentado.","Swedish_Index":"Índice Suecia","GBP_Index":"Índice GBP","ends_outside":"Finaliza fuera","minimum_available_duration":"duración mínima disponible","Russian_Regular_Index":"Índice regular Rusia","Gold/EUR":"Oro/EUR","Now":"Ahora","The_two_passwords_that_you_entered_do_not_match_":"Las dos contraseñas ingresadas no coinciden.","Stop-loss":"Stop loss","This_field_is_required_":"Este campo es obligatorio.","Return":"Ganancias","Norwegian_Index":"Índice de Noruega","Swiss_Index":"Índice Suiza","asian_up":"asiáticos arriba","AP_Ordinary":"AP Ordinario","Asians":"Asiáticas","Random_100_Index":"Random 100","September":"Septiembre","Save_as_PDF":"Guardar en formato PDF","Contract_Confirmation":"Confirmación del contrato","numbers":"números","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"min","day":"día","Save_as_JPEG":"Guardar en formato JPEG","Platinum/USD":"Platino/USD","hours":"horas","Euro_100_Index":"Índice Euro 30","second":"segundo","spread_down":"spread abajo","Belgian_Stocks":"Acciones Bélgica","Date":"Fecha","AUD_Index":"Índice AUD","Asia/Oceania":"Asia/Oceanía","Italian_Index":"Índice Italia","lower":"inferior","Digits":"Dígitos","April":"Abril","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"En este momento, no aceptamos cuentas de residentes de este país.","AUDZAR":"AUD/ZAR","Australian_Index":"Índice Australia","Last_Digit_Prediction":"Predicción del último dígito","Start_time":"Hora de comienzo","Americas":"América","Japanese_Index":"Índice de Japón","US_Tech_100_Index":"Índice US Tech 100","matches":"coincide","Long":"Largos","Jakarta_Index":"Índice Jakarta","is_required__Current_spread":"está requerido. El spread actual","Purchase_Price":"Precio de compra","Mr":"Sr","days":"días","March":"Marzo","(Bejing/CST_-8_hours)":"(Bejing/CST -8 horas)","Save_as_PNG":"Guardar en formato PNG","New_Zealand_Index":"Índice Nueva Zelanda","Week_of":"Semana","Entry_Spot":"Punto de entrada","Major_Pairs":"Pares mayores","Su":"DO","spread_up":"spread arriba","Jump_To":"Saltar a","Dutch_Index":"Índice Holanda","loading___":"cargando...","French_Index":"Índice Francia","Metals":"Metales","We":"MI","To":"Al","Tuesday":"Martes","even":"par","Sorry,_this_feature_is_not_available_":"Esta funcionalidad no está disponible.","High_barrier":"Barrera superior","Gaming_Account":"Cuenta de juego","You_must_accept_the_terms_and_conditions_to_open_an_account_":"Usted debe aceptar los términos y condiciones para abrir una cuenta.","July":"Julio","June":"Junio","USDZAR":"USD/ZAR","Purchase_Date":"Fecha de compra","Dec":"Dic","Thursday":"Jueves","Portuguese_Index":"Índice Portugal","Limit":"Límite","higher":"superior","Smart_Indices":"Índices Smart","Jan":"Ene","in_aggregate_over_the_last":"en total durante los últimos","Monday":"Lunes","differs":"es diferente","Randoms":"Índices Random","Oil/AUD":"Petróleo/AUD","USD_Index":"Índice USD","password":"contraseña","Stop-type":"Tipo de stop","Action":"Acción","Random_Moon":"Random Luna","Random_Bull":"Random Toros","comma":"coma","minutes":"minutos","Oil/GBP":"Petróleo/GBP","Indian_50_Index":"Índice India 50","Wall_Street_Index":"Índice Wall Street","ticks":"intervalos","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"Al hacer clic en \"OK\" usted será excluido de las operaciones en la web hasta la fecha seleccionada.","Apr":"Abr","months":"meses","Potential_Profit":"Beneficios potenciales","over":"sobre","Previous":"Anterior","Sale_Date":"Fecha de venta","Contract_period":"Período del contrato","Nocturnes":"Nocturnos","Euro_150_Index":"Índice Euro 150","Exercise_period":"Período del ejercicio","February":"Febrero","Failed_to_update_trade_description_":"Error al actualizar la desripción del contrato.","Your_current_balance_is":"El balance actual  de su cuenta es","Stocks":"Acciones","Singapore_Index":"Índice Singapur","Duration":"Duración","This_contract_lost":"Este contrato perdió","Buy":"Comprar","Next":"Siguiente","Friday":"Viernes","Random_Yin":"Random Ying","Your_password_cannot_be_the_same_as_your_email":"Tu contraseña no puede ser la misma que su dirección de correo electrónico","EUR_Index":"Índice EUR","Egypt_Index":"Índice Egipto","Net_profit":"Beneficio Neto","points":"puntos","There_was_a_problem_accessing_the_server_during_purchase_":"Hubo un problema al acceder al servidor durante la compra.","Random_25_Index":"Random 25","December":"Diciembre","Dutch_Stocks":"Acciones Holanda","Th":"JU","Higher/Lower":"Superior/Inferior","Stake":"Inversión","Barrier_offset":"Desplazamiento de barrera","Amount_per_point":"Cantidad por punto","in_aggregate_over_the_lifetime_of_your_account_":"en total durante toda la validez de su cuenta.","Gold/USD":"Oro/USD","Next_Day":"Día siguiente","Total_Profit/Loss":"Beneficios/perdidas totales","Save_as_CSV":"Guardar en formato CSV","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"Representa el monto máximo de dinero que puede tener en su cuenta. Si se alcanza el máximo se le pedirá que retire sus fondos.","Quotidians":"Cotidianos","Loss":"Pérdida","Mo":"LU","Tick":"Intervalo","Balance":"Saldo","Statement":"Extracto","ends_between":"Finaliza dentro","letters":"letras","under":"bajo","asian_down":"asiáticas abajo","Silver/USD":"Plata/USD","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"En estos momento no somos capaces de transmitir los precios en tiempo real. Para ver los precios en directo intente actualizar la página. Si el problema pesiste después de repetidos intentos, pruebe un navegador diferente","Low_barrier":"Barrera inferior","Minor_Pairs":"Pares menores","Energy":"Energía","Virtual_Account":"Cuenta virtual","From":"Desde","does_not_touch":"no toca","hour":"hora","View":"Ver","French_Stocks":"Acciones Francia","Please_input_a_valid_date":"Ingrese una fecha válida","years":"años","Sunday":"Domingo","Trading_Limits":"Límites","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"Por lo tanto, su máximo actual de retiro inmediato (sujeto a la existencia de fondos suficientes en su cuenta) es de EUR","Vanilla_Options":"Opciones vainilla","Please_wait_<br_/>Your_request_is_being_processed_":"Por favor, aguarde.<br />Se está procesando su solicitud.","Irish_Index":"Índice Irlanda","Belgian_Index":"Índice Bélgica","minute":"minuto","Palladium/USD":"Paladio/USD","January":"Enero","Maximum_account_cash_balance":"Saldo de caja máximo en la cuenta","August":"Agosto","Bombay_Index":"Índice Bombay","Maximum_number_of_open_positions":"Número máximo de posiciones abiertas","US_Tech_Composite_Index":"Índice US Tech Composite","Sa":"SA","Start_Time":"Hora de comienzo","seconds":"segundos","Gold/GBP":"Oro/GBP","Oil/USD":"Petróleo/USD","Ends_In/Out":"Finaliza Dentro/Fuera","Up/Down":"Arriba/Abajo","Indices":"Índices","Mrs":"Srta.","Maximum_aggregate_payouts_on_open_positions":"Máximo de pagos agregados en posiciones abiertas","Profit_Table":"Tabla de beneficios","Purchase":"Compra","Credit/Debit":"Crédito/débito","End_Time":"Hora de finalización","There_was_a_problem_accessing_the_server_":"Hubo un problema al acceder al servidor.","Invalid_email_address":"Correo electrónico no válido","year":"año","German_Index":"Índice Alemania","November":"Noviembre","Random_Sun":"Random Sol","Random_50_Index":"Random 50","South_African_Index":"Índice de Sudáfrica","Contract":"Contrato","Investment_Account":"Cuenta de inversión","Miss":"Srta.","Please_enter_a_date_that_is_at_least_6_months_from_now_":"Por favor, elija una fecha que es por lo menos 6 meses a partir de ahora.","Zoom":"Enfocar","Ms":"Sra.","Profit":"Beneficios","Rise/Fall":"Alza/Baja","Withdrawal_Limits":"Límites de retiro","Print_chart":"Imprimir el gráfico","Please_try_again_":"Por favor, inténtelo de nuevo.","Total_Cost":"Coste total","Your_transaction_reference_is":"La referencia de su transacción es","Touch/No_Touch":"Toque/Sin toque","Save_as_SVG":"Guardar en formato SVG","Profit/Loss":"Perdido/Ganado","Maximum_daily_turnover":"Volumen de negocios diario máximo","Commodities":"Materias primas","Please_check_your_email_for_the_next_step_":"Por favor revise su correo electrónico para el siguiente paso.","Fr":"VI","goes_outside":"sale fuera","Item":"Artículo","Month":"Mes","High_Barrier":"Barrera Superior","Random_Mars":"Random Marte","Middle_East":"Medio Oriente","space":"espacio","Portuguese_Smart_Index":"Índice Smart Portugal","Prof":"Beneficios","Saturday":"Sábado","Random_Yang":"Random Yan","Low_barrier_offset":"Desplazamiento de la barrera inferior","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"Presenta el pago total máximo de los contratos pendientes en su cartera. Si se ajusta al máximo, no podrá comprar contratos adicionales sin primero cerrar las posiciones actuales.","Description":"Descripción","Sell":"Venta","Abu_Dhabi_Index":"Índice Abu Dhabi"};
-texts_json['FR'] = {"Euro_50_Index":"Indice Euro 50","Please_select":"Veuillez sélectionner","This_contract_won":"Ce contrat remporté","October":"Octobre","Oil/EUR":"Pétrole/EUR","Spot":"Actuel","US_Index":"Indice US","Payout":"Paiement","Stays_In/Goes_Out":"Reste dans/Sort de la zone","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"Représente le nombre maximal de contrats actifs dans votre portefeuille. Chaque ligne dans votre portefeuille compte pour une position ouverte. Une fois le maximum atteint, vous ne serez pas en mesure d'ouvrir de nouvelles positions sans d'abord fermer une position existante.","stays_between":"reste entre","Random_Bear":"Ours Aléatoire","Italian_30_Index":"Indice Italien 30","Deposit_of":"Dépôt de","odd":"impair","Wednesday":"Mercredi","Airbus_Group":"Groupe Airbus","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"Représente le volume maximal de contrats que vous pouvez acheter au cours d'une journée de trading donnée.","Dubai_Index":"Indice de Dubaï","month":"mois","Hong_Kong_Index":"Indice Hong Kong","Sorry,_account_opening_is_unavailable_":"Désolé, l'ouverture de compte est indisponible.","In/Out":"Dans/Hors de","Barrier":"Barrière","Potential_Payout":"Gain Potentiel","Low_Barrier":"Barrière Inférieure","Previous_Day":"Jour précédent","Tu":"Ma","Therefore_you_may_not_withdraw_any_additional_funds_":"Vous ne pouvez donc pas retirer de fonds supplémentaires.","Gold/AUD":"Or/AUD","Sale_Price":"Prix de vente","touches":"touche","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"Entrez la barrière sous forme de différence avec le prix ponctuel. Si vous entrez +0,005, vous achèterez un contrat avec une barrière supérieure de 0,005 au prix d'entrée. Le prix d'entrée sera celui du prochain intervalle après que votre ordre a été reçue","Short":"Court","Random_75_Index":"Indice Random 75","Please_confirm_the_trade_on_your_statement_before_proceeding_":"Veuillez confirmer le trade sur votre extrait avant de procéder.","Year":"Année","Purchase_Time":"Heure d'Achat","No_Live_price_update":"Pas de mises à jour du prix en Direct","Real_Account":"Compte réel","Day":"Jour","Europe/Africa":"Europe/Afrique","Trading_and_Withdrawal_Limits":"Limites de Trading et de Retrait","High_barrier_offset":"Compensation barrière supérieure","Aug":"août","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"Votre compte est entièrement authentifié et vos limites de retrait ont été levées.","Swedish_Index":"Indice Suède","GBP_Index":"Indice GBP","KBC_Groep":"Groupe KBC","Jul":"Juil","ends_outside":"Finit hors de","minimum_available_duration":"durée minimale disponible","Russian_Regular_Index":"Indice Régulier de Russie","Feb":"Fév","Gold/EUR":"Or/EUR","Now":"Maintenant","The_two_passwords_that_you_entered_do_not_match_":"Les deux mots de passe que vous avez entrés ne correspondent pas.","Return":"Retour","Norwegian_Index":"Indice de Norvège","Swiss_Index":"Indice Suisse","asian_up":"haut asiatique","AP_Ordinary":"AP Ordinaire","Asians":"Asiatiques","Random_100_Index":"Indice Random 100","September":"Septembre","Save_as_PDF":"Sauvegarder comme PDF","Contract_Confirmation":"Confirmation du Contrat","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"min","day":"jour","Save_as_JPEG":"Sauvegarder comme JPEG","Platinum/USD":"Platine/USD","hours":"heures","Euro_100_Index":"Indice Euro 100","second":"seconde","spread_down":"Option courte","Belgian_Stocks":"Actions Belges","AUD_Index":"Indice AUD","Asia/Oceania":"Asie/Océanie","Italian_Index":"Indice Italien","lower":"inférieur","Digits":"Chiffres","April":"avril","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"Nous n'acceptions pas de comptes de résidents de ce pays pour le moment.","Australian_Index":"Indice Australien","Last_Digit_Prediction":"Prédiction du Dernier Chiffre","Start_time":"Heure du début","Americas":"Amériques","Japanese_Index":"Indice du Japon","US_Tech_100_Index":"Indice US Tech 100","matches":"est égale à","Jakarta_Index":"Indice Jakarta","is_required__Current_spread":"est requis. Spread actuel","Purchase_Price":"Prix d'achat","XPD/EUR":"FPD/EUR","Mr":"M.","days":"jours","March":"Mars","(Bejing/CST_-8_hours)":"(Pékin/CST -8 heures)","Save_as_PNG":"Sauvegarder comme PNG","New_Zealand_Index":"Indice Nouvelle-Zélande","Electricite_de_France":"Électricité de France","Smart_FX":"FX Intelligent","Week_of":"Semaine de","Entry_Spot":"Point d'Entrée","Major_Pairs":"Paires majeures","Su":"Di","Ref_":"Réf.","spread_up":"Option longue","Jump_To":"Aller à","Dutch_Index":"Indice Néerlandais","loading___":"chargement...","French_Index":"Indice Français","Metals":"Métaux","We":"Me","To":"Pour","Tuesday":"Mardi","even":"pair","Sorry,_this_feature_is_not_available_":"Désolé, cette option n'est pas disponible.","High_barrier":"Barrière supérieure","Gaming_Account":"Compte de Jeux","You_must_accept_the_terms_and_conditions_to_open_an_account_":"Vous devez accepter les conditions générales pour ouvrir un compte.","July":"Juillet","June":"Juin","Mar":"Mars","Purchase_Date":"Date d'achat","Dec":"Déc","Thursday":"Jeudi","Portuguese_Index":"Indice du Portugal","Limit":"Limite","higher":"supérieur","Smart_Indices":"Indices Intelligents","Monday":"Lundi","differs":"diffère","Randoms":"Aléatoires","Societe_Generale":"Société Générale","Oil/AUD":"Pétrole/AUD","USD_Index":"Indice USD","Stop-type":"Type d'ordre stop","Random_Moon":"Lune Aléatoire","Random_Bull":"Taureau Aléatoire","Oil/GBP":"Pétrole/GBP","Indian_50_Index":"Indice 50 d'Inde","Wall_Street_Index":"Indice Wall Street","ticks":"intervalles","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"Lorsque vous cliquez 'Ok' vous serez exclus des trades sur ce site jusqu'à la date sélectionnée.","Apr":"avr","months":"mois","Potential_Profit":"Gain Potentiel","over":"supérieur","Previous":"Précédent","Random":"Aléatoire","Sale_Date":"Date de Vente","Contract_period":"Durée du contrat","Euro_150_Index":"Indice Euro 150","Exercise_period":"Période d'exercice","February":"Février","Failed_to_update_trade_description_":"Échec de mise à jour de la description du trade","Your_current_balance_is":"Votre solde actuel est de","Stocks":"Actions","Singapore_Index":"Indice Singapour","Duration":"Durée","This_contract_lost":"Ce contrat perdu","Buy":"Achetez","Next":"Suivant","Friday":"Vendredi","Random_Yin":"Yin Aléatoire","Your_password_cannot_be_the_same_as_your_email":"Votre mot de passe ne peut pas être identique à votre e-mail","EUR_Index":"Indice EUR","Egypt_Index":"Indice égyptien","Net_profit":"Bénéfice net","points":"croix","There_was_a_problem_accessing_the_server_during_purchase_":"Il y a eu un problème d'accès au serveur durant l'achat.","Random_25_Index":"Indice Random 25","December":"Décembre","Dutch_Stocks":"Actions Hollandaises","Th":"Je","Higher/Lower":"Supérieur/Inférieur","Stake":"Gain","Barrier_offset":"Compensation Barrière","Amount_per_point":"Montant par point de base","Gold/USD":"Or/USD","Next_Day":"Jour suivant","Total_Profit/Loss":"Gain/Perte Total","Save_as_CSV":"Sauvegarder comme CSV","L'Oreal":"L'Oréal","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"Représente le montant d'argent maximal que vous pouvez garder sur votre compte.  Si le maximum est atteint, il vous sera demandé de retirer des fonds.","Quotidians":"Quotidiens","Loss":"Perte","Mo":"Lu","Jun":"Juin","Tick":"Intervalle","Balance":"Solde","Statement":"Relevé","ends_between":"Finit Entre","under":"inférieur","asian_down":"bas asiatique","Silver/USD":"Argent/USD","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"Nous ne pouvons pas diffuser des prix en direct en ce moment. Afin de profiter de la diffusion en direct de prix, veuillez rafraîchir la page, si vous avez ce problème après plusieurs tentatives, essayer un navigateur différent","Low_barrier":"Barrière inférieure","Minor_Pairs":"Paires mineures","Energy":"Energie","Virtual_Account":"Compte Virtuel","From":"De","does_not_touch":"ne touche pas","hour":"heure","Credit_Agricole":"Crédit Agricole","View":"Voir","French_Stocks":"Actions Françaises","years":"années","Sunday":"Dimanche","Trading_Limits":"Limites de Trading","Vanilla_Options":"Options Vanilla","Please_wait_<br_/>Your_request_is_being_processed_":"Veuillez patienter.<br />Votre demande est en cours de traitement.","Irish_Index":"Indice Irlandais","Belgian_Index":"Indice Belge","Random_Venus":"Venus Aléatoire","January":"Janvier","Maximum_account_cash_balance":"Solde de trésorerie maximal du compte","August":"août","Bombay_Index":"Indice Bombay","Maximum_number_of_open_positions":"Nombre maximal de positions ouvertes","US_Tech_Composite_Index":"Indice US Tech Composite","Start_Time":"Heure du Début","seconds":"secondes","Gold/GBP":"Or/GBP","Oil/USD":"Pétrole/USD","Ends_In/Out":"In/Out","Up/Down":"Haut/Bas","Mrs":"Mme","Maximum_aggregate_payouts_on_open_positions":"Maximum de versements cumulés sur les positions ouvertes","Profit_Table":"Tableau des Bénéfices","Purchase":"Achat","Credit/Debit":"Crédit/ Débit","End_Time":"Moment de Fin","There_was_a_problem_accessing_the_server_":"Il y a eu un problème d'accès au serveur.","Invalid_email_address":"Adresse email non valide","year":"année","German_Index":"Indice Allemand","November":"Novembre","Random_Sun":"Soleil Aléatoire","Random_50_Index":"Indice Random 50","South_African_Index":"Indice d'Afrique du Sud","Contract":"Contrat","Investment_Account":"Compte d'Investissement","Miss":"Mlle","Please_enter_a_date_that_is_at_least_6_months_from_now_":"Veuillez introduire une date qui est au moins 6 mois plus tard.","Ms":"Mme ou Mlle","May":"Mai","Profit":"Bénéfice","Rise/Fall":"Hausse/Baisse","Print_chart":"Imprimer graphique","Please_try_again_":"Veuillez essayer une nouvelle fois.","Total_Cost":"Coût Total","Your_transaction_reference_is":"Votre référence de transaction est","Touch/No_Touch":"Touche","Hang_Seng_China":"Hang Seng Chine","Save_as_SVG":"Sauvegarder comme SVG","Profit/Loss":"Bénéfice/Perte","Maximum_daily_turnover":"Chiffre d'affaires maximal journalier","Commodities":"Matières premières","Commbank_(Australia)":"Commbank (Australie)","Fr":"Ve","goes_outside":"sort de","Item":"Elément","Month":"Mois","High_Barrier":"Barrière Supérieure","Random_Mars":"Mars Aléatoire","Portuguese_Smart_Index":"Indice Intelligent Portugais","Saturday":"Samedi","Random_Yang":"Yang Aléatoire","Low_barrier_offset":"Compensation barrière inférieure","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"Présente les gains cumulés maximaux sur les contrats actifs dans votre portefeuille. Si le maximum est atteint, vous ne pouvez pas acheter de contrats supplémentaires sans fermer d'abord des positions existantes.","Sell":"Vendre","Abu_Dhabi_Index":"Indice d'Abou Dabi"};
-texts_json['IT'] = {"Euro_50_Index":"Indice Euro 50","Please_select":"Seleziona","This_contract_won":"Questo contratto ha vinto","October":"Ottobre","Oil/EUR":"Petrolio/EUR","US_Index":"Indice USA","period":"periodo","Stays_In/Goes_Out":"Stays In (Rimane in) / Goes Out (Esce fuori)","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"Rappresenta il numero massimo di contratti in essere nel tuo portafoglio. Ogni riga presente sul tuo portafoglio vale una posizione aperta. Una volta raggiunto il valore massimo, non potrai aprire nuove posizioni senza prima chiudere una posizione esistente.","stays_between":"Rimane fra","Random_Bear":"Random Orso","Italian_30_Index":"Indice Italia 30","Deposit_of":"Deposito di","odd":"dispari","Wednesday":"Mercoledì","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"Rappresenta il volume massimo di contratti che puoi acquistare in un dato giorno di trading.","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"L'indirizzo email fornito è già utilizzato da un'altro ID d'accesso","Dubai_Index":"Indice di Dubai","month":"mese","Hong_Kong_Index":"Indice di Hong Kong","Sorry,_account_opening_is_unavailable_":"Siamo spiacenti, l'apertura di account non è disponibile.","Barrier":"Barriera","Potential_Payout":"Payout potenziale","Low_Barrier":"Barriera inferiore","Previous_Day":"Giorno precedente","Points":"Punti","Tu":"Mar","Therefore_you_may_not_withdraw_any_additional_funds_":"Pertanto non puoi prelevare alcun fondo aggiuntivo.","Gold/AUD":"Oro/AUD","Sale_Price":"Prezzo di vendita","touches":"tocca","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"Inserisci il limite in termini di differenza dal prezzo spot. Se inserisci +0.005, allora starai acquistando un contratto con un limite 0.005 più alto rispetto al punto d'ingresso. Quest'ultimo sarà il tick successivo dopo aver ricevuto l'ordine","Short":"Breve","Random_75_Index":"Random 75","Please_confirm_the_trade_on_your_statement_before_proceeding_":"Prima di procedere, conferma il trade sul tuo estratto.","Year":"Anno","Purchase_Time":"Orario d'acquisto","No_Live_price_update":"Nessun aggiornamento dei prezzi in tempo reale","Real_Account":"Account reale","Day":"Giorno","Europe/Africa":"Europa/Africa","Trading_and_Withdrawal_Limits":"Limiti di trading e dei prelievi","High_barrier_offset":"Sfasamento della barriera superiore","Aug":"Ago","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"Il tuo account è stato completamente convalidato e sono stati rimossi i tuoi limiti di prelievo.","Swedish_Index":"Indice Svezia","GBP_Index":"Indice GBP","Jul":"Lug","ends_outside":"termina fuori","minimum_available_duration":"durata minima disponibile","Russian_Regular_Index":"Indice regolare russo","Gold/EUR":"Oro/EUR","Now":"Adesso","The_two_passwords_that_you_entered_do_not_match_":"Le due password inserite non combaciano.","Stop-loss":"Stop Loss","This_field_is_required_":"Questo campo è obbligatorio.","Return":"Rendimento","Norwegian_Index":"Indice della Norvegia","Swiss_Index":"Indice svizzero","asian_up":"asiatiche up","AP_Ordinary":"AP Ordinario","Asians":"Asiatiche","Random_100_Index":"Random 100","September":"Settembre","Save_as_PDF":"Salva come PDF","Contract_Confirmation":"Conferma del contratto","numbers":"numeri","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"minimo ","day":"giorno","Save_as_JPEG":"Salva come JPEG","Platinum/USD":"Platino/USD","hours":"ore","Euro_100_Index":"Indice Euro 100","second":"secondo","Belgian_Stocks":"Azioni Belgio","Date":"Data","AUD_Index":"Indice AUD","Italian_Index":"Indice italiano","lower":"inferiore","Digits":"Cifre","April":"Aprile","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"Al momento non accettiamo account di persone residenti in questo paese.","Australian_Index":"Indice Australia","Last_Digit_Prediction":"Previsione dell'ultima cifra","Start_time":"Orario d'inizio","Americas":"America","Japanese_Index":"Indice giapponese","US_Tech_100_Index":"Indice US Tech 100","Sep":"Sett","matches":"combacia","Long":"A lungo","Jakarta_Index":"Indice Jakarta","is_required__Current_spread":"è richiesto. Spread attuale","Purchase_Price":"Prezzo d'acquisto","Mr":"Sig.","days":"giorni","March":"Marzo","(Bejing/CST_-8_hours)":"(Pechino/CST -8 ore)","Save_as_PNG":"Salva come PNG","New_Zealand_Index":"Indice Nuova Zelanda","hyphen":"trattino","Week_of":"Settimana di","Entry_Spot":"Punto d'ingresso","Major_Pairs":"Coppie principali","Su":"Dom","Ref_":"Rif.","Jump_To":"Salta a","Dutch_Index":"Indice olandese","loading___":"caricamento...","French_Index":"Indice Francia","Metals":"Metalli","We":"Noi","To":"A","Tuesday":"Martedì","even":"pari","Sorry,_this_feature_is_not_available_":"Siamo spiacenti, questa funzione non è disponibile.","High_barrier":"Barriera superiore","Gaming_Account":"Account di gioco","You_must_accept_the_terms_and_conditions_to_open_an_account_":"Per aprire un account, devi accettare i termini e le condizioni.","July":"Luglio","June":"Giugno","Purchase_Date":"Data d'acquisto","Dec":"Dic","Thursday":"Giovedì","Portuguese_Index":"Indice Portogallo","Limit":"Limite","higher":"superiore","Smart_Indices":"Indici Smart","Jan":"Gen","in_aggregate_over_the_last":"in forma aggregata nel corso degli ultimi","Monday":"Lunedì","differs":"differisce","Randoms":"Indici Random","Oil/AUD":"Petrolio/AUD","USD_Index":"Indice USD","Action":"Azione","Random_Moon":"Random Luna","Random_Bull":"Random Toro","comma":"virgola","minutes":"minuti","Oil/GBP":"Petrolio/GBP","Indian_50_Index":"Indice Indian 50","Wall_Street_Index":"Indice Wall Street","ticks":"tick","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"Quando clicchi su \"Ok\" verrai escluso dal trading sul sito fino alla data selezionata.","months":"mesi","Potential_Profit":"Profitto potenziale","over":"sopra","Previous":"Precedente","Sale_Date":"Data della vendita","Contract_period":"Periodo del contratto","Nocturnes":"Notturni","Euro_150_Index":"Indice Euro 150","Exercise_period":"Periodo di prova","February":"Febbraio","Failed_to_update_trade_description_":"Impossibile aggiornare la descrizione del trade.","Your_current_balance_is":"Il tuo saldo attuale è","Stocks":"Azioni","Singapore_Index":"Indice Singapore","Duration":"Durata","This_contract_lost":"Questo contratto ha perso","Buy":"Acquista","Next":"Successivo","Friday":"Venerdì","Your_password_cannot_be_the_same_as_your_email":"La tua password non può essere uguale alla tua email","EUR_Index":"Indice EUR","Egypt_Index":"Indice dell'Egitto","Net_profit":"Profitto netto","points":"punti","There_was_a_problem_accessing_the_server_during_purchase_":"Durante l'acquisto si è verificato un problema d'accesso al server.","Random_25_Index":"Random 25","December":"Dicembre","Dutch_Stocks":"Azioni Olanda","Th":"Gio","Oct":"Ott","Higher/Lower":"High/Low","Stake":"Puntata","Barrier_offset":"Correzione della barriera","Amount_per_point":"Importo per punto","in_aggregate_over_the_lifetime_of_your_account_":"durante la durata complessiva del tuo account.","Gold/USD":"Oro/USD","Next_Day":"Giorno successivo","Total_Profit/Loss":"Profitto/Perdita totale","Save_as_CSV":"Salva come CSV","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"Rappresenta l'importo massimo di denaro che può essere tenuto sul tuo account. Se raggiungi tale valore massimo, ti verrà richiesto di prelevare fondi.","Quotidians":"Giornalieri","Loss":"Perdita","Mo":"Lun","Jun":"Giu","Balance":"Saldo","Statement":"Estratto","ends_between":"finisce tra","letters":"lettere","under":"sotto","asian_down":"asiatiche down","Silver/USD":"Argento/USD","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"Al momento non siamo in grado di trasmettere i prezzi in tempo reale. Per godere dello streaming live dei prezzi, prova a riaggiornare la pagina, se dopo vari tentativi si verifica sempre lo stesso problema, prova un browser diverso","Low_barrier":"Barriera inferiore","Minor_Pairs":"Coppie minori","Spreads":"Spread","Energy":"Energia","Virtual_Account":"Account virtuale","From":"Da","does_not_touch":"non tocca","hour":"ora","View":"Mostra","French_Stocks":"Azioni Francia","Please_input_a_valid_date":"Inserisci una data valida","years":"anni","Sunday":"Domenica","Trading_Limits":"Limiti del trading","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"Pertanto il tuo attuale prelievo massimo immediato (soggetto alla disponibilità di fondi sufficienti nell'account) è pari a EUR","Vanilla_Options":"Opzioni vanilla","Please_wait_<br_/>Your_request_is_being_processed_":"Attendi.<br />La tua richiesta sta per essere elaborata.","Irish_Index":"Indice irlandese","Belgian_Index":"Indice belga","minute":"minuto","Palladium/USD":"Palladio/USD","Random_Venus":"Random Venere","January":"Gennaio","Maximum_account_cash_balance":"Saldo di cassa massimo sull'account","August":"Agosto","Bombay_Index":"Indice di Bombay","Maximum_number_of_open_positions":"Numero massimo di posizioni aperte","US_Tech_Composite_Index":"Indice composto US Tech","Sa":"Sab","Start_Time":"Orario di inizio","seconds":"secondi","apostrophe":"apostrofo","Gold/GBP":"Oro/GBP","Oil/USD":"Petrolio/USD","Ends_In/Out":"Termina In/Out","Indices":"Indici","Mrs":"Sig.ra","Maximum_aggregate_payouts_on_open_positions":"Payout totali massimi su posizioni aperte","Profit_Table":"Tabella dei profitti","Purchase":"Acquisto","Credit/Debit":"Credito/Debito","End_Time":"Orario di fine","There_was_a_problem_accessing_the_server_":"Si è verificato un problema d'accesso al server.","Invalid_email_address":"Indirizzo email non valido","year":"anno","German_Index":"Indice tedesco","November":"Novembre","Random_Sun":"Random Sole","Random_50_Index":"Random 50","South_African_Index":"Indice del Sudafrica","Contract":"Contratto","Investment_Account":"Account d'investimento","Miss":"Sig.ra","Please_enter_a_date_that_is_at_least_6_months_from_now_":"Inserisci una data che sia distante almeno 6 mesi a partire da oggi.","Ms":"Sig.ra","May":"Mag","Profit":"Profitto","Rise/Fall":"Rialzo/Ribasso","Withdrawal_Limits":"Limiti per i Prelievi","Print_chart":"Stampa grafico","Please_try_again_":"Riprova.","Total_Cost":"Costo totale","Your_transaction_reference_is":"Il tuo riferimento per le transazioni è","Touch/No_Touch":"Touch/No touch","Save_as_SVG":"Salva come SVG","Profit/Loss":"Profitto/Perdita","Maximum_daily_turnover":"Turnover massimo giornaliero","Commodities":"Materie prime","Fr":"Ven","goes_outside":"esce fuori","Item":"Voce","Month":"Mese","High_Barrier":"Barriera superiore","Random_Mars":"Random Marte","Middle_East":"Medio Oriente","space":"spazio","Portuguese_Smart_Index":"Indice Smart Portogallo","Saturday":"Sabato","Low_barrier_offset":"Scostamento della barriera inferiore","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"Presenta i payout complessivi massimi sui contratti in essere nel tuo portafoglio. Se si raggiunge il numero massimo, non sarà possibile acquistare altri contratti senza prima chiudere delle posizioni esistenti.","Description":"Descrizione","Sell":"Vendi","Abu_Dhabi_Index":"Indice di Abu Dhabi"};
-texts_json['PT'] = {"Euro_50_Index":"Índice 50 Europeu","Please_select":"Selecione","This_contract_won":"Esse contrato ganhou","October":"Outubro","Oil/EUR":"Petróleo/EUR","Spot":"Preço atual","US_Index":"Índice USA","Payout":"Prêmio","period":"ponto","Stays_In/Goes_Out":"Fica dentro/Sai fora","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"Representa o número máximo de contratos pendentes no seu portfólio. Cada linha do seu portfólio conta para uma posição em aberto. Depois de atingido o máximo, não poderá abrir novas posições sem fechar primeiro uma posição existente.","stays_between":"fica entre","Random_Bear":"Random Urso (Baixista)","Italian_30_Index":"Índice 30 Italiano","Deposit_of":"Depósito de","odd":"número ímpar","Wednesday":"Quarta-feira","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"Representa o volume máximo de contratos que pode comprar em qualquer dia de negociações.","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"O endereço de e-mail fornecido já está sendo usado por outra ID de login","Dubai_Index":"Índice de Dubai","month":"mês","Hong_Kong_Index":"Índice de Hong Kong","Sorry,_account_opening_is_unavailable_":"Lamentamos, mas a abertura de contas está indisponível.","In/Out":"Dentro/Fora","Tokyo_Electric_Power_Co__Inc":"Tokyo Electric Power Co Inc","Barrier":"Barreira","Potential_Payout":"Possível Prêmio","Low_Barrier":"Barreira Baixa","Previous_Day":"Dia anterior","Points":"Pontos","Tu":"Qui","Therefore_you_may_not_withdraw_any_additional_funds_":"Por isso não pode levantar fundos adicionais.","ITC_Ltd":"ITC Ltda","Gold/AUD":"Ouro/AUD","Sale_Price":"Preço de venda","touches":"toca","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"Digite a barreira em termos da diferença do preço atual. Se você digitar +0,005, estará a comprar um contrato com uma barreira superior ao preço inicial em 0,005. O preço inicial será o próximo movimento mínimo após o seu pedido ter sido recebido","Short":"Curto","Random_75_Index":"Índice Random 75","Please_confirm_the_trade_on_your_statement_before_proceeding_":"Confirme a negociação no seu extrato antes de continuar.","Year":"Ano","Purchase_Time":"Hora da Compra","No_Live_price_update":"Sem atualização de preço ao vivo","Real_Account":"Conta Real","Day":"Dia","AT&T":"AT&T Inc.","Europe/Africa":"Europa/África","Trading_and_Withdrawal_Limits":"Limites de Negociação e de Retirada","High_barrier_offset":"Variação de barreira alta","ICICI_Bank_Ltd":"ICICI Bank Ltda","Aug":"Ago","Telenor":"Telenor Group","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"A sua conta está totalmente autenticada e os seus limites de retirada de fundos foram aumentados.","Swedish_Index":"Índice Sueco","GBP_Index":"Índice GBP","ends_outside":"termina fora","minimum_available_duration":"duração mínima disponível","Russian_Regular_Index":"Índice Regulador Russo","Hitachi_Ltd":"Hitachi Ltda","Feb":"Fev","Gold/EUR":"Ouro/EUR","Now":"Agora","The_two_passwords_that_you_entered_do_not_match_":"As palavras-chave que introduziu não coincidem.","Stop-loss":"Limite de perdas","This_field_is_required_":"Este campo é obrigatório.","Return":"Prêmio","Norwegian_Index":"Índice Norueguês","Swiss_Index":"Índice Suíço","asian_up":"Alta Asiática","AP_Ordinary":"AP Ordinária","Asians":"Asiático","Random_100_Index":"Índice Random 100","September":"Setembro","Save_as_PDF":"Salve como PDF","Contract_Confirmation":"Confirmação de Contrato","numbers":"números","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"min","day":"dia","Save_as_JPEG":"Salve como JPEG","Platinum/USD":"Platina/USD","hours":"horas","Euro_100_Index":"Índice 100 Europeu","second":"segundo","Belgian_Stocks":"Ações Belgas","Date":"Data","AUD_Index":"Índice AUD","Asia/Oceania":"Ásia/Oceânia","Italian_Index":"Índice Italiano","lower":"inferior","Digits":"Dígitos","April":"Abril","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"Não aceitamos atualmente contas de residentes deste país.","ICAG_(British_Airways)":"British Airways","Australian_Index":"índice Australiano","Last_Digit_Prediction":"Previsão do último dígito","Start_time":"Hora de início","Americas":"Américas","Japanese_Index":"Índice Japonês","US_Tech_100_Index":"Índice US Tech 100","Sep":"Set","matches":"combina","Long":"Longo","Jakarta_Index":"Índice de Jacarta","is_required__Current_spread":"é obrigatório. Spread atual","Purchase_Price":"Preço de Compra","Mr":"Sr.","days":"dias","Yara_International":"Yara International ASA","March":"Março","(Bejing/CST_-8_hours)":"(Pequim/CST -8 horas)","Save_as_PNG":"Salve como PNG","New_Zealand_Index":"Índice da Nova Zelândia","hyphen":"hífen","Smart_FX":"Inteligente FX","Week_of":"Semana de","Entry_Spot":"Preço de entrada","Major_Pairs":"Pares Principais","Su":"Dom","Jump_To":"Saltar para","QUALCOMM":"Qualcomm","Dutch_Index":"Índice Holandês","loading___":"a carregar...","EUR/BRL":"EUR/GBRL","French_Index":"Índice Francês","Metals":"Metais","We":"Qua","To":"Para","Tuesday":"Terça-feira","even":"número par","Sorry,_this_feature_is_not_available_":"Este recurso não está disponível.","High_barrier":"Barreira alta","Gaming_Account":"Conta de Jogos","You_must_accept_the_terms_and_conditions_to_open_an_account_":"Tem de aceitar os termos e condições para abrir uma conta.","July":"Julho","June":"Junho","Purchase_Date":"Data de Compra","Infosys_Ltd":"Infosys Ltda","Dec":"Dez","US_S&P_100":"EUA S&P 100","Thursday":"Quinta-feira","Portuguese_Index":"Índice Português","Limit":"Limite","higher":"superior","Smart_Indices":"Índices Inteligentes","in_aggregate_over_the_last":"de forma agregada durante os últimos","Monday":"Segunda","differs":"Diferentes","Randoms":"Randoms (Aleatórios)","Oil/AUD":"Petróleo/AUD","USD_Index":"Índice USD","ANZ_Banking_Group_Ltd":"Australia and New Zealand Banking Group Ltd (ANZ)","USD/MXN":"USD/MXR","HDFC_Bank_Ltd":"HDFC Bank Ltda","password":"senha","Stop-type":"Tipo de limite","Action":"Ação","Random_Moon":"Random Lua","Random_Bull":"Random Touro (Altista)","comma":"vírgula","minutes":"minutos","Oil/GBP":"Petróleo/GBP","Indian_50_Index":"Índice Indiano 50","Toyota_Motor":"Toyota Motor Corporation","Wall_Street_Index":"Índice de Wall Street","ticks":"tique-taques","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"Quando você clicar em 'Ok', você será excluído das negociações no site até a data escolhida.","Apr":"Abr","months":"meses","Potential_Profit":"Lucro Potencial","over":"acima","Previous":"Prévia","Reliance_Industries_Ltd":"Reliance Industries Ltda","Random":"Random (Aleatório)","Sale_Date":"Data de Venda","Contract_period":"Período do contrato","Nocturnes":"Noturno","Euro_150_Index":"Índice 150 Europeu","Exercise_period":"Período do exercício","February":"Fevereiro","Failed_to_update_trade_description_":"Falha na atualização dos dados da negociação.","Your_current_balance_is":"O seu saldo atual é","Stocks":"Ações","Singapore_Index":"Índice de Singapura","Duration":"Duração","This_contract_lost":"Esse contrato perdeu","Buy":"Comprar","Next":"Próximo","Friday":"Sexta-feira","Your_password_cannot_be_the_same_as_your_email":"A sua senha não pode ser igual ao seu e-mail","EUR_Index":"Índice EUR","Egypt_Index":"Índice de Egito","Net_profit":"Lucro líquido","points":"pontos","There_was_a_problem_accessing_the_server_during_purchase_":"Ocorreu um problema ao aceder ao servidor durante a aquisição.","Random_25_Index":"Índice Random 25","December":"Dezembro","Dutch_Stocks":"Ações Holandesas","Th":"Qui","Oct":"Out","Higher/Lower":"Superior/Inferior","Stake":"Aposta","Dr":"Dr.","GlaxoSmithKline_plc":"GlaxoSmithKline","Barrier_offset":"Compensação de Barreira","Amount_per_point":"Montante por ponto","in_aggregate_over_the_lifetime_of_your_account_":"de forma agregada ao longo da vida útil da sua conta.","Gold/USD":"Ouro/USD","The_Coca-Cola_Company":"Coca-Cola Company","Next_Day":"Dia seguinte","BHP_Billiton_Ltd":"BHP Billiton Ltda","Total_Profit/Loss":"Lucro/Perda Total","Save_as_CSV":"Salve como CVS","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"Representa a quantia máxima de dinheiro que pode manter na sua conta. Se o máximo for atingido, vamos solicitar-lhe a retirada dos fundos.","Quotidians":"Quotidianos","Loss":"Perda","Mo":"Seg","Tick":"Tique-taque","Balance":"Saldo","Statement":"Extrato","ends_between":"termina entre","letters":"caracteres","under":"abaixo","asian_down":"queda asiático","Silver/USD":"Prata/USD","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"Não podemos transmitir ao vivo os preços no momento. Para ver os preços ao vivo tente recarregar a página, se o problema persistir após repetidas tentativas tente um navegar diferente","Low_barrier":"Barreira Baixa","Forex":"Forex (Divisas Estrangeiras)","Minor_Pairs":"Pares secundários","Energy":"Energia","Virtual_Account":"Conta Virtual","From":"De","does_not_touch":"não toca","hour":"hora","View":"Ver","French_Stocks":"Ações Francesas","Please_input_a_valid_date":"Insira uma data válida","years":"anos","Sunday":"Domingo","Trading_Limits":"Limites de Negociação","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"Portanto, a sua retirada máxima imediata atual (sujeita à existência de fundos suficientes na sua conta) é EUR","Vanilla_Options":"Opções Vanilla","Please_wait_<br_/>Your_request_is_being_processed_":"Por favor aguarde.<br />O seu pedido está a ser processado.","Irish_Index":"Índice Irlandês","Belgian_Index":"Índice Belga","minute":"minuto","Palladium/USD":"Paládio/USD","Random_Venus":"Random Vênus","January":"Janeiro","Maximum_account_cash_balance":"Saldo máximo de numerário em conta","August":"Agosto","Hyundai_Motor_Co_":"Hyundai Motor Company.","Bombay_Index":"Índice de Bombaim","Maximum_number_of_open_positions":"Número máximo de posições em aberto","US_Tech_Composite_Index":"Índice US Tech Composite","Sa":"Sáb","Start_Time":"Hora de Início","seconds":"segundos","apostrophe":"apóstrofe","Gold/GBP":"Ouro/GBP","Shinhan_Financial":"Shinhan Financial Group","Oil/USD":"Petróleo/USD","Ends_In/Out":"Termina Dentro/Fora","Up/Down":"Acima/Abaixo","Telefonica_SA":"Telefônica SA","Indices":"Índices","Mrs":"Sra.","Maximum_aggregate_payouts_on_open_positions":"Máximo de pagamentos agregados sobre posições em aberto","Profit_Table":"Tabela de Lucros","Purchase":"Comprar","Credit/Debit":"Crédito/Débito","End_Time":"Hora final","There_was_a_problem_accessing_the_server_":"Ocorreu um problema ao aceder ao servidor.","Invalid_email_address":"Endereço de e-mail inválido","year":"ano","German_Index":"Índice Alemão","November":"Novembro","Random_Sun":"Random Sol","Random_50_Index":"Índice Random 50","South_African_Index":"Índice Sul Africano","Contract":"Contrato","Investment_Account":"Conta de Investimento","Miss":"Srª.","Please_enter_a_date_that_is_at_least_6_months_from_now_":"Por favor, introduza uma data que seja, no mínimo, seis meses a partir de agora.","Zoom":"Ampliar","Ms":"Sra.","May":"Maio","Profit":"Lucro","Rise/Fall":"Sobe/Desce","Withdrawal_Limits":"Limites de retirada","Print_chart":"Imprimir gráfico","Please_try_again_":"Por favor, tente novamente.","Total_Cost":"Custo Total","Your_transaction_reference_is":"A referência da sua transação é","Diageo_plc":"Diageo PLC","Touch/No_Touch":"Toca","Glencore_Xstrat":"GlencoreXtrata","National_Australia_Bank_Ltd":"National Australia Bank Ltda","Save_as_SVG":"Salve como SVG","Honda_Motor_Co__Ltd":"Honda Motor Co. Ltda","Profit/Loss":"Lucro/Perda","Maximum_daily_turnover":"Volume de negócios máximo diário","Commodities":"Matérias-primas","Please_check_your_email_for_the_next_step_":"Consulte a sua caixa de e-mail para informações sobre a próxima etapa.","Commbank_(Australia)":"Commbank (Austrália)","Fr":"Sex","Royal_Dutch_Shell_plc":"Royal Dutch Shell PLC","goes_outside":"sai fora","Item":"Artigo","Month":"Mês","High_Barrier":"Barreira Alta","Random_Mars":"Random Marte","Middle_East":"Oriente Médio","space":"espaço","Portuguese_Smart_Index":"Índice Inteligente Português","Prof":"Lucro","Saturday":"Sábado","Reckitt_Benckiser_Group_plc":"Reckitt Benckiser Group PLC","Low_barrier_offset":"Variação de barreira baixa","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"Apresenta os pagamentos agregados máximos referentes aos contratos pendente do seu portfólio. Se o máximo for atingido, você não poderá comprar contratos adicionais sem primeiro fechar as posições existentes.","Description":"Descrição","Sell":"Vender","Abu_Dhabi_Index":"Índice de Abu Dhabi"};
-texts_json['PL'] = {"Euro_50_Index":"Indeks Euro 50","Please_select":"Wybierz","This_contract_won":"Ten kontrakt wygrał","October":"Październik","Oil/EUR":"Ropa/EUR","Spot":"Cena aktualna","US_Index":"Indeks USA","Payout":"Wypłata","period":"okres","Stays_In/Goes_Out":"Pozostanie w/przekroczy","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"Pokazuje maksymalną liczbę niezapłaconych kontraktów w Twoim portfolio. Każda linia w Twoim portfolio liczy się jako jedna otwarta pozycja. Po osiągnięciu maksimum nie będziesz mieć możliwości otwierania nowych pozycji bez uprzedniego zamknięcia dotychczasowych pozycji.","stays_between":"pozostaje pomiędzy","Random_Bear":"Losowe bessa","Italian_30_Index":"Indeks włoski 30","Deposit_of":"Wpłata w wysokości","odd":"nieparzysta","Wednesday":"Środa","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"Pokazuje maksymalną liczbę kontraktów, które możesz nabyć w danym dniu handlowym.","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"Podany adres e-mail jest już przypisany do innego loginu","Dubai_Index":"Indeks dubajski","month":"miesiąc","Hong_Kong_Index":"Indeks hongkoński","Sorry,_account_opening_is_unavailable_":"Przepraszamy, otwarcie konta jest niemożliwe.","In/Out":"Zakłady w/poza","Barrier":"Limit","Potential_Payout":"Możliwa wypłata","Low_Barrier":"Niski limit","Previous_Day":"Poprzedni dzień","Points":"Punkty","Tu":"Wtorek","Therefore_you_may_not_withdraw_any_additional_funds_":"Nie możesz więc wypłacać żadnych środków.","Gold/AUD":"Złoto/AUD","Sale_Price":"Cena sprzedaży","touches":"osiąga","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"Wprowadź limit w zakresie różnicy od aktualnej ceny. Jeśli wprowadzisz +0,005, zakupisz kontrakt z limitem 0,005 wyższym niż pozycja wejściowa. Pozycja wejściowa to następny najmniejszy przyrost ceny po otrzymaniu zamówienia","Short":"Krótkie","Random_75_Index":"Losowy indeks 75","Please_confirm_the_trade_on_your_statement_before_proceeding_":"Aby przejść dalej, proszę potwierdzić transakcję w sekcji stan konta.","Year":"Rok","Purchase_Time":"Godzina zakupu","No_Live_price_update":"Brak aktualnych cen","Real_Account":"Prawdziwe konto","Day":"Dzień","Europe/Africa":"Europa/Afryka","Trading_and_Withdrawal_Limits":"Limity handlowe i limity wypłat","High_barrier_offset":"Offset wysokiego limitu","Aug":"Sierpień","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"Twoje konto jest w pełni zweryfikowane, a Twój limit wypłat został zwiększony.","Swedish_Index":"Indeks szwedzki","GBP_Index":"Indeks brytyjski (GBP)","Jul":"Lipiec","ends_outside":"kończy się poza","minimum_available_duration":"minimalny dostępny czas trwania","Russian_Regular_Index":"Regularny indeks rosyjski","Feb":"Luty","Gold/EUR":"Złoto/EUR","Now":"Teraz","The_two_passwords_that_you_entered_do_not_match_":"Wprowadzone hasła nie są identyczne.","Stop-loss":"Stop-stratom","This_field_is_required_":"To pole jest wymagane.","Return":"Zwrot","Norwegian_Index":"Indeks norweski","Swiss_Index":"Indeks szwajcarski","asian_up":"azjatyckie w górę","AP_Ordinary":"Zwykłe AP","Asians":"Azjatyckie","Random_100_Index":"Losowy indeks 100","September":"Wrzesień","Save_as_PDF":"Zapisz jako PDF","Contract_Confirmation":"Potwierdzenie kontraktu","numbers":"liczby","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"min","day":"dzień","Save_as_JPEG":"Zapisz jako JPEG","Platinum/USD":"Platyna/USD","hours":"godziny","Euro_100_Index":"Indeks Euro 100","second":"sek.","spread_down":"spread w dół","Belgian_Stocks":"Akcje belgijskie","Date":"Data","AUD_Index":"Indeks australijski (AUD)","Asia/Oceania":"Azja/Oceania","Italian_Index":"Indeks włoski","TOTAL":"SUMA","lower":"niższa","Digits":"Cyfry","April":"Kwiecień","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"W tej chwili nie otwieramy kont dla mieszkańców z tych krajów.","Australian_Index":"Indeks australijski","Last_Digit_Prediction":"Przewidywanie ostatniej cyfry","Start_time":"Godzina rozpoczęcia","Americas":"Ameryki","Japanese_Index":"Indeks japoński","US_Tech_100_Index":"Indeks US Tech 100","Sep":"Wrzesień","matches":"zgadza się","Long":"Długie","Jakarta_Index":"Indeks dżakarcki","is_required__Current_spread":"jest wymagany. Obecny spread","Purchase_Price":"Cena zakupu","Mr":"Pan","days":"dni","March":"Marzec","(Bejing/CST_-8_hours)":"(Pekin/CST - 8 godzin)","Save_as_PNG":"Zapisz jako PNG","New_Zealand_Index":"Indeks nowozelandzki","hyphen":"myślnik","Smart_FX":"Inteligentny forex","Week_of":"Tydzień","Entry_Spot":"Pozycja wejściowa","Major_Pairs":"Główne pary","Su":"niedziela","Nov":"Listopad","spread_up":"spread w górę","Jump_To":"Przejdź do","Dutch_Index":"Indeks holenderski","loading___":"ładowanie...","French_Index":"Indeks francuski","Metals":"Metale","We":"Środa","To":"Do","Tuesday":"Wtorek","even":"parzysta","Sorry,_this_feature_is_not_available_":"Przepraszamy, wybrana funkcja jest niedostępna.","High_barrier":"Wysoki limit","Gaming_Account":"Konto gracza","You_must_accept_the_terms_and_conditions_to_open_an_account_":"Musisz zaakceptować regulamin, aby otworzyć konto.","July":"Lipiec","June":"Czerwiec","Mar":"Marzec","Purchase_Date":"Data zakupu","Dec":"Grudzień","Thursday":"Czwartek","Portuguese_Index":"Indeks portugalski","higher":"wyższa","Smart_Indices":"Inteligentne wskaźniki","Jan":"Styczeń","in_aggregate_over_the_last":"ogółem przez ostatnie","Monday":"Poniedziałek","Royal_Dutch_Shell":"Royal Dutch Shell plc","differs":"różni się","Randoms":"Losowe","Oil/AUD":"Ropa/AUD","USD_Index":"Indeks amerykański (USD)","password":"hasło","Stop-type":"Stop-typ","Action":"Czynności","Random_Moon":"Losowe Księżyc","Random_Bull":"Losowe hossa","comma":"przecinek","minutes":"min","Oil/GBP":"Ropa/GBP","Indian_50_Index":"Indeks indyjski 50","Wall_Street_Index":"Indeks Wall Street","ticks":"zmiany ceny","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"Po kliknięciu przycisku OK handlowanie na portalu nie będzie możliwe aż do wybranej daty.","Apr":"Kwiecień","months":"miesiące","Potential_Profit":"Możliwy zysk","over":"ponad","Previous":"Poprzedni","Random":"Losowy","Sale_Date":"Data sprzedaży","Contract_period":"Okres kontraktu","Nocturnes":"Nokturny","Euro_150_Index":"Indeks Euro 150","Exercise_period":"Okres ćwiczeń","February":"Luty","Failed_to_update_trade_description_":"Nie udało się uaktualnić opisu transakcji.","Your_current_balance_is":"Obecnie Twoje saldo wynosi","Stocks":"Akcje","Singapore_Index":"Indeks singapurski","Duration":"Czas trwania","This_contract_lost":"Ten kontrakt przegrał","Buy":"Kup","Next":"Następny","Friday":"piątek","Random_Yin":"Losowe Yin","Your_password_cannot_be_the_same_as_your_email":"Hasło nie może być takie samo jak adres e-mail","EUR_Index":"Indeks EUR","Egypt_Index":"Indeks egipski","Net_profit":"Zysk netto","points":"punkty","There_was_a_problem_accessing_the_server_during_purchase_":"Wystąpił błąd podczas uzyskiwania dostępu do serwera w trakcie zakupu.","Random_25_Index":"Losowy indeks 25","December":"Grudzień","Dutch_Stocks":"Akcje holenderskie","Th":"czwartek","Oct":"Październik","Higher/Lower":"Wyższy/niższy","Stake":"Stawka","Barrier_offset":"Limit","Amount_per_point":"Kwota na punkt","in_aggregate_over_the_lifetime_of_your_account_":"ogółem w okresie działania Twojego konta.","Gold/USD":"Złoto/USD","Next_Day":"Następny dzień","Total_Profit/Loss":"Całkowity zysk/ całkowita strata","Save_as_CSV":"Zapisz jako CSV","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"Pokazuje maksymalną kwotę gotówki, jaką możesz mieć na koncie. Po osiągnięciu maksimum poprosimy Cię o wypłacenie środków.","Quotidians":"Codzienne","Loss":"Strata","Mo":"Poniedziałek","Jun":"Czerwiec","Tick":"Zmiana ceny","Balance":"Saldo","Statement":"Stan konta","ends_between":"kończy się pomiędzy","letters":"litery","under":"poniżej","asian_down":"azjatyckie w dół","Silver/USD":"Srebro/USD","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"W chwili obecnej nie jesteśmy w stanie przesyłać cen na żywo. Aby cieszyć się na żywo strumieniową transmisją cen, spróbuj ponownie odświeżyć stronę, a jeśli problem nadal występuje, spróbuj skorzystać z innej przeglądarki","Low_barrier":"Niski limit","Minor_Pairs":"Mniej ważne pary","Spreads":"Spready","Energy":"Energetyka","Virtual_Account":"Konto wirtualne","From":"Od","does_not_touch":"nie osiąga","hour":"godzina","View":"Widok","French_Stocks":"Akcje francuskie","Please_input_a_valid_date":"Wpisz poprawną datę","years":"lat(a)","Sunday":"Niedziela","Trading_Limits":"Limity handlowe","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"Dlatego w chwili obecnej Twoja maksymalna natychmiastowa wypłata (o ile posiadasz na koncie wystarczające środki) wynosi EUR","Vanilla_Options":"Opcje Vanilla","Please_wait_<br_/>Your_request_is_being_processed_":"Prosimy o cierpliwość.<br />Twoja prośba jest właśnie przetwarzana.","Irish_Index":"Indeks irlandzki","Belgian_Index":"Indeks belgijski","minute":"min","Palladium/USD":"Pallad/USD","Random_Venus":"Losowe Wenus","January":"Styczeń","Maximum_account_cash_balance":"Maksymalne saldo gotówki na koncie","August":"Sierpień","Bombay_Index":"Indeks bombajski","Maximum_number_of_open_positions":"Maksymalna dzienna liczba otwartych pozycji","US_Tech_Composite_Index":"Indeks\tUS Tech Composite","Sa":"sobota","Start_Time":"Godzina rozpoczęcia","seconds":"sek.","apostrophe":"apostrof","Gold/GBP":"Złoto/GBP","Oil/USD":"Ropa/USD","Ends_In/Out":"Kończy się w/poza","Up/Down":"Góra/dół","Indices":"Wskaźniki","Mrs":"Pani","Maximum_aggregate_payouts_on_open_positions":"Maksymalne zagregowane wypłaty dla pozycji otwartych","Profit_Table":"Tabela zysków","Purchase":"Kup","Credit/Debit":"Winien/Ma","End_Time":"Zakończenie","There_was_a_problem_accessing_the_server_":"Wystąpił błąd podczas uzyskiwania dostępu do serwera.","Invalid_email_address":"Nieprawidłowy adres e-mail","year":"rok","German_Index":"Indeks niemiecki","November":"Listopad","Random_Sun":"Losowe Słońce","Random_50_Index":"Losowy indeks 50","South_African_Index":"Indeks południowoafryk.","Contract":"Kontrakt","Investment_Account":"Konto inwestycyjne","Miss":"Pani","Please_enter_a_date_that_is_at_least_6_months_from_now_":"Wpisz datę co najmniej 6 miesięcy od dnia dzisiejszego.","Zoom":"Powiększ","Ms":"Pani","May":"Maj","Profit":"Zysk","Rise/Fall":"Wzrost/spadek","Withdrawal_Limits":"Limity wypłat","Print_chart":"Drukuj wykres","Please_try_again_":"Spróbuj ponownie.","Total_Cost":"Całkowity koszt","Your_transaction_reference_is":"Kod referencyjny Twojej transakcji to","Touch/No_Touch":"Osiągnie","Save_as_SVG":"Zapisz jako SVG","Profit/Loss":"Zysk/Strata","Maximum_daily_turnover":"Maksymalny dzienny obrót","Commodities":"Towary","Please_check_your_email_for_the_next_step_":"Informacje na temat kolejnych kroków zostały wysłane na adres e-mail.","Fr":"piątek","goes_outside":"przekracza","Item":"Element","Month":"Miesiąc","High_Barrier":"Wysoki limit","Random_Mars":"Losowe Mars","Middle_East":"Środkowy Wschód","space":"spacja","Portuguese_Smart_Index":"Inteligentny indeks portugalski","Prof":"Prof.","Saturday":"Sobota","Random_Yang":"Losowe Yang","Low_barrier_offset":"Ustawienie niskiego limitu","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"Pokazuje maksymalne zagregowane wypłaty dla niezapłaconych kontraktów w Twoim portfolio. Jeżeli maksimum zostanie osiągnięte, nie będziesz mieć możliwości zakupienia dodatkowych kontraktów bez uprzedniego zamknięcia aktualnych pozycji.","Description":"Opis","Sell":"Sprzedaj","Abu_Dhabi_Index":"Indeks Abu Zabi"};
-texts_json['DE'] = {"Please_select":"Bitte wählen Sie","This_contract_won":"Dieser Vertrag gewann","October":"Oktober","Oil/EUR":"Öl/EUR","Spot":"Kassakurs","Payout":"Auszahlung","period":"Zeitraum","Stays_In/Goes_Out":"Bleibt in/Geht außerhalb","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"Stellt die maximale Anzahl an ausstehenden Verträgen Ihres Portfolios dar. Jede Linie Ihres Portfolios steht für eine offene Position. Wenn das Maximum erreicht wird, können Sie keine neuen Positionen öffnen, ohne zuvor eine bereits bestehende Position zu schließen.","stays_between":"bleibt zwischen","Italian_30_Index":"Italienischer 30 Index","Deposit_of":"Einzahlung in Höhe von","odd":"ungleich","Wednesday":"Mittwoch","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"Stellt das maximale Volumen an Kontrakten dar, die Sie an einem einzelnen Börsentag erwerben können.","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"Die von Ihnen angegebene E-Mail Adresse wird bereits von einer anderen Login-ID verwendet.","month":"Monat","Sorry,_account_opening_is_unavailable_":"Leider ist die Kontoeröffnung nicht möglich.","In/Out":"Kauf/Verkauf","Barrier":"Schwelle","Potential_Payout":"Mögliche Auszahlung","Low_Barrier":"Untere Schwelle","Previous_Day":"Vorheriger Tag","Points":"Punkte","Tu":"Di","Therefore_you_may_not_withdraw_any_additional_funds_":"Deshalb können Sie kein zusätzliches Geld abheben.","Sale_Price":"Verkaufskurs","touches":"berührt","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"Geben Sie die Schwelle für die Differenz zum Kassakurs an. Wenn Sie +0,005 eingeben, erwerben Sie einen Kontrakt mit einer 0,005 höheren Schwelle als der Startkurs. Der Startkurs ist der nächste Tick nachdem Ihr Auftrag eingegangen ist","Short":"Kurz","Please_confirm_the_trade_on_your_statement_before_proceeding_":"Bevor Sie fortfahren, bestätigen Sie bitte das Geschäft in Ihrem Auszug.","Year":"Jahr","Purchase_Time":"Kaufuhrzeit","No_Live_price_update":"Keine Live Kursaktualisierung","Real_Account":"Echtes Konto","Day":"Tag","Europe/Africa":"Europa/Afrika","Trading_and_Withdrawal_Limits":"Handels- und Abhebelimits","High_barrier_offset":"Hohe Schwellenverschiebung","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"Ihr Konto ist vollständig authentifiziert und Ihr Abhebelimit wurde angehoben.","Swedish_Index":"Schwedischer Index","ends_outside":"endet außerhalb","minimum_available_duration":"kürzeste vorhandene Dauer","Russian_Regular_Index":"Russischer Regulärindex","Now":"Jetzt","The_two_passwords_that_you_entered_do_not_match_":"Die beiden Passwörter, die Sie eingegeben haben, stimmen nicht überein.","Stop-loss":"Stop-Loss","This_field_is_required_":"Dieses Feld ist erforderlich.","Return":"Rendite","Norwegian_Index":"Norwegischer Index","Swiss_Index":"Schweizerischer Index","asian_up":"Asiatisch hoch","AP_Ordinary":"AP Allgemein","Asians":"Asiaten","Save_as_PDF":"Als PDF speichern","Contract_Confirmation":"Vertragsbestätigung","numbers":"Zahlen","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"Minuten","day":"Tag","Save_as_JPEG":"Als JPEG speichern","Platinum/USD":"Platin/USD","hours":"Stunden","second":"Sekunde","spread_down":"Spread tief","Belgian_Stocks":"Belgische Aktien","Date":"Datum","Asia/Oceania":"Asien/Ozeanien","Italian_Index":"Italienischer Index","lower":"niedriger","Digits":"Dezimalstellen","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"Derzeit lehnen wir die Eröffnung von Konten für Einwohner dieses Landes ab.","AUDZAR":"AUD/ZAR","Australian_Index":"Australischer Index","Last_Digit_Prediction":"Voraussage der Letzten Stelle","Start_time":"Startzeit","Americas":"Amerika","Japanese_Index":"Japanischer Index","matches":"entspricht","Long":"Lang","is_required__Current_spread":"ist erforderlich. Aktueller Spread","Purchase_Price":"Kaufpreis","Mr":"Herr","days":"Tage","March":"März","(Bejing/CST_-8_hours)":"(Peking/CST -8 Stunden)","Save_as_PNG":"Als PNG speichern","New_Zealand_Index":"Neuseeland Index","Week_of":"Woche von","Entry_Spot":"Startkurs","Major_Pairs":"Wichtigste Paare","Su":"So","spread_up":"Spread hoch","Jump_To":"Springen zu","Dutch_Index":"Niederländischer Index","loading___":"wird geladen...","French_Index":"Französischer Index","Metals":"Metalle","We":"Mi","To":"An","Tuesday":"Dienstag","even":"gleich","Sorry,_this_feature_is_not_available_":"Leider ist diese Funktion nicht vorhanden.","High_barrier":"Hohe Schwelle","Gaming_Account":"Spielkonto","You_must_accept_the_terms_and_conditions_to_open_an_account_":"Sie müssen die Geschäftsbedingungen akzeptieren, um ein Konto eröffnen zu können.","July":"Juli","June":"Juni","USDZAR":"USD/ZAR","Mar":"Mär","Purchase_Date":"Kaufdatum","Dec":"Dez","Thursday":"Donnerstag","Portuguese_Index":"Portugiesischer Index","higher":"höher","Smart_Indices":"Smart Indizes","in_aggregate_over_the_last":"insgesamt über die letzten","Monday":"Montag","differs":"unterscheidet sich","Oil/AUD":"Öl/AUD","password":"Passwort","Stop-type":"Stopp-Art","Action":"Handlung","Random_Moon":"Random Mond","comma":"Komma","minutes":"Minuten","Oil/GBP":"Öl/GBP","Indian_50_Index":"Indischer 50 Index","ticks":"Ticks","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"Wenn Sie auf 'Ok' klicken, werden Sie bis zum ausgewählten Datum vom Handel auf dieser Site ausgeschlossen.","months":"Monate","Potential_Profit":"Möglicher Gewinn","over":"über","Previous":"Vorige","Sale_Date":"Verkaufsdatum","Contract_period":"Kontraktzeitraum","Exercise_period":"Ausübungszeitraum","February":"Februar","Failed_to_update_trade_description_":"Aktualisierung der Kontraktbeschreibung fehlgeschlagen.","Your_current_balance_is":"Ihr aktuelles Guthaben beträgt","Stocks":"Aktien","Singapore_Index":"Singapur Index","Duration":"Laufzeit","This_contract_lost":"Dieser Kontrakt verlor","Buy":"Kaufen","Next":"Weiter","Friday":"Freitag","Your_password_cannot_be_the_same_as_your_email":"Ihr Passwort kann nicht wie Ihre E-Mail Adresse lauten","Egypt_Index":"Ägypten Index","Net_profit":"Nettogewinn","points":"Punkte","There_was_a_problem_accessing_the_server_during_purchase_":"Während des Kaufs ist ein Problem beim Zugriff auf den Server aufgetreten.","December":"Dezember","Dutch_Stocks":"Niederländische Aktien","Th":"Do","Oct":"Okt","Higher/Lower":"Höher/Tiefer","Stake":"Einsatz","Barrier_offset":"Schwellenverschiebung","Amount_per_point":"Betrag je Punkt","in_aggregate_over_the_lifetime_of_your_account_":"insgesamt während der Laufzeit Ihres Kontos.","Next_Day":"Nächster Tag","Total_Profit/Loss":"Gesamter Gewinn/Verlust","Save_as_CSV":"Als CSV speichern","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"Stellt den maximalen Bargeldbetrag dar, den Sie auf Ihrem Konto haben dürfen. Wenn das Maximum erreicht wird, werden Sie gebeten, Gelder abzuheben.","Loss":"Verlust","Balance":"Guthaben","Statement":"Abrechnung","ends_between":"schließt zwischen","letters":"Buchstaben","under":"unter","asian_down":"asiatisches Tief","Silver/USD":"Silber/USD","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"Wir können zu diesem Zeitpunkt keine Kurse live anzeigen. Zur Ansicht der Echtzeitanzeige der Kurse sollten Sie diese Seite über den Browser aktualisieren. Wenn das Problem nach wiederholten Aktualisierungen der Seite weiter besteht, sollten Sie einen anderen Browser ausprobieren","Low_barrier":"Untere Schwelle","Forex":"Devisenhandel","Minor_Pairs":"Untergeordnete Paare","Energy":"Energie","Virtual_Account":"Virtuelles Konto","From":"Von","does_not_touch":"erreicht nicht","hour":"Stunde","View":"Ansehen","French_Stocks":"Französische Aktien","years":"Jahre","Sunday":"Sonntag","Trading_Limits":"Handelslimits","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"Daher beträgt Ihre derzeitige maximale Sofortabhebung (vorausgesetzt Ihr Konto hat ein ausreichendes Guthaben) EUR","Vanilla_Options":"Vanilla Optionen","Please_wait_<br_/>Your_request_is_being_processed_":"Bitte warten Sie.<br />Ihre Anfrage wird bearbeitet.","Irish_Index":"Irischer Index","Belgian_Index":"Belgischer Index","minute":"Minute","January":"Januar","Maximum_account_cash_balance":"Maximales Kontoguthaben","Bombay_Index":"Mumbai Index","Maximum_number_of_open_positions":"Maximale Anzahl offener Positionen","Start_Time":"Startzeit","seconds":"Sekunden","Oil/USD":"Öl/USD","Ends_In/Out":"Endet innerhalb/außerhalb","Up/Down":"Auf/Ab","Indices":"Indizes","Mrs":"Frau","Maximum_aggregate_payouts_on_open_positions":"Maximale Gesamtauszahlungen auf offene Positionen","Profit_Table":"Gewinntabelle","Purchase":"Kauf","Credit/Debit":"Gutschrift/Lastschrift","End_Time":"Endzeit","There_was_a_problem_accessing_the_server_":"Es gab ein Problem beim Zugriff auf den Server.","Invalid_email_address":"Falsche E-Mail Adresse","year":"Jahr","German_Index":"Deutscher Index","Random_Sun":"Random Sonne","South_African_Index":"Südafrikanischer Index","Contract":"Kontrakt","Investment_Account":"Investmentkonto","Miss":"Verpasst","Please_enter_a_date_that_is_at_least_6_months_from_now_":"Bitte geben Sie ein Datum ein, das mindestens 6 Monate in der Zukunft liegt.","Ms":"Frl.","May":"Mai","Profit":"Rendite","Rise/Fall":"Steigen/Fallen","Withdrawal_Limits":"Abhebungslimits","Print_chart":"Chart drucken","Please_try_again_":"Bitte versuchen Sie es erneut.","Total_Cost":"Gesamtkosten","Your_transaction_reference_is":"Ihre Überweisungsreferenz lautet","Touch/No_Touch":"Erreicht","Save_as_SVG":"Als SVG speichern","Profit/Loss":"Gewinn/Verlust","Maximum_daily_turnover":"Maximaler Tagesumsatz","Commodities":"Rohstoffe","Commbank_(Australia)":"Commbank (Australien)","goes_outside":"geht außerhalb","Item":"Posten","Month":"Monat","High_Barrier":"Hohe Schwelle","Middle_East":"Mittlerer Osten","space":"Bereich","Portuguese_Smart_Index":"Portugiesischer Smart Index","Saturday":"Samstag","Low_barrier_offset":"Verschiebung der unteren Schwelle","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"Stellt die maximalen Gesamtauszahlungen ausstehender Verträge Ihres Portfolios dar. Wenn das Maximum erreicht ist, können Sie keine zusätzlichen Verträge erwerben, ohne zunächst bestehende Positionen zu schließen.","Description":"Beschreibung","Sell":"Verkaufen"};
-texts_json['JA'] = {"Euro_50_Index":"ユーロ50インデックス","Please_select":"選択して下さい","This_contract_won":"このトレードは勝ち判定","October":"１０月","Spot":"スポット","ASML_Holding":"ASMLホールディング","Payout":"ペイアウト","Unilever_plc":"Unilever plc（ユニリーバ英）","period":"期間","Standard_Chartered_plc":"Standard Chartered plc（スタンダードチャータード銀行）","Stays_In/Goes_Out":"レンジ内/レンジ外に留まる","Fiat":"Fiat（フィアット）","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"未決済分のトレード総数を示し、各行を１件分の未決済分のオープン中のポジションとしてカウントします。最高件数を超えた場合、オープン中のトレードを閉じて頂くことで新たなトレードの購入が可能になります。","stays_between":"レンジ内に留まる","Random_Bear":"ランダム・ベアー","Deposit_of":"Xのご入金","odd":"奇数","Pfizer_Inc_":"Pfizer Inc.（ファイザー）","Wednesday":"水曜日","Airbus_Group":"Airbus Group（エアバスグループ）","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"購入可能な１日あたりのトレードの総額を示します。","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"ご入力いただいたメールアドレスは既に他のログインIDに使用されています。","Unilever":"Unilever（ユニリーバ）","Dubai_Index":"ドバイ インデックス","month":"ヶ月","Sorry,_account_opening_is_unavailable_":"申し訳ございませんが、口座開設をご利用いただけません。","In/Out":"レンジ内/レンジ外","Tokyo_Electric_Power_Co__Inc":"東京電力株式会社","AXA":"AXA（アクサ）","Barrier":"バリア","Potential_Payout":"期待払い戻し金額","Low_Barrier":"下限バリア","Previous_Day":"前日","Points":"ポイント","Tu":"木曜日","Therefore_you_may_not_withdraw_any_additional_funds_":"ゆえに、お客様はいかなる追加金額をご出金して頂くことはできません。","Belgacom":"Belgacom（ベルガコム）","Sale_Price":"決済価格","touches":"タッチ","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"スポット価格に差異を付加する目的でバリア値を設定しましょう。もしバリア値として+0.005を設定した場合はスポット価格より0.005高値のバリアが設定されたトレードを購入することになります。尚、スポット価格は注文を受けた次のTickが採用されます。","Short":"ショート","Random_75_Index":"ランダムインデックス75","Please_confirm_the_trade_on_your_statement_before_proceeding_":"続行する前に、お客様の取引明細書をご確認ください。","Year":"年","Purchase_Time":"購入時間","No_Live_price_update":"最新価格の更新がありません","Real_Account":"リアル口座","Day":"日","Europe/Africa":"ヨーロッパ・アフリカ","Trading_and_Withdrawal_Limits":"トレード及びご出金限度額","SABMiller_plc":"SABMiller plc（SABミラー）","High_barrier_offset":"上限追加バリア値","ICICI_Bank_Ltd":"ICICI銀行","Aug":"８月","Telenor":"Telenor（テレノール）","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"お客様のご口座はアップグレード済みですので、ご出金制限が引き上げられました。","Samsung_Electronics":"Samsung Electronics（サムスン電子）","Jul":"７月","ends_outside":"レンジ外で終了","minimum_available_duration":"最小取引期間","Russian_Regular_Index":"ロシア レギュラー インデックス","Hitachi_Ltd":"株式会社日立製作所","Feb":"２月","The_two_passwords_that_you_entered_do_not_match_":"ご入力頂いた各パスワードが合致しません。","Stop-loss":"損切り","This_field_is_required_":"この項目は必須です。","Return":"リターン率","Carrefour":"Carrefour（カノフール）","Swiss_Index":"スイス インデックス","asian_up":"Asian アップ","Random_100_Index":"ランダムインデックス100","September":"９月","Save_as_PDF":"PDFへ保存","Contract_Confirmation":"トレード確定","numbers":"数字","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"%ctx(最短期間, 例： 最小 15 秒）分","Merck_&_Co__Inc_":"Merck & Co. Inc.（メルク）","day":"日","Moet_Hennessy_Louis_Vuitton":"Moet Hennessy Louis Vuitton（モエ ヘネシー・ルイ ヴィトン）","Chevron_Co_":"Chevron Co.（シェブロン）","Save_as_JPEG":"JPEGへ保存","Platinum/USD":"白金/USD","hours":"時間","Euro_100_Index":"ユーロ100インデックス","second":"秒","spread_down":"スプレッド ダウン","Belgian_Stocks":"ベルギー株式","Date":"日付","Asia/Oceania":"アジア・オセアニア","lower":"Lower","Digits":"数字","April":"４月","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"現在当社ではこの国の居住者からの口座開設を承ることができません。","Daimler_AG":"Daimler AG（ダイムラー）","ICAG_(British_Airways)":"ICAG (ブリティッシュ・エアウェイズ)","Australian_Index":"オーストラリア インデックス","Last_Digit_Prediction":"下一桁の予想数字","Start_time":"開始時間","Rio_Tinto_plc":"Rio Tinto plc（リオ・ティント）","Americas":"南米","Statoil":"Statoil（スタトイル）","General_Electric_Company":"General Electric Company（ゼネラル・エレクトリック）","US_Tech_100_Index":"米ハイテク100指数","Sep":"９月","Safran":"Safran（サフラン）","matches":"マッチ","Long":"ロング","Jakarta_Index":"ジャカルタ インデックス","is_required__Current_spread":"のご入金が必要です。現在のスプレッド","Purchase_Price":"購入価格","days":"日","Yara_International":"Yara International（ヤラ インターナショナル）","Vivendi":"Vivendi（ビベンディ）","March":"３月","(Bejing/CST_-8_hours)":"(北京/CST -8時間)","Save_as_PNG":"PNGへ保存","New_Zealand_Index":"ニュージーランド インデックス","hyphen":"ハイフン","Electricite_de_France":"Electricite de France（フランス電力）","Week_of":"週","Entry_Spot":"エントリー価格","Major_Pairs":"主要ペア","Su":"日曜日","Nov":"１１月","Ref_":"参照番号","spread_up":"スプレッド アップ","Orange":"Orange（オレンジ）","BNP_Paribas":"BNP Paribas（BNPパリバ）","Jump_To":"Xへ移動する","loading___":"読み込み中","Essilor_International":"Essilor International（エシロール・インターナショナル）","Iberdrola_SA":"Iberdrola SA（インベルドローラ）","Metals":"金属関連","Heineken":"Heineken（ハイネケン）","We":"水曜日","To":"終了","Tuesday":"火曜日","even":"もなお","Sorry,_this_feature_is_not_available_":"申し訳ございませんが、この機能はご利用いただけません。","High_barrier":"上限バリア","Gaming_Account":"ゲームアカウント","You_must_accept_the_terms_and_conditions_to_open_an_account_":"ご口座を開設されるにあたりご利用規約に承諾しなければなりません。","July":"７月","June":"６月","Mar":"５月","Purchase_Date":"購入日時","Infosys_Ltd":"Infosys Ltd（インフォシス）","Allianz_SE":"Allianz SE（アリアンツ）","Dec":"１２月","Thursday":"木曜日","Portuguese_Index":"ポルトガル インデックス","Limit":"制限","higher":"ラダー高","Jan":"１月","in_aggregate_over_the_last":"直近の集計によると","Monday":"月曜日","Royal_Dutch_Shell":"Royal Dutch Shell（ロイヤルダッチシェル）","differs":"アンマッチ","Randoms":"ランダム","GDF_Suez":"GDFスエズ","ANZ_Banking_Group_Ltd":"ANZ Banking Group Ltd（ANZ銀行グループ）","HDFC_Bank_Ltd":"HDFC銀行","password":"パスワード","Stop-type":"ストップタイプ","Action":"売買","Random_Moon":"ランダム・ムーン","Random_Bull":"ランダム・ブル","comma":"読点","minutes":"分","Indian_50_Index":"インド50指数","Toyota_Motor":"トヨタ自動車株式会社","Wall_Street_Index":"ウォールストリート インデックス","ticks":"Tick","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"'Ok'をクリックすると、選択した日付までこのサイトでのトレードができなくなります。","Apr":"４月","Danone":"Danone（ダノン）","months":"ヶ月","Potential_Profit":"利益の期待値","over":"オーバー","Previous":"戻る","Reliance_Industries_Ltd":"Reliance Industries Ltd（リライアンス・インダストリーズ）","Random":"ランダム","Kering":"Kering（ケリング）","Sale_Date":"決済日時","Contract_period":"トレード期間","Nocturnes":"２１時リセット指数","Euro_150_Index":"ユーロ150インデックス","Exercise_period":"権利行使期間","February":"２月","Failed_to_update_trade_description_":"トレード内容の更新ができませんでした。","AB_Inbev":"AB Inbev（アンハイザー・ブッシュ・インベブ）","Your_current_balance_is":"お客様の現在の残高はxxxです。","Barclays_plc":"Barclays plc（バークレイズ）","Stocks":"株式","Singapore_Index":"シンガポール インデックス","Duration":"取引期間","This_contract_lost":"このトレードは負け判定","Buy":"購入","Next":"次","Friday":"金曜日","Random_Yin":"ランダム・陰","Your_password_cannot_be_the_same_as_your_email":"パスワードはEメールと同じものにはできません。","Egypt_Index":"エジプト インデックス","Schneider_Electric":"Schneider Electric（シュナイダーエレクトリック）","Net_profit":"純利益","BG_Group_plc":"BG Group plc（BGグループ）","points":"ポイント","There_was_a_problem_accessing_the_server_during_purchase_":"購入時にサーバーアクセスのエラーが発生がしました。","Random_25_Index":"ランダムインデックス25","JP_Morgan_Chase_&_Co_":"JP Morgan Chase & Co.（JPモルガン・チェース）","December":"１２月","SK_Hynix_Inc_":"SK Hynix Inc.（SKハイニックス）","Pernod_Ricard":"Pernod Ricard（ペルノ・リカール）","Dutch_Stocks":"オランダ株式","Th":"木曜日","Oct":"１０月","Higher/Lower":"ラダー高/ラダー低","Stake":"購入価格","GlaxoSmithKline_plc":"GlaxoSmithKline plc（グラクソ・スミスクライン）","Barrier_offset":"追加バリア値","Amount_per_point":"ポイントごとの金額","in_aggregate_over_the_lifetime_of_your_account_":"ご口座の存続期間の集計によると","The_Coca-Cola_Company":"The Coca-Cola Company（ザ コカ・コーラカンパニー）","Next_Day":"翌日","Inditex_SA":"Inditex SA（インディテックス）","BHP_Billiton_Ltd":"BHP Billiton Ltd（BHBビリトン）","Total_Profit/Loss":"利益・損失の総合","Save_as_CSV":"CSVへ保存","L'Oreal":"L'Oreal（ロレアル）","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"ご口座で保有可能なご口座残高の最高金額を示します。最高金額を超えた場合はご出金をお願いいたします。","Quotidians":"デイリー指数","Loss":"損益","Mo":"月曜日","Jun":"６月","Vodafone":"Vodafone（ボーダフォン）","Balance":"残高","Statement":"取引履歴","ends_between":"範囲内で終了","letters":"文字","under":"未満","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"現在、価格情報を更新することはできません。価格情報を更新したい場合は、このページを更新して下さい。状況が改善されない場合は、他のブラウザをお試しください。","Oracle":"Oracle（オラクル）","Low_barrier":"下限バリア","Forex":"外国為替","SoftBank_Co_":"ソフトバンク株式会社","Minor_Pairs":"マイナーペア","Spreads":"スプレッド","Energy":"エネルギー関連","Virtual_Account":"デモ口座","From":"開始","does_not_touch":"ノータッチ","hour":"時間","Credit_Agricole":"Credit Agricole（クレディ・アグリコル）","View":"表示","Wells_Fargo_&_Company":"Wells Fargo & Company（ウェルズ・ファーゴ）","French_Stocks":"フランス株式","Please_input_a_valid_date":"有効な日にちを入力して下さい。","years":"年","Sunday":"日曜日","Trading_Limits":"トレードの上限について","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"そのため、現在の時点ですぐにご出金いただける最高額は（ただし、口座残高が不足していない場合）はEURです。","Vanilla_Options":"バニラ・オプション","Please_wait_<br_/>Your_request_is_being_processed_":"少々お待ち下さい。<br />リクエストを処理中です。","Belgian_Index":"ベルギー インデックス","minute":"分","Palladium/USD":"パラジウム/USD","Random_Venus":"ランダム・ヴィーナス","January":"１月","BBVA_(Banco_Bilbao)":"BBVA (バンコ・ビルバオ)","Maximum_account_cash_balance":"ご口座上限金額","August":"８月","Hyundai_Motor_Co_":"Hyundai Motor Co.（現代自動車）","Renault":"Renault（ルノー）","Groupe_Bruxelles_Lambert":"Groupe Bruxelles Lambert（グループ・ブリュッセル・ランバート）","Maximum_number_of_open_positions":"保有可能なオープンポジションの総数","US_Tech_Composite_Index":"米ハイテク指数","Sa":"土曜日","Start_Time":"開始時間","Anglo_American_plc":"Anglo American plc（アングロ アメリカン）","seconds":"秒","Assicurazioni_Generali_SpA":"Assicurazioni Generali SpA（ゼネラリ保険会社）","apostrophe":"アポストロフィ","Ends_In/Out":"レンジ内/レンジ外で終了","Up/Down":"ラダー","Wal-Mart_Stores_Inc_":"Wal-Mart Stores Inc.（ウォルマート）","Telefonica_SA":"Telefonica SA（テレフォニカ）","Indices":"インデックス","Maximum_aggregate_payouts_on_open_positions":"オープン中ポジションに対する払い戻し金額の最高総額","Profit_Table":"取引詳細","Purchase":"購入","Credit/Debit":"クレジット/デビット","End_Time":"終了時間","There_was_a_problem_accessing_the_server_":"サーバーアクセスにエラーが発生しました。","Invalid_email_address":"無効なEメールアドレス","year":"年","Google_Inc_":"Google Inc.（グーグル）","November":"１１月","Random_Sun":"ランダム・サン","Random_50_Index":"ランダムインデックス50","ExxonMobil":"ExxonMobil（エクソンモービル）","South_African_Index":"南アフリカインデックス","Contract":"トレード","Investment_Account":"投資口座","Please_enter_a_date_that_is_at_least_6_months_from_now_":"現在から最低６ヶ月先の日付を入力して下さい。","Zoom":"ズーム","May":"５月","Profit":"利益","Westpac_Banking_Co_":"Westpac Banking Co.（ウエストパック銀行）","Rise/Fall":"ハイ/ロー","Withdrawal_Limits":"ご出金限度額","Print_chart":"チャートを印刷","Please_try_again_":"再びお試し下さい。","Total_Cost":"合計金額","Your_transaction_reference_is":"決済参照番号はxxxです。","Diageo_plc":"Diageo plc（ディアジオ）","Touch/No_Touch":"タッチ","Apple_Inc_":"Apple Inc.（アップル）","Glencore_Xstrat":"Glencore Xstrat（グレンコア・エクストラータ）","National_Australia_Bank_Ltd":"National Australia Bank Ltd（ナショナル・オーストラリア銀行）","Philip_Morris_International":"Philip Morris International（フィリップ・モリス）","Hang_Seng_China":"Hang Seng China（ハンセン中国）","Save_as_SVG":"SVGへ保存","Honda_Motor_Co__Ltd":"本田技研工業株式会社","Profit/Loss":"利益/損益","Intel":"Intel（インテル）","Maximum_daily_turnover":"１日あたりのトレード購入可能金額","Commodities":"コモディティ","Please_check_your_email_for_the_next_step_":"次のステップへお進みいただくためにメールアドレスをご確認ください。","Lloyds_Banking_Group_plc":"Lloyds Banking Group plc（ロイズ・バンキング・グループ）","Commbank_(Australia)":"Commbank （オーストラリア・コモンウェルス銀行）","Fr":"金曜日","Royal_Dutch_Shell_plc":"Royal Dutch Shell plc（ロイヤル・ダッチ・シェル）","Cie_de_Saint-Gobain":"Cie de Saint-Gobain（サンゴバン）","Air_Liquide":"Air Liquide（エア・リキード）","goes_outside":"レンジ外となる","Item":"項目","Month":"ヶ月","High_Barrier":"上限バリア","SANOFI":"SANOFI（サノフィ）","Random_Mars":"ランダム・マーズ","Middle_East":"中東","space":"スペース","Portuguese_Smart_Index":"ポルトガル スマートインデックス","Saturday":"土曜日","Random_Yang":"ランダム・陽","Reckitt_Benckiser_Group_plc":"Reckitt Benckiser Group plc（レキット・ベンキーザーグループ）","Low_barrier_offset":"下限追加バリア値","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"資産情報ページ内に存在する未決済分トレードに対する払い戻し金額の最高総額を示します。最高総額を超えた場合、オープン中のトレードを閉じて頂くことで新たなトレードの購入が可能になります。","Description":"取引内容","Sell":"売却","Abu_Dhabi_Index":"アブダビ インデックス"};
-texts_json['AR'] = {"Euro_50_Index":"مؤشر اليورو 50","Please_select":"يرجى اختيار","This_contract_won":"هذا العقد رابح","October":"أكتوبر","Oil/EUR":"نفط/يورو","Spot":"السعر","US_Index":"مؤشر الولايات المتحدة","Payout":"العائد","EUR/CAD":"يورو/دولار كندي","Procter_&_Gamble_Co_":".Procter & Gamble Co","period":"فترة","Stays_In/Goes_Out":"يبقى بين/يخرج عن","Fiat":"فيات","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"يمثل الحد الأقصى من العقود المعلقة فى محفظتك. كل سطر فى محفظتك يمثل معاملة مفتوحة. عندما يتم الوصول للحد الأقصى لن يعد بإمكانك أن تفتح معاملات جديدة دون أن تغلق معاملة موجودة أولاً.","stays_between":"يبقى بين","Random_Bear":"مؤشر راندوم الدب","Italian_30_Index":"مؤشر 30 الإيطالي","NZD/JPY":"دولار نيوزيلندي/الين الياباني","Deposit_of":"إيداع","odd":"فردي","Pfizer_Inc_":".Pfizer Inc","Wednesday":"الأربعاء","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"يمثل الحد الأقصى لحجم العقود التي بإمكانك أن تشتريها في أي يوم تداول.","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"عنوان البريد الإلكتروني الذي قدمته هو قيد الاستخدام من قبل معرف دخول آخر.","Dubai_Index":"مؤشر دبي","AUD/HKD":"دولار أسترالي/دولار هونغ كونغ","month":"شهر","EUR/USD":"اليورو/الدولار","XPD/GBP":"بالاديوم/جني استرليني","Hong_Kong_Index":"مؤشر هونج كونج","Sorry,_account_opening_is_unavailable_":"عفوا، فتح الحساب غير متاح.","In/Out":"داخل/خارج","Barrier":"حاجز","Potential_Payout":"المردودات المحتملة","Low_Barrier":"حاجز منخفض","GBP/NZD":"الجنيه الاسترليني/دولار نيوزيلاندي","Previous_Day":"اليوم السابق","Points":"نقاط","Tu":"الثلاثاء","Therefore_you_may_not_withdraw_any_additional_funds_":"لهذا لا يمكنك سحب أي مبالغ مالية اضافية.","USD/JPY":"الدولار الأمريكي/الين الياباني","Gold/AUD":"ذهب/دولار استرالي","Sale_Price":"سعر البيع","touches":"يصل إلى","AUD/IDR":"دولار أسترالي/روبية أندونيسي","AUD/BRL":"دولار أسترالي/ريال برازيلي","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"أدخل الحاجز بتحديد البعد بينه وبين سعر الإدخال. إذا أدخلت +0.005 فذلك يعنى أنك تشترى صفقة بحاجز أعلى من سعر الإدخال بـ 0.005. سعر الإدخال سيكون الحركة التالية بعد تسلم أمر الصفقة","GBP/CNY":"الجنيه الاسترليني/اليوان الصيني","Short":"قصير","Random_75_Index":"مؤشر راندوم 75","Please_confirm_the_trade_on_your_statement_before_proceeding_":"الرجاء التأكد من التداول بكشف حسابك قبل المتابعة.","AUD/CHF":"أسترالي/الفرنك السويسري","Year":"عام","Purchase_Time":"وقت الشراء","No_Live_price_update":"لا يوجد تحديث مباشر للأسعار","Real_Account":"حساب حقيقي","Day":"يوم","Europe/Africa":"أوروبا/أفريقيا","Trading_and_Withdrawal_Limits":"حدود التداول والسحب","USD/CNY":"دولار أمريكي/اليوان الصيني","High_barrier_offset":"بُعد الحاجز العالي","Aug":"أغسطس","USD/IDR":"دولار أمريكي/روبية أندونيسي","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"تم توثيق حسابك بالكامل وحد السحب الخاص بك تم رفعه.","Swedish_Index":"مؤشر سويدى","GBP_Index":"مؤشر الاسترليني","EUR/KRW":"يورو/ الوون الكوري","Jul":"يوليو","ends_outside":"ينتهي خارج","minimum_available_duration":"أقل مدة زمنية متاحة","Russian_Regular_Index":"المؤشر الروسي المنتظم","AUD/DKK":"دولار أسترالي/كرون دانماركي","Feb":"فبراير","Gold/EUR":"ذهب/يورو","USD/CAD":"دولار أمريكي/دولار كندي","Now":"الآن","The_two_passwords_that_you_entered_do_not_match_":"كلمتى المرور اللذين قمت بإدخالهم لا يتطابقوا.","EUR/MXN":"يورو/بيزو مكسيكي","Stop-loss":"وقف الخسارة","This_field_is_required_":"هذه الخانة مطلوبة.","Return":"عائد","Norwegian_Index":"مؤشر نرويجي","EUR/PLN":"يورو/زلوتي بولندا","Swiss_Index":"المؤشر السويسري","asian_up":"صعود آسيوي","USD/SAR":"دولار أمريكي/ريال سعودي","AP_Ordinary":"AP العادية","GBP/AUD":"الجنيه الاسترليني/دولار أسترالي","Asians":"آسيوي","Random_100_Index":"مؤشر راندوم 100","September":"سبتمبر","Save_as_PDF":"الحفظ كملف PDF","Contract_Confirmation":"تأكيد العقد","numbers":"أرقام","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"minimum duration, for example minimum 15 seconds)%ctx)دقيقة","Intesa_Sanpaolo":"انتيسا سان باولو","Merck_&_Co__Inc_":".Merck & Co. Inc","XAG/AUD":"فضة/دولار استرالي","day":"يوم","Chevron_Co_":".Chevron Co","Save_as_JPEG":"الحفظ كملف JPEG","AUD/CZK":"الدولار الأسترالي/ الكورونا التشيكية","Platinum/USD":"بلاتين/دولار","hours":"ساعات","Euro_100_Index":"مؤشر اليورو 100","second":"ثانية","GBP/INR":"الجنيه الاسترليني/الروبية الهندية","EUR/AED":"يورو/درهم إماراتي","spread_down":"السبريد لأسفل","GBP/KRW":"الجنيه الاسترليني/الوون الكوري","Belgian_Stocks":"بورصات البلجيكية","Date":"تاريخ","AUD_Index":"مؤشر الاسترالي","Asia/Oceania":"آسيا/أوقيانوسيا","Italian_Index":"مؤشر إيطالي","lower":"أدنى","AUD/SGD":"أسترالي/دولار سنغافوري","Digits":"الأرقام","April":"أبريل","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"لا نقبل حسابات المقيمين في هذا البلد في الوقت الحالي.","AUDZAR":"دولار أسترالي/الراند الجنوب أفريقي","GBP/SGD":"الجنيه الاسترليني/دولار سنغافوري","Australian_Index":"مؤشر أستراليا","NZD/USD":"دولار نيوزيلندي/ دولار أمريكي","Last_Digit_Prediction":"التنبؤ بالرقم الأخير","Start_time":"وقت البدء","GBP/CHF":"الجنيه الاسترليني/الفرنك السويسري","USD/DKK":"دولار أمريكي/كرونة دانمركية","Americas":"الأمريكتين","Japanese_Index":"مؤشر ياباني","US_Tech_100_Index":"مؤشر الولايات المتحدة تك 100","AUD/AED":"أسترالي/درهم إماراتي","Sep":"سبتمبر","matches":"يماثل","USD/AED":"دولار أمريكي/درهم إماراتي","Long":"طويل","Jakarta_Index":"مؤشر جاكرتا","USD/BRL":"دولار أمريكي/ريال برازيلي","is_required__Current_spread":"مطلوب. السبريد الحالي","Purchase_Price":"سعر الشراء","XPD/EUR":"بالاديوم/يورو","AUD/SAR":"أسترالي/ ريال سعودي","Mr":"السيد","days":"أيام","XAG/EUR":"فضة/يورو","March":"مارس","(Bejing/CST_-8_hours)":"(توقيت بكين ينقص 8 ساعات عن التوقيت المركزى)","Save_as_PNG":"الحفظ كملف PNG","New_Zealand_Index":"مؤشر نيوزيلندا","Smart_FX":"FX الذكية","AUD/INR":"دولار أسترالي/روبية هندية","GBP/NOK":"الجنيه الاسترليني/كرونة نرويجية","Week_of":"أسبوع","Entry_Spot":"سعر الدخول","Major_Pairs":"الأزواج الرئيسية","Su":"الأحد","Nov":"نوفمبر","Ref_":"مرجع","spread_up":"السبريد لأعلى","GBP/CAD":"الجنيه الاسترليني/دولار كندي","Jump_To":"الانتقال إلى","Dutch_Index":"مؤشر هولندي","loading___":"تحميل...","EUR/BRL":"يورو/ ريال برازيلي","French_Index":"مؤشر فرنسى","Metals":"معادن","EUR/INR":"يورو/الروبية الهندية","We":"الأسبوع","EUR/HKD":"يورو/دولار هونج كونج","EUR/SGD":"يورو/دولار سنغافوري","AUD/PLN":"أسترالي/زلوتي بولندا","To":"إلى","AUD/NOK":"دولار أسترالي/الكرون النرويجي","Tuesday":"الثلاثاء","even":"زوجي","Sorry,_this_feature_is_not_available_":"عفوا، هذه الميزة غير متوفرة.","High_barrier":"حاجز مرتفع","GBP/HKD":"الجنيه الاسترليني/دولار هونغ كونغ","Gaming_Account":"حساب الألعاب","You_must_accept_the_terms_and_conditions_to_open_an_account_":"يجب أن تقبل الشروط والأحكام قبل أن تفتح حساب.","July":"يوليو","June":"يونيو","ENEL":"إنيل","USDZAR":"دولار أمريكي/الراند الجنوب أفريقي","Mar":"مارس","Purchase_Date":"تاريخ الشراء","Dec":"ديسمبر","Thursday":"الخميس","EUR/AUD":"يورو/دولار أسترالي","Portuguese_Index":"مؤشر البرتغال","Limit":"حد","higher":"أعلى","Smart_Indices":"المؤشرات الذكية","Jan":"يناير","in_aggregate_over_the_last":"إجمالا على مدار آخر","Monday":"الأثنين","EUR/DKK":"يورو/الكرون الدانمركي","differs":"يختلف","Randoms":"راندمز","Oil/AUD":"نفط/دولار استرالي","USD_Index":"مؤشر الدولار الأمريكي","GBP/BRL":"الجنيه الاسترليني/ريال برازيلي","USD/MXN":"دولار أمريكي/بيزو مكسيكي","GBP/DKK":"الجنيه الاسترليني/كرونة دانمركية","password":"كلمة المرور","Stop-type":"نوع الوقف","AUD/JPY":"دولار أسترالي/ ين ياباني","Action":"عمل","GBP/IDR":"الجنيه الاسترليني/روبية أندونيسي","Random_Moon":"راندوم مون","Random_Bull":"مؤشر راندوم الثور","comma":"فاصلة","minutes":"دقائق","USD/CHF":"الدولار الأمريكي/الفرنك السويسري","AUD/MXN":"الدولار الأسترالي/بيزو مكسيكي","Oil/GBP":"نفط/جني استرليني","Indian_50_Index":"مؤشر 50 الهندى","Wall_Street_Index":"مؤشر وول ستريت","EUR/HUF":"يورو/الفورنت المجري","ticks":"حركات","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"عندما تضغط \"موافق\" سوف تستثنى من التداول على الموقع حتى التاريخ المحدد.","Apr":"أبريل","months":"شهور","Potential_Profit":"الربح المحتمل","over":"فوق","Previous":"سابق","Random":"عشوائي","EUR/IDR":"يورو/روبية أندونيسي","Sale_Date":"تاريخ البيع","Contract_period":"فترة العقد","Nocturnes":"مؤشرات ليلية","Euro_150_Index":"مؤشر يورو 150","Exercise_period":"فترة العمل","February":"فبراير","Failed_to_update_trade_description_":"فشل فى تحديث توصيف المعاملة التجارية.","Your_current_balance_is":"رصيدك الحالي هو","Stocks":"الأسهم","Singapore_Index":"مؤشر سنغافورة","Duration":"المدة","This_contract_lost":"هذا العقد خاسر","Buy":"شراء","AUD/CNY":"الدولار الأسترالي/اليوان الصيني","Next":"التالي","Friday":"الجمعة","Random_Yin":"مؤشر راندوم ين","AUD/USD":"دولار أسترالي/دولار","Your_password_cannot_be_the_same_as_your_email":"كلمة السر لا يمكن أن تكون نفس البريد الإلكتروني الخاص بك","EUR_Index":"مؤشر يورو","Egypt_Index":"مؤشر مصر","Net_profit":"صافي الربح","points":"نقاط","There_was_a_problem_accessing_the_server_during_purchase_":"هناك مشكلة في الوصول إلى الخادم أثناء الشراء.","Random_25_Index":"مؤشر راندوم 25","JP_Morgan_Chase_&_Co_":".JP Morgan Chase & Co","December":"ديسمبر","SK_Hynix_Inc_":".SK Hynix Inc","Dutch_Stocks":"الأسهم الهولندية","XAG/GBP":"فضة/جني استرليني","Th":"الخميس","Oct":"أكتوبر","Higher/Lower":"أعلى/أسفل","Stake":"الحصة","Dr":"د.","Barrier_offset":"حاجز تعويض","GBP/MXN":"الجنيه الاسترليني/بيزو مكسيكي","Amount_per_point":"القيمة لكل نقطة","EUR/JPY":"اليورو/الين الياباني","in_aggregate_over_the_lifetime_of_your_account_":"اجمالا على مدى تاريخ حسابك.","Gold/USD":"ذهب/دولار","USD/SEK":"دولار أمريكي/كرونة سويدية","Next_Day":"اليوم التالي","EUR/SAR":"يورو/ريال سعودي","Total_Profit/Loss":"إجمالي الربح/الخسارة","Save_as_CSV":"الحفظ كملف CSV","GBP/PLN":"الجنيه الاسترليني/زلوتي بولندا","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"يمثل الحد الأقصى لمقدار النقد الذي تستطيع أن تحتفظ به فى حسابك.  إذا تم الوصول للحد الأقصى سيُطلب منك أن تسحب الأموال.","Quotidians":"مؤشرات نهارية","Loss":"خسارة","Mo":"الأثنين","Jun":"يونيو","AUD/KRW":"دولار أسترالي/الوون الكوري","Tick":"حركة","Balance":"رصيد","Statement":"كشف الحساب","ends_between":"ينتهي بين","letters":"حروف","under":"تحت","asian_down":"هبوط آسيوي","Silver/USD":"فضة/دولار","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"لا نستطيع بث الأسعار بث مباشر في الوقت الحالي. لتتمتع بخدمة البث المباشر للأسعار جرب إعادة تحميل الصفحة، إذا حدث هذا الأمر بعد عدة محاولات جرب متصفح آخر","Low_barrier":"حاجز منخفض","Forex":"الفوركس","Minor_Pairs":"الأزواج الثانوية","Spreads":"السبريد (الفروق)","Energy":"طاقة","Virtual_Account":"حساب افتراضي","From":"من","does_not_touch":"لا يصل إلى","hour":"ساعة","USD/NOK":"دولار أمريكي/كرونة نرويجية","View":"شاهد","EUR/NOK":"يورو/الكرون النرويجي","French_Stocks":"بورصات الفرنسية","years":"أعوام","Sunday":"الأحد","USD/PLN":"دولار/زلوتي بولندا","Trading_Limits":"حدود التداول","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"لهذا فإن الحد الأقصى الحالي للسحب (شريطة أن يكون فى حسابك أموالا كافية) هو يورو","Vanilla_Options":"خيارات الفانيليا","Please_wait_<br_/>Your_request_is_being_processed_":"يرجى الانتظار.<br />يتم معالجة طلبك.","Irish_Index":"مؤشر أيرلندي","AUD/NZD":"أسترالي/دولار نيوزيلاندي","Belgian_Index":"مؤشر بلجيكي","minute":"دقيقة","Palladium/USD":"بالاديوم/دولار","Random_Venus":"راندم فينوس","ENI_SpA":"شركة إني","January":"يناير","Maximum_account_cash_balance":"الحد الأقصى لرصيد الحساب النقدي","August":"أغسطس","EUR/CNY":"يورو/يوان صيني","Bombay_Index":"مؤشر بومباي","Maximum_number_of_open_positions":"الحد الأقصى لعدد المعاملات المفتوحة","GBP/JPY":"الجنيه الاسترليني/الين الياباني","US_Tech_Composite_Index":"مؤشر ناسداك للتكنولوجيا الولايات المتحدة","Sa":"السبت","Start_Time":"وقت البدء","seconds":"ثوان","Gold/GBP":"ذهب/جني استرليني","AUD/SEK":"أسترالي/كرونة سويدية","Oil/USD":"نفط/دولار","GBP/ZAR":"الجنيه الاسترليني/الراند الجنوب أفريقي","Ends_In/Out":"ينتهي بين/خارج","Up/Down":"فوق/تحت","XPD/AUD":"بالاديوم/دولار استرالي","Wal-Mart_Stores_Inc_":".Wal-Mart Stores Inc","Indices":"مؤشرات","Mrs":"السيدة","EUR/NZD":"يورو/دولار نيوزيلاندي","Maximum_aggregate_payouts_on_open_positions":"الحد الأقصى لإجمالي عوائد المعاملات المفتوحة","Profit_Table":"جدول الأرباح","Purchase":"شراء","Credit/Debit":"ائتمان/خصم","End_Time":"وقت النهاية","There_was_a_problem_accessing_the_server_":"حدثت مشكلة في التواصل مع الخادم.","Invalid_email_address":"عنوان البريد غير صحيح","year":"عام","German_Index":"مؤشر ألماني","EUR/CHF":"يورو/فرنك سويسري","November":"نوفمبر","Random_Sun":"مؤشر راندوم الشمس","Random_50_Index":"مؤشر راندوم 50","South_African_Index":"مؤشر جنوب أفريقيا","Contract":"عقد","Investment_Account":"حساب الاستثمار","GBP/AED":"الجنيه الاسترليني/درهم إماراتي","USD/SGD":"دولار أمريكي/دولار سنغافوري","USD/KRW":"دولار أمريكي/ون كوريا الجنوبية","Miss":"آنسة","Please_enter_a_date_that_is_at_least_6_months_from_now_":"رجاء إدخال تاريخ بعد الآن بستة أشهر على الأقل.","Zoom":"ارتفاع حاد فى الأسعار","EUR/ZAR":"يورو/الراند الجنوب أفريقي","Ms":"آنسة","May":"مايو","Profit":"أرباح","Westpac_Banking_Co_":".Westpac Banking Co","Rise/Fall":"الصعود/الهبوط","Withdrawal_Limits":"حدود السحب","Print_chart":"اطبع المخطط","Please_try_again_":"رجاء حاول مرة أخرى.","Total_Cost":"التكلفة الإجمالية","Your_transaction_reference_is":"الرقم المرجعي لمعاملتك هو","Touch/No_Touch":"الوصول/عدم الوصول","Hang_Seng_China":"هانغ سنغ الصين (Hang Seng China )","Save_as_SVG":"الحفظ كملف SVG","Profit/Loss":"الربح/الخسارة","Maximum_daily_turnover":"الحد الأقصى لحجم التداول اليومي","Commodities":"السلع","Commbank_(Australia)":"Commbank (استراليا)","Fr":"الجمعة","goes_outside":"يخرج عن","Item":"بند","Month":"شهر","High_Barrier":"حاجز عالي","GBP/SAR":"الجنيه الاسترليني/ ريال سعودي","Random_Mars":"مؤشر راندوم مارس","Middle_East":"الشرق الأوسط","space":"المسافة","Portuguese_Smart_Index":"مؤشر البرتغال الذكي","EUR/GBP":"اليورو/الجنيه الاسترليني","Prof":"أرباح","Saturday":"السبت","Random_Yang":"مؤشر يانج العشوائي","USD/HKD":"دولار أمريكي/دولار هونغ كونغ","Low_barrier_offset":"تحديد حاجز منخفض","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"يمثل الحد الأقصى للعوائد الكلية على العقود المعلقة فى محفظتك. إذا تم الوصول للحد الأقصى لن يمكنك شراء عقود إضافية بدون قفل المعاملات الموجودة.","EUR/CZK":"يورو/كورونا تشيكية","USD/INR":"دولار أمريكي/الروبية الهندية","Description":"الوصف","Sell":"بيع","Abu_Dhabi_Index":"مؤشر أبوظبي","AUD/CAD":"أسترالي/كندي","GBP/USD":"الجنيه الاسترليني/الدولار"};
-texts_json['ZH_CN'] = {"Euro_50_Index":"欧洲 50 指数","Please_select":"请选择","This_contract_won":"此合约获利","October":"十月","Oil/EUR":"原油/欧元","Spot":"现价","US_Index":"美国指数","ASML_Holding":"阿斯麦公司","Payout":"赔付","EUR/CAD":"欧元/加元","Unilever_plc":"联合利华公司","Procter_&_Gamble_Co_":"宝洁公司","period":"周期","Standard_Chartered_plc":"渣打银行","Stays_In/Goes_Out":"“保持在范围之内/超出范围之外”","Fiat":"菲亚特","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"表示您的投资组合中未平仓合约的最大数量。您投资组合中的每一行都算作是一个未平仓头寸。一旦达到该最大值，在开设新头寸之前您需要先了结一个现有头寸。","stays_between":"位于区间之内","Random_Bear":"随机熊市","Italian_30_Index":"意大利 30 指数","NZD/JPY":"纽元/日元","Deposit_of":"存款","odd":"奇数","Pfizer_Inc_":"辉瑞公司","Wednesday":"星期三","Airbus_Group":"空中客车集团","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"表示任一给定交易日您可以买入的最大合约数量。","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"您所提供的电邮地址已被另一登录 ID 使用","Unilever":"联合利华公司","Dubai_Index":"迪拜指数","AUD/HKD":"澳元/港币","month":"月份","EUR/USD":"欧元/美元","XPD/GBP":"钯价盎司/英镑","Hong_Kong_Index":"香港指数","Banco_Santander_SA":"桑坦德银行","Sorry,_account_opening_is_unavailable_":"对不起，不可开立账户。","In/Out":"“范围之内/之外”","Tokyo_Electric_Power_Co__Inc":"东京电力公司","AXA":"法国安盛集团","Barrier":"障碍","Potential_Payout":"可能的赔付额","Low_Barrier":"低障碍","GBP/NZD":"英镑/新西兰元","Previous_Day":"前一天","Points":"点","Tu":"星期二","Therefore_you_may_not_withdraw_any_additional_funds_":"所以您可能不能提取任何额外资金。","Belgacom":"移动比利时","ITC_Ltd":"国际贸易中心有限公司","USD/JPY":"美元/日元","Gold/AUD":"黄金/澳元","Vinci":"法国万喜集团","Sale_Price":"卖出价格","touches":"触及","AUD/IDR":"澳元/印度尼西亚卢比","AUD/BRL":"澳元/巴西雷亚尔","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"请按与现货价格差额的形式输入障碍水平。如果您输入 +0.005 ，那么您将买入障碍水平比入市现价高 0.005 的合约。入市现价为收到您订单之后的下一个价格","GBP/CNY":"英镑/人民币","Short":"短仓","Random_75_Index":"随机 75 指数","Please_confirm_the_trade_on_your_statement_before_proceeding_":"继续执行之前，请在您的声明上确认此项交易。","AUD/CHF":"澳元/瑞士法郎","Year":"年","Purchase_Time":"买入时间","No_Live_price_update":"没实时价格更新","Real_Account":"真实账户","Day":"天","AT&T":"AT&T公司","Europe/Africa":"欧洲/非洲","Trading_and_Withdrawal_Limits":"交易和取款限额","SABMiller_plc":"米勒啤酒集团","USD/CNY":"美元/人民币","High_barrier_offset":"高障碍位移","ICICI_Bank_Ltd":"印度工业信贷投资银行","Aug":"八月","Telenor":"挪威电信公司","USD/IDR":"美元/印度尼西亚卢比","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"您的账户已经得到完全验证，且您的取款限额已经取消。","Swedish_Index":"瑞典指数","GBP_Index":"英镑指数","KBC_Groep":"KBC集团","EUR/KRW":"欧元/韩元","Samsung_Electronics":"三星电子","Jul":"七月","ends_outside":"区间之外结束","minimum_available_duration":"最短可用期限","Russian_Regular_Index":"俄罗斯普通指数","AUD/DKK":"澳元/丹麦克朗","Hitachi_Ltd":"日立公司","Feb":"二月","Gold/EUR":"黄金/欧元","USD/CAD":"美元/加元","Now":"现在","The_two_passwords_that_you_entered_do_not_match_":"两次输入的密码不一致。","EUR/MXN":"欧元/墨西哥比索","Stop-loss":"止损","This_field_is_required_":"此字段为必填项。","Return":"回报","Norwegian_Index":"挪威指数","EUR/PLN":"欧元/波兰兹罗提","Carrefour":"家乐福超市","Swiss_Index":"瑞士指数","asian_up":"亚洲上涨","USD/SAR":"美元/沙特阿拉伯里亚尔","AP_Ordinary":"AP 普通股票指数","GBP/AUD":"英镑/澳元","Asians":"亚洲期权","Random_100_Index":"随机 100 指数","September":"九月","Save_as_PDF":"以PDF格式保存","Contract_Confirmation":"合约确认","numbers":"号码","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"分钟","Intesa_Sanpaolo":"联合圣保罗银行","Merck_&_Co__Inc_":"默克集团","XAG/AUD":"银价盎司/澳元","day":"天","Moet_Hennessy_Louis_Vuitton":"酩悦·轩尼诗-路易·威登集团","Chevron_Co_":"雪佛兰公司","Save_as_JPEG":"以JPEG格式保存","AUD/CZK":"澳元/捷克克朗","Platinum/USD":"铂金/美元","hours":"小时","Johnson_&_Johnson":"强生","Euro_100_Index":"欧洲100指数","second":"秒","GBP/INR":"英镑/印度卢比","EUR/AED":"欧元/阿联酋迪拉姆","spread_down":"价差下跌","GBP/KRW":"英镑/韩元","Belgian_Stocks":"比利时股票","Date":"日期","AUD_Index":"澳元指数","Asia/Oceania":"亚洲/大洋洲","Italian_Index":"意大利指数","TOTAL":"道达尔公司","lower":"低于","AUD/SGD":"澳元/新加坡元","Digits":"数字期权","April":"四月","UCB":"比利时联合化工集团","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"目前不接受来自该国居民的账户。","Daimler_AG":"戴姆勒股份公司","ICAG_(British_Airways)":"英国航空公司","AUDZAR":"澳元兑南非兰特","GBP/SGD":"英镑/新加坡元","Australian_Index":"澳大利亚指数","NZD/USD":"新西兰元/美元","Last_Digit_Prediction":"最后数字的预测","Start_time":"开始时间","Rio_Tinto_plc":"力拓","GBP/CHF":"英镑/瑞士法郎","USD/DKK":"美元/丹麦克朗","Americas":"美洲","Japanese_Index":"日本指数","Statoil":"挪威国家石油公司","General_Electric_Company":"通用电气公司","US_Tech_100_Index":"美国科技100指数","AUD/AED":"澳元/阿联酋迪拉姆","Sep":"九月","Safran":"赛峰","matches":"符合","USD/AED":"美元/阿联酋迪拉姆","Long":"长仓","Jakarta_Index":"雅加达指数","USD/BRL":"美元/巴西雷亚尔","is_required__Current_spread":"为必要。当前价差","Purchase_Price":"买入价格","XPD/EUR":"钯价盎司/欧元","AUD/SAR":"澳元/沙特阿拉伯里亚尔","XPT/EUR":"铂价盎司/欧元","Mr":"先生","days":"天","Yara_International":"雅苒国际","XAG/EUR":"银价盎司/欧元","Vivendi":"法国威望迪集团","March":"三月","GBP/SEK":"英镑/瑞典克朗","(Bejing/CST_-8_hours)":"（北京/CST -8 小时）","Save_as_PNG":"以PNG格式保存","New_Zealand_Index":"新西兰指数","hyphen":"连字符","Electricite_de_France":"法国电力公司","Smart_FX":"智能外汇","AUD/INR":"澳元/印度卢比","GBP/NOK":"英镑/挪威克朗","XPT/GBP":"铂价盎司/英镑","Week_of":"周","Entry_Spot":"入市现价","Major_Pairs":"主要货币对","Su":"星期日","Nov":"十一月","Ref_":"参考","spread_up":"价差上涨","Orange":"法国电信集团","BNP_Paribas":"法国巴黎银行","GBP/CAD":"英镑/加元","Jump_To":"跳至","QUALCOMM":"高通公司","Dutch_Index":"荷兰指数","loading___":"加载中……","EUR/BRL":"欧元/巴西雷亚尔","French_Index":"法国指数","Essilor_International":"依视路","Iberdrola_SA":"伊维尔德罗拉公司","Metals":"金属","Heineken":"喜力","EUR/INR":"欧元/印度卢比","We":"星期三","EUR/HKD":"欧元/港币","EUR/SGD":"欧元/新加坡元","AUD/PLN":"澳元/波兰兹罗提","To":"到","AUD/NOK":"澳元/挪威克朗","Tuesday":"星期二","even":"偶数","Sorry,_this_feature_is_not_available_":"对不起，此功能不可用。","High_barrier":"高障碍","GBP/HKD":"英镑/港币","Gaming_Account":"博彩账户","You_must_accept_the_terms_and_conditions_to_open_an_account_":"您必须接受条款和条件才能开户。","July":"七月","June":"六月","USDZAR":"美元兑南非兰特","Mar":"三月","Purchase_Date":"买入日期","Infosys_Ltd":"印孚瑟斯有限公司","Allianz_SE":"安联 SE","Dec":"十二月","US_S&P_100":"美国标普 100 指数","Thursday":"星期四","EUR/AUD":"欧元/澳元","Portuguese_Index":"葡萄牙指数","Limit":"限额","higher":"高于","Smart_Indices":"智能指数","Jan":"一月","in_aggregate_over_the_last":"上期内的总额","Monday":"星期一","Royal_Dutch_Shell":"荷兰皇家壳牌公司","EUR/DKK":"欧元/丹麦克朗","differs":"相差","USD/CZK":"美元/捷克克朗","Randoms":"随机指数","GDF_Suez":"苏伊士环能集团","Societe_Generale":"法国兴业银行","Oil/AUD":"原油/澳元","USD_Index":"美元指数","GBP/BRL":"英镑/巴西里尔","ANZ_Banking_Group_Ltd":"澳新银行集团有限公司","USD/MXN":"美元/墨西哥比索","HDFC_Bank_Ltd":"印度HDFC银行","GBP/DKK":"英镑/丹麦克朗","password":"密码","Stop-type":"停止类型","AUD/JPY":"澳元/日元","Action":"操作","GBP/IDR":"英镑/印度尼西亚卢比","Random_Moon":"随机月市","Random_Bull":"随机牛市","comma":"逗号","minutes":"分钟","USD/CHF":"美元/瑞士法郎","AUD/MXN":"澳元/墨西哥比索","Oil/GBP":"原油/英镑","Indian_50_Index":"印度50指数","Toyota_Motor":"丰田汽车","Wall_Street_Index":"华尔街指数","EUR/HUF":"欧元/匈牙利福林","ticks":"跳动点","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"当您点选“Ok”后，您将被禁止在此网站交易，直到选定期限结束为止。","Apr":"四月","Danone":"达能集团","months":"月份","Potential_Profit":"潜在利润","over":"高于","Previous":"之前","Microsoft":"微软","Reliance_Industries_Ltd":"信实工业有限公司","Random":"随机","Kering":"开云集团","EUR/IDR":"欧元/印度尼西亚卢比","Sale_Date":"卖出日期","Contract_period":"合约期间","Nocturnes":"Nocturne指数","Euro_150_Index":"欧洲150指数","Exercise_period":"练习期间","February":"二月","Failed_to_update_trade_description_":"无法更新交易描述。","AB_Inbev":"安海斯-布希英博","Your_current_balance_is":"您当前余额有","Barclays_plc":"巴克莱银行","Stocks":"股票","Singapore_Index":"新加坡指数","Duration":"期限","This_contract_lost":"此合约亏损","Buy":"买入","AUD/CNY":"澳元/人民币","Next":"下一页","Friday":"星期五","Random_Yin":"随机阴市","AUD/USD":"澳元/美元","EUR/SEK":"欧元/瑞典克朗","Your_password_cannot_be_the_same_as_your_email":"您的密码不可与电子邮件相同","EUR_Index":"欧元指数","Egypt_Index":"埃及指数","Schneider_Electric":"施耐德电气公司","Net_profit":"净收益","BG_Group_plc":"英国天然气集团公司","points":"点","There_was_a_problem_accessing_the_server_during_purchase_":"买入时服务器访问出了问题。","Random_25_Index":"随机 25 指数","JP_Morgan_Chase_&_Co_":"摩根大通公司","December":"十二月","SK_Hynix_Inc_":"SK海力士半导体公司","Pernod_Ricard":"法国保乐力加集团","Dutch_Stocks":"荷兰股票","XAG/GBP":"银价盎司/英镑","Th":"星期四","Oct":"十月","Higher/Lower":"“高于/低于”","Stake":"投注资金","Dr":"博士","GlaxoSmithKline_plc":"葛兰素史克公司","Barrier_offset":"障碍位移","GBP/MXN":"英镑/墨西哥比索","Amount_per_point":"每点之金额","EUR/JPY":"欧元/日元","in_aggregate_over_the_lifetime_of_your_account_":"您的帐户有效期内的总额。","Gold/USD":"黄金/美元","The_Coca-Cola_Company":"可口可乐","USD/SEK":"美元/瑞典克朗","Next_Day":"第二天","EUR/SAR":"欧元/沙特阿拉伯里亚尔","Inditex_SA":"印地纺集团","BHP_Billiton_Ltd":"必和必拓公司","Total_Profit/Loss":"利润/亏损合计","Save_as_CSV":"以CSV格式保存","L'Oreal":"欧莱雅集团","GBP/PLN":"英镑/波兰兹罗提","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"表示您的账户中可持有的最高现金额度。如果达到该最高额度，将会要求您提取资金。","Quotidians":"Quotidian市场","Loss":"亏损","Mo":"星期一","Jun":"六月","Vodafone":"沃达丰集团","AUD/KRW":"澳元/韩元","Tick":"跳动点","Balance":"余额","Statement":"账单","ends_between":"区间之内结束","letters":"信件","under":"低于","asian_down":"亚洲下跌","Silver/USD":"白银/美元","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"当前我们不能够串流实时价格。要获得价格的实时串流请尝试刷新页面，如果经过反复尝试还是存在此问题，请换一个浏览器","Oracle":"甲骨文公司","Low_barrier":"低障碍","Forex":"外汇","SoftBank_Co_":"软银公司","Minor_Pairs":"次要货币对","Spreads":"价差","Energy":"能源","Virtual_Account":"虚拟账户","From":"来自","does_not_touch":"未触及","hour":"小时","USD/NOK":"美元/挪威克朗","Credit_Agricole":"法国农业信贷银行","PowerShares_QQQ":"PowerShares纳斯达克100指数ETF","View":"查看","Wells_Fargo_&_Company":"富国银行","EUR/NOK":"欧元/挪威克朗","French_Stocks":"法国股票","Please_input_a_valid_date":"请输入有效日期","years":"年","Sunday":"周日","USD/PLN":"美元/波兰兹罗提","GBP/CZK":"英镑/捷克克朗","Trading_Limits":"交易限制","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"因此，您当前可即时提取的最大金额为（前提是您的帐户有足够资金）欧元","Vanilla_Options":"单纯期权","Please_wait_<br_/>Your_request_is_being_processed_":"请稍候。<br />您的请求正在处理中。","Irish_Index":"爱尔兰指数","AUD/NZD":"澳元/新西兰元","Belgian_Index":"比利时指数","minute":"分钟","Palladium/USD":"钯金/美元","Random_Venus":"随机金星","ENI_SpA":"意大利埃尼集团","January":"一月","BBVA_(Banco_Bilbao)":"西班牙对外银行","Maximum_account_cash_balance":"最大账户现金余额","August":"八月","Hyundai_Motor_Co_":"现代汽车公司","Renault":"雷诺汽车","EUR/CNY":"欧元/人民币","Groupe_Bruxelles_Lambert":"蓝博特布鲁塞尔集团","Bombay_Index":"孟买指数","Maximum_number_of_open_positions":"最大未平仓头寸数目","GBP/JPY":"英镑/日元","US_Tech_Composite_Index":"美国技术综合指数","Sa":"星期六","Start_Time":"开始时间","Anglo_American_plc":"英美资源集团","seconds":"秒","Assicurazioni_Generali_SpA":"忠利保险有限公司","apostrophe":"撇号","Gold/GBP":"黄金/英镑","Shinhan_Financial":"新韩金融","AUD/SEK":"澳元/瑞典克朗","Oil/USD":"原油/美元","GBP/ZAR":"英镑/南非兰特","Ends_In/Out":"“范围之内/之外”收盘","Up/Down":"涨/跌","XPD/AUD":"钯价盎司/澳元","Wal-Mart_Stores_Inc_":"沃尔玛百货有限公司","Telefonica_SA":"西班牙电信","Indices":"指数","Mrs":"夫人","EUR/NZD":"欧元/新西兰元","Maximum_aggregate_payouts_on_open_positions":"未平仓头寸的最大赔付总额","Profit_Table":"利润表","Purchase":"买入","Credit/Debit":"借方/贷方","End_Time":"结束时间","There_was_a_problem_accessing_the_server_":"服务器访问出了问题。","Invalid_email_address":"无效的电子邮件地址","year":"年","German_Index":"德国指数","Google_Inc_":"谷歌公司。","EUR/CHF":"欧元/瑞士法郎","November":"十一月","Random_Sun":"随机日市","Random_50_Index":"随机 50 指数","ExxonMobil":"埃克森美孚公司","South_African_Index":"南非指数","Contract":"合约","Investment_Account":"投资账户","GBP/AED":"英镑/阿联酋迪拉姆","USD/SGD":"美元/新加坡元","USD/KRW":"美元/韩元","Miss":"遗漏","Please_enter_a_date_that_is_at_least_6_months_from_now_":"请输入至少6个月后的日期。","Zoom":"缩放","EUR/ZAR":"欧元/南非兰特","Ms":"女士","May":"五月","Profit":"利润","Westpac_Banking_Co_":"西太平洋银行公司","Rise/Fall":"“上涨/下跌”合约","Withdrawal_Limits":"取款限额","Print_chart":"打印图表","Please_try_again_":"请重试。","XPT/AUD":"铂价盎司/澳元","Total_Cost":"成本总计","Your_transaction_reference_is":"您的交易参考号是","Diageo_plc":"英国帝亚吉欧公司","Touch/No_Touch":"触及/未触及","Apple_Inc_":"苹果公司。","Glencore_Xstrat":"嘉能可超达","National_Australia_Bank_Ltd":"澳大利亚国民银行有限公司","Philip_Morris_International":"菲利普·莫里斯公司","Hang_Seng_China":"恒生中国指数","Save_as_SVG":"以SVG格式保存","Honda_Motor_Co__Ltd":"本田汽车有限公司","Profit/Loss":"利润/亏损","Intel":"英特尔公司","Maximum_daily_turnover":"最大日成交量","Commodities":"大宗商品","Seadrill":"挪威石油服务公司","Please_check_your_email_for_the_next_step_":"进入下一步骤前请检查您的电邮地址。","Lloyds_Banking_Group_plc":"劳埃德银行集团","Commbank_(Australia)":"联邦银行（澳大利亚）","Fr":"星期五","Royal_Dutch_Shell_plc":"荷兰皇家壳牌公司","Cie_de_Saint-Gobain":"圣戈班公司","Air_Liquide":"液化空气集团","goes_outside":"处于区间之外","Item":"项目","Month":"月份","High_Barrier":"高障碍","SANOFI":"赛诺菲","GBP/SAR":"英镑/沙特阿拉伯里亚尔","Random_Mars":"随机火星","Middle_East":"中东","space":"空间","Portuguese_Smart_Index":"葡萄牙智能指数","EUR/GBP":"欧元/英镑","Prof":"教授","Saturday":"周六","Random_Yang":"随机阳市","Reckitt_Benckiser_Group_plc":"利洁时集团公司","USD/HKD":"美元/港币","Low_barrier_offset":"低障碍位移","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"表示您证券组合中未平仓合约的最大总赔付额。如果达到该最大值，那么您在购买更多合约之前需要先对现有头寸进行平仓。","EUR/CZK":"欧元/捷克克朗","USD/INR":"美元/印度卢比","Description":"说明","Sell":"卖出","Abu_Dhabi_Index":"阿布达比指数","AUD/CAD":"澳元/加元","GBP/USD":"英镑/美元"};
-texts_json['VI'] = {"Euro_50_Index":"Chỉ số 50 châu Âu","Please_select":"Vui lòng chọn","This_contract_won":"Hợp đồng này đã thắng","October":"Tháng Mười","Oil/EUR":"Dầu/Eur","Spot":"Giao ngay","US_Index":"Chỉ số Hoa Kỳ","ASML_Holding":"Tập đoàn ASML Holding","Payout":"Tiền thưởng","EUR/CAD":"Cặp đồng tiền EUR/CAD","Unilever_plc":"Tập đoàn Unilever","Procter_&_Gamble_Co_":"Tập đoàn Procter & Gamble Co.","period":"giai đoạn","Standard_Chartered_plc":"Ngân hàng Standard Chartered","Stays_In/Goes_Out":"Vẫn ở trong /Đi ra Ngoài","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"Hãy trình bày số hợp đồng xuất sắc tối đa có trong hồ sơ của bạn. Mỗi một dòng trong hồ sơ là một vị thế mở. Khi đã đạt đến mức tối đa, bạn sẽ không thể mở thêm vị thế mới mà không đóng các vị thế đang có trước.","stays_between":"nằm giữa","Random_Bear":"Gấu Ngẫu nhiên","Italian_30_Index":"Chỉ số 30 Italia","NZD/JPY":"Cặp đồng tiền NZD/JPY","Deposit_of":"Tiền gửi của","odd":"Số lẻ","Pfizer_Inc_":"Tập đoàn Pfizer Inc.","Wednesday":"Thứ Tư","Airbus_Group":"Tập đoàn Airbus","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"Hiển thị khối lượng hợp đồng tối đa bạn có thể mua trong ngày giao dịch.","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"Bạn đã cung cấp địa chỉ email được sử dụng bởi một ID đăng nhập khác.","Unilever":"Tập đoàn Unilever","Dubai_Index":"Chỉ số Dubai","AUD/HKD":"Cặp đồng tiền AUD/HKD","month":"tháng","EUR/USD":"Cặp đồng tiền EUR/USD","XPD/GBP":"Cặp tiền tệ XPD/GBP","Hong_Kong_Index":"Chỉ số Hồng Kông","Banco_Santander_SA":"Ngân hàng Banco Santander SA","Sorry,_account_opening_is_unavailable_":"Xin lỗi, việc mở tài khoản hiện đang không phục vụ.","In/Out":"Trong/Ngoài","Tokyo_Electric_Power_Co__Inc":"Liên hợp công ty điện Tokyo","AXA":"Tập đoàn AXA","DNB":"Tập đoàn tài chính DNB","Barrier":"Rào cản","Potential_Payout":"Tiền thưởng Tiềm ẩn","Low_Barrier":"Rào cản thấp","GBP/NZD":"Cặp đồng tiền GBP/NZD","Previous_Day":"Ngày trước","Points":"Điểm","Therefore_you_may_not_withdraw_any_additional_funds_":"Vì vậy bạn không thể rút tiền thêm nữa.","Belgacom":"Tập đoàn viễn thông Belgacom (Vương quốc Bỉ)","ITC_Ltd":"Tập đoàn ITC","USD/JPY":"Cặp đồng tiền USD/JPY","Gold/AUD":"Vàng/AUD","Vinci":"Tập đoàn xây dựng Vinci","Sale_Price":"Giá bán hàng","touches":"chạm","AUD/IDR":"Cặp đồng tiền AUD/IDR","AUD/BRL":"Cặp đồng tiền AUD/BRL","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"Nhập giá giới hạn khác với giá giao ngay. Nếu bạn nhập +0.005, bạn sẽ có thể mua được một hợp đồng với giá giới hạn cao hơn 0.005 so với giá giao ngay  được nhập. GIá giao ngay được nhập sẽ là giá tiếp theo sau khi lệnh của bạn được nhận","GBP/CNY":"Cặp đồng tiền GBP/CNY","Short":"Vị thế Bán","Random_75_Index":"75 chỉ số ngẫu nhiên","Please_confirm_the_trade_on_your_statement_before_proceeding_":"Xin vui lòng xác nhận nội dung giao dịch của bạn trước khi xử lý.","AUD/CHF":"Cặp đồng tiền AUD/CHF","Year":"Năm","Purchase_Time":"Thời Gian mua","No_Live_price_update":"Không cập nhật giá Trực tiếp","Real_Account":"Tài khoản Thực","Day":"Ngày","AT&T":"Tập đoàn viễn thông AT&T","Europe/Africa":"Châu Âu/châu Phi","Trading_and_Withdrawal_Limits":"Giới hạn Giao dich và giới hạn Rút tiền","SABMiller_plc":"Tập đoàn đồ uống SABMiller plc","USD/CNY":"Cặp đồng tiền USD/CNY","High_barrier_offset":"Hàng rào cao","ICICI_Bank_Ltd":"Ngân hàng ICICI","Aug":"Tháng 8","Telenor":"Hãng Telenor","USD/IDR":"Cặp đồng tiền USD/IDR","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"Tài khoản của bạn được xác thực đầy đủ và mức giới hạn rút tiền của bạn đã được nâng lên.","Swedish_Index":"Chỉ số Thụy Điển","GBP_Index":"Chỉ số GBP","KBC_Groep":"Tập đoàn KBC","EUR/KRW":"Cặp đồng tiền EUR/KRW","Samsung_Electronics":"Tập đoàn điện tử Samsung Electronics","Jul":"Tháng Bảy","ends_outside":"kết thúc bên ngoài","minimum_available_duration":"khoảng thời gian có sẵn tối thiểu","Russian_Regular_Index":"Chỉ số Thông thường Nga","AUD/DKK":"Cặp đồng tiền AUD/DKK","Hitachi_Ltd":"Tập đoàn Hitachi","Feb":"Tháng Hai","Gold/EUR":"Vàng/EUR","USD/CAD":"Cặp đồng tiền USD/CAD","Now":"Bây giờ","The_two_passwords_that_you_entered_do_not_match_":"Hai mật khẩu bạn vừa nhập không khớp với nhau.","EUR/MXN":"Cặp đồng tiền EUR/MXN","Stop-loss":"Thua lỗ -Tới hạn","This_field_is_required_":"Lĩnh vực này được yêu cầu.","Return":"Lợi nhuận","Norwegian_Index":"Chỉ số Na Uy","EUR/PLN":"Cặp đồng tiền EUR/PLN","Carrefour":"Tập đoàn Carrefour","Swiss_Index":"Chỉ số Thụy Sĩ","asian_up":"lên kiểu châu Á","USD/SAR":"Cặp đồng tiền USD/SAR","AP_Ordinary":"AP thông thường","GBP/AUD":"Cặp đồng tiền GBP/AUD","Asians":"Người châu Á","Random_100_Index":"100 chỉ số Ngẫu nhiên","September":"Tháng Chín","Save_as_PDF":"Lưu theo định dạng PDF","Contract_Confirmation":"Xác nhận Hợp đồng","numbers":"các số","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"tối thiểu","Merck_&_Co__Inc_":"Tập đoàn Merck & Co. Inc.","XAG/AUD":"Cặp tiền tệ XAG/AUD","day":"ngày","Moet_Hennessy_Louis_Vuitton":"Công ty Moet Hennessy Louis Vuitton","Chevron_Co_":"Tập đoàn năng lượng Chevron Co.","Save_as_JPEG":"Lưu dưới định dạng JPEG","AUD/CZK":"Cặp đồng tiền AUD/CZK","Platinum/USD":"Cặp Platinum/USD","hours":"giờ","Johnson_&_Johnson":"Johnson và Johnson","Euro_100_Index":"Chỉ số 100 Euro","second":"giây","GBP/INR":"Cặp đồng tiền GBP/INR","EUR/AED":"Cặp đồng tiền EUR/AED","spread_down":"chênh lệch giảm","GBP/KRW":"Cặp đồng tiền GBP/KRW","Belgian_Stocks":"Chứng khoán Bỉ","Date":"Ngày","AUD_Index":"Chỉ số AUD","Asia/Oceania":"Châu Á/châu Đại Dương","Italian_Index":"Chỉ số Ý","TOTAL":"Tập đoàn TOTAL","lower":"thấp hơn","AUD/SGD":"Cặp đồng tiền AUD/SGD","Digits":"Chữ số","April":"Tháng 4","UCB":"Tập đoàn UCB","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"Chúng tôi không nhận tại khoản của người dân tại nước này vào thời điểm này.","Daimler_AG":"Tập đoàn ô tô Daimler AG","ICAG_(British_Airways)":"ICAG (Hãng hàng không Anh Quốc)","AUDZAR":"Cặp đồng tiền AUD/ZAR","GBP/SGD":"Cặp đồng tiền GBP/SGD","Australian_Index":"Chỉ số Úc","NZD/USD":"Cặp đồng tiền NZD/USD","Last_Digit_Prediction":"Dự đoán chữ số cuối cùng","Start_time":"Thời gian bắt đầu","Rio_Tinto_plc":"Tập đoàn Rio Tinto plc","GBP/CHF":"Cặp đồng tiền GBP/CHF","USD/DKK":"Cặp đồng tiền USD/DKK","Americas":"Châu Mỹ","Japanese_Index":"Chỉ số Nhật Bản","Statoil":"Hãng Statoil","General_Electric_Company":"Tập đoàn General Electric Company","US_Tech_100_Index":"Chỉ số US Tech 100","AUD/AED":"Cặp đồng tiền AUD/AED","Sep":"Tháng Chín","Safran":"Tập đoàn Safran","matches":"khớp","USD/AED":"Cặp đồng tiền USD/AED","Long":"Vị thế Mua","Jakarta_Index":"Chỉ số Jakarta","USD/BRL":"Cặp đồng tiền USD/BRL","is_required__Current_spread":"là bắt buộc. Giá chênh lệch hiện tại","Purchase_Price":"Giá Mua","XPD/EUR":"Cặp tiền tệ XPD/EUR","AUD/SAR":"Cặp đồng tiền AUD/SAR","XPT/EUR":"Cặp tiền tệ XPT/EUR","Mr":"Ngài","days":"ngày","Yara_International":"Yara Quốc tế","XAG/EUR":"Cặp tiền tệ XAG/EUR","Vivendi":"Tập đoàn viễn thông Vivendi","March":"Tháng Ba","GBP/SEK":"Cặp đồng tiền GBP/SEK","(Bejing/CST_-8_hours)":"(Bắc Kinh/CST -8 tiếng)","Save_as_PNG":"Lưu theo định dạng PNG","New_Zealand_Index":"Chỉ số New Zealand","hyphen":"dấu nối","Electricite_de_France":"Tập đoàn Electricite de France (Pháp)","Smart_FX":"Thị trường ngoại hối Thông minh","AUD/INR":"Cặp đồng tiền AUD/INR","GBP/NOK":"Cặp đồng tiền GBP/NOK","XPT/GBP":"Cặp tiền tệ XPT/GBP","Week_of":"Tuần của","Entry_Spot":"Giá giao ngay Đi vào","Major_Pairs":"Cặp tiền tệ chính","Nov":"Tháng Mười một","Ref_":"Tham khảo.","spread_up":"chênh lệch lên","Orange":"Cam","BNP_Paribas":"Ngân hàng BNP Paribas","GBP/CAD":"Cặp đồng tiền GBP/CAD","Jump_To":"Nhảy đến","Dutch_Index":"Chỉ số Hà Lan","loading___":"đang tải...","POSCO":"Tập đoàn POSCO","EUR/BRL":"Cặp đồng tiền EUR/BRL","French_Index":"Chỉ số chứng khoán Pháp","Essilor_International":"Tập đoàn quốc tế Essilor","Iberdrola_SA":"Tập đoàn Iberdrola SA","Metals":"Kim loại","Heineken":"Nhãn hiệu Heineken","EUR/INR":"Cặp đồng tiền EUR/INR","We":"Chúng tôi","EUR/HKD":"Cặp đồng tiền EUR/HKD","EUR/SGD":"Cặp đồng tiền EUR/SGD","AUD/PLN":"Cặp đồng tiền AUD/PLN","To":"Để","AUD/NOK":"Cặp đồng tiền AUD/NOK","Tuesday":"Thứ Ba","even":"đồng đều","Sorry,_this_feature_is_not_available_":"Xin lỗi, đặc tính này không có.","High_barrier":"Rào cản cao","GBP/HKD":"Cặp đồng tiền GBP/HKD","Gaming_Account":"Tài khoản Cá cược","You_must_accept_the_terms_and_conditions_to_open_an_account_":"Bạn phải chấp nhận các điều khoản và điều kiện để mở tài khoản.","July":"Tháng Bảy","June":"Tháng Sáu","USDZAR":"Cặp đồng tiền USD/ZAR","Mar":"Tháng Ba","Purchase_Date":"Ngày Mua","Infosys_Ltd":"Tập đoàn Infosys Ltd (Ấn Độ)","Allianz_SE":"Nhà cung cấp dịch vụ tài chính Allianz SE","Dec":"Tháng 12","US_S&P_100":"Chỉ số chứng khoán Hoa Kỳ S&P 100","Thursday":"Thứ Năm","EUR/AUD":"Cặp đồng tiền EUR/AUD","Portuguese_Index":"Chỉ số Bồ Đào Nha","Limit":"Giới hạn","higher":"cao hơn","Smart_Indices":"Chỉ số Thông minh","Jan":"Tháng Một","in_aggregate_over_the_last":"trong tổng số vượt quá lần cuối","Monday":"Thứ Hai","Royal_Dutch_Shell":"Tập đoàn Shell Hoàng Gia Hà Lan","EUR/DKK":"Cặp đồng tiền EUR/DKK","differs":"Khác","USD/CZK":"Cặp đồng tiền USD/CZK","Randoms":"Ngẫu nhiên","GDF_Suez":"Tập đoàn GDF Suez","Societe_Generale":"Hãng Societe Generale","Oil/AUD":"Dầu/AUD","USD_Index":"Chỉ số đô la Mỹ","GBP/BRL":"Cặp đồng tiền GBP/BRL","ANZ_Banking_Group_Ltd":"Tập đoàn tài chính ANZ","USD/MXN":"Cặp đồng tiền USD/MXN","HDFC_Bank_Ltd":"Ngân hàng HDFC","GBP/DKK":"Cặp đồng tiền GBP/DKK","password":"mật khẩu","Stop-type":"Loại - Tới hạn","AUD/JPY":"Tỷ giá giữa đồng Đô la Úc và đồng Yên Nhật","Action":"Hành động","GBP/IDR":"Cặp đồng tiền GBP/IDR","Random_Moon":"Trăng Ngẫu nhiên","Random_Bull":"Bò Random","comma":"dấu phẩy","minutes":"phút","USD/CHF":"Cặp đồng tiền USD/CHF","AUD/MXN":"Cặp đồng tiền AUD/MXN","Oil/GBP":"Dầu/GBP","Indian_50_Index":"Chỉ số Indian 50","Toyota_Motor":"Tập đoàn Toyota Motor","Wall_Street_Index":"Chỉ số phố Wall","EUR/HUF":"Cặp đồng tiền EUR/HUF","ticks":"giây","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"Khi bạn nhấp vào \"OK\" bạn sẽ bị loại bỏ khỏi giao dịch trên trang web tới ngày được chọn.","IBM":"Tập đoàn IBM","Apr":"Tháng 4","Danone":"Công ty sữa Danone","months":"tháng","Potential_Profit":"Lợi nhuận tiềm ẩn","over":"Vượt quá","Previous":"Trước","Reliance_Industries_Ltd":"Công ty Reliance Industries","Random":"Ngẫu nhiên","Kering":"Tập đoàn Kering","EUR/IDR":"Cặp đồng tiền EUR/IDR","Sale_Date":"Ngày Bán hàng","Contract_period":"Thời hạn hợp đồng","Nocturnes":"Dạ khúc","Euro_150_Index":"Chỉ số 150 Euro","Exercise_period":"Thời hạn thực tập","February":"Tháng Hai","Failed_to_update_trade_description_":"Không thể cập nhật mô tả giao dịch.","AB_Inbev":"Tập đoàn AB Inbev","Your_current_balance_is":"Số dư hiện tại của bạn là","Barclays_plc":"Ngân hàng Barclays plc","Stocks":"Cổ phiếu","Singapore_Index":"Chỉ số Singapore","Duration":"Khoảng thời gian","This_contract_lost":"Hợp đồng này đã bị lỗ","Buy":"Mua","AUD/CNY":"Cặp đồng tiền AUD/CNY","Next":"Tiếp theo","Friday":"Thứ Sáu","Random_Yin":"Yin ngẫu nhiên","AUD/USD":"Cặp đồng tiền AUD/USD","EUR/SEK":"Cặp đồng tiền EUR/SEK","Your_password_cannot_be_the_same_as_your_email":"Mật khẩu của bạn không thể giống như mật khẩu email","EUR_Index":"Chỉ số EUR","Egypt_Index":"Chỉ số Ai Cập","Schneider_Electric":"Tập đoàn năng lượng Schneider Electric","Net_profit":"Lợi nhuận thuần","BG_Group_plc":"Tập đoàn BG","points":"điểm","There_was_a_problem_accessing_the_server_during_purchase_":"Có lỗi trung cập vào máy chủ khi mua.","Random_25_Index":"25 chỉ số ngẫu nhiên","JP_Morgan_Chase_&_Co_":"Tập đoàn tài chính JP Morgan Chase & Co.","December":"Tháng 12","SK_Hynix_Inc_":"Tập đoàn SK Hynix.","Pernod_Ricard":"Tập đoàn Pernod Ricard","Dutch_Stocks":"Chứng khoán Hà Lan","XAG/GBP":"Cặp tiền tệ XAG/GBP","Oct":"Tháng Mười","Higher/Lower":"Cao hơn/Thấp hơn","Stake":"Đơn vị vốn, cổ phiếu","Dr":"Ngài","GlaxoSmithKline_plc":"Tập đoàn dược phẩm GlaxoSmithKline","Barrier_offset":"Bù đắp Rào cản","GBP/MXN":"Cặp đồng tiền GBP/MXN","Amount_per_point":"Số tiền trên mỗi điểm","EUR/JPY":"Cặp đồng tiền EUR/JPY","in_aggregate_over_the_lifetime_of_your_account_":"trong tổng số vượt quá vòng đời của tài khoản.","Gold/USD":"Vàng/ đô la Mỹ","The_Coca-Cola_Company":"Tập đoàn Coca-Cola","USD/SEK":"Cặp đồng tiền USD/SEK","Next_Day":"Ngày tiếp theo","EUR/SAR":"Cặp đồng tiền EUR/SAR","Inditex_SA":"SA Inditex","BHP_Billiton_Ltd":"Công ty BHP Billiton","Total_Profit/Loss":"Tổng Lợi nhuận/Thua lỗ","Save_as_CSV":"Lưu dưới dạng CSV","L'Oreal":"Tập đoàn L'Oreal","GBP/PLN":"Cặp đồng tiền GBP/PLN","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"Hãy trình bày số tiền tối đa mà bạn có thể giữ trong tài khoản. Nếu đã đạt mức tối đa, bạn sẽ được yêu cầu rút tiền.","Quotidians":"Hàng ngày","Loss":"Thất thoát","Jun":"Tháng Sáu","Vodafone":"Tập đoàn viễn thông Vodafone","AUD/KRW":"Cặp đồng tiền AUD/KRW","Tick":"Giây","Balance":"Số dư tài khoản","Statement":"Tuyên bố","ends_between":"kết thúc giữa","letters":"các ký tự","under":"ở dưới","asian_down":"xuống kiểu châu Á","Silver/USD":"Cặp Bạc/ đô la Mỹ","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"Chúng tôi không thể dò giá trực tiếp tại thời điểm này. Để thấy được dòng giá hãy thử làm mới lại trang web, nếu bạn gặp vấn đề này sau khi làm thì hãy thử một trình duyệt khác","Low_barrier":"Rào cản thấp","Forex":"Thị trường ngoại hối","SoftBank_Co_":"Tập đoàn SoftBank Co.","Minor_Pairs":"Cặp tiền tệ thứ yếu","Spreads":"Giá chênh lệch","Energy":"Năng lượng","Virtual_Account":"Tài khoản Ảo","From":"Từ","does_not_touch":"không chạm","hour":"giờ","USD/NOK":"Cặp đồng tiền USD/NOK","Credit_Agricole":"Ngân hàng Credit Agricole","View":"Xem","Wells_Fargo_&_Company":"Tập đoàn Wells Fargo & Company","EUR/NOK":"Cặp đồng tiền EUR/NOK","French_Stocks":"Chứng khoán Pháp","Please_input_a_valid_date":"Vui lòng nhập ngày hợp lệ","years":"năm","Sunday":"Chủ nhật","USD/PLN":"Cặp đồng tiền USD/PLN","GBP/CZK":"Cặp đồng tiền GBP/CZK","Trading_Limits":"Giới hạn Giao dịch","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"Vì vậy khoản tiền rút tối đa hiện giờ của bạn (nói tới tài khoản đang có tiền được rút) là EUR","Vanilla_Options":"Quyền chọn vanilla","Please_wait_<br_/>Your_request_is_being_processed_":"Vui lòng chờ. <br />Yêu cầu của bạn đang được xử lý.","Irish_Index":"Chỉ số Ailen","AUD/NZD":"Cặp đồng tiền AUD/NZD","Belgian_Index":"Chỉ số Bỉ","minute":"phút","Palladium/USD":"Cặp Palladium/USD","Random_Venus":"Venus Ngẫu nhiên","January":"Tháng Một","BBVA_(Banco_Bilbao)":"Tập đoàn BBVA (Banco Bilbao)","Maximum_account_cash_balance":"Số dư tài khoản tối đa","August":"Tháng 8","Hyundai_Motor_Co_":"Tập đoàn Hyundai Motor.","Renault":"Tập đoàn ô tô Renault","EUR/CNY":"Cặp đồng tiền EUR/CNY","Groupe_Bruxelles_Lambert":"Tập đoàn Bruxelles Lambert","Bombay_Index":"Chỉ số Bombay","Maximum_number_of_open_positions":"Số tối đa của vị thế mở","GBP/JPY":"Cặp đồng tiền GBP/JPY","US_Tech_Composite_Index":"Chỉ số US Tech Composite","Start_Time":"Thời gian bắt đầu","Anglo_American_plc":"Công ty mỏ Anglo American plc","seconds":"giây","apostrophe":"dấu móc lửng (')","Gold/GBP":"Vàng/GBP","Shinhan_Financial":"Tập đoàn tài chính Thượng Hải","AUD/SEK":"Cặp đồng tiền AUD/SEK","Oil/USD":"Dầu/ đô la Mỹ","GBP/ZAR":"Cặp đồng tiền GBP/ZAR","Ends_In/Out":"Kết thúc Trong/Ngoài","Up/Down":"Lên/Xuống","XPD/AUD":"Cặp tiền tệ XPD/AUD","Wal-Mart_Stores_Inc_":"Tập đoàn bán lẻ đa quốc gia Wal-Mart Stores Inc.","Telefonica_SA":"Tập đoàn Telefonica SA","Indices":"Chỉ số","Mrs":"Bà","EUR/NZD":"Cặp đồng tiền EUR/NZD","Maximum_aggregate_payouts_on_open_positions":"Tập hợp tiền thưởng tối đa trên vị thế mở","Profit_Table":"Bảng lợi nhuận","Purchase":"Mua","Credit/Debit":"Tín dụng/Ghi nợ","End_Time":"Thời gian Kết thúc","There_was_a_problem_accessing_the_server_":"Có lỗi khi truy cập máy chủ.","Invalid_email_address":"Địa chỉ email không hợp lệ","year":"năm","German_Index":"Chỉ số chứng khoán Đức","EUR/CHF":"Cặp đồng tiền EUR/CHF","November":"Tháng Mười một","Random_Sun":"Mặt trời ngẫu nhiên","Random_50_Index":"50 chỉ số ngẫu nhiên","ExxonMobil":"Tập đoàn ExxonMobil","South_African_Index":"Chỉ số chứng khoán Nam Phi","Contract":"Hợp đồng","Investment_Account":"Tài khoản Đầu tư","GBP/AED":"Cặp đồng tiền GBP/AED","USD/SGD":"Cặp đồng tiền USD/SGD","USD/KRW":"Cặp đồng tiền USD/KRW","Miss":"Cô","Please_enter_a_date_that_is_at_least_6_months_from_now_":"Vui lòng nhập ngày ít nhất là 6 tháng kể từ bây giờ.","Zoom":"Phóng","EUR/ZAR":"Cặp đồng tiên EUR/ZAR","Ms":"Cô","May":"Tháng Năm","Profit":"Lợi nhuận","Westpac_Banking_Co_":"Tập đoàn tài chính Westpac Banking Co.","Rise/Fall":"Tăng/Giảm","Withdrawal_Limits":"Giới hạn Rút tiền","Print_chart":"In biểu đồ","Please_try_again_":"Vui lòng thử lại.","XPT/AUD":"Cặp tiền tệ XPT/AUD","Total_Cost":"Tổng Chi phí","Your_transaction_reference_is":"Tham chiếu giao dịch của bạn là","Diageo_plc":"Tập đoàn Diageo","Touch/No_Touch":"Chạm","Glencore_Xstrat":"Tập đoàn Glencore Xstrat","National_Australia_Bank_Ltd":"Ngân hàng quốc gia Australia","Philip_Morris_International":"Tập đoàn quốc tế Philip Morris International","Hang_Seng_China":"Hằng Sinh, Trung Quốc","Save_as_SVG":"Lưu theo định dạng SVG","Honda_Motor_Co__Ltd":"Tập đoàn Honda Motor Co. Ltd","Profit/Loss":"Lợi nhuận/Thua lỗ","Maximum_daily_turnover":"Thu nhập hàng ngày tối đa","Commodities":"Hàng hóa","Seadrill":"Tập đoàn khai thác Seadrill","Please_check_your_email_for_the_next_step_":"Vui lòng kiểm tra email của bạn cho bước tiếp theo.","Lloyds_Banking_Group_plc":"Tập đoàn tài chính Lloyds Banking Group plc","Commbank_(Australia)":"Commbank (Úc)","Royal_Dutch_Shell_plc":"Tập đoàn Shell Hoàng Gia Hà Lan","Cie_de_Saint-Gobain":"Tập đoàn Cie de Saint-Gobain","Air_Liquide":"Công ty khí gas công nghiệp Air Liquide","goes_outside":"đi ra ngoài","Item":"Hạng mục","Month":"Tháng","High_Barrier":"Rào cản Cao","SANOFI":"Tập đoàn chăm sóc sức khỏe SANOFI","GBP/SAR":"Cặp đồng tiền GBP/SAR","Random_Mars":"Mars ngẫu nhiên","Middle_East":"Trung Đông","space":"khoảng cách","Portuguese_Smart_Index":"Chỉ số thông minh Bồ Đào Nha","EUR/GBP":"Cặp đồng tiền EUR/GBP","Prof":"Lợi nhuận","Saturday":"Thứ Bảy","Random_Yang":"Yang Ngẫu nhiên","Reckitt_Benckiser_Group_plc":"Tập đoàn Reckitt Benckiser Group plc","USD/HKD":"Cặp đồng tiền USD/HKD","Low_barrier_offset":"Tấm chắn hàng rào thấp","ING":"Tập đoàn tài chính ING","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"Thể hiện số tiền lãi tối đa trên hợp đồng nổi bật ở trong hồ sơ của bạn. Nếu lượng tối đa đã đạt được, bạn có thể sẽ không cần mua thêm hợp đồng không phải đóng trước vị thế đang tồn tại.","EUR/CZK":"Cặp đồng tiền EUR/CZK","USD/INR":"Cặp đồng tiền USD/INR","Description":"Mô tả","Sell":"Bán","Abu_Dhabi_Index":"Chỉ số Abu Dhabi","AUD/CAD":"Cặp đồng tiền AUD/CAD","GBP/USD":"Cặp đồng tiền GBP/USD"};
-texts_json['ZH_TW'] = {"Euro_50_Index":"歐洲 50 指數","Please_select":"請選擇","This_contract_won":"此合約獲利","October":"十月","Oil/EUR":"原油/歐元","Spot":"現價","US_Index":"美國指數","ASML_Holding":"阿斯麥公司","Payout":"賠付","EUR/CAD":"歐元/加元","Unilever_plc":"聯合利華公司","Procter_&_Gamble_Co_":"寶鹼公司","period":"週期","Standard_Chartered_plc":"渣打銀行","Stays_In/Goes_Out":"「保持在範圍之內/超出範圍之外」","Fiat":"飛雅特汽車公司","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"表示您的投資組合中未平倉合約的最大數量。您投資組合中的每一行都算作是一個未平倉頭寸。一旦達到該最大值，在開設新頭寸之前您需要先了結一個現有頭寸。","stays_between":"位於區間之內","Random_Bear":"隨機熊市","Italian_30_Index":"意大利 30 指數","NZD/JPY":"紐元/日圓","Deposit_of":"存款","odd":"奇數","Pfizer_Inc_":"輝瑞大藥廠","Wednesday":"星期三","Airbus_Group":"空中巴士集團","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"表示任一指定交易日您可以買入的最大合約數量。","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"您所提供的電郵地址已被另一登入ID 使用","Unilever":"聯合利華公司","Dubai_Index":"迪拜指數","AUD/HKD":"澳元/港幣","month":"月份","EUR/USD":"歐元/美元","XPD/GBP":"鈀金價盎司/英鎊","Hong_Kong_Index":"香港指數","Banco_Santander_SA":"桑坦德銀行","Sorry,_account_opening_is_unavailable_":"對不起，不可開立帳號。","In/Out":"「範圍之內/之外」","Tokyo_Electric_Power_Co__Inc":"東京電力公司","AXA":"法國安盛集團","Barrier":"障礙","Potential_Payout":"可能的賠付額","Low_Barrier":"低障礙","GBP/NZD":"英鎊/紐西蘭元","Previous_Day":"前一天","Points":"點","Tu":"星期二","Therefore_you_may_not_withdraw_any_additional_funds_":"所以您可能不能提取任何額外資金。","Belgacom":"比利時電信","ITC_Ltd":"國際貿易中心有限公司","USD/JPY":"美元/日圓","Gold/AUD":"黃金/澳元","Vinci":"法國萬喜集團","Sale_Price":"賣出價格","touches":"觸及","AUD/IDR":"澳元/印度尼西亞盧比","AUD/BRL":"英鎊/人民幣","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"請按與現貨價格差額的形式輸入障礙水平。如果您輸入+0.005 ，那麼您將買入障礙水平比入市現價高0.005 的合約。入市現價為收到您訂單之後的下一個價格","GBP/CNY":"澳元/巴西雷亞爾","Short":"短倉","Random_75_Index":"隨機 75 指數","Please_confirm_the_trade_on_your_statement_before_proceeding_":"繼續執行之前，請在您的聲明上確認此項交易。","AUD/CHF":"澳元/瑞士法郎","Year":"年","Purchase_Time":"買入時間","No_Live_price_update":"無即時價格更新","Real_Account":"真實帳戶","Day":"天","AT&T":"AT&T公司","Europe/Africa":"歐洲/非洲","Trading_and_Withdrawal_Limits":"交易和取款限額","SABMiller_plc":"米勒啤酒集團","USD/CNY":"美元/人民幣","High_barrier_offset":"高障礙位移","ICICI_Bank_Ltd":"印度工業信貸投資銀行","Aug":"八月","Telenor":"挪威電信公司","USD/IDR":"美元/印度尼西亞盧比","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"您的帳戶已經得到完全驗證，且您的取款限額已經取消。","Swedish_Index":"瑞典指數","GBP_Index":"英鎊指數","KBC_Groep":"KBC集團","EUR/KRW":"歐元/韓元","Samsung_Electronics":"三星電子","Jul":"七月","ends_outside":"區間之外結束","minimum_available_duration":"最短可用期限","Russian_Regular_Index":"俄羅斯普通指數","AUD/DKK":"澳元/丹麥克朗","Hitachi_Ltd":"日立公司","Feb":"二月","Gold/EUR":"黃金/歐元","USD/CAD":"美元/加元","Now":"現在","The_two_passwords_that_you_entered_do_not_match_":"兩次輸入的密碼不相符。","EUR/MXN":"歐元/墨西哥披索","Stop-loss":"止損","This_field_is_required_":"此為必填欄位。","Return":"回報","Norwegian_Index":"挪威指數","EUR/PLN":"歐元/波蘭茲羅提","Carrefour":"家樂福超市","Swiss_Index":"瑞士指數","asian_up":"亞洲上漲","USD/SAR":"美元/沙特阿拉伯里亞爾","AP_Ordinary":"AP 普通股票指數","GBP/AUD":"英鎊/澳元","Asians":"亞洲期權","Random_100_Index":"隨機 100 指數","September":"九月","Save_as_PDF":"以PDF格式儲存","Contract_Confirmation":"合約確認","numbers":"數字","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"分鐘","Intesa_Sanpaolo":"義大利聯合聖保羅銀行","Merck_&_Co__Inc_":"默克集團","XAG/AUD":"銀價盎司/澳元","day":"天","Moet_Hennessy_Louis_Vuitton":"酩悅·軒尼詩-路易·威登集團","Chevron_Co_":"雪佛龍公司","Save_as_JPEG":"以JPEG格式儲存","AUD/CZK":"澳元/捷克克朗","Platinum/USD":"白金/美元","hours":"小時","Johnson_&_Johnson":"壯生","Euro_100_Index":"歐洲100指數","second":"秒","GBP/INR":"英鎊/印度盧比","EUR/AED":"歐元/阿聯酋迪拉姆","spread_down":"價差下跌","GBP/KRW":"英鎊/韓元","Belgian_Stocks":"比利時股票","Date":"日期","AUD_Index":"澳元指數","Asia/Oceania":"亞洲/大洋洲","Italian_Index":"意大利指數","TOTAL":"道達爾公司","lower":"低於","AUD/SGD":"澳元/新加坡元","Digits":"數字期權","April":"四月","UCB":"比利時聯合化學集團","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"目前不接受來自該國居民的帳戶。","Daimler_AG":"戴姆勒股份公司","ICAG_(British_Airways)":"英國航空公司","AUDZAR":"澳元兌南非蘭特","GBP/SGD":"英鎊/新加坡元","Australian_Index":"澳大利亞指數","NZD/USD":"美元/丹麥克朗","Last_Digit_Prediction":"最後數字的預測","Start_time":"開始時間","Rio_Tinto_plc":"力拓集團","GBP/CHF":"英鎊/瑞士法郎","USD/DKK":"紐西蘭元/美元","Americas":"美洲","Japanese_Index":"日本指數","Statoil":"挪威國家石油公司","General_Electric_Company":"通用電氣公司","US_Tech_100_Index":"美國科技100指數","AUD/AED":"澳元/阿聯酋迪拉姆","Sep":"九月","Safran":"賽峰","matches":"符合","USD/AED":"美元/阿聯酋迪拉姆","Long":"長倉","Jakarta_Index":"雅加達指數","USD/BRL":"美元/巴西雷亞爾","is_required__Current_spread":"為必要。目前價差","Purchase_Price":"買入價格","XPD/EUR":"鈀金價盎司/歐元","AUD/SAR":"澳元/沙特阿拉伯里亞爾","XPT/EUR":"白金價盎司/歐元","Mr":"先生","days":"天","Yara_International":"雅苒國際","XAG/EUR":"銀價盎司/歐元","Vivendi":"法國斐凡迪集團","March":"三月","GBP/SEK":"英鎊/瑞典克朗","(Bejing/CST_-8_hours)":"（北京/CST -8 小時）","Save_as_PNG":"以PNG格式儲存","New_Zealand_Index":"紐西蘭指數","Electricite_de_France":"法國電力公司","Smart_FX":"智慧外匯","AUD/INR":"澳元/印度盧比","GBP/NOK":"英鎊/挪威克朗","XPT/GBP":"白金價盎司/英鎊","Week_of":"週","Entry_Spot":"入市現價","Major_Pairs":"主要貨幣對","Su":"星期日","Nov":"十一月","Ref_":"參考","spread_up":"價差上漲","Orange":"法國電信集團","BNP_Paribas":"法國巴黎銀行","GBP/CAD":"英鎊/加元","Jump_To":"跳至","QUALCOMM":"美國高通公司","Dutch_Index":"荷蘭指數","loading___":"載入中……","EUR/BRL":"歐元/巴西雷亞爾","French_Index":"法國指數","Essilor_International":"依視路","Iberdrola_SA":"西班牙電力公司","Metals":"金屬","Heineken":"海尼根","EUR/INR":"歐元/印度盧比","We":"星期三","EUR/HKD":"歐元/港幣","EUR/SGD":"歐元/新加坡元","AUD/PLN":"澳元/波蘭兹羅提","To":"到","AUD/NOK":"澳元/挪威克朗","Tuesday":"星期二","even":"偶數","Sorry,_this_feature_is_not_available_":"對不起，此功能不可用。","High_barrier":"高障礙","GBP/HKD":"英鎊/港幣","Gaming_Account":"博彩帳戶","You_must_accept_the_terms_and_conditions_to_open_an_account_":"您必須接受條款和條件才能開戶。","July":"七月","June":"六月","ENEL":"義大利國家電力公司","USDZAR":"美元兌南非蘭特","Mar":"三月","Purchase_Date":"買入日期","Infosys_Ltd":"印孚瑟斯有限公司","Allianz_SE":"安聯 SE","Dec":"十二月","US_S&P_100":"美國標普 100 指數","Thursday":"星期四","EUR/AUD":"歐元/澳元","Portuguese_Index":"葡萄牙指數","Limit":"限額","higher":"高於","Smart_Indices":"智慧指數","Jan":"一月","in_aggregate_over_the_last":"上期內的總額","Monday":"星期一","Royal_Dutch_Shell":"荷蘭皇家殼牌公司","EUR/DKK":"歐元/丹麥克朗","differs":"相差","USD/CZK":"美元/捷克克朗","Randoms":"隨機指數","GDF_Suez":"法國天然氣蘇伊士集團","Societe_Generale":"法國興業銀行","Oil/AUD":"原油/澳元","USD_Index":"美元指數","GBP/BRL":"英鎊/巴西雷亞爾","ANZ_Banking_Group_Ltd":"澳新銀行集團有限公司","USD/MXN":"美元/墨西哥披索","HDFC_Bank_Ltd":"印度HDFC銀行","GBP/DKK":"英鎊/丹麥克朗","password":"密碼","Stop-type":"停止類型","AUD/JPY":"澳元/日圓","Action":"動作","GBP/IDR":"英鎊/印度尼西亞盧比","Random_Moon":"隨機月市","Random_Bull":"隨機牛市","comma":"逗號","minutes":"分鐘","USD/CHF":"美元/瑞士法郎","AUD/MXN":"澳元/墨西哥比索","Oil/GBP":"原油/英鎊","Indian_50_Index":"印度50 指數","Toyota_Motor":"豐田汽車","Wall_Street_Index":"華爾街指數","EUR/HUF":"歐元/匈牙利福林","ticks":"跳動點","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"當您點選「Ok」後，您將被禁止在此網站交易，直到選定期限結束為止。","Apr":"四月","Danone":"達能集團","months":"月份","Potential_Profit":"潛在利潤","over":"高於","Previous":"之前","Microsoft":"微軟公司","Reliance_Industries_Ltd":"信實工業有限公司","Random":"隨機","Kering":"開雲集團","EUR/IDR":"歐元/印度尼西亞盧比","Sale_Date":"賣出日期","Contract_period":"合約期間","Nocturnes":"Nocturne指數","Euro_150_Index":"歐洲150指數","Exercise_period":"練習期間","February":"二月","Failed_to_update_trade_description_":"無法更新交易描述。","AB_Inbev":"安海斯-布希英博","Your_current_balance_is":"您目前餘額有","Barclays_plc":"巴克萊銀行","Stocks":"股票","Singapore_Index":"新加坡指數","Duration":"期限","This_contract_lost":"此合約虧損","Buy":"買入","AUD/CNY":"澳元/人民幣","Next":"下一頁","Friday":"星期五","Random_Yin":"隨機陰市","AUD/USD":"澳元/美元","EUR/SEK":"歐元/瑞典克朗","Your_password_cannot_be_the_same_as_your_email":"您的密碼不可與電子郵件相同","EUR_Index":"歐元指數","Egypt_Index":"埃及指數","Schneider_Electric":"施耐德電氣公司","Net_profit":"淨收益","BG_Group_plc":"英國石油天然氣集團公司","points":"點","There_was_a_problem_accessing_the_server_during_purchase_":"買入時伺服器存取出了問題。","Random_25_Index":"隨機 25 指數","JP_Morgan_Chase_&_Co_":"摩根大通公司","December":"十二月","SK_Hynix_Inc_":"SK海力士半導體公司","Pernod_Ricard":"法國保樂力加集團","Dutch_Stocks":"荷蘭股票","XAG/GBP":"銀價盎司/英鎊","Th":"星期四","Oct":"十月","Higher/Lower":"「高於/低於」","Stake":"投注資金","Dr":"博士","GlaxoSmithKline_plc":"荷商葛蘭素史克藥廠","Barrier_offset":"障礙位移","GBP/MXN":"英鎊/墨西哥披索","Amount_per_point":"每點之金額","EUR/JPY":"歐元/日圓","in_aggregate_over_the_lifetime_of_your_account_":"自您開戶以來的累計總額。","Gold/USD":"黃金/美元","The_Coca-Cola_Company":"可口可樂","USD/SEK":"美元/瑞典克朗","Next_Day":"第二天","EUR/SAR":"歐元/沙特阿拉伯里亞爾","Inditex_SA":"西班牙Inditex SA集團","BHP_Billiton_Ltd":"必和必拓公司","Total_Profit/Loss":"利潤/虧損合計","Save_as_CSV":"以CSV格式儲存","L'Oreal":"歐萊雅集團","GBP/PLN":"英鎊/波蘭茲羅提","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"表示您的帳戶中可持有的最高現金額。如果達到該最高額，將會要求您提取資金。","Quotidians":"Quotidian市場","Loss":"虧損","Mo":"星期一","Jun":"六月","Vodafone":"沃達豐集團","AUD/KRW":"澳元/韓元","Tick":"跳動點","Balance":"餘額","Statement":"帳單","ends_between":"區間之內結束","letters":"信件","under":"低於","asian_down":"亞洲下跌","Silver/USD":"白銀/美元","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"目前我們不能夠串流即時價格。要獲得價格的即時串流請試重新整理頁面，如果經過反复嘗試還是存在此問題，請換一個瀏覽器","Oracle":"甲骨文公司","Low_barrier":"低障礙","Forex":"外匯","SoftBank_Co_":"軟銀公司","Minor_Pairs":"次要貨幣對","Spreads":"價差","Energy":"能源","Virtual_Account":"虛擬帳戶","From":"來自","does_not_touch":"未觸及","hour":"小時","USD/NOK":"美元/挪威克朗","Credit_Agricole":"法國農業信貸銀行","View":"檢視","Wells_Fargo_&_Company":"富國銀行","EUR/NOK":"歐元/挪威克朗","French_Stocks":"法國股票","years":"年","Sunday":"星期日","USD/PLN":"美元/波蘭茲羅提","GBP/CZK":"英鎊/捷克克朗","Trading_Limits":"交易限制","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"因此您目前的即時最高取款額（要求您的帳戶具有充足的資金）為EUR","Vanilla_Options":"單純期權","Please_wait_<br_/>Your_request_is_being_processed_":"請稍候。 <br />您的要求正在處理中。","Irish_Index":"愛爾蘭指數","AUD/NZD":"澳元/紐西蘭元","Belgian_Index":"比利時指數","minute":"分鐘","Palladium/USD":"鈀金/美元","Random_Venus":"隨機金星","ENI_SpA":"義大利埃尼集團","January":"一月","BBVA_(Banco_Bilbao)":"西班牙對外銀行","Maximum_account_cash_balance":"最大帳戶現金餘額","August":"八月","Hyundai_Motor_Co_":"現代汽車公司","Renault":"雷諾汽車","EUR/CNY":"歐元/人民幣","Groupe_Bruxelles_Lambert":"藍博特布魯塞爾集團","Bombay_Index":"孟買指數","Maximum_number_of_open_positions":"最大未平倉頭寸數目","GBP/JPY":"英鎊/日圓","US_Tech_Composite_Index":"美國科技綜合指數","Sa":"星期六","Start_Time":"開始時間","Anglo_American_plc":"英美資源集團","seconds":"秒","Assicurazioni_Generali_SpA":"義大利忠利保險公司","Gold/GBP":"黃金/英鎊","Shinhan_Financial":"新韓金融","AUD/SEK":"澳元/瑞典克朗","Oil/USD":"原油/美元","GBP/ZAR":"英鎊/南非蘭特","Ends_In/Out":"收盤價在「範圍之內/之外」","Up/Down":"漲/跌","XPD/AUD":"鈀金價盎司/澳元","Wal-Mart_Stores_Inc_":"沃爾瑪百貨有限公司","Telefonica_SA":"西班牙電信","Indices":"指數","Mrs":"夫人","EUR/NZD":"歐元/紐西蘭元","Maximum_aggregate_payouts_on_open_positions":"未平倉頭寸的最大賠付總額","Profit_Table":"利潤表","Purchase":"買入","Credit/Debit":"借記/貸記","End_Time":"結束時間","There_was_a_problem_accessing_the_server_":"伺服器存取出了問題。","Invalid_email_address":"無效的電子郵件地址","year":"年","German_Index":"德國指數","Google_Inc_":"谷歌","EUR/CHF":"歐元/瑞士法郎","November":"十一月","Random_Sun":"隨機日市","Random_50_Index":"隨機 50 指數","ExxonMobil":"埃克森美孚公司","South_African_Index":"南非指數","Contract":"合約","Investment_Account":"投資帳戶","GBP/AED":"英鎊/阿聯酋迪拉姆","USD/SGD":"美元/新加坡元","USD/KRW":"美元/韓元","Miss":"遺漏","Please_enter_a_date_that_is_at_least_6_months_from_now_":"請輸入至少6個月後的日期。","Zoom":"縮放","EUR/ZAR":"歐元/南非蘭特","Ms":"女士","May":"五月","Profit":"利潤","Westpac_Banking_Co_":"西太平洋銀行公司","Rise/Fall":"「上漲/下跌」合約","Withdrawal_Limits":"取款限額","Print_chart":"列印圖表","Please_try_again_":"請重試。","XPT/AUD":"白金價盎司/澳元","Total_Cost":"成本總計","Your_transaction_reference_is":"您的交易參考號是","Diageo_plc":"英國帝亞吉歐公司","Touch/No_Touch":"觸及/未觸及","Apple_Inc_":"蘋果公司","Glencore_Xstrat":"嘉能可超達","National_Australia_Bank_Ltd":"澳大利亞國民銀行有限公司","Philip_Morris_International":"菲利普莫里斯股份有限公司","Hang_Seng_China":"恆生中國指數","Save_as_SVG":"以SVG格式儲存","Honda_Motor_Co__Ltd":"本田汽車有限公司","Profit/Loss":"利潤/虧損","Intel":"英特爾公司","Maximum_daily_turnover":"最大日成交量","Commodities":"商品","Seadrill":"挪威石油服務公司","Lloyds_Banking_Group_plc":"萊斯銀行集團","Commbank_(Australia)":"聯邦銀行（澳大利亞）","Fr":"星期五","Royal_Dutch_Shell_plc":"荷蘭皇家殼牌公司","Cie_de_Saint-Gobain":"聖戈班公司","Air_Liquide":"法國液空集團","goes_outside":"處於區間之外","Item":"項目","Month":"月份","High_Barrier":"高障礙","SANOFI":"賽諾菲","GBP/SAR":"英鎊/沙特阿拉伯里亞爾","Random_Mars":"隨機火星","Middle_East":"中東","space":"空間","Portuguese_Smart_Index":"葡萄牙智慧指數","EUR/GBP":"歐元/英鎊","Prof":"教授","Saturday":"星期六","Random_Yang":"隨機陽市","Reckitt_Benckiser_Group_plc":"利潔時集團公司","USD/HKD":"美元/港幣","Low_barrier_offset":"低障礙位移","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"表示您證券組合中未平倉合約的最大總賠付額。如果達到該最大值，那麼您在購買更多合約之前需要先對現有頭寸進行平倉。","EUR/CZK":"歐元/捷克克朗","USD/INR":"美元/印度盧比","Description":"描述","Sell":"賣出","Abu_Dhabi_Index":"阿布達比指數","AUD/CAD":"澳元/加元","GBP/USD":"英鎊/美元"};
+texts_json['EN'] = {"Your_request_to_withdraw_[_1]_[_2]_from_your_account_[_3]_to_Payment_Agent_[_4]_account_has_been_successfully_processed_":"Your request to withdraw   from your account  to Payment Agent  account has been successfully processed.","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"min"};
+texts_json['ID'] = {"Euro_50_Index":"Indeks Euro 50","This_contract_won":"Kontrak ini untung","October":"Oktober","Oil/EUR":"Minyak/EUR","Spot":"Posisi","US_Index":"Indeks AS","Payout":"Hasil","period":"periode","Stays_In/Goes_Out":"Tetap Di Dalam/Luar","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"Mewakili jumlah kontrak pada portopolio Anda. Setiap baris pada portopolio Anda dihitung sebagai satu posisi. Jika jumlah maksimum tercapai maka Anda perlu menutup salah satu posisi untuk membeli kontrak atau posisi lainnya.","stays_between":"tetap antara","Italian_30_Index":"Indeks Italia 30","Deposit_of":"Deposit dari","Asset":"Aset","Wednesday":"Rabu","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"Mewakili jumlah maksimum pembelian kontrak dalam satu hari trading.","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"Alamat email yang Anda ajukan telah digunakan oleh Login ID lain","Dubai_Index":"Indeks Dubai","month":"bulan","Hong_Kong_Index":"Indeks Hong Kong","In/Out":"Di Dalam/Luar","Opens":"Dibuka","Barrier":"Batasan","Potential_Payout":"Potensi Hasil","Low_Barrier":"Batasan Rendah","Previous_Day":"Hari Sebelumnya","Points":"Poin","Tu":"Kam","Therefore_you_may_not_withdraw_any_additional_funds_":"Maka Anda tidak dapat melakukan penarikan dana selanjutnya.","Sale_Price":"Harga Jual","touches":"menyentuh","day_withdrawal_limit_is_currently_EUR":"batas penarikan perhari adalah EUR","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"Masukan batasan yang merupakan selisih harga spot. Jika Anda memasukan +0.005, maka Anda akan membeli kontrak dengan batasan 0.005 lebih tinggi dari spot masuk. Spot masuk adalah tik setelah kontrak Anda diproses","Short":"Pendek","Random_75_Index":"Indeks Random 75","Please_confirm_the_trade_on_your_statement_before_proceeding_":"Mohon konfirmasikan kontrak pada bagian pernyataan sebelum melanjutkan.","Year":"Tahun","Purchase_Time":"Waktu Beli","No_Live_price_update":"Tidak tersedia harga Live","Please_select_a_payment_agent":"Silahkan pilih agen pembayaran","Real_Account":"Akun Riil","Day":"Hari","Your_request_to_withdraw_[_1]_[_2]_from_your_account_[_3]_to_Payment_Agent_[_4]_account_has_been_successfully_processed_":"Permohonan penarikan Anda   dari account  ke Agen Pembayaran  telah diproses.","Europe/Africa":"Eropa/Afrika","Trading_and_Withdrawal_Limits":"Batasan Penarikan - ","High_barrier_offset":"Batasan offset tinggi","Aug":"Agustus","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"Akun Anda telah terbukti dan batasan penarikan Anda telah dihapuskan.","GBP_Index":"Indeks GBP","KBC_Groep":"KBC Group","country_of_residence":"negara tempat tinggal","ends_outside":"berakhir di luar","Upcoming_Events":"Acara Mendatang","minimum_available_duration":"durasi minimal yang tersedia","Russian_Regular_Index":"Indeks Reguler Rusia","Feb":"Peb","Now":"Sekarang","The_two_passwords_that_you_entered_do_not_match_":"Kedua-dua password yang Anda masukkan tidak cocok.","re-enter_password":"masukkan ulang kata sandi","This_field_is_required_":"Bagian ini diperlukan.","Return":"Laba","Norwegian_Index":"Indeks Norwegia","Swiss_Index":"Indeks Swis","asian_up":"asian naik","Asians":"Asian","Random_100_Index":"Indeks Random 100","Save_as_PDF":"Simpan dalam PDF","Contract_Confirmation":"Konfirmasi Kontrak","numbers":"nomor","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"min","day":"hari","Save_as_JPEG":"Simpan dalam JPEG","Delete":"Hapus","hours":"jam","Euro_100_Index":"Indeks Euro 100","second":"detik","spread_down":"spread turun","Belgian_Stocks":"Saham Belgia","Date":"Tanggal","AUD_Index":"Indeks AUD","Your_withdrawal_limit_is_EUR":"Batas penarikan Anda adalah EUR","lower":"lebih rendah","Digits":"Digit","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"Saat ini kami tidak menerima pembukaan akun dari penduduk negara berikut.","Australian_Index":"Indeks Australia","Last_Digit_Prediction":"Analisa Digit Terakhir","Start_time":"Waktu mulai","Your":"Anda","Americas":"Amerika","Japanese_Index":"Indeks Jepang","US_Tech_100_Index":"Indeks US 100 Tech","matches":"cocok","Long":"Panjang","Jakarta_Index":"Indeks Jakarta","is_required__Current_spread":"dibutuhkan. Spread saat ini","Purchase_Price":"Harga Beli","UK_Smart_Index":"Indeks Smart Inggris","days":"hari","March":"Maret","Name":"Nama","(Bejing/CST_-8_hours)":"(Bejing/CST -8 jam)","Save_as_PNG":"Simpan dalam PNG","New_Zealand_Index":"Indeks Selandia Baru","Smart_FX":"FX Smart","Week_of":"Minggu ke","Entry_Spot":"Spot entri","Major_Pairs":"Pasangan Utama","Su":"Mgg","Nov":"Nop","spread_up":"spread naik","Jump_To":"Lompat Ke","Dutch_Index":"Indeks Belanda","loading___":"pemuatan...","French_Index":"Indeks Perancis","Metals":"Logam","Email_address":"Alamat email","We":"Kami","Closes":"Ditutup","To":"Kepada","Tuesday":"Selasa","High_barrier":"Batasan Tinggi","Gaming_Account":"Akun Trading","You_must_accept_the_terms_and_conditions_to_open_an_account_":"Anda harus menyetujui syarat dan ketentuan untuk mendaftar akun.","July":"Juli","June":"Juni","Purchase_Date":"Tanggal Beli","Dec":"Des","Thursday":"Kamis","Portuguese_Index":"Indeks Portugis","Limit":"Batas","higher":"lebih tinggi","Smart_Indices":"Indeks Smart","in_aggregate_over_the_last":"rata-rata selama","Monday":"Senin","differs":"berbeda","Randoms":"Random","Oil/AUD":"Minyak/AUD","USD_Index":"Indeks USD","password":"kata sandi","Action":"Aksi","French_Smart_Index":"Indeks Smart Perancis","comma":"koma","minutes":"menit","details":"perincian","Last_Used":"Terakhir digunakan","Your_withdrawal_limit_for_the_entire_duration_of_the_account_is_currently:_EUR":"Batas penarikan akun Anda untuk seluruh durasi akun saat ini adalah: EUR","Oil/GBP":"Minyak/GBP","Indian_50_Index":"Indeks India 50","Wall_Street_Index":"Indeks Wall Street","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"Setelah mengklik 'Ok' Anda akan dikecualikan dari trading hingga tanggal yang dipilih.","ticks":"tik","months":"bulan","Potential_Profit":"Potensi Hasil","Previous":"Sebelumnya","Random":"Secara Acak","Contract_period":"Masa kontrak","Sale_Date":"Tanggal Jual","Exercise_period":"Periode latihan","Euro_150_Index":"Indeks Euro 150","Failed_to_update_trade_description_":"Gagal memperbarui deskripsi kontrak.","February":"Pebruari","Your_current_balance_is":"Saldo Anda saat ini","This_contract_lost":"Kontrak ini rugi","Duration":"Durasi","Singapore_Index":"Indeks Singapura","Stocks":"Saham","Buy":"Beli","The_Payment_Agent_facility_is_currently_not_available_in_your_country_":"Fasilitas Agen Pembayaran tidak tersedia pada negara anda.","Next":"Lanjutkan","Friday":"Jum'at","Your_password_cannot_be_the_same_as_your_email":"Kata sandi tidak boleh sama dengan alamat email","Your_settings_have_been_updated_successfully_":"Pengaturan Anda telah sukses diperbarui.","EUR_Index":"Indeks EUR","Egypt_Index":"Indeks Egypt","Net_profit":"Laba bersih","Shanghai_Index":"Indeks Shanghai","points":"nilai","There_was_a_problem_accessing_the_server_during_purchase_":"Terjadi masalah mengakses server saat pembelian berlangsung.","Random_25_Index":"Indeks Random 25","December":"Desember","create_new_account":"daftar akun baru","Dutch_Stocks":"Saham Belanda","Th":"Kam","Oct":"Oktober","Saudi_Arabia_Index":"Indeks Arab Saudi","Stake":"Modal","Higher/Lower":"Lebih Tinggi/Rendah","Barrier_offset":"Diluar Batasan","Amount_per_point":"Jumlah per poin","in_aggregate_over_the_lifetime_of_your_account_":"rata-rata selama akun Anda berlangsung.","Next_Day":"Hari Berikutnya","Save_as_CSV":"Simpan dalam CSV","Total_Profit/Loss":"Total Untung/Rugi","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"Mewakili jumlah maksimum saldo tunai pada akun anda. Jika jumlah maksimum tercapai, maka anda perlu menarik dana anda.","Quotidians":"Harian","Mo":"Sen","Jun":"Juni","Loss":"Rugi","Tick":"Tik","Dutch_Smart_Index":"Indeks Smart Belanda","Balance":"Saldo","Statement":"Pernyataan","ends_between":"berakhir antara","letters":"huruf","asian_down":"asian turun","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"Kami tidak dapat memberikan striming harga live untuk saat ini. Untuk menikmati striming harga live silahkan coba merefresh halaman, atau coba browser lain","Low_barrier":"Batasan rendah","Minor_Pairs":"Pasangan Ringan","Spreads":"Spread","Energy":"Energi","From":"Dari","Virtual_Account":"Akun Virtual","does_not_touch":"tidak menyentuh","hour":"jam","View":"Lihat","Sorry,_an_error_occurred_while_processing_your_account_":"Maaf, error terjadi ketika memproses rekening Anda.","French_Stocks":"Saham Perancis","years":"tahun","Sunday":"Minggu","Trading_Limits":"Batasan Trading","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"Oleh karena itu jumlah maksimal yang dapat Anda cairkan langsung (jika saldo mencukupi) adalah EUR","Vanilla_Options":"Opsi Vanila","Please_wait_<br_/>Your_request_is_being_processed_":"Silahkan tunggu.<br />Permohonan Anda sedang diproses.","Irish_Index":"Indeks Irlandia","German_Smart_Index":"Indeks Smart Jerman","minute":"menit","Belgian_Index":"Indeks Belgia","January":"Januari","August":"Agustus","Maximum_account_cash_balance":"Maksimum saldo tunai","Bombay_Index":"Bombay Indeks","Maximum_number_of_open_positions":"Maksimal jumlah posisi terbuka","Euro_50_Smart_Index":"Indeks Smart Euro 50","Sa":"Sab","Start_Time":"Waktu Mulai","US_Tech_Composite_Index":"Indeks Gabungan Tech US","seconds":"detik","or_equivalent_in_other_currency":"atau setara dalam mata uang lainnya","Ends_In/Out":"Berakhir Di Dalam/Luar","Up/Down":"Atas/Bawah","You_have_already_withdrawn_the_equivalent_of_EUR":"Anda telah menarik dana setara dengan EUR","Indices":"Indeks","Maximum_aggregate_payouts_on_open_positions":"Jumlah maksimal hasil rata-rata pada posisi terbuka","Purchase":"Beli","Profit_Table":"Tabel Laba Rugi","End_Time":"Waktu berakhir","Credit/Debit":"Kredit/Debit","There_was_a_problem_accessing_the_server_":"Terjadi masalah pada saat mengakses server.","Invalid_email_address":"Invalid alamat email","Shenzhen_Index":"Indeks Shenzhen","year":"tahun","German_Index":"Indeks Jerman","Please_check_your_Email_for_the_next_step_":"Cek email Anda untuk langkah selanjutnya.","November":"Nopember","Random_50_Index":"Indeks Random 50","Contract":"Kontrak","South_African_Index":"Indeks Afrika Selatan","Investment_Account":"Akun Investasi","You_are_not_authorized_for_withdrawal_via_payment_agent_":"Anda tidak dibenarkan menarik dana menggunakan agen pembayaran.","Please_enter_a_date_that_is_at_least_6_months_from_now_":"Masukkan tanggal setidaknya 6 bulan dari sekarang.","Wall_Street_Smart_Index":"Indeks Smart Wall Street","May":"Mei","Profit":"Keuntungan","Rise/Fall":"Naik/Turun","Print_chart":"Cetak grafik","Please_try_again_":"Silahkan coba kembali.","Withdrawal_Limits":"Batas Penarikan","Total_Cost":"Total Biaya","Your_transaction_reference_is":"Referensi transaksi Anda adalah","Touch/No_Touch":"Menyentuh/Tidak","Save_as_SVG":"Simpan dalam SVG","Profit/Loss":"Untung/Rugi","Maximum_daily_turnover":"Maksimum turnover harian","Commodities":"Komoditi","Verification_token_is_missing__Click_on_the_verification_link_sent_to_your_Email_and_make_sure_you_are_not_already_logged_in_":"Token verifikasi hilang. Klik pada link verifikasi yang dikirim ke alamat email Anda dan pastikan Anda belum melakukan login.","Fr":"Jum","Settles":"Diselesaikan","goes_outside":"bergerak keluar","Month":"Bulan","Item":"Bagian","High_Barrier":"Batasan Tinggi","space":"ruang","Middle_East":"Timur Tengah","Portuguese_Smart_Index":"Indeks Smart Portugis","Saturday":"Sabtu","Never_Used":"Tidak pernah dipakai","Low_barrier_offset":"Batasan offset rendah","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"Mewakili jumlah maksimum hasil kontrak pada portopolio Anda. Jika jumlah maksimum tercapai maka Anda tidak dapat membeli kontrak baru tanpa menyelesaikan salah satu posisi Anda.","Sell":"Jual","Description":"Deskripsi","Abu_Dhabi_Index":"Indeks Abu Dhabi"};
+texts_json['RU'] = {"This_contract_won":"Контракт выиграл","October":"Октябрь","Oil/EUR":"Нефть/EUR","Spot":"Спот-котировка","US_Index":"Амер. индекс","Payout":"Выплата","period":"период","Stays_In/Goes_Out":"Останется Внутри/Выйдет за пределы","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"Представляет собой максимальное количество открытых контрактов в Вашем портфолио. Каждая линия в Вашем портфолио считается как открытая позиция. Когда Вы достигаете лимита, Вы не можете создавать новые контракты, пока не закроете существующие.","stays_between":"останется между","Random_Bear":"Random медведи","Italian_30_Index":"Итальянский индекс 30","Deposit_of":"Пополнение в размере","odd":"нечётное число","Asset":"Актив","Wednesday":"Среда","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"Представляет собой максимальный объём контрактов, который Вы можете приобрести в течение любого торгового дня.","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"Указанный Вами электронный адрес уже используется на другом счету","Dubai_Index":"Дубайский индекс","month":"мес.","Hong_Kong_Index":"Гонг-Конгский индекс","In/Out":"Внутри/Вне","Opens":"Открывается","Barrier":"Барьер","Potential_Payout":"Потенциальная выплата","Low_Barrier":"Нижний Барьер","Previous_Day":"Предыдущ. день","Points":"Пункты","Tu":"Вт","Therefore_you_may_not_withdraw_any_additional_funds_":"Это означает, что Вы не можете снять дополнительные средства со счета.","Gold/AUD":"Золото/AUD","Sale_Price":"Цена прод.","touches":"коснется","day_withdrawal_limit_is_currently_EUR":"дневной лимит на вывод составляет EUR","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"Внесите барьер для изменения спот-котировки. Если Вы внесете +0.005, Вы покупаете контракт с барьером на 0.005 выше, чем спот-котировка. Спот-котировкой считается следующий тик после покупки контракта","Short":"Короткая поз.","Random_75_Index":"Random 75 индекс","Please_confirm_the_trade_on_your_statement_before_proceeding_":"Пожалуйста, подтвердите контракт в своей истории счета, прежде чем продолжить.","Token":"Токен","Year":"год","Purchase_Time":"Время покупки","No_Live_price_update":"Нет обновления настоящей котировки","Please_select_a_payment_agent":"Пожалуйста, выберите платежного агента","Real_Account":"Реальный счет","Day":"День","Your_request_to_withdraw_[_1]_[_2]_from_your_account_[_3]_to_Payment_Agent_[_4]_account_has_been_successfully_processed_":"Ваш запрос на вывод   с Вашего счета  на счет платежного агента  был выполнен успешно.","Europe/Africa":"Европа/Африка","Trading_and_Withdrawal_Limits":"Лимиты на торговлю и вывод","High_barrier_offset":"Изменение высшего барьера","Aug":"Авг","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"Ваш счет полностью авторизован, и лимит на вывод был снят.","Swedish_Index":"Шведский индекс","GBP_Index":"GBP индекс","country_of_residence":"страна проживания","Jul":"Июл","ends_outside":"закончится вне","Upcoming_Events":"Приближающиеся события","minimum_available_duration":"мин. доступный период","Russian_Regular_Index":"Российский станд.инд.","Feb":"Фев","Gold/EUR":"Золото/EUR","Now":"Сейчас","The_two_passwords_that_you_entered_do_not_match_":"Введенные пароли не совпадают.","Stop-loss":"Стоп-лосс","re-enter_password":"внесите пароль заново","This_field_is_required_":"Данное поле является необходимым.","Return":"Прибыль","Norwegian_Index":"Норвежский индекс","Swiss_Index":"Швейцарский индекс","asian_up":"азиатские вверх","Asians":"Азиатские","Random_100_Index":"Random 100 индекс","September":"Сентябрь","Save_as_PDF":"Сохранить в формате PDF","Contract_Confirmation":"Подтверждение контракта","numbers":"цифры","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"мин.","day":"дн.","Save_as_JPEG":"Сохранить в формате JPEG","Delete":"Удалить","Platinum/USD":"Платина/USD","hours":"час.","second":"секунд(ы)","spread_down":"спред вниз","Belgian_Stocks":"Бельгийские акции","Date":"Дата","AUD_Index":"AUD индекс","Asia/Oceania":"Азия","Italian_Index":"Итальянский индекс","Your_withdrawal_limit_is_EUR":"Ваш лимит на вывод EUR","lower":"ниже","Digits":"Цифров.","April":"Апрель","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"В настоящее время мы не открываем счета для резидентов этой страны.","Australian_Index":"Австралийский индекс","Last_Digit_Prediction":"Прогноз последней десятичной","Start_time":"Время начала","Your":"Ваш","Americas":"Америка","Japanese_Index":"Японский индекс","Sep":"Сен","matches":"Совпадет","Long":"Длинная позиция","Jakarta_Index":"Индекс Джакарты","is_required__Current_spread":"необходимо. Текущий спред","Purchase_Price":"Цена покупки","UK_Smart_Index":"Брит. Smart-индексы","days":"дн.","March":"Март","Name":"Имя и фамилия","(Bejing/CST_-8_hours)":"(Пекин/CST -8 часов)","Save_as_PNG":"Сохранить в формате PNG","New_Zealand_Index":"Новозеландский индекс","Week_of":"Нед.","Entry_Spot":"Входная котировка","Major_Pairs":"Основные пары","Su":"Вс","Nov":"Ноя","Ref_":"Номер","spread_up":"спред вверх","Jump_To":"Перейти к","Dutch_Index":"Голландский индекс","loading___":"загружается...","French_Index":"Французский индекс","Metals":"Металлы","Email_address":"Эл. адрес","We":"Ср","Closes":"Закрывается","To":"До","Tuesday":"Вторник","even":"чётное число","High_barrier":"Высший барьер","Gaming_Account":"Игровой счет","You_must_accept_the_terms_and_conditions_to_open_an_account_":"Для открытия счета необходимо согласиться с правилами и условиями.","July":"Июль","June":"Июнь","Mar":"Мар","Purchase_Date":"Дата покупки","Dec":"Дек","Thursday":"Четверг","Portuguese_Index":"Португальский индекс","Limit":"Лимит","higher":"выше","Smart_Indices":"Smart-индексы","Jan":"Янв","in_aggregate_over_the_last":"в совокупности за последний(ие)","Monday":"Понедельник","differs":"отличается","Randoms":"Random","Oil/AUD":"Нефть/AUD","USD_Index":"USD индекс","password":"пароль","Stop-type":"Тип стопа","Action":"Акт","French_Smart_Index":"Французский Smart индекс","Random_Bull":"Random быки","comma":"запятая","minutes":"минут(ы)","Last_Used":"Последние","details":"подробности","Your_withdrawal_limit_for_the_entire_duration_of_the_account_is_currently:_EUR":"Ваш лимит на снятие (неограниченный во времени) составляет: EUR","Oil/GBP":"Нефть/GBP","Indian_50_Index":"Индия 50 индекс","ticks":"тиков","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"Когда Вы нажимаете на \"ОК\", Вы будете отстранены от работы на сайте до окончания выбранной даты.","Apr":"Апр","months":"мес.","Potential_Profit":"Потенциальная прибыль","over":"больше","Previous":"Предыдущ.","Random":"Индексы Random","Sale_Date":"Дата продажи","Contract_period":"Период контракта","Nocturnes":"Ночные","Exercise_period":"Период исполнения","February":"Февраль","Failed_to_update_trade_description_":"Невозможно обновить описание контракта.","Your_current_balance_is":"Текущий баланс Вашего счета составляет","Stocks":"Акции","Singapore_Index":"Сингапурский индекс","Duration":"Продолжительность","This_contract_lost":"Контракт проиграл","The_Payment_Agent_facility_is_currently_not_available_in_your_country_":"Оплата через платежного агента в данный момент недоступна для Вашей страны.","Buy":"Покупка","Next":"Далее","Friday":"пятница","Random_Yin":"Random инь","Your_settings_have_been_updated_successfully_":"Настройки успешно обновлены.","Your_password_cannot_be_the_same_as_your_email":"Ваш пароль не может быть таким же, как Ваш эл.адрес","EUR_Index":"EUR индекс","Egypt_Index":"Египетский индекс","Shanghai_Index":"Шанхайский индекс","Net_profit":"Чистая прибыль","points":"пункты","There_was_a_problem_accessing_the_server_during_purchase_":"Возникла проблема с доступом к серверу во время процесса покупки.","Random_25_Index":"Random 25 индекс","create_new_account":"открыть новый счет","December":"Декабрь","Dutch_Stocks":"Голландские акции","Th":"Чт","Oct":"Окт","Saudi_Arabia_Index":"Индекс Саудовской Аравии","Higher/Lower":"Выше/Ниже","Stake":"Ставка","Barrier_offset":"Изменение барьера","Amount_per_point":"Сумма за пункт","in_aggregate_over_the_lifetime_of_your_account_":"в совокупности, за время существования Вашего счета.","Gold/USD":"Золото/USD","Next_Day":"Следующий день","Total_Profit/Loss":"Полные прибыль/потери","Save_as_CSV":"Сохранить в формате CSV","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"Представляет максимальную сумму средств на Вашем счету. Когда Вы достигаете лимита, Вас попросят вывести часть средств.","Quotidians":"Ежедневные","Loss":"Потери","Mo":"Пн","Jun":"Июн","Dutch_Smart_Index":"Голландский Smart индекс","Tick":"Тики","Balance":"Баланс","Statement":"История счета","ends_between":"закончится между","letters":"буквы","under":"меньше","asian_down":"азиатские вниз","Silver/USD":"Серебро/USD","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"Мы не в состоянии предложить живые цены в данный момент. Чтобы посмотреть живые цены, попробуйте перезагрузить страницу. Если вы получаете это сообщение повторно, используйте другой браузер","Low_barrier":"Нижний барьер","Forex":"Форекс","Minor_Pairs":"Вторичные пары","Spreads":"Спреды","Energy":"Энергия","Virtual_Account":"Демо-счет","From":"от","does_not_touch":"не коснется","hour":"час.","View":"Просмотр","Sorry,_an_error_occurred_while_processing_your_account_":"Извините, произошла ошибка.","French_Stocks":"Французские акции","years":"год(а)/лет","Sunday":"Воскресенье","Trading_Limits":"Торговые лимиты","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"Следовательно, Ваш максимальный лимит на вывод на данный момент составляет EUR","Vanilla_Options":"Ванильные опционы","Please_wait_<br_/>Your_request_is_being_processed_":"Пожалуйста, подождите.<br/>Запрос в обработке.","Irish_Index":"Ирландский индекс","German_Smart_Index":"Немецкий Smart индекс","Belgian_Index":"Бельгийский индекс","minute":"минут(ы)","Palladium/USD":"Палладий/USD","January":"Январь","Maximum_account_cash_balance":"Максимальный баланс на счету","August":"Август","Bombay_Index":"Бомбейский индекс","Maximum_number_of_open_positions":"Максимальное количество открытых позиций","Euro_50_Smart_Index":"Euro 50 Smart индекс","Sa":"Сб","Start_Time":"Время начала","seconds":"секунд(ы)","or_equivalent_in_other_currency":"или эквивалентная сумма в других валютах","Gold/GBP":"Золото/GBP","Oil/USD":"Нефть/USD","Ends_In/Out":"Заканчивается Внутри/Вне","Up/Down":"Вверх/Вниз","You_have_already_withdrawn_the_equivalent_of_EUR":"Вы уже вывели со счета сумму, эквивалентную EUR","Indices":"Индексы","Maximum_aggregate_payouts_on_open_positions":"Максимальная совокупная выплата по открытым позициям","Profit_Table":"Анализ счета","Purchase":"Покупка","Credit/Debit":"Кредит/Дебет","End_Time":"Окончание","There_was_a_problem_accessing_the_server_":"Возникла проблема с доступом к серверу.","Shenzhen_Index":"Шеньчженьский индекс","Invalid_email_address":"Недействительный e-mail","year":"год(а)/лет","German_Index":"Немецкий индекс","Please_check_your_Email_for_the_next_step_":"Пожалуйста, проверьте свой email для выполнения дальнейших шагов.","November":"Ноябрь","Random_50_Index":"Random 50 индекс","South_African_Index":"Южно-Африк.инд.","Contract":"Контракт","Investment_Account":"Инвестиционный счет","You_are_not_authorized_for_withdrawal_via_payment_agent_":"Вы не можете выводить средства через платежного агента.","Please_enter_a_date_that_is_at_least_6_months_from_now_":"Внесите дату, по меньшей мере, в 6 месяцах от настоящей.","Wall_Street_Smart_Index":"Wall Street Smart индекс","Zoom":"Приблизить","May":"Май","Profit":"Прибыль","Rise/Fall":"Повышение/Падение","Withdrawal_Limits":"Лимиты на вывод","Print_chart":"Напечатать график","Please_try_again_":"Пожалуйста, попробуйте снова.","Total_Cost":"Общая стоимость","Your_transaction_reference_is":"Ссылка на Вашу сделку","Touch/No_Touch":"Касание","Save_as_SVG":"Сохранить в формате SVG","Profit/Loss":"Плюс/Минус","Maximum_daily_turnover":"Максимальный дневной оборот","Commodities":"Сырьевые товары","Verification_token_is_missing__Click_on_the_verification_link_sent_to_your_Email_and_make_sure_you_are_not_already_logged_in_":"Токен не подтвержден. Нажмите на ссылку подтверждения, отправленную на Ваш электронный адрес (предварительно убедившись, что Вы ещё не вошли в систему).","Fr":"Пт","Settles":"Заканчивается","goes_outside":"выйдет за пределы","Item":"Описание","Month":"Месяц","High_Barrier":"Высший Барьер","Middle_East":"Ближний Восток","space":"пробел","Portuguese_Smart_Index":"Португальский Smart индекс","Saturday":"Суббота","Never_Used":"Никогда не использовался","Random_Yang":"Random янь","Low_barrier_offset":"Изменение нижнего барьера","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"Представляет общую максимальную сумму выплат по открытым ставкам в Вашем портфолио. Когда будет достигнута максимальная сумма, Вы не сможете приобретать новые контракты без закрытия действующих.","Description":"Описание","Sell":"Продажа","Abu_Dhabi_Index":"Индекс Абу-Даби"};
+texts_json['ES'] = {"Euro_50_Index":"Índice Euro 50","This_contract_won":"Este contrato ganó","October":"Octubre","Oil/EUR":"Petróleo/EUR","Spot":"Precio actual del mercado","US_Index":"Índice EEUU","Payout":"Pago","period":"período","Stays_In/Goes_Out":"Queda Dentro/Sale Fuera","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"Representa el número máximo de contratos pendientes en su cartera. Cada línea de su cartera cuenta para una posición abierta. Una vez que se alcanza el máximo no podrá abrir nuevas posiciones sin cerrar las posiciones existentes primero.","stays_between":"queda dentro","Random_Bear":"Random Osos","Italian_30_Index":"Índice Italia 30","Deposit_of":"Depósito de","odd":"impar","Asset":"Activo","Wednesday":"Miércoles","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"Representa el volumen máximo de contratos que puede comprar en un día de comercialización determinado.","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"La dirección de correo electrónico que usted ha proporcionado ya está utilizado por otro usuario","Dubai_Index":"Índice Dubai","month":"mes","Hong_Kong_Index":"Índice Hong Kong","In/Out":"Dentro/Fuera","Opens":"Abre","Barrier":"Límite","Potential_Payout":"Pago potencial","Low_Barrier":"Barrera Inferior","Previous_Day":"Día Anterior","Points":"Puntos","Tu":"MA","Therefore_you_may_not_withdraw_any_additional_funds_":"Por lo tanto, es posible que no pueda retirar más fondos.","Gold/AUD":"Oro/AUD","Sale_Price":"Precio venta","touches":"toca","day_withdrawal_limit_is_currently_EUR":"el límite de retiro diario es actualmente de EUR","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"Introduzca el límite en términos de la diferencia con el precio al contado. Si usted introduce +0.005, estará adquiriendo un contrato con un límite 0.005 por encima del precio al contado. El precio al contado es el precio recibido una vez ejecutada la orden de la compra","Short":"Cortos","Random_75_Index":"Random 75","Please_confirm_the_trade_on_your_statement_before_proceeding_":"Por favor, confirme el contrato en su cartera antes de proceder.","Year":"Año","Purchase_Time":"Hora de compra","No_Live_price_update":"Falta de actualización de precios en tiempo real","Please_select_a_payment_agent":"Seleccione un agente de pago","Real_Account":"Cuenta real","Day":"Día","Your_request_to_withdraw_[_1]_[_2]_from_your_account_[_3]_to_Payment_Agent_[_4]_account_has_been_successfully_processed_":"Su solicitud de retiro de 1% 2% de su cuenta  al agente de pagos 4% se ha procesado correctamente.","Europe/Africa":"Europa/África","Trading_and_Withdrawal_Limits":"Límites de comercialización y de retiro","High_barrier_offset":"Desplazamiento de la barrera superior","Aug":"Ago","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"Su cuenta está totalmente autenticada y su límite de extracciones ha sido aumentado.","Swedish_Index":"Índice Suecia","GBP_Index":"Índice GBP","country_of_residence":"país de residencia","ends_outside":"Finaliza fuera","Upcoming_Events":"Próximos eventos","minimum_available_duration":"duración mínima disponible","Russian_Regular_Index":"Índice regular Rusia","Gold/EUR":"Oro/EUR","Now":"Ahora","The_two_passwords_that_you_entered_do_not_match_":"Las dos contraseñas ingresadas no coinciden.","Stop-loss":"Stop loss","re-enter_password":"vuelva a teclear la contraseña","This_field_is_required_":"Este campo es obligatorio.","Return":"Ganancias","Norwegian_Index":"Índice de Noruega","Swiss_Index":"Índice Suiza","asian_up":"asiáticos arriba","AP_Ordinary":"AP Ordinario","Asians":"Asiáticas","Random_100_Index":"Random 100","September":"Septiembre","Save_as_PDF":"Guardar en formato PDF","Contract_Confirmation":"Confirmación del contrato","numbers":"números","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"min","day":"día","Save_as_JPEG":"Guardar en formato JPEG","Delete":"Eliminar","Platinum/USD":"Platino/USD","hours":"horas","Euro_100_Index":"Índice Euro 30","second":"segundo","spread_down":"spread abajo","Belgian_Stocks":"Acciones Bélgica","Date":"Fecha","AUD_Index":"Índice AUD","Asia/Oceania":"Asia/Oceanía","Italian_Index":"Índice Italia","Your_withdrawal_limit_is_EUR":"Su límite de retiro es de EUR","lower":"inferior","Digits":"Dígitos","April":"Abril","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"En este momento, no aceptamos cuentas de residentes de este país.","AUDZAR":"AUD/ZAR","Australian_Index":"Índice Australia","Last_Digit_Prediction":"Predicción del último dígito","Start_time":"Hora de comienzo","Your":"Su","Americas":"América","Japanese_Index":"Índice de Japón","US_Tech_100_Index":"Índice US Tech 100","matches":"coincide","Long":"Largos","Jakarta_Index":"Índice Jakarta","is_required__Current_spread":"está requerido. El spread actual","Purchase_Price":"Precio de compra","UK_Smart_Index":"Índice Smart Reino Unido","days":"días","March":"Marzo","Name":"Nombre","(Bejing/CST_-8_hours)":"(Bejing/CST -8 horas)","Save_as_PNG":"Guardar en formato PNG","New_Zealand_Index":"Índice Nueva Zelanda","Week_of":"Semana","Entry_Spot":"Punto de entrada","Major_Pairs":"Pares mayores","Su":"DO","spread_up":"spread arriba","Jump_To":"Saltar a","Dutch_Index":"Índice Holanda","loading___":"cargando...","French_Index":"Índice Francia","Metals":"Metales","Email_address":"Dirección de correo electrónico","We":"MI","Closes":"Cierra","To":"Al","Tuesday":"Martes","even":"par","High_barrier":"Barrera superior","Gaming_Account":"Cuenta de juego","You_must_accept_the_terms_and_conditions_to_open_an_account_":"Usted debe aceptar los términos y condiciones para abrir una cuenta.","July":"Julio","June":"Junio","USDZAR":"USD/ZAR","Purchase_Date":"Fecha de compra","Dec":"Dic","Thursday":"Jueves","Portuguese_Index":"Índice Portugal","Limit":"Límite","higher":"superior","Smart_Indices":"Índices Smart","Jan":"Ene","in_aggregate_over_the_last":"en total durante los últimos","Monday":"Lunes","differs":"es diferente","Randoms":"Índices Random","Oil/AUD":"Petróleo/AUD","USD_Index":"Índice USD","password":"contraseña","Stop-type":"Tipo de stop","Action":"Acción","French_Smart_Index":"Índice Smart Francia","Random_Bull":"Random Toros","comma":"coma","minutes":"minutos","Last_Used":"Último usado","details":"detalles","Your_withdrawal_limit_for_the_entire_duration_of_the_account_is_currently:_EUR":"Su actual límite de retiro para toda la validez de la cuenta es: EUR","Oil/GBP":"Petróleo/GBP","Indian_50_Index":"Índice India 50","Wall_Street_Index":"Índice Wall Street","ticks":"intervalos","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"Al hacer clic en \"OK\" usted será excluido de las operaciones en la web hasta la fecha seleccionada.","Apr":"Abr","months":"meses","Potential_Profit":"Beneficios potenciales","over":"sobre","Previous":"Anterior","Sale_Date":"Fecha de venta","Contract_period":"Período del contrato","Nocturnes":"Nocturnos","Euro_150_Index":"Índice Euro 150","Exercise_period":"Período del ejercicio","February":"Febrero","Failed_to_update_trade_description_":"Error al actualizar la desripción del contrato.","Your_current_balance_is":"El balance actual  de su cuenta es","Stocks":"Acciones","Singapore_Index":"Índice Singapur","Duration":"Duración","This_contract_lost":"Este contrato perdió","The_Payment_Agent_facility_is_currently_not_available_in_your_country_":"Los agentes de pagos no están disponibles para su país.","Buy":"Comprar","Next":"Siguiente","Friday":"Viernes","Random_Yin":"Random Ying","Your_settings_have_been_updated_successfully_":"Su configuración se ha actualizado exitosamente.","Your_password_cannot_be_the_same_as_your_email":"Tu contraseña no puede ser la misma que su dirección de correo electrónico","EUR_Index":"Índice EUR","Egypt_Index":"Índice Egipto","Shanghai_Index":"Índice Shanghai","Net_profit":"Beneficio Neto","points":"puntos","There_was_a_problem_accessing_the_server_during_purchase_":"Hubo un problema al acceder al servidor durante la compra.","Random_25_Index":"Random 25","create_new_account":"crear una cuenta nueva","December":"Diciembre","Dutch_Stocks":"Acciones Holanda","Th":"JU","Saudi_Arabia_Index":"Índice Arabia Saudí","Higher/Lower":"Superior/Inferior","Stake":"Inversión","Barrier_offset":"Desplazamiento de barrera","Amount_per_point":"Cantidad por punto","in_aggregate_over_the_lifetime_of_your_account_":"en total durante toda la validez de su cuenta.","Gold/USD":"Oro/USD","Next_Day":"Día siguiente","Total_Profit/Loss":"Beneficios/perdidas totales","Save_as_CSV":"Guardar en formato CSV","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"Representa el monto máximo de dinero que puede tener en su cuenta. Si se alcanza el máximo se le pedirá que retire sus fondos.","Quotidians":"Cotidianos","Loss":"Pérdida","Mo":"LU","Dutch_Smart_Index":"Índice Smart Holanda","Tick":"Intervalo","Balance":"Saldo","Statement":"Extracto","ends_between":"Finaliza dentro","letters":"letras","under":"bajo","asian_down":"asiáticas abajo","Silver/USD":"Plata/USD","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"En estos momento no somos capaces de transmitir los precios en tiempo real. Para ver los precios en directo intente actualizar la página. Si el problema pesiste después de repetidos intentos, pruebe un navegador diferente","Low_barrier":"Barrera inferior","Minor_Pairs":"Pares menores","Energy":"Energía","Virtual_Account":"Cuenta virtual","From":"Desde","does_not_touch":"no toca","hour":"hora","View":"Ver","Sorry,_an_error_occurred_while_processing_your_account_":"Lo sentimos, ha ocurrido un error mientras se procesaba su cuenta.","French_Stocks":"Acciones Francia","years":"años","Sunday":"Domingo","Trading_Limits":"Límites","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"Por lo tanto, su máximo actual de retiro inmediato (sujeto a la existencia de fondos suficientes en su cuenta) es de EUR","Vanilla_Options":"Opciones vainilla","Please_wait_<br_/>Your_request_is_being_processed_":"Por favor, aguarde.<br />Se está procesando su solicitud.","Irish_Index":"Índice Irlanda","German_Smart_Index":"Índice Smart Alemania","Belgian_Index":"Índice Bélgica","minute":"minuto","Palladium/USD":"Paladio/USD","January":"Enero","Maximum_account_cash_balance":"Saldo de caja máximo en la cuenta","August":"Agosto","Bombay_Index":"Índice Bombay","Maximum_number_of_open_positions":"Número máximo de posiciones abiertas","Euro_50_Smart_Index":"Índice Smart Euro 50","US_Tech_Composite_Index":"Índice US Tech Composite","Sa":"SA","Start_Time":"Hora de comienzo","seconds":"segundos","or_equivalent_in_other_currency":"o el equivalente en otra moneda","Gold/GBP":"Oro/GBP","Oil/USD":"Petróleo/USD","Ends_In/Out":"Finaliza Dentro/Fuera","Up/Down":"Arriba/Abajo","You_have_already_withdrawn_the_equivalent_of_EUR":"Usted ya retiró un total equivalente a EUR","Indices":"Índices","Maximum_aggregate_payouts_on_open_positions":"Máximo de pagos agregados en posiciones abiertas","Profit_Table":"Tabla de beneficios","Purchase":"Compra","Credit/Debit":"Crédito/débito","End_Time":"Hora de finalización","There_was_a_problem_accessing_the_server_":"Hubo un problema al acceder al servidor.","Shenzhen_Index":"Índice Shenzhen","Invalid_email_address":"Correo electrónico no válido","year":"año","German_Index":"Índice Alemania","Please_check_your_Email_for_the_next_step_":"Por favor revise su correo electrónico para el siguiente paso.","November":"Noviembre","Random_50_Index":"Random 50","South_African_Index":"Índice de Sudáfrica","Contract":"Contrato","Investment_Account":"Cuenta de inversión","You_are_not_authorized_for_withdrawal_via_payment_agent_":"Usted no está autorizado para el retiro de dinero a través de agente de pago.","Please_enter_a_date_that_is_at_least_6_months_from_now_":"Por favor, elija una fecha que es por lo menos 6 meses a partir de ahora.","Wall_Street_Smart_Index":"Índice Smart Wall Street","Zoom":"Enfocar","Profit":"Beneficios","Rise/Fall":"Alza/Baja","Withdrawal_Limits":"Límites de retiro","Print_chart":"Imprimir el gráfico","Please_try_again_":"Por favor, inténtelo de nuevo.","Total_Cost":"Coste total","Your_transaction_reference_is":"La referencia de su transacción es","Touch/No_Touch":"Toque/Sin toque","Save_as_SVG":"Guardar en formato SVG","Profit/Loss":"Perdido/Ganado","Maximum_daily_turnover":"Volumen de negocios diario máximo","Commodities":"Materias primas","Verification_token_is_missing__Click_on_the_verification_link_sent_to_your_Email_and_make_sure_you_are_not_already_logged_in_":"Clave de verificación no encontrada. Haga clic en el enlace de verificación enviado a su correo electrónico y asegúrese de que no ha iniciado ya sesión.","Fr":"VI","Settles":"Establece","goes_outside":"sale fuera","Item":"Artículo","Month":"Mes","High_Barrier":"Barrera Superior","Middle_East":"Medio Oriente","space":"espacio","Portuguese_Smart_Index":"Índice Smart Portugal","Saturday":"Sábado","Never_Used":"Nunca usado","Random_Yang":"Random Yan","Low_barrier_offset":"Desplazamiento de la barrera inferior","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"Presenta el pago total máximo de los contratos pendientes en su cartera. Si se ajusta al máximo, no podrá comprar contratos adicionales sin primero cerrar las posiciones actuales.","Description":"Descripción","Sell":"Venta","Abu_Dhabi_Index":"Índice Abu Dhabi"};
+texts_json['FR'] = {"Euro_50_Index":"Indice Euro 50","This_contract_won":"Ce contrat remporté","October":"Octobre","Oil/EUR":"Pétrole/EUR","Spot":"Actuel","US_Index":"Indice US","Payout":"Paiement","Stays_In/Goes_Out":"Reste dans/Sort de la zone","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"Représente le nombre maximal de contrats actifs dans votre portefeuille. Chaque ligne dans votre portefeuille compte pour une position ouverte. Une fois le maximum atteint, vous ne serez pas en mesure d'ouvrir de nouvelles positions sans d'abord fermer une position existante.","stays_between":"reste entre","Random_Bear":"Ours Aléatoire","Italian_30_Index":"Indice Italien 30","Deposit_of":"Dépôt de","odd":"impair","Asset":"Actif","Wednesday":"Mercredi","Airbus_Group":"Groupe Airbus","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"Représente le volume maximal de contrats que vous pouvez acheter au cours d'une journée de trading donnée.","Dubai_Index":"Indice de Dubaï","month":"mois","Hong_Kong_Index":"Indice Hong Kong","In/Out":"Dans/Hors de","Opens":"Ouvre","Barrier":"Barrière","Potential_Payout":"Gain Potentiel","Low_Barrier":"Barrière Inférieure","Previous_Day":"Jour précédent","Tu":"Ma","Therefore_you_may_not_withdraw_any_additional_funds_":"Vous ne pouvez donc pas retirer de fonds supplémentaires.","Gold/AUD":"Or/AUD","Sale_Price":"Prix de vente","touches":"touche","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"Entrez la barrière sous forme de différence avec le prix ponctuel. Si vous entrez +0,005, vous achèterez un contrat avec une barrière supérieure de 0,005 au prix d'entrée. Le prix d'entrée sera celui du prochain intervalle après que votre ordre a été reçue","Short":"Court","Random_75_Index":"Indice Random 75","Please_confirm_the_trade_on_your_statement_before_proceeding_":"Veuillez confirmer le trade sur votre extrait avant de procéder.","Token":"Jeton d'authentification","Year":"Année","Purchase_Time":"Heure d'Achat","No_Live_price_update":"Pas de mises à jour du prix en Direct","Please_select_a_payment_agent":"Veuillez sélectionner un agent de paiement","Real_Account":"Compte réel","Day":"Jour","Your_request_to_withdraw_[_1]_[_2]_from_your_account_[_3]_to_Payment_Agent_[_4]_account_has_been_successfully_processed_":"Votre demande de retirer   de votre compte  pour le compte de l'Agent de Paiement  a été traitée avec succès.","Europe/Africa":"Europe/Afrique","Trading_and_Withdrawal_Limits":"Limites de Trading et de Retrait","High_barrier_offset":"Compensation barrière supérieure","Aug":"août","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"Votre compte est entièrement authentifié et vos limites de retrait ont été levées.","Swedish_Index":"Indice Suède","GBP_Index":"Indice GBP","KBC_Groep":"Groupe KBC","Jul":"Juil","ends_outside":"Finit hors de","Upcoming_Events":"Prochains Évènements","minimum_available_duration":"durée minimale disponible","Russian_Regular_Index":"Indice Régulier de Russie","Feb":"Fév","Gold/EUR":"Or/EUR","Now":"Maintenant","The_two_passwords_that_you_entered_do_not_match_":"Les deux mots de passe que vous avez entrés ne correspondent pas.","Return":"Retour","Norwegian_Index":"Indice de Norvège","Swiss_Index":"Indice Suisse","asian_up":"haut asiatique","AP_Ordinary":"AP Ordinaire","Asians":"Asiatiques","Random_100_Index":"Indice Random 100","September":"Septembre","Save_as_PDF":"Sauvegarder comme PDF","Contract_Confirmation":"Confirmation du Contrat","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"min","day":"jour","Save_as_JPEG":"Sauvegarder comme JPEG","Delete":"Supprimer","Platinum/USD":"Platine/USD","hours":"heures","Euro_100_Index":"Indice Euro 100","second":"seconde","spread_down":"Option courte","Belgian_Stocks":"Actions Belges","AUD_Index":"Indice AUD","Asia/Oceania":"Asie/Océanie","Italian_Index":"Indice Italien","lower":"inférieur","Digits":"Chiffres","April":"avril","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"Nous n'acceptions pas de comptes de résidents de ce pays pour le moment.","Australian_Index":"Indice Australien","Last_Digit_Prediction":"Prédiction du Dernier Chiffre","Start_time":"Heure du début","Americas":"Amériques","Japanese_Index":"Indice du Japon","US_Tech_100_Index":"Indice US Tech 100","matches":"est égale à","Jakarta_Index":"Indice Jakarta","is_required__Current_spread":"est requis. Spread actuel","Purchase_Price":"Prix d'achat","XPD/EUR":"FPD/EUR","UK_Smart_Index":"Indice intelligent Royaume-Uni","days":"jours","March":"Mars","Name":"Nom","(Bejing/CST_-8_hours)":"(Pékin/CST -8 heures)","Save_as_PNG":"Sauvegarder comme PNG","New_Zealand_Index":"Indice Nouvelle-Zélande","Electricite_de_France":"Électricité de France","Smart_FX":"FX Intelligent","Week_of":"Semaine de","Entry_Spot":"Point d'Entrée","Major_Pairs":"Paires majeures","Su":"Di","Ref_":"Réf.","spread_up":"Option longue","Jump_To":"Aller à","Dutch_Index":"Indice Néerlandais","loading___":"chargement...","French_Index":"Indice Français","Metals":"Métaux","Email_address":"Adresse email","We":"Me","Closes":"Ferme","To":"Pour","Tuesday":"Mardi","even":"pair","High_barrier":"Barrière supérieure","Gaming_Account":"Compte de Jeux","You_must_accept_the_terms_and_conditions_to_open_an_account_":"Vous devez accepter les conditions générales pour ouvrir un compte.","July":"Juillet","June":"Juin","Mar":"Mars","Purchase_Date":"Date d'achat","Dec":"Déc","Thursday":"Jeudi","Portuguese_Index":"Indice du Portugal","Limit":"Limite","higher":"supérieur","Smart_Indices":"Indices Intelligents","Monday":"Lundi","differs":"diffère","Randoms":"Aléatoires","Societe_Generale":"Société Générale","Oil/AUD":"Pétrole/AUD","USD_Index":"Indice USD","Stop-type":"Type d'ordre stop","French_Smart_Index":"Indice Intelligent Français","Random_Bull":"Taureau Aléatoire","Last_Used":"Dernier utilisé","details":"détails","Oil/GBP":"Pétrole/GBP","Indian_50_Index":"Indice 50 d'Inde","Wall_Street_Index":"Indice Wall Street","ticks":"intervalles","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"Lorsque vous cliquez 'Ok' vous serez exclus des trades sur ce site jusqu'à la date sélectionnée.","Apr":"avr","months":"mois","Potential_Profit":"Gain Potentiel","over":"supérieur","Previous":"Précédent","Random":"Aléatoire","Sale_Date":"Date de Vente","Contract_period":"Durée du contrat","Euro_150_Index":"Indice Euro 150","Exercise_period":"Période d'exercice","February":"Février","Failed_to_update_trade_description_":"Échec de mise à jour de la description du trade","Your_current_balance_is":"Votre solde actuel est de","Stocks":"Actions","Singapore_Index":"Indice Singapour","Duration":"Durée","This_contract_lost":"Ce contrat perdu","The_Payment_Agent_facility_is_currently_not_available_in_your_country_":"L'option des Agents de Paiement n'est pas disponible pour le moment dans votre pays.","Buy":"Achetez","Next":"Suivant","Friday":"Vendredi","Random_Yin":"Yin Aléatoire","Your_settings_have_been_updated_successfully_":"Vos paramètres ont été actualisés avec succès.","Your_password_cannot_be_the_same_as_your_email":"Votre mot de passe ne peut pas être identique à votre e-mail","EUR_Index":"Indice EUR","Egypt_Index":"Indice égyptien","Shanghai_Index":"Indice Shanghai","Net_profit":"Bénéfice net","points":"croix","There_was_a_problem_accessing_the_server_during_purchase_":"Il y a eu un problème d'accès au serveur durant l'achat.","Random_25_Index":"Indice Random 25","December":"Décembre","Dutch_Stocks":"Actions Hollandaises","Th":"Je","Higher/Lower":"Supérieur/Inférieur","Stake":"Gain","Barrier_offset":"Compensation Barrière","Amount_per_point":"Montant par point de base","Gold/USD":"Or/USD","Next_Day":"Jour suivant","Total_Profit/Loss":"Gain/Perte Total","Save_as_CSV":"Sauvegarder comme CSV","L'Oreal":"L'Oréal","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"Représente le montant d'argent maximal que vous pouvez garder sur votre compte.  Si le maximum est atteint, il vous sera demandé de retirer des fonds.","Quotidians":"Quotidiens","Loss":"Perte","Mo":"Lu","Jun":"Juin","Dutch_Smart_Index":"Indice Intelligent Néerlandais","Tick":"Intervalle","Balance":"Solde","Statement":"Relevé","ends_between":"Finit Entre","under":"inférieur","asian_down":"bas asiatique","Silver/USD":"Argent/USD","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"Nous ne pouvons pas diffuser des prix en direct en ce moment. Afin de profiter de la diffusion en direct de prix, veuillez rafraîchir la page, si vous avez ce problème après plusieurs tentatives, essayer un navigateur différent","Low_barrier":"Barrière inférieure","Minor_Pairs":"Paires mineures","Energy":"Energie","Virtual_Account":"Compte Virtuel","From":"De","does_not_touch":"ne touche pas","hour":"heure","Credit_Agricole":"Crédit Agricole","View":"Voir","Sorry,_an_error_occurred_while_processing_your_account_":"Désolé, une erreur est survenu pendant le traitement de votre compte.","French_Stocks":"Actions Françaises","years":"années","Sunday":"Dimanche","Trading_Limits":"Limites de Trading","Vanilla_Options":"Options Vanilla","Please_wait_<br_/>Your_request_is_being_processed_":"Veuillez patienter.<br />Votre demande est en cours de traitement.","Irish_Index":"Indice Irlandais","German_Smart_Index":"Indice Intelligent Allemand","Belgian_Index":"Indice Belge","January":"Janvier","Maximum_account_cash_balance":"Solde de trésorerie maximal du compte","August":"août","Bombay_Index":"Indice Bombay","Maximum_number_of_open_positions":"Nombre maximal de positions ouvertes","Euro_50_Smart_Index":"Indice Intelligent Euro 50","US_Tech_Composite_Index":"Indice US Tech Composite","Start_Time":"Heure du Début","seconds":"secondes","Gold/GBP":"Or/GBP","Oil/USD":"Pétrole/USD","Ends_In/Out":"In/Out","Up/Down":"Haut/Bas","Maximum_aggregate_payouts_on_open_positions":"Maximum de versements cumulés sur les positions ouvertes","Profit_Table":"Tableau des Bénéfices","Purchase":"Achat","Credit/Debit":"Crédit/ Débit","End_Time":"Moment de Fin","There_was_a_problem_accessing_the_server_":"Il y a eu un problème d'accès au serveur.","Shenzhen_Index":"Indice Shenzhen","Invalid_email_address":"Adresse email non valide","year":"année","German_Index":"Indice Allemand","November":"Novembre","Random_50_Index":"Indice Random 50","South_African_Index":"Indice d'Afrique du Sud","Contract":"Contrat","Investment_Account":"Compte d'Investissement","You_are_not_authorized_for_withdrawal_via_payment_agent_":"Vous n'êtes pas habilité à faire des retraits via un agent de paiement.","Please_enter_a_date_that_is_at_least_6_months_from_now_":"Veuillez introduire une date qui est au moins 6 mois plus tard.","Wall_Street_Smart_Index":"Indice Intelligent Wall Street","May":"Mai","Profit":"Bénéfice","Rise/Fall":"Hausse/Baisse","Print_chart":"Imprimer graphique","Please_try_again_":"Veuillez essayer une nouvelle fois.","Total_Cost":"Coût Total","Your_transaction_reference_is":"Votre référence de transaction est","Touch/No_Touch":"Touche","Hang_Seng_China":"Hang Seng Chine","Save_as_SVG":"Sauvegarder comme SVG","Profit/Loss":"Bénéfice/Perte","Maximum_daily_turnover":"Chiffre d'affaires maximal journalier","Commodities":"Matières premières","Commbank_(Australia)":"Commbank (Australie)","Fr":"Ve","Settles":"Configuration","goes_outside":"sort de","Item":"Elément","Month":"Mois","High_Barrier":"Barrière Supérieure","Portuguese_Smart_Index":"Indice Intelligent Portugais","Saturday":"Samedi","Never_Used":"Jamais utilisé","Random_Yang":"Yang Aléatoire","Low_barrier_offset":"Compensation barrière inférieure","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"Présente les gains cumulés maximaux sur les contrats actifs dans votre portefeuille. Si le maximum est atteint, vous ne pouvez pas acheter de contrats supplémentaires sans fermer d'abord des positions existantes.","Sell":"Vendre","Abu_Dhabi_Index":"Indice d'Abou Dabi"};
+texts_json['IT'] = {"Euro_50_Index":"Indice Euro 50","This_contract_won":"Questo contratto ha vinto","October":"Ottobre","Oil/EUR":"Petrolio/EUR","US_Index":"Indice USA","period":"periodo","Stays_In/Goes_Out":"Stays In (Rimane in) / Goes Out (Esce fuori)","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"Rappresenta il numero massimo di contratti in essere nel tuo portafoglio. Ogni riga presente sul tuo portafoglio vale una posizione aperta. Una volta raggiunto il valore massimo, non potrai aprire nuove posizioni senza prima chiudere una posizione esistente.","stays_between":"Rimane fra","Random_Bear":"Random Orso","Italian_30_Index":"Indice Italia 30","Deposit_of":"Deposito di","odd":"dispari","Wednesday":"Mercoledì","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"Rappresenta il volume massimo di contratti che puoi acquistare in un dato giorno di trading.","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"L'indirizzo email fornito è già utilizzato da un'altro ID d'accesso","Dubai_Index":"Indice di Dubai","month":"mese","Hong_Kong_Index":"Indice di Hong Kong","Opens":"Apre","Barrier":"Barriera","Potential_Payout":"Payout potenziale","Low_Barrier":"Barriera inferiore","Previous_Day":"Giorno precedente","Points":"Punti","Tu":"Mar","Therefore_you_may_not_withdraw_any_additional_funds_":"Pertanto non puoi prelevare alcun fondo aggiuntivo.","Gold/AUD":"Oro/AUD","Sale_Price":"Prezzo di vendita","touches":"tocca","day_withdrawal_limit_is_currently_EUR":"il limite di prelievo giornaliero è attualmente EUR","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"Inserisci il limite in termini di differenza dal prezzo spot. Se inserisci +0.005, allora starai acquistando un contratto con un limite 0.005 più alto rispetto al punto d'ingresso. Quest'ultimo sarà il tick successivo dopo aver ricevuto l'ordine","Short":"Breve","Random_75_Index":"Random 75","Please_confirm_the_trade_on_your_statement_before_proceeding_":"Prima di procedere, conferma il trade sul tuo estratto.","Year":"Anno","Purchase_Time":"Orario d'acquisto","No_Live_price_update":"Nessun aggiornamento dei prezzi in tempo reale","Please_select_a_payment_agent":"Seleziona un agente di pagamento","Real_Account":"Account reale","Day":"Giorno","Your_request_to_withdraw_[_1]_[_2]_from_your_account_[_3]_to_Payment_Agent_[_4]_account_has_been_successfully_processed_":"La tua richiesta di prelevare   dal tuo account  all'account dell'Agente di pagamento  è stata elaborata con successo.","Europe/Africa":"Europa/Africa","Trading_and_Withdrawal_Limits":"Limiti di trading e dei prelievi","High_barrier_offset":"Sfasamento della barriera superiore","Aug":"Ago","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"Il tuo account è stato completamente convalidato e sono stati rimossi i tuoi limiti di prelievo.","Swedish_Index":"Indice Svezia","GBP_Index":"Indice GBP","country_of_residence":"paese di residenza","Jul":"Lug","ends_outside":"termina fuori","Upcoming_Events":"Prossimi eventi","minimum_available_duration":"durata minima disponibile","Russian_Regular_Index":"Indice regolare russo","Gold/EUR":"Oro/EUR","Now":"Adesso","The_two_passwords_that_you_entered_do_not_match_":"Le due password inserite non combaciano.","Stop-loss":"Stop Loss","re-enter_password":"inserisci nuovamente la password","This_field_is_required_":"Questo campo è obbligatorio.","Return":"Rendimento","Norwegian_Index":"Indice della Norvegia","Swiss_Index":"Indice svizzero","asian_up":"asiatiche up","AP_Ordinary":"AP Ordinario","Asians":"Asiatiche","Random_100_Index":"Random 100","September":"Settembre","Save_as_PDF":"Salva come PDF","Contract_Confirmation":"Conferma del contratto","numbers":"numeri","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"minimo ","day":"giorno","Save_as_JPEG":"Salva come JPEG","Delete":"Elimina","Platinum/USD":"Platino/USD","hours":"ore","Euro_100_Index":"Indice Euro 100","second":"secondo","Belgian_Stocks":"Azioni Belgio","Date":"Data","AUD_Index":"Indice AUD","Italian_Index":"Indice italiano","Your_withdrawal_limit_is_EUR":"Il tuo limite di prelievo è EUR","lower":"inferiore","Digits":"Cifre","April":"Aprile","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"Al momento non accettiamo account di persone residenti in questo paese.","Australian_Index":"Indice Australia","Last_Digit_Prediction":"Previsione dell'ultima cifra","Start_time":"Orario d'inizio","Your":"Il tuo","Americas":"America","Japanese_Index":"Indice giapponese","US_Tech_100_Index":"Indice US Tech 100","Sep":"Sett","matches":"combacia","Long":"A lungo","Jakarta_Index":"Indice Jakarta","is_required__Current_spread":"è richiesto. Spread attuale","Purchase_Price":"Prezzo d'acquisto","UK_Smart_Index":"Indice Smart Regno Unito","days":"giorni","March":"Marzo","Name":"Nome","(Bejing/CST_-8_hours)":"(Pechino/CST -8 ore)","Save_as_PNG":"Salva come PNG","New_Zealand_Index":"Indice Nuova Zelanda","Week_of":"Settimana di","Entry_Spot":"Punto d'ingresso","Major_Pairs":"Coppie principali","Su":"Dom","Ref_":"Rif.","Jump_To":"Salta a","Dutch_Index":"Indice olandese","loading___":"caricamento...","French_Index":"Indice Francia","Metals":"Metalli","Email_address":"Indirizzo email","We":"Noi","Closes":"Chiude","To":"A","Tuesday":"Martedì","even":"pari","High_barrier":"Barriera superiore","Gaming_Account":"Account di gioco","You_must_accept_the_terms_and_conditions_to_open_an_account_":"Per aprire un account, devi accettare i termini e le condizioni.","July":"Luglio","June":"Giugno","Purchase_Date":"Data d'acquisto","Dec":"Dic","Thursday":"Giovedì","Portuguese_Index":"Indice Portogallo","Limit":"Limite","higher":"superiore","Smart_Indices":"Indici Smart","Jan":"Gen","in_aggregate_over_the_last":"in forma aggregata nel corso degli ultimi","Monday":"Lunedì","differs":"differisce","Randoms":"Indici Random","Oil/AUD":"Petrolio/AUD","USD_Index":"Indice USD","Action":"Azione","French_Smart_Index":"Indice Smart francese","Random_Bull":"Random Toro","comma":"virgola","minutes":"minuti","Last_Used":"Ultimo utilizzato","details":"dettagli","Your_withdrawal_limit_for_the_entire_duration_of_the_account_is_currently:_EUR":"Il tuo limite di prelievo per l'intera durata dell'account è attualmente: EUR","Oil/GBP":"Petrolio/GBP","Indian_50_Index":"Indice Indian 50","Wall_Street_Index":"Indice Wall Street","ticks":"tick","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"Quando clicchi su \"Ok\" verrai escluso dal trading sul sito fino alla data selezionata.","months":"mesi","Potential_Profit":"Profitto potenziale","over":"sopra","Previous":"Precedente","Sale_Date":"Data della vendita","Contract_period":"Periodo del contratto","Nocturnes":"Notturni","Euro_150_Index":"Indice Euro 150","Exercise_period":"Periodo di prova","February":"Febbraio","Failed_to_update_trade_description_":"Impossibile aggiornare la descrizione del trade.","Your_current_balance_is":"Il tuo saldo attuale è","Stocks":"Azioni","Singapore_Index":"Indice Singapore","Duration":"Durata","This_contract_lost":"Questo contratto ha perso","The_Payment_Agent_facility_is_currently_not_available_in_your_country_":"La funzione dell'Agente di pagamento al momento non è disponibile nel tuo paese.","Buy":"Acquista","Next":"Successivo","Friday":"Venerdì","Your_settings_have_been_updated_successfully_":"Le tue impostazioni sono state aggiornate con successo.","Your_password_cannot_be_the_same_as_your_email":"La tua password non può essere uguale alla tua email","EUR_Index":"Indice EUR","Egypt_Index":"Indice dell'Egitto","Shanghai_Index":"Indice Shanghai","Net_profit":"Profitto netto","points":"punti","There_was_a_problem_accessing_the_server_during_purchase_":"Durante l'acquisto si è verificato un problema d'accesso al server.","Random_25_Index":"Random 25","create_new_account":"crea un nuovo account","December":"Dicembre","Dutch_Stocks":"Azioni Olanda","Th":"Gio","Oct":"Ott","Saudi_Arabia_Index":"Indice dell'Arabia Saudita","Higher/Lower":"High/Low","Stake":"Puntata","Barrier_offset":"Correzione della barriera","Amount_per_point":"Importo per punto","in_aggregate_over_the_lifetime_of_your_account_":"durante la durata complessiva del tuo account.","Gold/USD":"Oro/USD","Next_Day":"Giorno successivo","Total_Profit/Loss":"Profitto/Perdita totale","Save_as_CSV":"Salva come CSV","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"Rappresenta l'importo massimo di denaro che può essere tenuto sul tuo account. Se raggiungi tale valore massimo, ti verrà richiesto di prelevare fondi.","Quotidians":"Giornalieri","Loss":"Perdita","Mo":"Lun","Jun":"Giu","Dutch_Smart_Index":"Indice Smart olandese","Balance":"Saldo","Statement":"Estratto","ends_between":"finisce tra","letters":"lettere","under":"sotto","asian_down":"asiatiche down","Silver/USD":"Argento/USD","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"Al momento non siamo in grado di trasmettere i prezzi in tempo reale. Per godere dello streaming live dei prezzi, prova a riaggiornare la pagina, se dopo vari tentativi si verifica sempre lo stesso problema, prova un browser diverso","Low_barrier":"Barriera inferiore","Minor_Pairs":"Coppie minori","Spreads":"Spread","Energy":"Energia","Virtual_Account":"Account virtuale","From":"Da","does_not_touch":"non tocca","hour":"ora","View":"Mostra","Sorry,_an_error_occurred_while_processing_your_account_":"Siamo spiacenti, si è verificato un errore durante l'elaborazione del tuo account.","French_Stocks":"Azioni Francia","years":"anni","Sunday":"Domenica","Trading_Limits":"Limiti del trading","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"Pertanto il tuo attuale prelievo massimo immediato (soggetto alla disponibilità di fondi sufficienti nell'account) è pari a EUR","Vanilla_Options":"Opzioni vanilla","Please_wait_<br_/>Your_request_is_being_processed_":"Attendi.<br />La tua richiesta sta per essere elaborata.","Irish_Index":"Indice irlandese","German_Smart_Index":"Indice Smart tedesco","Belgian_Index":"Indice belga","minute":"minuto","Palladium/USD":"Palladio/USD","January":"Gennaio","Maximum_account_cash_balance":"Saldo di cassa massimo sull'account","August":"Agosto","Bombay_Index":"Indice di Bombay","Maximum_number_of_open_positions":"Numero massimo di posizioni aperte","Euro_50_Smart_Index":"Indice Smart Euro 50","US_Tech_Composite_Index":"Indice composto US Tech","Sa":"Sab","Start_Time":"Orario di inizio","seconds":"secondi","or_equivalent_in_other_currency":"o equivalente in altra valuta","Gold/GBP":"Oro/GBP","Oil/USD":"Petrolio/USD","Ends_In/Out":"Termina In/Out","You_have_already_withdrawn_the_equivalent_of_EUR":"Hai già prelevato l'equivalente di EUR","Indices":"Indici","Maximum_aggregate_payouts_on_open_positions":"Payout totali massimi su posizioni aperte","Profit_Table":"Tabella dei profitti","Purchase":"Acquisto","Credit/Debit":"Credito/Debito","End_Time":"Orario di fine","There_was_a_problem_accessing_the_server_":"Si è verificato un problema d'accesso al server.","Shenzhen_Index":"Indice di Shenzhen","Invalid_email_address":"Indirizzo email non valido","year":"anno","German_Index":"Indice tedesco","Please_check_your_Email_for_the_next_step_":"Verifica il tuo indirizzo email per lo step successivo.","November":"Novembre","Random_50_Index":"Random 50","South_African_Index":"Indice del Sudafrica","Contract":"Contratto","Investment_Account":"Account d'investimento","You_are_not_authorized_for_withdrawal_via_payment_agent_":"Non sei autorizzato a prelevare tramite un agente di pagamento.","Please_enter_a_date_that_is_at_least_6_months_from_now_":"Inserisci una data che sia distante almeno 6 mesi a partire da oggi.","Wall_Street_Smart_Index":"Indice Smart Wall Street","May":"Mag","Profit":"Profitto","Rise/Fall":"Rialzo/Ribasso","Withdrawal_Limits":"Limiti per i Prelievi","Print_chart":"Stampa grafico","Please_try_again_":"Riprova.","Total_Cost":"Costo totale","Your_transaction_reference_is":"Il tuo riferimento per le transazioni è","Touch/No_Touch":"Touch/No touch","Save_as_SVG":"Salva come SVG","Profit/Loss":"Profitto/Perdita","Maximum_daily_turnover":"Turnover massimo giornaliero","Commodities":"Materie prime","Verification_token_is_missing__Click_on_the_verification_link_sent_to_your_Email_and_make_sure_you_are_not_already_logged_in_":"Token di verifica mancante. Clicca sul link di verifica inviato al tuo indirizzo email e assicurati di non aver già effettuato il login.","Fr":"Ven","Settles":"Liquida","goes_outside":"esce fuori","Item":"Voce","Month":"Mese","High_Barrier":"Barriera superiore","Middle_East":"Medio Oriente","space":"spazio","Portuguese_Smart_Index":"Indice Smart Portogallo","Saturday":"Sabato","Never_Used":"Mai utilizzato","Low_barrier_offset":"Scostamento della barriera inferiore","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"Presenta i payout complessivi massimi sui contratti in essere nel tuo portafoglio. Se si raggiunge il numero massimo, non sarà possibile acquistare altri contratti senza prima chiudere delle posizioni esistenti.","Description":"Descrizione","Sell":"Vendi","Abu_Dhabi_Index":"Indice di Abu Dhabi"};
+texts_json['PT'] = {"Euro_50_Index":"Índice 50 Europeu","This_contract_won":"Esse contrato ganhou","October":"Outubro","Oil/EUR":"Petróleo/EUR","Spot":"Preço atual","US_Index":"Índice USA","Payout":"Prêmio","period":"ponto","Stays_In/Goes_Out":"Fica dentro/Sai fora","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"Representa o número máximo de contratos pendentes no seu portfólio. Cada linha do seu portfólio conta para uma posição em aberto. Depois de atingido o máximo, não poderá abrir novas posições sem fechar primeiro uma posição existente.","stays_between":"fica entre","Random_Bear":"Random Urso (Baixista)","Italian_30_Index":"Índice 30 Italiano","Deposit_of":"Depósito de","odd":"número ímpar","Asset":"Ativos","Wednesday":"Quarta-feira","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"Representa o volume máximo de contratos que pode comprar em qualquer dia de negociações.","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"O endereço de e-mail fornecido já está sendo usado por outra ID de login","Dubai_Index":"Índice de Dubai","month":"mês","Hong_Kong_Index":"Índice de Hong Kong","In/Out":"Dentro/Fora","Tokyo_Electric_Power_Co__Inc":"Tokyo Electric Power Co Inc","Opens":"Abre","Barrier":"Barreira","Potential_Payout":"Possível Prêmio","Low_Barrier":"Barreira Baixa","Previous_Day":"Dia anterior","Points":"Pontos","Tu":"Qui","Therefore_you_may_not_withdraw_any_additional_funds_":"Por isso não pode levantar fundos adicionais.","ITC_Ltd":"ITC Ltda","Gold/AUD":"Ouro/AUD","Sale_Price":"Preço de venda","touches":"toca","day_withdrawal_limit_is_currently_EUR":"limite de retirada diário é atualmente EUR","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"Digite a barreira em termos da diferença do preço atual. Se você digitar +0,005, estará a comprar um contrato com uma barreira superior ao preço inicial em 0,005. O preço inicial será o próximo movimento mínimo após o seu pedido ter sido recebido","Short":"Curto","Random_75_Index":"Índice Random 75","Please_confirm_the_trade_on_your_statement_before_proceeding_":"Confirme a negociação no seu extrato antes de continuar.","Year":"Ano","Purchase_Time":"Hora da Compra","No_Live_price_update":"Sem atualização de preço ao vivo","Please_select_a_payment_agent":"Selecione um valor agente de pagamentos","Real_Account":"Conta Real","Day":"Dia","Your_request_to_withdraw_[_1]_[_2]_from_your_account_[_3]_to_Payment_Agent_[_4]_account_has_been_successfully_processed_":"O seu pedido para levantar   da sua conta  para a conta  do Agente de Pagamentos foi processado com sucesso.","AT&T":"AT&T Inc.","Europe/Africa":"Europa/África","Trading_and_Withdrawal_Limits":"Limites de Negociação e de Retirada","High_barrier_offset":"Variação de barreira alta","ICICI_Bank_Ltd":"ICICI Bank Ltda","Aug":"Ago","Telenor":"Telenor Group","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"A sua conta está totalmente autenticada e os seus limites de retirada de fundos foram aumentados.","Swedish_Index":"Índice Sueco","GBP_Index":"Índice GBP","country_of_residence":"país de residência","ends_outside":"termina fora","Upcoming_Events":"Próximos Eventos","minimum_available_duration":"duração mínima disponível","Russian_Regular_Index":"Índice Regulador Russo","Hitachi_Ltd":"Hitachi Ltda","Feb":"Fev","Gold/EUR":"Ouro/EUR","Now":"Agora","The_two_passwords_that_you_entered_do_not_match_":"As palavras-chave que introduziu não coincidem.","Stop-loss":"Limite de perdas","re-enter_password":"redigite a sua senha","This_field_is_required_":"Este campo é obrigatório.","Return":"Prêmio","Norwegian_Index":"Índice Norueguês","Swiss_Index":"Índice Suíço","asian_up":"Alta Asiática","AP_Ordinary":"AP Ordinária","Asians":"Asiático","Random_100_Index":"Índice Random 100","September":"Setembro","Save_as_PDF":"Salve como PDF","Contract_Confirmation":"Confirmação de Contrato","numbers":"números","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"min","day":"dia","Save_as_JPEG":"Salve como JPEG","Delete":"Eliminar","Platinum/USD":"Platina/USD","hours":"horas","Euro_100_Index":"Índice 100 Europeu","second":"segundo","Belgian_Stocks":"Ações Belgas","Date":"Data","AUD_Index":"Índice AUD","Asia/Oceania":"Ásia/Oceânia","Italian_Index":"Índice Italiano","Your_withdrawal_limit_is_EUR":"O seu limite de retirada é EUR","lower":"inferior","Digits":"Dígitos","April":"Abril","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"Não aceitamos atualmente contas de residentes deste país.","ICAG_(British_Airways)":"British Airways","Australian_Index":"índice Australiano","Last_Digit_Prediction":"Previsão do último dígito","Start_time":"Hora de início","Your":"O seu","Americas":"Américas","Japanese_Index":"Índice Japonês","US_Tech_100_Index":"Índice US Tech 100","Sep":"Set","matches":"combina","Long":"Longo","Jakarta_Index":"Índice de Jacarta","is_required__Current_spread":"é obrigatório. Spread atual","Purchase_Price":"Preço de Compra","UK_Smart_Index":"Índice Inteligente do Reino Unido","days":"dias","Yara_International":"Yara International ASA","March":"Março","Name":"Nome","(Bejing/CST_-8_hours)":"(Pequim/CST -8 horas)","Save_as_PNG":"Salve como PNG","New_Zealand_Index":"Índice da Nova Zelândia","Smart_FX":"Inteligente FX","Week_of":"Semana de","Entry_Spot":"Preço de entrada","Major_Pairs":"Pares Principais","Su":"Dom","Jump_To":"Saltar para","QUALCOMM":"Qualcomm","Dutch_Index":"Índice Holandês","loading___":"a carregar...","EUR/BRL":"EUR/GBRL","French_Index":"Índice Francês","Metals":"Metais","Email_address":"Endereço de e-mail","We":"Qua","Closes":"Fecha","To":"Para","Tuesday":"Terça-feira","even":"número par","High_barrier":"Barreira alta","Gaming_Account":"Conta de Jogos","You_must_accept_the_terms_and_conditions_to_open_an_account_":"Tem de aceitar os termos e condições para abrir uma conta.","July":"Julho","June":"Junho","Purchase_Date":"Data de Compra","Infosys_Ltd":"Infosys Ltda","Dec":"Dez","US_S&P_100":"EUA S&P 100","Thursday":"Quinta-feira","Portuguese_Index":"Índice Português","Limit":"Limite","higher":"superior","Smart_Indices":"Índices Inteligentes","in_aggregate_over_the_last":"de forma agregada durante os últimos","Monday":"Segunda","differs":"Diferentes","Randoms":"Randoms (Aleatórios)","Oil/AUD":"Petróleo/AUD","USD_Index":"Índice USD","ANZ_Banking_Group_Ltd":"Australia and New Zealand Banking Group Ltd (ANZ)","USD/MXN":"USD/MXR","HDFC_Bank_Ltd":"HDFC Bank Ltda","password":"senha","Stop-type":"Tipo de limite","Action":"Ação","French_Smart_Index":"Índice Inteligente Francês","Random_Bull":"Random Touro (Altista)","comma":"vírgula","minutes":"minutos","Last_Used":"Última utilização","details":"detalhes","Your_withdrawal_limit_for_the_entire_duration_of_the_account_is_currently:_EUR":"O seu limite de retirada para toda a duração da conta é atualmente: EUR","Oil/GBP":"Petróleo/GBP","Indian_50_Index":"Índice Indiano 50","Toyota_Motor":"Toyota Motor Corporation","Wall_Street_Index":"Índice de Wall Street","ticks":"tique-taques","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"Quando você clicar em 'Ok', você será excluído das negociações no site até a data escolhida.","Apr":"Abr","months":"meses","Potential_Profit":"Lucro Potencial","over":"acima","Previous":"Prévia","Reliance_Industries_Ltd":"Reliance Industries Ltda","Random":"Random (Aleatório)","Sale_Date":"Data de Venda","Contract_period":"Período do contrato","Nocturnes":"Noturno","Euro_150_Index":"Índice 150 Europeu","Exercise_period":"Período do exercício","February":"Fevereiro","Failed_to_update_trade_description_":"Falha na atualização dos dados da negociação.","Your_current_balance_is":"O seu saldo atual é","Stocks":"Ações","Singapore_Index":"Índice de Singapura","Duration":"Duração","This_contract_lost":"Esse contrato perdeu","The_Payment_Agent_facility_is_currently_not_available_in_your_country_":"A opção Agentes de Pagamentos não está atualmente disponível no seu país.","Buy":"Comprar","Next":"Próximo","Friday":"Sexta-feira","Your_settings_have_been_updated_successfully_":"As suas definições foram atualizadas com sucesso.","Your_password_cannot_be_the_same_as_your_email":"A sua senha não pode ser igual ao seu e-mail","EUR_Index":"Índice EUR","Egypt_Index":"Índice de Egito","Shanghai_Index":"Índice Xangai","Net_profit":"Lucro líquido","points":"pontos","There_was_a_problem_accessing_the_server_during_purchase_":"Ocorreu um problema ao aceder ao servidor durante a aquisição.","Random_25_Index":"Índice Random 25","create_new_account":"criar uma conta nova","December":"Dezembro","Dutch_Stocks":"Ações Holandesas","Th":"Qui","Oct":"Out","Saudi_Arabia_Index":"Índice de Arábia Saudita","Higher/Lower":"Superior/Inferior","Stake":"Aposta","GlaxoSmithKline_plc":"GlaxoSmithKline","Barrier_offset":"Compensação de Barreira","Amount_per_point":"Montante por ponto","in_aggregate_over_the_lifetime_of_your_account_":"de forma agregada ao longo da vida útil da sua conta.","Gold/USD":"Ouro/USD","The_Coca-Cola_Company":"Coca-Cola Company","Next_Day":"Dia seguinte","BHP_Billiton_Ltd":"BHP Billiton Ltda","Total_Profit/Loss":"Lucro/Perda Total","Save_as_CSV":"Salve como CVS","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"Representa a quantia máxima de dinheiro que pode manter na sua conta. Se o máximo for atingido, vamos solicitar-lhe a retirada dos fundos.","Quotidians":"Quotidianos","Loss":"Perda","Mo":"Seg","Dutch_Smart_Index":"Índice Inteligente Holandês","Tick":"Tique-taque","Balance":"Saldo","Statement":"Extrato","ends_between":"termina entre","letters":"caracteres","under":"abaixo","asian_down":"queda asiático","Silver/USD":"Prata/USD","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"Não podemos transmitir ao vivo os preços no momento. Para ver os preços ao vivo tente recarregar a página, se o problema persistir após repetidas tentativas tente um navegar diferente","Low_barrier":"Barreira Baixa","Forex":"Forex (Divisas Estrangeiras)","Minor_Pairs":"Pares secundários","Energy":"Energia","Virtual_Account":"Conta Virtual","From":"De","does_not_touch":"não toca","hour":"hora","View":"Ver","Sorry,_an_error_occurred_while_processing_your_account_":"Lamentamos, ocorreu um erro durante o processamento da sua conta.","French_Stocks":"Ações Francesas","years":"anos","Sunday":"Domingo","Trading_Limits":"Limites de Negociação","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"Portanto, a sua retirada máxima imediata atual (sujeita à existência de fundos suficientes na sua conta) é EUR","Vanilla_Options":"Opções Vanilla","Please_wait_<br_/>Your_request_is_being_processed_":"Por favor aguarde.<br />O seu pedido está a ser processado.","Irish_Index":"Índice Irlandês","German_Smart_Index":"Índice Inteligente Alemão","Belgian_Index":"Índice Belga","minute":"minuto","Palladium/USD":"Paládio/USD","January":"Janeiro","Maximum_account_cash_balance":"Saldo máximo de numerário em conta","August":"Agosto","Hyundai_Motor_Co_":"Hyundai Motor Company.","Bombay_Index":"Índice de Bombaim","Maximum_number_of_open_positions":"Número máximo de posições em aberto","Euro_50_Smart_Index":"Índice Inteligente Euro 50","US_Tech_Composite_Index":"Índice US Tech Composite","Sa":"Sáb","Start_Time":"Hora de Início","seconds":"segundos","or_equivalent_in_other_currency":"ou equivalente em outra moeda","Gold/GBP":"Ouro/GBP","Shinhan_Financial":"Shinhan Financial Group","Oil/USD":"Petróleo/USD","Ends_In/Out":"Termina Dentro/Fora","Up/Down":"Acima/Abaixo","You_have_already_withdrawn_the_equivalent_of_EUR":"Você já levantou o equivalente a EUR","Telefonica_SA":"Telefônica SA","Indices":"Índices","Maximum_aggregate_payouts_on_open_positions":"Máximo de pagamentos agregados sobre posições em aberto","Profit_Table":"Tabela de Lucros","Purchase":"Comprar","Credit/Debit":"Crédito/Débito","End_Time":"Hora final","There_was_a_problem_accessing_the_server_":"Ocorreu um problema ao aceder ao servidor.","Shenzhen_Index":"Índice de Shenzhen","Invalid_email_address":"Endereço de e-mail inválido","year":"ano","German_Index":"Índice Alemão","Please_check_your_Email_for_the_next_step_":"Consulte a sua caixa de e-mail para informações sobre a próxima etapa.","November":"Novembro","Random_50_Index":"Índice Random 50","South_African_Index":"Índice Sul Africano","Contract":"Contrato","Investment_Account":"Conta de Investimento","You_are_not_authorized_for_withdrawal_via_payment_agent_":"Você não está autorizado a fazer uma retirada por meio de agente de pagamento.","Please_enter_a_date_that_is_at_least_6_months_from_now_":"Por favor, introduza uma data que seja, no mínimo, seis meses a partir de agora.","Wall_Street_Smart_Index":"Índice Inteligente da Wall Street","Zoom":"Ampliar","May":"Maio","Profit":"Lucro","Rise/Fall":"Sobe/Desce","Withdrawal_Limits":"Limites de retirada","Print_chart":"Imprimir gráfico","Please_try_again_":"Por favor, tente novamente.","Total_Cost":"Custo Total","Your_transaction_reference_is":"A referência da sua transação é","Diageo_plc":"Diageo PLC","Touch/No_Touch":"Toca","Glencore_Xstrat":"GlencoreXtrata","National_Australia_Bank_Ltd":"National Australia Bank Ltda","Save_as_SVG":"Salve como SVG","Honda_Motor_Co__Ltd":"Honda Motor Co. Ltda","Profit/Loss":"Lucro/Perda","Maximum_daily_turnover":"Volume de negócios máximo diário","Commodities":"Matérias-primas","Verification_token_is_missing__Click_on_the_verification_link_sent_to_your_Email_and_make_sure_you_are_not_already_logged_in_":"O token de verificação está em falta. Clique no link de verificação que foi enviado para o seu e-mail e certifique-se de que você não está já conectado.","Commbank_(Australia)":"Commbank (Austrália)","Fr":"Sex","Royal_Dutch_Shell_plc":"Royal Dutch Shell PLC","Settles":"Liquida","goes_outside":"sai fora","Item":"Artigo","Month":"Mês","High_Barrier":"Barreira Alta","Middle_East":"Oriente Médio","space":"espaço","Portuguese_Smart_Index":"Índice Inteligente Português","Saturday":"Sábado","Never_Used":"Nunca utilizado","Reckitt_Benckiser_Group_plc":"Reckitt Benckiser Group PLC","Low_barrier_offset":"Variação de barreira baixa","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"Apresenta os pagamentos agregados máximos referentes aos contratos pendente do seu portfólio. Se o máximo for atingido, você não poderá comprar contratos adicionais sem primeiro fechar as posições existentes.","Description":"Descrição","Sell":"Vender","Abu_Dhabi_Index":"Índice de Abu Dhabi"};
+texts_json['PL'] = {"Euro_50_Index":"Indeks Euro 50","This_contract_won":"Ten kontrakt wygrał","October":"Październik","Oil/EUR":"Ropa/EUR","Spot":"Cena aktualna","US_Index":"Indeks USA","Payout":"Wypłata","period":"okres","Stays_In/Goes_Out":"Pozostanie w/przekroczy","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"Pokazuje maksymalną liczbę niezapłaconych kontraktów w Twoim portfolio. Każda linia w Twoim portfolio liczy się jako jedna otwarta pozycja. Po osiągnięciu maksimum nie będziesz mieć możliwości otwierania nowych pozycji bez uprzedniego zamknięcia dotychczasowych pozycji.","stays_between":"pozostaje pomiędzy","Random_Bear":"Losowe bessa","Italian_30_Index":"Indeks włoski 30","Deposit_of":"Wpłata w wysokości","odd":"nieparzysta","Asset":"Kapitał","Wednesday":"Środa","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"Pokazuje maksymalną liczbę kontraktów, które możesz nabyć w danym dniu handlowym.","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"Podany adres e-mail jest już przypisany do innego loginu","Dubai_Index":"Indeks dubajski","month":"miesiąc","Hong_Kong_Index":"Indeks hongkoński","In/Out":"Zakłady w/poza","Opens":"Otwarcie","Barrier":"Limit","Potential_Payout":"Możliwa wypłata","Low_Barrier":"Niski limit","Previous_Day":"Poprzedni dzień","Points":"Punkty","Tu":"Wtorek","Therefore_you_may_not_withdraw_any_additional_funds_":"Nie możesz więc wypłacać żadnych środków.","Gold/AUD":"Złoto/AUD","Sale_Price":"Cena sprzedaży","touches":"osiąga","day_withdrawal_limit_is_currently_EUR":"dzienny limit wypłat wynosi obecnie EUR","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"Wprowadź limit w zakresie różnicy od aktualnej ceny. Jeśli wprowadzisz +0,005, zakupisz kontrakt z limitem 0,005 wyższym niż pozycja wejściowa. Pozycja wejściowa to następny najmniejszy przyrost ceny po otrzymaniu zamówienia","Short":"Krótkie","Random_75_Index":"Losowy indeks 75","Please_confirm_the_trade_on_your_statement_before_proceeding_":"Aby przejść dalej, proszę potwierdzić transakcję w sekcji stan konta.","Year":"Rok","Purchase_Time":"Godzina zakupu","No_Live_price_update":"Brak aktualnych cen","Please_select_a_payment_agent":"Proszę wybrać pośrednika płatności","Real_Account":"Prawdziwe konto","Day":"Dzień","Your_request_to_withdraw_[_1]_[_2]_from_your_account_[_3]_to_Payment_Agent_[_4]_account_has_been_successfully_processed_":"Twój wniosek o wypłatę   z Twojego konta  na konto pośrednika płatności  został zrealizowany.","Europe/Africa":"Europa/Afryka","Trading_and_Withdrawal_Limits":"Limity handlowe i limity wypłat","High_barrier_offset":"Offset wysokiego limitu","Aug":"Sierpień","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"Twoje konto jest w pełni zweryfikowane, a Twój limit wypłat został zwiększony.","Swedish_Index":"Indeks szwedzki","GBP_Index":"Indeks brytyjski (GBP)","country_of_residence":"kraj zamieszkania","Jul":"Lipiec","ends_outside":"kończy się poza","Upcoming_Events":"Nadchodzące wydarzenia","minimum_available_duration":"minimalny dostępny czas trwania","Russian_Regular_Index":"Regularny indeks rosyjski","Feb":"Luty","Gold/EUR":"Złoto/EUR","Now":"Teraz","The_two_passwords_that_you_entered_do_not_match_":"Wprowadzone hasła nie są identyczne.","Stop-loss":"Stop-stratom","re-enter_password":"wpisz hasło ponownie","This_field_is_required_":"To pole jest wymagane.","Return":"Zwrot","Norwegian_Index":"Indeks norweski","Swiss_Index":"Indeks szwajcarski","asian_up":"azjatyckie w górę","AP_Ordinary":"Zwykłe AP","Asians":"Azjatyckie","Random_100_Index":"Losowy indeks 100","September":"Wrzesień","Save_as_PDF":"Zapisz jako PDF","Contract_Confirmation":"Potwierdzenie kontraktu","numbers":"liczby","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"min","day":"dzień","Save_as_JPEG":"Zapisz jako JPEG","Delete":"Usuń","Platinum/USD":"Platyna/USD","hours":"godziny","Euro_100_Index":"Indeks Euro 100","second":"sek.","spread_down":"spread w dół","Belgian_Stocks":"Akcje belgijskie","Date":"Data","AUD_Index":"Indeks australijski (AUD)","Asia/Oceania":"Azja/Oceania","Italian_Index":"Indeks włoski","Your_withdrawal_limit_is_EUR":"Twój limit wypłat wynosi EUR","TOTAL":"SUMA","lower":"niższa","Digits":"Cyfry","April":"Kwiecień","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"W tej chwili nie otwieramy kont dla mieszkańców z tych krajów.","Australian_Index":"Indeks australijski","Last_Digit_Prediction":"Przewidywanie ostatniej cyfry","Start_time":"Godzina rozpoczęcia","Your":"Twój","Americas":"Ameryki","Japanese_Index":"Indeks japoński","US_Tech_100_Index":"Indeks US Tech 100","Sep":"Wrzesień","matches":"zgadza się","Long":"Długie","Jakarta_Index":"Indeks dżakarcki","is_required__Current_spread":"jest wymagany. Obecny spread","Purchase_Price":"Cena zakupu","UK_Smart_Index":"Inteligentny indeks brytyjski","days":"dni","March":"Marzec","Name":"Nazwisko","(Bejing/CST_-8_hours)":"(Pekin/CST - 8 godzin)","Save_as_PNG":"Zapisz jako PNG","New_Zealand_Index":"Indeks nowozelandzki","Smart_FX":"Inteligentny forex","Week_of":"Tydzień","Entry_Spot":"Pozycja wejściowa","Major_Pairs":"Główne pary","Su":"niedziela","Nov":"Listopad","spread_up":"spread w górę","Jump_To":"Przejdź do","Dutch_Index":"Indeks holenderski","loading___":"ładowanie...","French_Index":"Indeks francuski","Metals":"Metale","Email_address":"Adres e-mail","We":"Środa","Closes":"Zamknięcie","To":"Do","Tuesday":"Wtorek","even":"parzysta","High_barrier":"Wysoki limit","Gaming_Account":"Konto gracza","You_must_accept_the_terms_and_conditions_to_open_an_account_":"Musisz zaakceptować regulamin, aby otworzyć konto.","July":"Lipiec","June":"Czerwiec","Mar":"Marzec","Purchase_Date":"Data zakupu","Dec":"Grudzień","Thursday":"Czwartek","Portuguese_Index":"Indeks portugalski","higher":"wyższa","Smart_Indices":"Inteligentne wskaźniki","Jan":"Styczeń","in_aggregate_over_the_last":"ogółem przez ostatnie","Monday":"Poniedziałek","Royal_Dutch_Shell":"Royal Dutch Shell plc","differs":"różni się","Randoms":"Losowe","Oil/AUD":"Ropa/AUD","USD_Index":"Indeks amerykański (USD)","password":"hasło","Stop-type":"Stop-typ","Action":"Czynności","French_Smart_Index":"Inteligentny indeks francuski","Random_Bull":"Losowe hossa","comma":"przecinek","minutes":"min","Last_Used":"Ostatnio używane","details":"szczegóły","Your_withdrawal_limit_for_the_entire_duration_of_the_account_is_currently:_EUR":"Twój limit wypłat za cały okres działania konta wynosi obecnie: EUR","Oil/GBP":"Ropa/GBP","Indian_50_Index":"Indeks indyjski 50","Wall_Street_Index":"Indeks Wall Street","ticks":"zmiany ceny","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"Po kliknięciu przycisku OK handlowanie na portalu nie będzie możliwe aż do wybranej daty.","Apr":"Kwiecień","months":"miesiące","Potential_Profit":"Możliwy zysk","over":"ponad","Previous":"Poprzedni","Random":"Losowy","Sale_Date":"Data sprzedaży","Contract_period":"Okres kontraktu","Nocturnes":"Nokturny","Euro_150_Index":"Indeks Euro 150","Exercise_period":"Okres ćwiczeń","February":"Luty","Failed_to_update_trade_description_":"Nie udało się uaktualnić opisu transakcji.","Your_current_balance_is":"Obecnie Twoje saldo wynosi","Stocks":"Akcje","Singapore_Index":"Indeks singapurski","Duration":"Czas trwania","This_contract_lost":"Ten kontrakt przegrał","The_Payment_Agent_facility_is_currently_not_available_in_your_country_":"Usługi pośredników płatności są obecnie niedostępne w Twoim kraju.","Buy":"Kup","Next":"Następny","Friday":"piątek","Random_Yin":"Losowe Yin","Your_settings_have_been_updated_successfully_":"Twoje ustawienia zostały uaktualnione.","Your_password_cannot_be_the_same_as_your_email":"Hasło nie może być takie samo jak adres e-mail","EUR_Index":"Indeks EUR","Egypt_Index":"Indeks egipski","Shanghai_Index":"Indeks szanghajski","Net_profit":"Zysk netto","points":"punkty","There_was_a_problem_accessing_the_server_during_purchase_":"Wystąpił błąd podczas uzyskiwania dostępu do serwera w trakcie zakupu.","Random_25_Index":"Losowy indeks 25","create_new_account":"załóż nowe konto","December":"Grudzień","Dutch_Stocks":"Akcje holenderskie","Th":"czwartek","Oct":"Październik","Saudi_Arabia_Index":"Indeks Arabii Saudyjskiej","Higher/Lower":"Wyższy/niższy","Stake":"Stawka","Barrier_offset":"Limit","Amount_per_point":"Kwota na punkt","in_aggregate_over_the_lifetime_of_your_account_":"ogółem w okresie działania Twojego konta.","Gold/USD":"Złoto/USD","Next_Day":"Następny dzień","Total_Profit/Loss":"Całkowity zysk/ całkowita strata","Save_as_CSV":"Zapisz jako CSV","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"Pokazuje maksymalną kwotę gotówki, jaką możesz mieć na koncie. Po osiągnięciu maksimum poprosimy Cię o wypłacenie środków.","Quotidians":"Codzienne","Loss":"Strata","Mo":"Poniedziałek","Jun":"Czerwiec","Dutch_Smart_Index":"Inteligentny indeks holenderski","Tick":"Zmiana ceny","Balance":"Saldo","Statement":"Stan konta","ends_between":"kończy się pomiędzy","letters":"litery","under":"poniżej","asian_down":"azjatyckie w dół","Silver/USD":"Srebro/USD","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"W chwili obecnej nie jesteśmy w stanie przesyłać cen na żywo. Aby cieszyć się na żywo strumieniową transmisją cen, spróbuj ponownie odświeżyć stronę, a jeśli problem nadal występuje, spróbuj skorzystać z innej przeglądarki","Low_barrier":"Niski limit","Minor_Pairs":"Mniej ważne pary","Spreads":"Spready","Energy":"Energetyka","Virtual_Account":"Konto wirtualne","From":"Od","does_not_touch":"nie osiąga","hour":"godzina","View":"Widok","Sorry,_an_error_occurred_while_processing_your_account_":"Przepraszamy, wystąpił błąd podczas operacji na Twoim koncie.","French_Stocks":"Akcje francuskie","years":"lat(a)","Sunday":"Niedziela","Trading_Limits":"Limity handlowe","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"Dlatego w chwili obecnej Twoja maksymalna natychmiastowa wypłata (o ile posiadasz na koncie wystarczające środki) wynosi EUR","Vanilla_Options":"Opcje Vanilla","Please_wait_<br_/>Your_request_is_being_processed_":"Prosimy o cierpliwość.<br />Twoja prośba jest właśnie przetwarzana.","Irish_Index":"Indeks irlandzki","German_Smart_Index":"Inteligentny indeks niemiecki","Belgian_Index":"Indeks belgijski","minute":"min","Palladium/USD":"Pallad/USD","January":"Styczeń","Maximum_account_cash_balance":"Maksymalne saldo gotówki na koncie","August":"Sierpień","Bombay_Index":"Indeks bombajski","Maximum_number_of_open_positions":"Maksymalna dzienna liczba otwartych pozycji","Euro_50_Smart_Index":"Inteligentny indeks Euro 50","US_Tech_Composite_Index":"Indeks\tUS Tech Composite","Sa":"sobota","Start_Time":"Godzina rozpoczęcia","seconds":"sek.","or_equivalent_in_other_currency":"lub ekwiwalent w innej walucie","Gold/GBP":"Złoto/GBP","Oil/USD":"Ropa/USD","Ends_In/Out":"Kończy się w/poza","Up/Down":"Góra/dół","You_have_already_withdrawn_the_equivalent_of_EUR":"Już wypłaciłeś ekwiwalent EUR","Indices":"Wskaźniki","Maximum_aggregate_payouts_on_open_positions":"Maksymalne zagregowane wypłaty dla pozycji otwartych","Profit_Table":"Tabela zysków","Purchase":"Kup","Credit/Debit":"Winien/Ma","End_Time":"Zakończenie","There_was_a_problem_accessing_the_server_":"Wystąpił błąd podczas uzyskiwania dostępu do serwera.","Shenzhen_Index":"Indeks Shenzhen","Invalid_email_address":"Nieprawidłowy adres e-mail","year":"rok","German_Index":"Indeks niemiecki","Please_check_your_Email_for_the_next_step_":"Informacje na temat kolejnych kroków zostały wysłane na adres e-mail.","November":"Listopad","Random_50_Index":"Losowy indeks 50","South_African_Index":"Indeks południowoafryk.","Contract":"Kontrakt","Investment_Account":"Konto inwestycyjne","You_are_not_authorized_for_withdrawal_via_payment_agent_":"Nie jesteś upoważniony do wypłat przez pośrednika płatności.","Please_enter_a_date_that_is_at_least_6_months_from_now_":"Wpisz datę co najmniej 6 miesięcy od dnia dzisiejszego.","Wall_Street_Smart_Index":"Inteligentny indeks Wall Street","Zoom":"Powiększ","May":"Maj","Profit":"Zysk","Rise/Fall":"Wzrost/spadek","Withdrawal_Limits":"Limity wypłat","Print_chart":"Drukuj wykres","Please_try_again_":"Spróbuj ponownie.","Total_Cost":"Całkowity koszt","Your_transaction_reference_is":"Kod referencyjny Twojej transakcji to","Touch/No_Touch":"Osiągnie","Save_as_SVG":"Zapisz jako SVG","Profit/Loss":"Zysk/Strata","Maximum_daily_turnover":"Maksymalny dzienny obrót","Commodities":"Towary","Verification_token_is_missing__Click_on_the_verification_link_sent_to_your_Email_and_make_sure_you_are_not_already_logged_in_":"Brak tokenu weryfikującego. Kliknij na link weryfikujący wysłany na Twój adres e-mail i upewnij się, czy nie jesteś już zalogowany/a.","Fr":"piątek","Settles":"Rozliczenie","goes_outside":"przekracza","Item":"Element","Month":"Miesiąc","High_Barrier":"Wysoki limit","Middle_East":"Środkowy Wschód","space":"spacja","Portuguese_Smart_Index":"Inteligentny indeks portugalski","Saturday":"Sobota","Never_Used":"Nigdy nie użyte","Random_Yang":"Losowe Yang","Low_barrier_offset":"Ustawienie niskiego limitu","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"Pokazuje maksymalne zagregowane wypłaty dla niezapłaconych kontraktów w Twoim portfolio. Jeżeli maksimum zostanie osiągnięte, nie będziesz mieć możliwości zakupienia dodatkowych kontraktów bez uprzedniego zamknięcia aktualnych pozycji.","Description":"Opis","Sell":"Sprzedaj","Abu_Dhabi_Index":"Indeks Abu Zabi"};
+texts_json['DE'] = {"This_contract_won":"Dieser Vertrag gewann","October":"Oktober","Oil/EUR":"Öl/EUR","Spot":"Kassakurs","Payout":"Auszahlung","period":"Zeitraum","Stays_In/Goes_Out":"Bleibt in/Geht außerhalb","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"Stellt die maximale Anzahl an ausstehenden Verträgen Ihres Portfolios dar. Jede Linie Ihres Portfolios steht für eine offene Position. Wenn das Maximum erreicht wird, können Sie keine neuen Positionen öffnen, ohne zuvor eine bereits bestehende Position zu schließen.","stays_between":"bleibt zwischen","Italian_30_Index":"Italienischer 30 Index","Deposit_of":"Einzahlung in Höhe von","odd":"ungleich","Asset":"Kapital","Wednesday":"Mittwoch","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"Stellt das maximale Volumen an Kontrakten dar, die Sie an einem einzelnen Börsentag erwerben können.","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"Die von Ihnen angegebene E-Mail Adresse wird bereits von einer anderen Login-ID verwendet.","month":"Monat","In/Out":"Kauf/Verkauf","Opens":"Öffnet","Barrier":"Schwelle","Potential_Payout":"Mögliche Auszahlung","Low_Barrier":"Untere Schwelle","Previous_Day":"Vorheriger Tag","Points":"Punkte","Tu":"Di","Therefore_you_may_not_withdraw_any_additional_funds_":"Deshalb können Sie kein zusätzliches Geld abheben.","Sale_Price":"Verkaufskurs","touches":"berührt","day_withdrawal_limit_is_currently_EUR":"das tägliche Abhebelimit beträgt derzeit EUR","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"Geben Sie die Schwelle für die Differenz zum Kassakurs an. Wenn Sie +0,005 eingeben, erwerben Sie einen Kontrakt mit einer 0,005 höheren Schwelle als der Startkurs. Der Startkurs ist der nächste Tick nachdem Ihr Auftrag eingegangen ist","Short":"Kurz","Please_confirm_the_trade_on_your_statement_before_proceeding_":"Bevor Sie fortfahren, bestätigen Sie bitte das Geschäft in Ihrem Auszug.","Year":"Jahr","Purchase_Time":"Kaufuhrzeit","No_Live_price_update":"Keine Live Kursaktualisierung","Please_select_a_payment_agent":"Bitte wählen Sie einen Zahlungsabwickler aus","Real_Account":"Echtes Konto","Day":"Tag","Your_request_to_withdraw_[_1]_[_2]_from_your_account_[_3]_to_Payment_Agent_[_4]_account_has_been_successfully_processed_":"Ihr Auftrag,   von Ihrem Konto  auf das Konto des Zahlungsabwicklers  zu überweisen, wurde erfolgreich bearbeitet.","Europe/Africa":"Europa/Afrika","Trading_and_Withdrawal_Limits":"Handels- und Abhebelimits","High_barrier_offset":"Hohe Schwellenverschiebung","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"Ihr Konto ist vollständig authentifiziert und Ihr Abhebelimit wurde angehoben.","Swedish_Index":"Schwedischer Index","country_of_residence":"Wohnsitzland","ends_outside":"endet außerhalb","Upcoming_Events":"Bevorstehende Events","minimum_available_duration":"kürzeste vorhandene Dauer","Russian_Regular_Index":"Russischer Regulärindex","Now":"Jetzt","The_two_passwords_that_you_entered_do_not_match_":"Die beiden Passwörter, die Sie eingegeben haben, stimmen nicht überein.","Stop-loss":"Stop-Loss","re-enter_password":"Passwort erneut eingeben","This_field_is_required_":"Dieses Feld ist erforderlich.","Return":"Rendite","Norwegian_Index":"Norwegischer Index","Swiss_Index":"Schweizerischer Index","asian_up":"Asiatisch hoch","AP_Ordinary":"AP Allgemein","Asians":"Asiaten","Save_as_PDF":"Als PDF speichern","Contract_Confirmation":"Vertragsbestätigung","numbers":"Zahlen","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"Minuten","day":"Tag","Save_as_JPEG":"Als JPEG speichern","Delete":"Löschen","Platinum/USD":"Platin/USD","hours":"Stunden","second":"Sekunde","spread_down":"Spread tief","Belgian_Stocks":"Belgische Aktien","Date":"Datum","Asia/Oceania":"Asien/Ozeanien","Italian_Index":"Italienischer Index","Your_withdrawal_limit_is_EUR":"Ihr Abhebelimit beträgt EUR","lower":"niedriger","Digits":"Dezimalstellen","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"Derzeit lehnen wir die Eröffnung von Konten für Einwohner dieses Landes ab.","AUDZAR":"AUD/ZAR","Australian_Index":"Australischer Index","Last_Digit_Prediction":"Voraussage der Letzten Stelle","Start_time":"Startzeit","Your":"Ihr","Americas":"Amerika","Japanese_Index":"Japanischer Index","matches":"entspricht","Long":"Lang","is_required__Current_spread":"ist erforderlich. Aktueller Spread","Purchase_Price":"Kaufpreis","UK_Smart_Index":"GB Smart Index","days":"Tage","March":"März","(Bejing/CST_-8_hours)":"(Peking/CST -8 Stunden)","Save_as_PNG":"Als PNG speichern","New_Zealand_Index":"Neuseeland Index","Week_of":"Woche von","Entry_Spot":"Startkurs","Major_Pairs":"Wichtigste Paare","Su":"So","spread_up":"Spread hoch","Jump_To":"Springen zu","Dutch_Index":"Niederländischer Index","loading___":"wird geladen...","French_Index":"Französischer Index","Metals":"Metalle","Email_address":"E-Mail Adresse","We":"Mi","Closes":"Schließt","To":"An","Tuesday":"Dienstag","even":"gleich","High_barrier":"Hohe Schwelle","Gaming_Account":"Spielkonto","You_must_accept_the_terms_and_conditions_to_open_an_account_":"Sie müssen die Geschäftsbedingungen akzeptieren, um ein Konto eröffnen zu können.","July":"Juli","June":"Juni","USDZAR":"USD/ZAR","Mar":"Mär","Purchase_Date":"Kaufdatum","Dec":"Dez","Thursday":"Donnerstag","Portuguese_Index":"Portugiesischer Index","higher":"höher","Smart_Indices":"Smart Indizes","in_aggregate_over_the_last":"insgesamt über die letzten","Monday":"Montag","differs":"unterscheidet sich","Oil/AUD":"Öl/AUD","password":"Passwort","Stop-type":"Stopp-Art","Action":"Handlung","French_Smart_Index":"Französischer Smart Index","comma":"Komma","minutes":"Minuten","Last_Used":"Zuletzt verwendet","details":"Angaben","Your_withdrawal_limit_for_the_entire_duration_of_the_account_is_currently:_EUR":"Ihr Auszahlungslimit für die Gesamtlaufzeit des Kontos ist aktuell: EUR","Oil/GBP":"Öl/GBP","Indian_50_Index":"Indischer 50 Index","ticks":"Ticks","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"Wenn Sie auf 'Ok' klicken, werden Sie bis zum ausgewählten Datum vom Handel auf dieser Site ausgeschlossen.","months":"Monate","Potential_Profit":"Möglicher Gewinn","over":"über","Previous":"Vorige","Sale_Date":"Verkaufsdatum","Contract_period":"Kontraktzeitraum","Exercise_period":"Ausübungszeitraum","February":"Februar","Failed_to_update_trade_description_":"Aktualisierung der Kontraktbeschreibung fehlgeschlagen.","Your_current_balance_is":"Ihr aktuelles Guthaben beträgt","Stocks":"Aktien","Singapore_Index":"Singapur Index","Duration":"Laufzeit","This_contract_lost":"Dieser Kontrakt verlor","The_Payment_Agent_facility_is_currently_not_available_in_your_country_":"In Ihrem Land ist derzeit für Ihr Konto kein Zahlungsabwickler vorhanden.","Buy":"Kaufen","Next":"Weiter","Friday":"Freitag","Your_settings_have_been_updated_successfully_":"Ihre Einstellungen wurden erfolgreich aktualisiert.","Your_password_cannot_be_the_same_as_your_email":"Ihr Passwort kann nicht wie Ihre E-Mail Adresse lauten","Egypt_Index":"Ägypten Index","Net_profit":"Nettogewinn","points":"Punkte","There_was_a_problem_accessing_the_server_during_purchase_":"Während des Kaufs ist ein Problem beim Zugriff auf den Server aufgetreten.","create_new_account":"Neues Konto eröffnen","December":"Dezember","Dutch_Stocks":"Niederländische Aktien","Th":"Do","Oct":"Okt","Saudi_Arabia_Index":"Saudi Arabien Index","Higher/Lower":"Höher/Tiefer","Stake":"Einsatz","Barrier_offset":"Schwellenverschiebung","Amount_per_point":"Betrag je Punkt","in_aggregate_over_the_lifetime_of_your_account_":"insgesamt während der Laufzeit Ihres Kontos.","Next_Day":"Nächster Tag","Total_Profit/Loss":"Gesamter Gewinn/Verlust","Save_as_CSV":"Als CSV speichern","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"Stellt den maximalen Bargeldbetrag dar, den Sie auf Ihrem Konto haben dürfen. Wenn das Maximum erreicht wird, werden Sie gebeten, Gelder abzuheben.","Loss":"Verlust","Dutch_Smart_Index":"Niederländischer Smart Index","Balance":"Guthaben","Statement":"Abrechnung","ends_between":"schließt zwischen","letters":"Buchstaben","under":"unter","asian_down":"asiatisches Tief","Silver/USD":"Silber/USD","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"Wir können zu diesem Zeitpunkt keine Kurse live anzeigen. Zur Ansicht der Echtzeitanzeige der Kurse sollten Sie diese Seite über den Browser aktualisieren. Wenn das Problem nach wiederholten Aktualisierungen der Seite weiter besteht, sollten Sie einen anderen Browser ausprobieren","Low_barrier":"Untere Schwelle","Forex":"Devisenhandel","Minor_Pairs":"Untergeordnete Paare","Energy":"Energie","Virtual_Account":"Virtuelles Konto","From":"Von","does_not_touch":"erreicht nicht","hour":"Stunde","View":"Ansehen","Sorry,_an_error_occurred_while_processing_your_account_":"Es tut uns leid, bei der Bearbeitung Ihres Kontos ist ein Fehler aufgetreten.","French_Stocks":"Französische Aktien","years":"Jahre","Sunday":"Sonntag","Trading_Limits":"Handelslimits","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"Daher beträgt Ihre derzeitige maximale Sofortabhebung (vorausgesetzt Ihr Konto hat ein ausreichendes Guthaben) EUR","Vanilla_Options":"Vanilla Optionen","Please_wait_<br_/>Your_request_is_being_processed_":"Bitte warten Sie.<br />Ihre Anfrage wird bearbeitet.","Irish_Index":"Irischer Index","German_Smart_Index":"Deutscher Smart Index","Belgian_Index":"Belgischer Index","minute":"Minute","January":"Januar","Maximum_account_cash_balance":"Maximales Kontoguthaben","Bombay_Index":"Mumbai Index","Maximum_number_of_open_positions":"Maximale Anzahl offener Positionen","Start_Time":"Startzeit","seconds":"Sekunden","or_equivalent_in_other_currency":"oder Gegenwert in anderer Währung","Oil/USD":"Öl/USD","Ends_In/Out":"Endet innerhalb/außerhalb","Up/Down":"Auf/Ab","You_have_already_withdrawn_the_equivalent_of_EUR":"Sie haben bereits den Gegenwert von EUR abgehoben","Indices":"Indizes","Maximum_aggregate_payouts_on_open_positions":"Maximale Gesamtauszahlungen auf offene Positionen","Profit_Table":"Gewinntabelle","Purchase":"Kauf","Credit/Debit":"Gutschrift/Lastschrift","End_Time":"Endzeit","There_was_a_problem_accessing_the_server_":"Es gab ein Problem beim Zugriff auf den Server.","Invalid_email_address":"Falsche E-Mail Adresse","year":"Jahr","German_Index":"Deutscher Index","Please_check_your_Email_for_the_next_step_":"Bitte überprüfen Sie Ihre E-Mail Adresse für den nächsten Schritt.","South_African_Index":"Südafrikanischer Index","Contract":"Kontrakt","Investment_Account":"Investmentkonto","You_are_not_authorized_for_withdrawal_via_payment_agent_":"Sie sind nicht befugt, eine Auszahlung über einen Zahlungsabwickler zu tätigen.","Please_enter_a_date_that_is_at_least_6_months_from_now_":"Bitte geben Sie ein Datum ein, das mindestens 6 Monate in der Zukunft liegt.","May":"Mai","Profit":"Rendite","Rise/Fall":"Steigen/Fallen","Withdrawal_Limits":"Abhebungslimits","Print_chart":"Chart drucken","Please_try_again_":"Bitte versuchen Sie es erneut.","Total_Cost":"Gesamtkosten","Your_transaction_reference_is":"Ihre Überweisungsreferenz lautet","Touch/No_Touch":"Erreicht","Save_as_SVG":"Als SVG speichern","Profit/Loss":"Gewinn/Verlust","Maximum_daily_turnover":"Maximaler Tagesumsatz","Commodities":"Rohstoffe","Commbank_(Australia)":"Commbank (Australien)","Settles":"Begleicht","goes_outside":"geht außerhalb","Item":"Posten","Month":"Monat","High_Barrier":"Hohe Schwelle","Middle_East":"Mittlerer Osten","space":"Bereich","Portuguese_Smart_Index":"Portugiesischer Smart Index","Saturday":"Samstag","Never_Used":"Nie verwendet","Low_barrier_offset":"Verschiebung der unteren Schwelle","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"Stellt die maximalen Gesamtauszahlungen ausstehender Verträge Ihres Portfolios dar. Wenn das Maximum erreicht ist, können Sie keine zusätzlichen Verträge erwerben, ohne zunächst bestehende Positionen zu schließen.","Description":"Beschreibung","Sell":"Verkaufen"};
+texts_json['JA'] = {"Euro_50_Index":"ユーロ50インデックス","This_contract_won":"このトレードは勝ち判定","October":"１０月","Spot":"スポット","ASML_Holding":"ASMLホールディング","Payout":"ペイアウト","Unilever_plc":"Unilever plc（ユニリーバ英）","period":"期間","Standard_Chartered_plc":"Standard Chartered plc（スタンダードチャータード銀行）","Stays_In/Goes_Out":"レンジ内/レンジ外に留まる","Fiat":"Fiat（フィアット）","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"未決済分のトレード総数を示し、各行を１件分の未決済分のオープン中のポジションとしてカウントします。最高件数を超えた場合、オープン中のトレードを閉じて頂くことで新たなトレードの購入が可能になります。","stays_between":"レンジ内に留まる","Random_Bear":"ランダム・ベアー","Deposit_of":"Xのご入金","odd":"奇数","Pfizer_Inc_":"Pfizer Inc.（ファイザー）","Asset":"取引対象","Wednesday":"水曜日","Airbus_Group":"Airbus Group（エアバスグループ）","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"購入可能な１日あたりのトレードの総額を示します。","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"ご入力いただいたメールアドレスは既に他のログインIDに使用されています。","Unilever":"Unilever（ユニリーバ）","Dubai_Index":"ドバイ インデックス","month":"ヶ月","In/Out":"レンジ内/レンジ外","Tokyo_Electric_Power_Co__Inc":"東京電力株式会社","AXA":"AXA（アクサ）","Opens":"開場時間","Barrier":"バリア","Potential_Payout":"期待払い戻し金額","Low_Barrier":"下限バリア","Previous_Day":"前日","Points":"ポイント","Tu":"木曜日","Therefore_you_may_not_withdraw_any_additional_funds_":"ゆえに、お客様はいかなる追加金額をご出金して頂くことはできません。","Belgacom":"Belgacom（ベルガコム）","Sale_Price":"決済価格","touches":"タッチ","day_withdrawal_limit_is_currently_EUR":"1日の出金限度額は現在EURです。","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"スポット価格に差異を付加する目的でバリア値を設定しましょう。もしバリア値として+0.005を設定した場合はスポット価格より0.005高値のバリアが設定されたトレードを購入することになります。尚、スポット価格は注文を受けた次のTickが採用されます。","Short":"ショート","Random_75_Index":"ランダムインデックス75","Please_confirm_the_trade_on_your_statement_before_proceeding_":"続行する前に、お客様の取引明細書をご確認ください。","Token":"トークン","Year":"年","Purchase_Time":"購入時間","No_Live_price_update":"最新価格の更新がありません","Please_select_a_payment_agent":"決済サービスを選択してください。","Real_Account":"リアル口座","Day":"日","Your_request_to_withdraw_[_1]_[_2]_from_your_account_[_3]_to_Payment_Agent_[_4]_account_has_been_successfully_processed_":"お客様のご口座から決済サービス口座へ の出金リクエストが正常に処理されました。","Europe/Africa":"ヨーロッパ・アフリカ","Trading_and_Withdrawal_Limits":"トレード及びご出金限度額","SABMiller_plc":"SABMiller plc（SABミラー）","High_barrier_offset":"上限追加バリア値","ICICI_Bank_Ltd":"ICICI銀行","Aug":"８月","Telenor":"Telenor（テレノール）","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"お客様のご口座はアップグレード済みですので、ご出金制限が引き上げられました。","Samsung_Electronics":"Samsung Electronics（サムスン電子）","country_of_residence":"居住国","Jul":"７月","ends_outside":"レンジ外で終了","Upcoming_Events":"祝祭日","minimum_available_duration":"最小取引期間","Russian_Regular_Index":"ロシア レギュラー インデックス","Hitachi_Ltd":"株式会社日立製作所","Feb":"２月","The_two_passwords_that_you_entered_do_not_match_":"ご入力頂いた各パスワードが合致しません。","Stop-loss":"損切り","re-enter_password":"パスワードを再度入力して下さい。","This_field_is_required_":"この項目は必須です。","Return":"リターン率","Carrefour":"Carrefour（カノフール）","Swiss_Index":"スイス インデックス","asian_up":"Asian アップ","Random_100_Index":"ランダムインデックス100","September":"９月","Save_as_PDF":"PDFへ保存","Contract_Confirmation":"トレード確定","numbers":"数字","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"%ctx(最短期間, 例： 最小 15 秒）分","Merck_&_Co__Inc_":"Merck & Co. Inc.（メルク）","day":"日","Moet_Hennessy_Louis_Vuitton":"Moet Hennessy Louis Vuitton（モエ ヘネシー・ルイ ヴィトン）","Chevron_Co_":"Chevron Co.（シェブロン）","Save_as_JPEG":"JPEGへ保存","Delete":"消去","Platinum/USD":"白金/USD","hours":"時間","Euro_100_Index":"ユーロ100インデックス","second":"秒","spread_down":"スプレッド ダウン","Belgian_Stocks":"ベルギー株式","Date":"日付","Asia/Oceania":"アジア・オセアニア","Your_withdrawal_limit_is_EUR":"お客様の出金限度額はEURです。","lower":"Lower","Digits":"数字","April":"４月","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"現在当社ではこの国の居住者からの口座開設を承ることができません。","Daimler_AG":"Daimler AG（ダイムラー）","ICAG_(British_Airways)":"ICAG (ブリティッシュ・エアウェイズ)","Australian_Index":"オーストラリア インデックス","Last_Digit_Prediction":"下一桁の予想数字","Start_time":"開始時間","Rio_Tinto_plc":"Rio Tinto plc（リオ・ティント）","Your":"あなたの","Americas":"南米","Statoil":"Statoil（スタトイル）","General_Electric_Company":"General Electric Company（ゼネラル・エレクトリック）","US_Tech_100_Index":"米ハイテク100指数","Sep":"９月","Safran":"Safran（サフラン）","matches":"マッチ","Long":"ロング","Jakarta_Index":"ジャカルタ インデックス","is_required__Current_spread":"のご入金が必要です。現在のスプレッド","Purchase_Price":"購入価格","UK_Smart_Index":"英国スマートインデックス","days":"日","Yara_International":"Yara International（ヤラ インターナショナル）","Vivendi":"Vivendi（ビベンディ）","March":"３月","Name":"お名前","(Bejing/CST_-8_hours)":"(北京/CST -8時間)","Save_as_PNG":"PNGへ保存","New_Zealand_Index":"ニュージーランド インデックス","Electricite_de_France":"Electricite de France（フランス電力）","Week_of":"週","Entry_Spot":"エントリー価格","Major_Pairs":"主要ペア","Su":"日曜日","Nov":"１１月","Ref_":"参照番号","spread_up":"スプレッド アップ","Orange":"Orange（オレンジ）","BNP_Paribas":"BNP Paribas（BNPパリバ）","Jump_To":"Xへ移動する","loading___":"読み込み中","Essilor_International":"Essilor International（エシロール・インターナショナル）","Iberdrola_SA":"Iberdrola SA（インベルドローラ）","Metals":"金属関連","Heineken":"Heineken（ハイネケン）","Email_address":"メールアドレス","We":"水曜日","Closes":"閉場時間","To":"終了","Tuesday":"火曜日","even":"もなお","High_barrier":"上限バリア","Gaming_Account":"ゲームアカウント","You_must_accept_the_terms_and_conditions_to_open_an_account_":"ご口座を開設されるにあたりご利用規約に承諾しなければなりません。","July":"７月","June":"６月","Mar":"５月","Purchase_Date":"購入日時","Infosys_Ltd":"Infosys Ltd（インフォシス）","Allianz_SE":"Allianz SE（アリアンツ）","Dec":"１２月","Thursday":"木曜日","Portuguese_Index":"ポルトガル インデックス","Limit":"制限","higher":"ラダー高","Jan":"１月","in_aggregate_over_the_last":"直近の集計によると","Monday":"月曜日","Royal_Dutch_Shell":"Royal Dutch Shell（ロイヤルダッチシェル）","differs":"アンマッチ","Randoms":"ランダム","GDF_Suez":"GDFスエズ","ANZ_Banking_Group_Ltd":"ANZ Banking Group Ltd（ANZ銀行グループ）","HDFC_Bank_Ltd":"HDFC銀行","password":"パスワード","Stop-type":"ストップタイプ","Action":"売買","French_Smart_Index":"フランス スマートインデックス","Random_Bull":"ランダム・ブル","comma":"読点","minutes":"分","Last_Used":"最後に使用した","details":"詳細","Your_withdrawal_limit_for_the_entire_duration_of_the_account_is_currently:_EUR":"現在のご口座累計の出金限度額：EUR","Indian_50_Index":"インド50指数","Toyota_Motor":"トヨタ自動車株式会社","Wall_Street_Index":"ウォールストリート インデックス","ticks":"Tick","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"'Ok'をクリックすると、選択した日付までこのサイトでのトレードができなくなります。","Apr":"４月","Danone":"Danone（ダノン）","months":"ヶ月","Potential_Profit":"利益の期待値","over":"オーバー","Previous":"戻る","Reliance_Industries_Ltd":"Reliance Industries Ltd（リライアンス・インダストリーズ）","Random":"ランダム","Kering":"Kering（ケリング）","Sale_Date":"決済日時","Contract_period":"トレード期間","Nocturnes":"２１時リセット指数","Euro_150_Index":"ユーロ150インデックス","Exercise_period":"権利行使期間","February":"２月","Failed_to_update_trade_description_":"トレード内容の更新ができませんでした。","AB_Inbev":"AB Inbev（アンハイザー・ブッシュ・インベブ）","Your_current_balance_is":"お客様の現在の残高はxxxです。","Barclays_plc":"Barclays plc（バークレイズ）","Stocks":"株式","Singapore_Index":"シンガポール インデックス","Duration":"取引期間","This_contract_lost":"このトレードは負け判定","The_Payment_Agent_facility_is_currently_not_available_in_your_country_":"その決済サービスは、お客様のお住まいの国では現在ご利用いただけません。","Buy":"購入","Next":"次","Friday":"金曜日","Random_Yin":"ランダム・陰","Your_settings_have_been_updated_successfully_":"設定が正しく更新されました。","Your_password_cannot_be_the_same_as_your_email":"パスワードはEメールと同じものにはできません。","Egypt_Index":"エジプト インデックス","Schneider_Electric":"Schneider Electric（シュナイダーエレクトリック）","Shanghai_Index":"上海インデックス","Net_profit":"純利益","BG_Group_plc":"BG Group plc（BGグループ）","points":"ポイント","There_was_a_problem_accessing_the_server_during_purchase_":"購入時にサーバーアクセスのエラーが発生がしました。","Random_25_Index":"ランダムインデックス25","JP_Morgan_Chase_&_Co_":"JP Morgan Chase & Co.（JPモルガン・チェース）","create_new_account":"無料口座開設","December":"１２月","SK_Hynix_Inc_":"SK Hynix Inc.（SKハイニックス）","Pernod_Ricard":"Pernod Ricard（ペルノ・リカール）","Dutch_Stocks":"オランダ株式","Th":"木曜日","Oct":"１０月","Saudi_Arabia_Index":"サウジアラビア インデックス","Higher/Lower":"ラダー高/ラダー低","Stake":"購入価格","GlaxoSmithKline_plc":"GlaxoSmithKline plc（グラクソ・スミスクライン）","Barrier_offset":"追加バリア値","Amount_per_point":"ポイントごとの金額","in_aggregate_over_the_lifetime_of_your_account_":"ご口座の存続期間の集計によると","The_Coca-Cola_Company":"The Coca-Cola Company（ザ コカ・コーラカンパニー）","Next_Day":"翌日","Inditex_SA":"Inditex SA（インディテックス）","BHP_Billiton_Ltd":"BHP Billiton Ltd（BHBビリトン）","Total_Profit/Loss":"利益・損失の総合","Save_as_CSV":"CSVへ保存","L'Oreal":"L'Oreal（ロレアル）","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"ご口座で保有可能なご口座残高の最高金額を示します。最高金額を超えた場合はご出金をお願いいたします。","Quotidians":"デイリー指数","Loss":"損益","Mo":"月曜日","Jun":"６月","Vodafone":"Vodafone（ボーダフォン）","Dutch_Smart_Index":"オランダ スマートインデックス","Balance":"残高","Statement":"取引履歴","ends_between":"範囲内で終了","letters":"文字","under":"未満","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"現在、価格情報を更新することはできません。価格情報を更新したい場合は、このページを更新して下さい。状況が改善されない場合は、他のブラウザをお試しください。","Oracle":"Oracle（オラクル）","Low_barrier":"下限バリア","Forex":"外国為替","SoftBank_Co_":"ソフトバンク株式会社","Minor_Pairs":"マイナーペア","Spreads":"スプレッド","Energy":"エネルギー関連","Virtual_Account":"デモ口座","From":"開始","does_not_touch":"ノータッチ","hour":"時間","Credit_Agricole":"Credit Agricole（クレディ・アグリコル）","View":"表示","Wells_Fargo_&_Company":"Wells Fargo & Company（ウェルズ・ファーゴ）","Sorry,_an_error_occurred_while_processing_your_account_":"申し訳ございませんが、処理中にエラーが発生しました。","French_Stocks":"フランス株式","years":"年","Sunday":"日曜日","Trading_Limits":"トレードの上限について","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"そのため、現在の時点ですぐにご出金いただける最高額は（ただし、口座残高が不足していない場合）はEURです。","Vanilla_Options":"バニラ・オプション","Please_wait_<br_/>Your_request_is_being_processed_":"少々お待ち下さい。<br />リクエストを処理中です。","German_Smart_Index":"ドイツ スマートインデックス","Belgian_Index":"ベルギー インデックス","minute":"分","Palladium/USD":"パラジウム/USD","January":"１月","BBVA_(Banco_Bilbao)":"BBVA (バンコ・ビルバオ)","Maximum_account_cash_balance":"ご口座上限金額","August":"８月","Hyundai_Motor_Co_":"Hyundai Motor Co.（現代自動車）","Renault":"Renault（ルノー）","Groupe_Bruxelles_Lambert":"Groupe Bruxelles Lambert（グループ・ブリュッセル・ランバート）","Maximum_number_of_open_positions":"保有可能なオープンポジションの総数","Euro_50_Smart_Index":"ユーロ50スマートインデックス","US_Tech_Composite_Index":"米ハイテク指数","Sa":"土曜日","Start_Time":"開始時間","Anglo_American_plc":"Anglo American plc（アングロ アメリカン）","seconds":"秒","Assicurazioni_Generali_SpA":"Assicurazioni Generali SpA（ゼネラリ保険会社）","or_equivalent_in_other_currency":"またはその他の通貨での等価","Ends_In/Out":"レンジ内/レンジ外で終了","Up/Down":"ラダー","Wal-Mart_Stores_Inc_":"Wal-Mart Stores Inc.（ウォルマート）","You_have_already_withdrawn_the_equivalent_of_EUR":"EURと同等の金額を既に出金されました。","Telefonica_SA":"Telefonica SA（テレフォニカ）","Indices":"インデックス","Maximum_aggregate_payouts_on_open_positions":"オープン中ポジションに対する払い戻し金額の最高総額","Profit_Table":"取引詳細","Purchase":"購入","Credit/Debit":"クレジット/デビット","End_Time":"終了時間","There_was_a_problem_accessing_the_server_":"サーバーアクセスにエラーが発生しました。","Shenzhen_Index":"深センインデックス","Invalid_email_address":"無効なEメールアドレス","year":"年","Please_check_your_Email_for_the_next_step_":"次のステップへお進みいただくためにメールアドレスをご確認ください。","Google_Inc_":"Google Inc.（グーグル）","November":"１１月","Random_50_Index":"ランダムインデックス50","ExxonMobil":"ExxonMobil（エクソンモービル）","South_African_Index":"南アフリカインデックス","Contract":"トレード","Investment_Account":"投資口座","You_are_not_authorized_for_withdrawal_via_payment_agent_":"お客様は決済サービスでのご出金が許可されていません。","Please_enter_a_date_that_is_at_least_6_months_from_now_":"現在から最低６ヶ月先の日付を入力して下さい。","Wall_Street_Smart_Index":"ウォールストリート スマートインデックス","Zoom":"ズーム","May":"５月","Profit":"利益","Westpac_Banking_Co_":"Westpac Banking Co.（ウエストパック銀行）","Rise/Fall":"ハイ/ロー","Withdrawal_Limits":"ご出金限度額","Print_chart":"チャートを印刷","Please_try_again_":"再びお試し下さい。","Total_Cost":"合計金額","Your_transaction_reference_is":"決済参照番号はxxxです。","Diageo_plc":"Diageo plc（ディアジオ）","Touch/No_Touch":"タッチ","Apple_Inc_":"Apple Inc.（アップル）","Glencore_Xstrat":"Glencore Xstrat（グレンコア・エクストラータ）","National_Australia_Bank_Ltd":"National Australia Bank Ltd（ナショナル・オーストラリア銀行）","Philip_Morris_International":"Philip Morris International（フィリップ・モリス）","Hang_Seng_China":"Hang Seng China（ハンセン中国）","Save_as_SVG":"SVGへ保存","Honda_Motor_Co__Ltd":"本田技研工業株式会社","Profit/Loss":"利益/損益","Intel":"Intel（インテル）","Maximum_daily_turnover":"１日あたりのトレード購入可能金額","Commodities":"コモディティ","Verification_token_is_missing__Click_on_the_verification_link_sent_to_your_Email_and_make_sure_you_are_not_already_logged_in_":"認証トークンが見つかりません。お客様のメールアドレスに送信されたリンクをクリックして認証を行ってください。その際に、ログインしていないことを確認してください。","Lloyds_Banking_Group_plc":"Lloyds Banking Group plc（ロイズ・バンキング・グループ）","Commbank_(Australia)":"Commbank （オーストラリア・コモンウェルス銀行）","Fr":"金曜日","Royal_Dutch_Shell_plc":"Royal Dutch Shell plc（ロイヤル・ダッチ・シェル）","Cie_de_Saint-Gobain":"Cie de Saint-Gobain（サンゴバン）","Settles":"約定時間","Air_Liquide":"Air Liquide（エア・リキード）","goes_outside":"レンジ外となる","Item":"項目","Month":"ヶ月","High_Barrier":"上限バリア","SANOFI":"SANOFI（サノフィ）","Middle_East":"中東","space":"スペース","Portuguese_Smart_Index":"ポルトガル スマートインデックス","Saturday":"土曜日","Never_Used":"使用されることはありません。","Random_Yang":"ランダム・陽","Reckitt_Benckiser_Group_plc":"Reckitt Benckiser Group plc（レキット・ベンキーザーグループ）","Low_barrier_offset":"下限追加バリア値","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"資産情報ページ内に存在する未決済分トレードに対する払い戻し金額の最高総額を示します。最高総額を超えた場合、オープン中のトレードを閉じて頂くことで新たなトレードの購入が可能になります。","Description":"取引内容","Sell":"売却","Abu_Dhabi_Index":"アブダビ インデックス"};
+texts_json['AR'] = {"Euro_50_Index":"مؤشر اليورو 50","This_contract_won":"هذا العقد رابح","October":"أكتوبر","Oil/EUR":"نفط/يورو","Spot":"السعر","US_Index":"مؤشر الولايات المتحدة","Payout":"العائد","EUR/CAD":"يورو/دولار كندي","Procter_&_Gamble_Co_":".Procter & Gamble Co","period":"فترة","Stays_In/Goes_Out":"يبقى بين/يخرج عن","Fiat":"فيات","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"يمثل الحد الأقصى من العقود المعلقة فى محفظتك. كل سطر فى محفظتك يمثل معاملة مفتوحة. عندما يتم الوصول للحد الأقصى لن يعد بإمكانك أن تفتح معاملات جديدة دون أن تغلق معاملة موجودة أولاً.","stays_between":"يبقى بين","Random_Bear":"مؤشر راندوم الدب","Italian_30_Index":"مؤشر 30 الإيطالي","NZD/JPY":"دولار نيوزيلندي/الين الياباني","Deposit_of":"إيداع","odd":"فردي","Pfizer_Inc_":".Pfizer Inc","Asset":"الأصول","Wednesday":"الأربعاء","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"يمثل الحد الأقصى لحجم العقود التي بإمكانك أن تشتريها في أي يوم تداول.","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"عنوان البريد الإلكتروني الذي قدمته هو قيد الاستخدام من قبل معرف دخول آخر.","Dubai_Index":"مؤشر دبي","AUD/HKD":"دولار أسترالي/دولار هونغ كونغ","month":"شهر","EUR/USD":"اليورو/الدولار","XPD/GBP":"بالاديوم/جني استرليني","Hong_Kong_Index":"مؤشر هونج كونج","In/Out":"داخل/خارج","Opens":"يفتح","Barrier":"حاجز","Potential_Payout":"المردودات المحتملة","Low_Barrier":"حاجز منخفض","GBP/NZD":"الجنيه الاسترليني/دولار نيوزيلاندي","Previous_Day":"اليوم السابق","Points":"نقاط","Tu":"الثلاثاء","Therefore_you_may_not_withdraw_any_additional_funds_":"لهذا لا يمكنك سحب أي مبالغ مالية اضافية.","USD/JPY":"الدولار الأمريكي/الين الياباني","Gold/AUD":"ذهب/دولار استرالي","Sale_Price":"سعر البيع","touches":"يصل إلى","AUD/IDR":"دولار أسترالي/روبية أندونيسي","AUD/BRL":"دولار أسترالي/ريال برازيلي","day_withdrawal_limit_is_currently_EUR":"حد السحب اليومي هو حاليا يورو","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"أدخل الحاجز بتحديد البعد بينه وبين سعر الإدخال. إذا أدخلت +0.005 فذلك يعنى أنك تشترى صفقة بحاجز أعلى من سعر الإدخال بـ 0.005. سعر الإدخال سيكون الحركة التالية بعد تسلم أمر الصفقة","GBP/CNY":"الجنيه الاسترليني/اليوان الصيني","Short":"قصير","Random_75_Index":"مؤشر راندوم 75","Please_confirm_the_trade_on_your_statement_before_proceeding_":"الرجاء التأكد من التداول بكشف حسابك قبل المتابعة.","AUD/CHF":"أسترالي/الفرنك السويسري","Token":"رمز","Year":"عام","Purchase_Time":"وقت الشراء","No_Live_price_update":"لا يوجد تحديث مباشر للأسعار","Please_select_a_payment_agent":"يرجى اختيار وكيل دفع","Real_Account":"حساب حقيقي","Day":"يوم","Your_request_to_withdraw_[_1]_[_2]_from_your_account_[_3]_to_Payment_Agent_[_4]_account_has_been_successfully_processed_":"تم معالجة  طلبك لسحب   من حسابك  لحساب وكيل الدفع  بنجاح.","Europe/Africa":"أوروبا/أفريقيا","Trading_and_Withdrawal_Limits":"حدود التداول والسحب","USD/CNY":"دولار أمريكي/اليوان الصيني","High_barrier_offset":"بُعد الحاجز العالي","Aug":"أغسطس","USD/IDR":"دولار أمريكي/روبية أندونيسي","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"تم توثيق حسابك بالكامل وحد السحب الخاص بك تم رفعه.","Swedish_Index":"مؤشر سويدى","GBP_Index":"مؤشر الاسترليني","EUR/KRW":"يورو/ الوون الكوري","country_of_residence":"بلد الإقامة","Jul":"يوليو","ends_outside":"ينتهي خارج","Upcoming_Events":"الأحداث القادمة","minimum_available_duration":"أقل مدة زمنية متاحة","Russian_Regular_Index":"المؤشر الروسي المنتظم","AUD/DKK":"دولار أسترالي/كرون دانماركي","Feb":"فبراير","Gold/EUR":"ذهب/يورو","USD/CAD":"دولار أمريكي/دولار كندي","Now":"الآن","The_two_passwords_that_you_entered_do_not_match_":"كلمتى المرور اللذين قمت بإدخالهم لا يتطابقوا.","EUR/MXN":"يورو/بيزو مكسيكي","Stop-loss":"وقف الخسارة","re-enter_password":"أعد إدخال كلمة المرور","This_field_is_required_":"هذه الخانة مطلوبة.","Return":"عائد","Norwegian_Index":"مؤشر نرويجي","EUR/PLN":"يورو/زلوتي بولندا","Swiss_Index":"المؤشر السويسري","asian_up":"صعود آسيوي","USD/SAR":"دولار أمريكي/ريال سعودي","AP_Ordinary":"AP العادية","GBP/AUD":"الجنيه الاسترليني/دولار أسترالي","Asians":"آسيوي","Random_100_Index":"مؤشر راندوم 100","September":"سبتمبر","Save_as_PDF":"الحفظ كملف PDF","Contract_Confirmation":"تأكيد العقد","numbers":"أرقام","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"minimum duration, for example minimum 15 seconds)%ctx)دقيقة","Intesa_Sanpaolo":"انتيسا سان باولو","Merck_&_Co__Inc_":".Merck & Co. Inc","XAG/AUD":"فضة/دولار استرالي","day":"يوم","Chevron_Co_":".Chevron Co","Save_as_JPEG":"الحفظ كملف JPEG","AUD/CZK":"الدولار الأسترالي/ الكورونا التشيكية","Delete":"أحذف","Platinum/USD":"بلاتين/دولار","hours":"ساعات","Euro_100_Index":"مؤشر اليورو 100","second":"ثانية","GBP/INR":"الجنيه الاسترليني/الروبية الهندية","EUR/AED":"يورو/درهم إماراتي","spread_down":"السبريد لأسفل","GBP/KRW":"الجنيه الاسترليني/الوون الكوري","Belgian_Stocks":"بورصات البلجيكية","Date":"تاريخ","AUD_Index":"مؤشر الاسترالي","Asia/Oceania":"آسيا/أوقيانوسيا","Italian_Index":"مؤشر إيطالي","Your_withdrawal_limit_is_EUR":"حد السحب الخاص بك هو يورو","lower":"أدنى","AUD/SGD":"أسترالي/دولار سنغافوري","Digits":"الأرقام","April":"أبريل","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"لا نقبل حسابات المقيمين في هذا البلد في الوقت الحالي.","AUDZAR":"دولار أسترالي/الراند الجنوب أفريقي","GBP/SGD":"الجنيه الاسترليني/دولار سنغافوري","Australian_Index":"مؤشر أستراليا","NZD/USD":"دولار نيوزيلندي/ دولار أمريكي","Last_Digit_Prediction":"التنبؤ بالرقم الأخير","Start_time":"وقت البدء","GBP/CHF":"الجنيه الاسترليني/الفرنك السويسري","USD/DKK":"دولار أمريكي/كرونة دانمركية","Your":"حضرتك","Americas":"الأمريكتين","Japanese_Index":"مؤشر ياباني","US_Tech_100_Index":"مؤشر الولايات المتحدة تك 100","AUD/AED":"أسترالي/درهم إماراتي","Sep":"سبتمبر","matches":"يماثل","USD/AED":"دولار أمريكي/درهم إماراتي","Long":"طويل","Jakarta_Index":"مؤشر جاكرتا","USD/BRL":"دولار أمريكي/ريال برازيلي","is_required__Current_spread":"مطلوب. السبريد الحالي","Purchase_Price":"سعر الشراء","XPD/EUR":"بالاديوم/يورو","UK_Smart_Index":"مؤشر المملكة المتحدة (UK Smart Index)","AUD/SAR":"أسترالي/ ريال سعودي","days":"أيام","XAG/EUR":"فضة/يورو","March":"مارس","Name":"الإسم","(Bejing/CST_-8_hours)":"(توقيت بكين ينقص 8 ساعات عن التوقيت المركزى)","Save_as_PNG":"الحفظ كملف PNG","New_Zealand_Index":"مؤشر نيوزيلندا","Smart_FX":"FX الذكية","AUD/INR":"دولار أسترالي/روبية هندية","GBP/NOK":"الجنيه الاسترليني/كرونة نرويجية","Week_of":"أسبوع","Entry_Spot":"سعر الدخول","Major_Pairs":"الأزواج الرئيسية","Su":"الأحد","Nov":"نوفمبر","Ref_":"مرجع","spread_up":"السبريد لأعلى","GBP/CAD":"الجنيه الاسترليني/دولار كندي","Jump_To":"الانتقال إلى","Dutch_Index":"مؤشر هولندي","loading___":"تحميل...","EUR/BRL":"يورو/ ريال برازيلي","French_Index":"مؤشر فرنسى","Metals":"معادن","EUR/INR":"يورو/الروبية الهندية","Email_address":"عنوان البريد الإلكتروني","We":"الأسبوع","EUR/HKD":"يورو/دولار هونج كونج","EUR/SGD":"يورو/دولار سنغافوري","AUD/PLN":"أسترالي/زلوتي بولندا","Closes":"يغلق","To":"إلى","AUD/NOK":"دولار أسترالي/الكرون النرويجي","Tuesday":"الثلاثاء","even":"زوجي","High_barrier":"حاجز مرتفع","GBP/HKD":"الجنيه الاسترليني/دولار هونغ كونغ","Gaming_Account":"حساب الألعاب","You_must_accept_the_terms_and_conditions_to_open_an_account_":"يجب أن تقبل الشروط والأحكام قبل أن تفتح حساب.","July":"يوليو","June":"يونيو","ENEL":"إنيل","USDZAR":"دولار أمريكي/الراند الجنوب أفريقي","Mar":"مارس","Purchase_Date":"تاريخ الشراء","Dec":"ديسمبر","Thursday":"الخميس","EUR/AUD":"يورو/دولار أسترالي","Portuguese_Index":"مؤشر البرتغال","Limit":"حد","higher":"أعلى","Smart_Indices":"المؤشرات الذكية","Jan":"يناير","in_aggregate_over_the_last":"إجمالا على مدار آخر","Monday":"الأثنين","EUR/DKK":"يورو/الكرون الدانمركي","differs":"يختلف","Randoms":"راندمز","Oil/AUD":"نفط/دولار استرالي","USD_Index":"مؤشر الدولار الأمريكي","GBP/BRL":"الجنيه الاسترليني/ريال برازيلي","USD/MXN":"دولار أمريكي/بيزو مكسيكي","GBP/DKK":"الجنيه الاسترليني/كرونة دانمركية","password":"كلمة المرور","Stop-type":"نوع الوقف","AUD/JPY":"دولار أسترالي/ ين ياباني","Action":"عمل","French_Smart_Index":"مؤشر الفرنسي الذكي(French Smart Index)","GBP/IDR":"الجنيه الاسترليني/روبية أندونيسي","Random_Bull":"مؤشر راندوم الثور","comma":"فاصلة","minutes":"دقائق","USD/CHF":"الدولار الأمريكي/الفرنك السويسري","Last_Used":"المستخدم أخيرا","details":"تفاصيل","AUD/MXN":"الدولار الأسترالي/بيزو مكسيكي","Your_withdrawal_limit_for_the_entire_duration_of_the_account_is_currently:_EUR":"حد السحب الحالي لمدة حسابك بالكامل هو: يورو","Oil/GBP":"نفط/جني استرليني","Indian_50_Index":"مؤشر 50 الهندى","Wall_Street_Index":"مؤشر وول ستريت","EUR/HUF":"يورو/الفورنت المجري","ticks":"حركات","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"عندما تضغط \"موافق\" سوف تستثنى من التداول على الموقع حتى التاريخ المحدد.","Apr":"أبريل","months":"شهور","Potential_Profit":"الربح المحتمل","over":"فوق","Previous":"سابق","Random":"عشوائي","EUR/IDR":"يورو/روبية أندونيسي","Sale_Date":"تاريخ البيع","Contract_period":"فترة العقد","Nocturnes":"مؤشرات ليلية","Euro_150_Index":"مؤشر يورو 150","Exercise_period":"فترة العمل","February":"فبراير","Failed_to_update_trade_description_":"فشل فى تحديث توصيف المعاملة التجارية.","Your_current_balance_is":"رصيدك الحالي هو","Stocks":"الأسهم","Singapore_Index":"مؤشر سنغافورة","Duration":"المدة","This_contract_lost":"هذا العقد خاسر","The_Payment_Agent_facility_is_currently_not_available_in_your_country_":"وسيلة وكلاء الدفع غير متاحة حاليا في بلدك.","Buy":"شراء","AUD/CNY":"الدولار الأسترالي/اليوان الصيني","Next":"التالي","Friday":"الجمعة","Random_Yin":"مؤشر راندوم ين","AUD/USD":"دولار أسترالي/دولار","Your_settings_have_been_updated_successfully_":"تم تحديث إعداداتك بنجاح.","Your_password_cannot_be_the_same_as_your_email":"كلمة السر لا يمكن أن تكون نفس البريد الإلكتروني الخاص بك","EUR_Index":"مؤشر يورو","Egypt_Index":"مؤشر مصر","Shanghai_Index":"مؤشر شنغهاي","Net_profit":"صافي الربح","points":"نقاط","There_was_a_problem_accessing_the_server_during_purchase_":"هناك مشكلة في الوصول إلى الخادم أثناء الشراء.","Random_25_Index":"مؤشر راندوم 25","JP_Morgan_Chase_&_Co_":".JP Morgan Chase & Co","create_new_account":"أنشىء حساب جديد","December":"ديسمبر","SK_Hynix_Inc_":".SK Hynix Inc","Dutch_Stocks":"الأسهم الهولندية","XAG/GBP":"فضة/جني استرليني","Th":"الخميس","Oct":"أكتوبر","Saudi_Arabia_Index":"مؤشر السعودية","Higher/Lower":"أعلى/أسفل","Stake":"الحصة","Barrier_offset":"حاجز تعويض","GBP/MXN":"الجنيه الاسترليني/بيزو مكسيكي","Amount_per_point":"القيمة لكل نقطة","EUR/JPY":"اليورو/الين الياباني","in_aggregate_over_the_lifetime_of_your_account_":"اجمالا على مدى تاريخ حسابك.","Gold/USD":"ذهب/دولار","USD/SEK":"دولار أمريكي/كرونة سويدية","Next_Day":"اليوم التالي","EUR/SAR":"يورو/ريال سعودي","Total_Profit/Loss":"إجمالي الربح/الخسارة","Save_as_CSV":"الحفظ كملف CSV","GBP/PLN":"الجنيه الاسترليني/زلوتي بولندا","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"يمثل الحد الأقصى لمقدار النقد الذي تستطيع أن تحتفظ به فى حسابك.  إذا تم الوصول للحد الأقصى سيُطلب منك أن تسحب الأموال.","Quotidians":"مؤشرات نهارية","Loss":"خسارة","Mo":"الأثنين","Jun":"يونيو","Dutch_Smart_Index":"مؤشر هولندا الذكي","AUD/KRW":"دولار أسترالي/الوون الكوري","Tick":"حركة","Balance":"رصيد","Statement":"كشف الحساب","ends_between":"ينتهي بين","letters":"حروف","under":"تحت","asian_down":"هبوط آسيوي","Silver/USD":"فضة/دولار","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"لا نستطيع بث الأسعار بث مباشر في الوقت الحالي. لتتمتع بخدمة البث المباشر للأسعار جرب إعادة تحميل الصفحة، إذا حدث هذا الأمر بعد عدة محاولات جرب متصفح آخر","Low_barrier":"حاجز منخفض","Forex":"الفوركس","Minor_Pairs":"الأزواج الثانوية","Spreads":"السبريد (الفروق)","Energy":"طاقة","Virtual_Account":"حساب افتراضي","From":"من","does_not_touch":"لا يصل إلى","hour":"ساعة","USD/NOK":"دولار أمريكي/كرونة نرويجية","View":"شاهد","EUR/NOK":"يورو/الكرون النرويجي","Sorry,_an_error_occurred_while_processing_your_account_":"عفواً، حدث خطأ أثناء معالجة حسابك.","French_Stocks":"بورصات الفرنسية","years":"أعوام","Sunday":"الأحد","USD/PLN":"دولار/زلوتي بولندا","Trading_Limits":"حدود التداول","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"لهذا فإن الحد الأقصى الحالي للسحب (شريطة أن يكون فى حسابك أموالا كافية) هو يورو","Vanilla_Options":"خيارات الفانيليا","Please_wait_<br_/>Your_request_is_being_processed_":"يرجى الانتظار.<br />يتم معالجة طلبك.","Irish_Index":"مؤشر أيرلندي","German_Smart_Index":"مؤشر المانيا الذكي","AUD/NZD":"أسترالي/دولار نيوزيلاندي","Belgian_Index":"مؤشر بلجيكي","minute":"دقيقة","Palladium/USD":"بالاديوم/دولار","ENI_SpA":"شركة إني","January":"يناير","Maximum_account_cash_balance":"الحد الأقصى لرصيد الحساب النقدي","August":"أغسطس","EUR/CNY":"يورو/يوان صيني","Bombay_Index":"مؤشر بومباي","Maximum_number_of_open_positions":"الحد الأقصى لعدد المعاملات المفتوحة","Euro_50_Smart_Index":"مؤشر اليورو50 الذكي (Euro 50 Smart Index)","GBP/JPY":"الجنيه الاسترليني/الين الياباني","US_Tech_Composite_Index":"مؤشر ناسداك للتكنولوجيا الولايات المتحدة","Sa":"السبت","Start_Time":"وقت البدء","seconds":"ثوان","or_equivalent_in_other_currency":"أو ما يعادلها بعملة أخرى","Gold/GBP":"ذهب/جني استرليني","AUD/SEK":"أسترالي/كرونة سويدية","Oil/USD":"نفط/دولار","GBP/ZAR":"الجنيه الاسترليني/الراند الجنوب أفريقي","Ends_In/Out":"ينتهي بين/خارج","Up/Down":"فوق/تحت","XPD/AUD":"بالاديوم/دولار استرالي","Wal-Mart_Stores_Inc_":".Wal-Mart Stores Inc","You_have_already_withdrawn_the_equivalent_of_EUR":"لقد سحبت بالفعل ما يعادل يورو","Indices":"مؤشرات","EUR/NZD":"يورو/دولار نيوزيلاندي","Maximum_aggregate_payouts_on_open_positions":"الحد الأقصى لإجمالي عوائد المعاملات المفتوحة","Profit_Table":"جدول الأرباح","Purchase":"شراء","Credit/Debit":"ائتمان/خصم","End_Time":"وقت النهاية","There_was_a_problem_accessing_the_server_":"حدثت مشكلة في التواصل مع الخادم.","Shenzhen_Index":"مؤشر شنزن","Invalid_email_address":"عنوان البريد غير صحيح","year":"عام","German_Index":"مؤشر ألماني","Please_check_your_Email_for_the_next_step_":"يرجى التحقق من بريدك الالكتروني للخطوة التالية.","EUR/CHF":"يورو/فرنك سويسري","November":"نوفمبر","Random_50_Index":"مؤشر راندوم 50","South_African_Index":"مؤشر جنوب أفريقيا","Contract":"عقد","Investment_Account":"حساب الاستثمار","GBP/AED":"الجنيه الاسترليني/درهم إماراتي","USD/SGD":"دولار أمريكي/دولار سنغافوري","You_are_not_authorized_for_withdrawal_via_payment_agent_":"غير مصرح لك بالسحب بواسطة وكيل دفع.","USD/KRW":"دولار أمريكي/ون كوريا الجنوبية","Please_enter_a_date_that_is_at_least_6_months_from_now_":"رجاء إدخال تاريخ بعد الآن بستة أشهر على الأقل.","Wall_Street_Smart_Index":"مؤشر وول ستريت الذكي","Zoom":"ارتفاع حاد فى الأسعار","EUR/ZAR":"يورو/الراند الجنوب أفريقي","May":"مايو","Profit":"أرباح","Westpac_Banking_Co_":".Westpac Banking Co","Rise/Fall":"الصعود/الهبوط","Withdrawal_Limits":"حدود السحب","Print_chart":"اطبع المخطط","Please_try_again_":"رجاء حاول مرة أخرى.","Total_Cost":"التكلفة الإجمالية","Your_transaction_reference_is":"الرقم المرجعي لمعاملتك هو","Touch/No_Touch":"الوصول/عدم الوصول","Hang_Seng_China":"هانغ سنغ الصين (Hang Seng China )","Save_as_SVG":"الحفظ كملف SVG","Profit/Loss":"الربح/الخسارة","Maximum_daily_turnover":"الحد الأقصى لحجم التداول اليومي","Commodities":"السلع","Verification_token_is_missing__Click_on_the_verification_link_sent_to_your_Email_and_make_sure_you_are_not_already_logged_in_":"رمز التحقق مفقود. انقر على رابط التحقق المرسل إلى بريدك الالكتروني وتأكد من عدم تسجيلك للدخول فعلا.","Commbank_(Australia)":"Commbank (استراليا)","Fr":"الجمعة","Settles":"يستقر","goes_outside":"يخرج عن","Item":"بند","Month":"شهر","High_Barrier":"حاجز عالي","GBP/SAR":"الجنيه الاسترليني/ ريال سعودي","Middle_East":"الشرق الأوسط","space":"المسافة","Portuguese_Smart_Index":"مؤشر البرتغال الذكي","EUR/GBP":"اليورو/الجنيه الاسترليني","Saturday":"السبت","Never_Used":"لم تستخدم من قبل","Random_Yang":"مؤشر يانج العشوائي","USD/HKD":"دولار أمريكي/دولار هونغ كونغ","Low_barrier_offset":"تحديد حاجز منخفض","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"يمثل الحد الأقصى للعوائد الكلية على العقود المعلقة فى محفظتك. إذا تم الوصول للحد الأقصى لن يمكنك شراء عقود إضافية بدون قفل المعاملات الموجودة.","EUR/CZK":"يورو/كورونا تشيكية","USD/INR":"دولار أمريكي/الروبية الهندية","Description":"الوصف","Sell":"بيع","Abu_Dhabi_Index":"مؤشر أبوظبي","AUD/CAD":"أسترالي/كندي","GBP/USD":"الجنيه الاسترليني/الدولار"};
+texts_json['ZH_CN'] = {"This_contract_won":"此合约获利","Oil/EUR":"原油/欧元","Spot":"现价","US_Index":"美国指数","ASML_Holding":"阿斯麦公司","Payout":"赔付","EUR/CAD":"欧元/加元","Unilever_plc":"联合利华公司","stays_between":"位于区间之内","Random_Bear":"随机熊市","NZD/JPY":"纽元/日元","Deposit_of":"存款","odd":"奇数","Pfizer_Inc_":"辉瑞公司","Wednesday":"星期三","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"表示任一给定交易日您可以买入的最大合约数量。","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"您所提供的电邮地址已被另一登录 ID 使用","Dubai_Index":"迪拜指数","month":"月份","XPD/GBP":"钯价盎司/英镑","Banco_Santander_SA":"桑坦德银行","In/Out":"“范围之内/之外”","Tokyo_Electric_Power_Co__Inc":"东京电力公司","AXA":"法国安盛集团","Opens":"开盘","Potential_Payout":"可能的赔付额","GBP/NZD":"英镑/新西兰元","Points":"点","Therefore_you_may_not_withdraw_any_additional_funds_":"所以您可能不能提取任何额外资金。","Belgacom":"移动比利时","ITC_Ltd":"国际贸易中心有限公司","USD/JPY":"美元/日元","Gold/AUD":"黄金/澳元","Vinci":"法国万喜集团","touches":"触及","AUD/BRL":"澳元/巴西雷亚尔","day_withdrawal_limit_is_currently_EUR":"您的当前日提款限额为EUR","AUD/CHF":"澳元/瑞士法郎","No_Live_price_update":"没实时价格更新","Please_select_a_payment_agent":"请选择支付代理","Real_Account":"真实账户","Europe/Africa":"欧洲/非洲","USD/CNY":"美元/人民币","USD/IDR":"美元/印度尼西亚卢比","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"您的账户已经得到完全验证，且您的取款限额已经取消。","Swedish_Index":"瑞典指数","GBP_Index":"英镑指数","Samsung_Electronics":"三星电子","country_of_residence":"居住国","Jul":"七月","Upcoming_Events":"未来事件","minimum_available_duration":"最短可用期限","AUD/DKK":"澳元/丹麦克朗","Gold/EUR":"黄金/欧元","USD/CAD":"美元/加元","Now":"现在","EUR/MXN":"欧元/墨西哥比索","Norwegian_Index":"挪威指数","EUR/PLN":"欧元/波兰兹罗提","asian_up":"亚洲上涨","GBP/AUD":"英镑/澳元","Asians":"亚洲期权","Random_100_Index":"随机 100 指数","September":"九月","Save_as_PDF":"以PDF格式保存","Contract_Confirmation":"合约确认","numbers":"号码","Merck_&_Co__Inc_":"默克集团","XAG/AUD":"银价盎司/澳元","Moet_Hennessy_Louis_Vuitton":"酩悦·轩尼诗-路易·威登集团","Delete":"删除","spread_down":"价差下跌","GBP/KRW":"英镑/韩元","AUD_Index":"澳元指数","AUD/SGD":"澳元/新加坡元","Digits":"数字期权","UCB":"比利时联合化工集团","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"目前不接受来自该国居民的账户。","Australian_Index":"澳大利亚指数","NZD/USD":"新西兰元/美元","Start_time":"开始时间","Rio_Tinto_plc":"力拓","Your":"您的","Americas":"美洲","Japanese_Index":"日本指数","Statoil":"挪威国家石油公司","matches":"符合","Long":"长仓","USD/BRL":"美元/巴西雷亚尔","is_required__Current_spread":"为必要。当前价差","AUD/SAR":"澳元/沙特阿拉伯里亚尔","Yara_International":"雅苒国际","XAG/EUR":"银价盎司/欧元","Vivendi":"法国威望迪集团","March":"三月","GBP/SEK":"英镑/瑞典克朗","(Bejing/CST_-8_hours)":"（北京/CST -8 小时）","Smart_FX":"智能外汇","AUD/INR":"澳元/印度卢比","GBP/NOK":"英镑/挪威克朗","XPT/GBP":"铂价盎司/英镑","Week_of":"周","Entry_Spot":"入市现价","Nov":"十一月","Ref_":"参考","spread_up":"价差上涨","Orange":"法国电信集团","BNP_Paribas":"法国巴黎银行","QUALCOMM":"高通公司","Dutch_Index":"荷兰指数","EUR/BRL":"欧元/巴西雷亚尔","Iberdrola_SA":"伊维尔德罗拉公司","Metals":"金属","EUR/INR":"欧元/印度卢比","We":"星期三","EUR/HKD":"欧元/港币","even":"偶数","Gaming_Account":"博彩账户","July":"七月","June":"六月","Purchase_Date":"买入日期","Infosys_Ltd":"印孚瑟斯有限公司","Thursday":"星期四","EUR/AUD":"欧元/澳元","Limit":"限额","Smart_Indices":"智能指数","EUR/DKK":"欧元/丹麦克朗","GDF_Suez":"苏伊士环能集团","USD_Index":"美元指数","ANZ_Banking_Group_Ltd":"澳新银行集团有限公司","USD/MXN":"美元/墨西哥比索","HDFC_Bank_Ltd":"印度HDFC银行","GBP/DKK":"英镑/丹麦克朗","password":"密码","Stop-type":"停止类型","AUD/JPY":"澳元/日元","GBP/IDR":"英镑/印度尼西亚卢比","Random_Bull":"随机牛市","Your_withdrawal_limit_for_the_entire_duration_of_the_account_is_currently:_EUR":"在整个账户存续期内您的取款限额目前为：EUR","EUR/HUF":"欧元/匈牙利福林","ticks":"跳动点","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"当您点选“Ok”后，您将被禁止在此网站交易，直到选定期限结束为止。","Apr":"四月","Danone":"达能集团","months":"月份","Potential_Profit":"潜在利润","over":"高于","Microsoft":"微软","Reliance_Industries_Ltd":"信实工业有限公司","Random":"随机","Sale_Date":"卖出日期","Nocturnes":"Nocturne指数","Exercise_period":"练习期间","February":"二月","AB_Inbev":"安海斯-布希英博","Your_current_balance_is":"您当前余额有","Singapore_Index":"新加坡指数","Duration":"期限","This_contract_lost":"此合约亏损","AUD/CNY":"澳元/人民币","AUD/USD":"澳元/美元","EUR_Index":"欧元指数","Egypt_Index":"埃及指数","Net_profit":"净收益","There_was_a_problem_accessing_the_server_during_purchase_":"买入时服务器访问出了问题。","JP_Morgan_Chase_&_Co_":"摩根大通公司","create_new_account":"开立新账户","SK_Hynix_Inc_":"SK海力士半导体公司","Pernod_Ricard":"法国保乐力加集团","Dutch_Stocks":"荷兰股票","Th":"星期四","Oct":"十月","Barrier_offset":"障碍位移","EUR/JPY":"欧元/日元","Gold/USD":"黄金/美元","Next_Day":"第二天","EUR/SAR":"欧元/沙特阿拉伯里亚尔","Inditex_SA":"印地纺集团","BHP_Billiton_Ltd":"必和必拓公司","Save_as_CSV":"以CSV格式保存","GBP/PLN":"英镑/波兰兹罗提","Quotidians":"Quotidian市场","Loss":"亏损","Mo":"星期一","Vodafone":"沃达丰集团","Dutch_Smart_Index":"荷兰智能指数","AUD/KRW":"澳元/韩元","Tick":"跳动点","letters":"信件","under":"低于","Silver/USD":"白银/美元","SoftBank_Co_":"软银公司","Energy":"能源","From":"来自","does_not_touch":"未触及","hour":"小时","Credit_Agricole":"法国农业信贷银行","View":"查看","Wells_Fargo_&_Company":"富国银行","EUR/NOK":"欧元/挪威克朗","Sorry,_an_error_occurred_while_processing_your_account_":"对不起，在处理您的账户时出错。","Trading_Limits":"交易限制","Vanilla_Options":"单纯期权","German_Smart_Index":"德国智能指数","minute":"分钟","BBVA_(Banco_Bilbao)":"西班牙对外银行","Maximum_account_cash_balance":"最大账户现金余额","August":"八月","Renault":"雷诺汽车","EUR/CNY":"欧元/人民币","Bombay_Index":"孟买指数","Euro_50_Smart_Index":"欧洲 50 智能指数","GBP/JPY":"英镑/日元","US_Tech_Composite_Index":"美国技术综合指数","Sa":"星期六","Anglo_American_plc":"英美资源集团","seconds":"秒","Assicurazioni_Generali_SpA":"忠利保险有限公司","or_equivalent_in_other_currency":"或等值的其它货币","Gold/GBP":"黄金/英镑","Oil/USD":"原油/美元","GBP/ZAR":"英镑/南非兰特","Up/Down":"涨/跌","Wal-Mart_Stores_Inc_":"沃尔玛百货有限公司","You_have_already_withdrawn_the_equivalent_of_EUR":"您已累计提取 EUR","Telefonica_SA":"西班牙电信","Profit_Table":"利润表","Purchase":"买入","Shenzhen_Index":"深圳指数","Invalid_email_address":"无效的电子邮件地址","Please_check_your_Email_for_the_next_step_":"进入下一步骤前请检查您的电邮地址。","Random_50_Index":"随机 50 指数","Investment_Account":"投资账户","GBP/AED":"英镑/阿联酋迪拉姆","USD/SGD":"美元/新加坡元","You_are_not_authorized_for_withdrawal_via_payment_agent_":"您未经授权通过付款代理进行取款。","USD/KRW":"美元/韩元","Wall_Street_Smart_Index":"华尔街智能指数","EUR/ZAR":"欧元/南非兰特","Westpac_Banking_Co_":"西太平洋银行公司","Withdrawal_Limits":"取款限额","Print_chart":"打印图表","Please_try_again_":"请重试。","Your_transaction_reference_is":"您的交易参考号是","Diageo_plc":"英国帝亚吉欧公司","Apple_Inc_":"苹果公司。","Glencore_Xstrat":"嘉能可超达","National_Australia_Bank_Ltd":"澳大利亚国民银行有限公司","Philip_Morris_International":"菲利普·莫里斯公司","Save_as_SVG":"以SVG格式保存","Profit/Loss":"利润/亏损","Commodities":"大宗商品","Seadrill":"挪威石油服务公司","Verification_token_is_missing__Click_on_the_verification_link_sent_to_your_Email_and_make_sure_you_are_not_already_logged_in_":"没找到验证令牌。请点击发送到您邮箱的验证链接，并确保您还未登录。","Lloyds_Banking_Group_plc":"劳埃德银行集团","Fr":"星期五","Air_Liquide":"液化空气集团","goes_outside":"处于区间之外","High_Barrier":"高障碍","GBP/SAR":"英镑/沙特阿拉伯里亚尔","space":"空间","Portuguese_Smart_Index":"葡萄牙智能指数","EUR/GBP":"欧元/英镑","Saturday":"周六","Never_Used":"从未使用过","USD/HKD":"美元/港币","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"表示您证券组合中未平仓合约的最大总赔付额。如果达到该最大值，那么您在购买更多合约之前需要先对现有头寸进行平仓。","EUR/CZK":"欧元/捷克克朗","Description":"说明","Sell":"卖出","Abu_Dhabi_Index":"阿布达比指数","Euro_50_Index":"欧洲 50 指数","October":"十月","period":"周期","Procter_&_Gamble_Co_":"宝洁公司","Standard_Chartered_plc":"渣打银行","Stays_In/Goes_Out":"“保持在范围之内/超出范围之外”","Fiat":"菲亚特","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"表示您的投资组合中未平仓合约的最大数量。您投资组合中的每一行都算作是一个未平仓头寸。一旦达到该最大值，在开设新头寸之前您需要先了结一个现有头寸。","Italian_30_Index":"意大利 30 指数","Asset":"资产","Airbus_Group":"空中客车集团","AUD/HKD":"澳元/港币","Unilever":"联合利华公司","EUR/USD":"欧元/美元","Hong_Kong_Index":"香港指数","Barrier":"障碍","Low_Barrier":"低障碍","Previous_Day":"前一天","Tu":"星期二","Sale_Price":"卖出价格","AUD/IDR":"澳元/印度尼西亚卢比","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"请按与现货价格差额的形式输入障碍水平。如果您输入 +0.005 ，那么您将买入障碍水平比入市现价高 0.005 的合约。入市现价为收到您订单之后的下一个价格","Short":"短仓","GBP/CNY":"英镑/人民币","Random_75_Index":"随机 75 指数","Please_confirm_the_trade_on_your_statement_before_proceeding_":"继续执行之前，请在您的声明上确认此项交易。","Token":"令牌","Year":"年","Purchase_Time":"买入时间","Day":"天","Your_request_to_withdraw_[_1]_[_2]_from_your_account_[_3]_to_Payment_Agent_[_4]_account_has_been_successfully_processed_":"您从  账户提取   到支付代理 账户的请求已成功处理。","AT&T":"AT&T公司","Trading_and_Withdrawal_Limits":"交易和取款限额","SABMiller_plc":"米勒啤酒集团","High_barrier_offset":"高障碍位移","Aug":"八月","ICICI_Bank_Ltd":"印度工业信贷投资银行","Telenor":"挪威电信公司","EUR/KRW":"欧元/韩元","KBC_Groep":"KBC集团","ends_outside":"区间之外结束","Russian_Regular_Index":"俄罗斯普通指数","Feb":"二月","Hitachi_Ltd":"日立公司","The_two_passwords_that_you_entered_do_not_match_":"两次输入的密码不一致。","Stop-loss":"止损","Return":"回报","This_field_is_required_":"此字段为必填项。","re-enter_password":"重新输入密码","Carrefour":"家乐福超市","Swiss_Index":"瑞士指数","USD/SAR":"美元/沙特阿拉伯里亚尔","AP_Ordinary":"AP 普通股票指数","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"分钟","Intesa_Sanpaolo":"联合圣保罗银行","day":"天","Save_as_JPEG":"以JPEG格式保存","Chevron_Co_":"雪佛兰公司","AUD/CZK":"澳元/捷克克朗","hours":"小时","Platinum/USD":"铂金/美元","second":"秒","Euro_100_Index":"欧洲100指数","Johnson_&_Johnson":"强生","EUR/AED":"欧元/阿联酋迪拉姆","GBP/INR":"英镑/印度卢比","Date":"日期","Belgian_Stocks":"比利时股票","Italian_Index":"意大利指数","Asia/Oceania":"亚洲/大洋洲","Your_withdrawal_limit_is_EUR":"您的取款限额是EUR","TOTAL":"道达尔公司","lower":"低于","April":"四月","ICAG_(British_Airways)":"英国航空公司","Daimler_AG":"戴姆勒股份公司","GBP/SGD":"英镑/新加坡元","AUDZAR":"澳元兑南非兰特","Last_Digit_Prediction":"最后数字的预测","USD/DKK":"美元/丹麦克朗","GBP/CHF":"英镑/瑞士法郎","Sep":"九月","AUD/AED":"澳元/阿联酋迪拉姆","US_Tech_100_Index":"美国科技100指数","General_Electric_Company":"通用电气公司","Safran":"赛峰","USD/AED":"美元/阿联酋迪拉姆","Purchase_Price":"买入价格","Jakarta_Index":"雅加达指数","UK_Smart_Index":"英国智能指数","XPD/EUR":"钯价盎司/欧元","XPT/EUR":"铂价盎司/欧元","days":"天","Name":"姓名","Save_as_PNG":"以PNG格式保存","New_Zealand_Index":"新西兰指数","Electricite_de_France":"法国电力公司","Su":"星期日","Major_Pairs":"主要货币对","Jump_To":"跳至","GBP/CAD":"英镑/加元","loading___":"加载中……","French_Index":"法国指数","Essilor_International":"依视路","Email_address":"电子邮件地址","Heineken":"喜力","Closes":"收盘","AUD/PLN":"澳元/波兰兹罗提","EUR/SGD":"欧元/新加坡元","To":"到","AUD/NOK":"澳元/挪威克朗","Tuesday":"星期二","High_barrier":"高障碍","GBP/HKD":"英镑/港币","You_must_accept_the_terms_and_conditions_to_open_an_account_":"您必须接受条款和条件才能开户。","Mar":"三月","USDZAR":"美元兑南非兰特","Allianz_SE":"安联 SE","Dec":"十二月","US_S&P_100":"美国标普 100 指数","Portuguese_Index":"葡萄牙指数","higher":"高于","Jan":"一月","Monday":"星期一","in_aggregate_over_the_last":"上期内的总额","Royal_Dutch_Shell":"荷兰皇家壳牌公司","USD/CZK":"美元/捷克克朗","differs":"相差","Randoms":"随机指数","Societe_Generale":"法国兴业银行","Oil/AUD":"原油/澳元","GBP/BRL":"英镑/巴西里尔","Action":"操作","French_Smart_Index":"法国智能指数","comma":"逗号","minutes":"分钟","USD/CHF":"美元/瑞士法郎","details":"详情","Last_Used":"上一次使用","AUD/MXN":"澳元/墨西哥比索","Indian_50_Index":"印度50指数","Oil/GBP":"原油/英镑","Wall_Street_Index":"华尔街指数","Toyota_Motor":"丰田汽车","Previous":"之前","Contract_period":"合约期间","EUR/IDR":"欧元/印度尼西亚卢比","Kering":"开云集团","Euro_150_Index":"欧洲150指数","Failed_to_update_trade_description_":"无法更新交易描述。","Barclays_plc":"巴克莱银行","Stocks":"股票","Buy":"买入","The_Payment_Agent_facility_is_currently_not_available_in_your_country_":"您的国家无可用支付代理设施。","Next":"下一页","Friday":"星期五","Random_Yin":"随机阴市","EUR/SEK":"欧元/瑞典克朗","Your_password_cannot_be_the_same_as_your_email":"您的密码不可与电子邮件相同","Your_settings_have_been_updated_successfully_":"您的设置已成功更新。","Schneider_Electric":"施耐德电气公司","Shanghai_Index":"上海指数","BG_Group_plc":"英国天然气集团公司","points":"点","Random_25_Index":"随机 25 指数","December":"十二月","XAG/GBP":"银价盎司/英镑","Saudi_Arabia_Index":"沙特阿拉伯指数","Stake":"投注资金","Higher/Lower":"“高于/低于”","GlaxoSmithKline_plc":"葛兰素史克公司","Amount_per_point":"每点之金额","GBP/MXN":"英镑/墨西哥比索","in_aggregate_over_the_lifetime_of_your_account_":"您的帐户有效期内的总额。","USD/SEK":"美元/瑞典克朗","The_Coca-Cola_Company":"可口可乐","Total_Profit/Loss":"利润/亏损合计","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"表示您的账户中可持有的最高现金额度。如果达到该最高额度，将会要求您提取资金。","L'Oreal":"欧莱雅集团","Jun":"六月","Balance":"余额","Statement":"账单","ends_between":"区间之内结束","asian_down":"亚洲下跌","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"当前我们不能够串流实时价格。要获得价格的实时串流请尝试刷新页面，如果经过反复尝试还是存在此问题，请换一个浏览器","Low_barrier":"低障碍","Oracle":"甲骨文公司","Forex":"外汇","Minor_Pairs":"次要货币对","Spreads":"价差","Virtual_Account":"虚拟账户","USD/NOK":"美元/挪威克朗","PowerShares_QQQ":"PowerShares纳斯达克100指数ETF","French_Stocks":"法国股票","Sunday":"周日","years":"年","USD/PLN":"美元/波兰兹罗提","GBP/CZK":"英镑/捷克克朗","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"因此，您当前可即时提取的最大金额为（前提是您的帐户有足够资金）欧元","Please_wait_<br_/>Your_request_is_being_processed_":"请稍候。<br />您的请求正在处理中。","Irish_Index":"爱尔兰指数","AUD/NZD":"澳元/新西兰元","Belgian_Index":"比利时指数","Palladium/USD":"钯金/美元","ENI_SpA":"意大利埃尼集团","January":"一月","Hyundai_Motor_Co_":"现代汽车公司","Groupe_Bruxelles_Lambert":"蓝博特布鲁塞尔集团","Maximum_number_of_open_positions":"最大未平仓头寸数目","Start_Time":"开始时间","AUD/SEK":"澳元/瑞典克朗","Shinhan_Financial":"新韩金融","XPD/AUD":"钯价盎司/澳元","Ends_In/Out":"“范围之内/之外”收盘","Indices":"指数","Maximum_aggregate_payouts_on_open_positions":"未平仓头寸的最大赔付总额","EUR/NZD":"欧元/新西兰元","End_Time":"结束时间","Credit/Debit":"借方/贷方","There_was_a_problem_accessing_the_server_":"服务器访问出了问题。","year":"年","German_Index":"德国指数","EUR/CHF":"欧元/瑞士法郎","Google_Inc_":"谷歌公司。","November":"十一月","Contract":"合约","South_African_Index":"南非指数","ExxonMobil":"埃克森美孚公司","Please_enter_a_date_that_is_at_least_6_months_from_now_":"请输入至少6个月后的日期。","Zoom":"缩放","May":"五月","Profit":"利润","Rise/Fall":"“上涨/下跌”合约","Total_Cost":"成本总计","XPT/AUD":"铂价盎司/澳元","Touch/No_Touch":"触及/未触及","Hang_Seng_China":"恒生中国指数","Honda_Motor_Co__Ltd":"本田汽车有限公司","Intel":"英特尔公司","Maximum_daily_turnover":"最大日成交量","Commbank_(Australia)":"联邦银行（澳大利亚）","Cie_de_Saint-Gobain":"圣戈班公司","Royal_Dutch_Shell_plc":"荷兰皇家壳牌公司","Settles":"结算","Month":"月份","Item":"项目","SANOFI":"赛诺菲","Middle_East":"中东","Reckitt_Benckiser_Group_plc":"利洁时集团公司","Random_Yang":"随机阳市","Low_barrier_offset":"低障碍位移","USD/INR":"美元/印度卢比","GBP/USD":"英镑/美元","AUD/CAD":"澳元/加元"};
+texts_json['VI'] = {"This_contract_won":"Hợp đồng này đã thắng","Oil/EUR":"Dầu/Eur","Spot":"Giao ngay","US_Index":"Chỉ số Hoa Kỳ","ASML_Holding":"Tập đoàn ASML Holding","Payout":"Tiền thưởng","EUR/CAD":"Cặp đồng tiền EUR/CAD","Unilever_plc":"Tập đoàn Unilever","stays_between":"nằm giữa","Random_Bear":"Gấu Ngẫu nhiên","NZD/JPY":"Cặp đồng tiền NZD/JPY","Deposit_of":"Tiền gửi của","odd":"Số lẻ","Pfizer_Inc_":"Tập đoàn Pfizer Inc.","Wednesday":"Thứ Tư","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"Hiển thị khối lượng hợp đồng tối đa bạn có thể mua trong ngày giao dịch.","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"Bạn đã cung cấp địa chỉ email được sử dụng bởi một ID đăng nhập khác.","Dubai_Index":"Chỉ số Dubai","month":"tháng","XPD/GBP":"Cặp tiền tệ XPD/GBP","Banco_Santander_SA":"Ngân hàng Banco Santander SA","In/Out":"Trong/Ngoài","Tokyo_Electric_Power_Co__Inc":"Liên hợp công ty điện Tokyo","AXA":"Tập đoàn AXA","Opens":"Mở","Potential_Payout":"Tiền thưởng Tiềm ẩn","GBP/NZD":"Cặp đồng tiền GBP/NZD","Points":"Điểm","Therefore_you_may_not_withdraw_any_additional_funds_":"Vì vậy bạn không thể rút tiền thêm nữa.","Belgacom":"Tập đoàn viễn thông Belgacom (Vương quốc Bỉ)","ITC_Ltd":"Tập đoàn ITC","USD/JPY":"Cặp đồng tiền USD/JPY","Gold/AUD":"Vàng/AUD","Vinci":"Tập đoàn xây dựng Vinci","touches":"chạm","AUD/BRL":"Cặp đồng tiền AUD/BRL","day_withdrawal_limit_is_currently_EUR":"giới hạn rút tiền trong ngày là EUR hiện tại","AUD/CHF":"Cặp đồng tiền AUD/CHF","No_Live_price_update":"Không cập nhật giá Trực tiếp","Please_select_a_payment_agent":"Vui lòng chọn một đại lý thanh toán","Real_Account":"Tài khoản Thực","Europe/Africa":"Châu Âu/châu Phi","USD/CNY":"Cặp đồng tiền USD/CNY","USD/IDR":"Cặp đồng tiền USD/IDR","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"Tài khoản của bạn được xác thực đầy đủ và mức giới hạn rút tiền của bạn đã được nâng lên.","Swedish_Index":"Chỉ số Thụy Điển","GBP_Index":"Chỉ số GBP","Samsung_Electronics":"Tập đoàn điện tử Samsung Electronics","country_of_residence":"Quốc gia Cư trú","Jul":"Tháng Bảy","Upcoming_Events":"Sự kiện sắp diễn ra","minimum_available_duration":"khoảng thời gian có sẵn tối thiểu","AUD/DKK":"Cặp đồng tiền AUD/DKK","Gold/EUR":"Vàng/EUR","USD/CAD":"Cặp đồng tiền USD/CAD","Now":"Bây giờ","EUR/MXN":"Cặp đồng tiền EUR/MXN","Norwegian_Index":"Chỉ số Na Uy","EUR/PLN":"Cặp đồng tiền EUR/PLN","asian_up":"lên kiểu châu Á","GBP/AUD":"Cặp đồng tiền GBP/AUD","Asians":"Người châu Á","Random_100_Index":"100 chỉ số Ngẫu nhiên","September":"Tháng Chín","Save_as_PDF":"Lưu theo định dạng PDF","Contract_Confirmation":"Xác nhận Hợp đồng","numbers":"các số","Merck_&_Co__Inc_":"Tập đoàn Merck & Co. Inc.","XAG/AUD":"Cặp tiền tệ XAG/AUD","Moet_Hennessy_Louis_Vuitton":"Công ty Moet Hennessy Louis Vuitton","Delete":"Xóa","spread_down":"chênh lệch giảm","GBP/KRW":"Cặp đồng tiền GBP/KRW","AUD_Index":"Chỉ số AUD","AUD/SGD":"Cặp đồng tiền AUD/SGD","Digits":"Chữ số","UCB":"Tập đoàn UCB","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"Chúng tôi không nhận tại khoản của người dân tại nước này vào thời điểm này.","Australian_Index":"Chỉ số Úc","NZD/USD":"Cặp đồng tiền NZD/USD","Start_time":"Thời gian bắt đầu","Rio_Tinto_plc":"Tập đoàn Rio Tinto plc","Your":"Của bạn","Americas":"Châu Mỹ","Japanese_Index":"Chỉ số Nhật Bản","Statoil":"Hãng Statoil","matches":"khớp","Long":"Vị thế Mua","USD/BRL":"Cặp đồng tiền USD/BRL","is_required__Current_spread":"là bắt buộc. Giá chênh lệch hiện tại","AUD/SAR":"Cặp đồng tiền AUD/SAR","Yara_International":"Yara Quốc tế","XAG/EUR":"Cặp tiền tệ XAG/EUR","Vivendi":"Tập đoàn viễn thông Vivendi","March":"Tháng Ba","GBP/SEK":"Cặp đồng tiền GBP/SEK","(Bejing/CST_-8_hours)":"(Bắc Kinh/CST -8 tiếng)","Smart_FX":"Thị trường ngoại hối Thông minh","AUD/INR":"Cặp đồng tiền AUD/INR","GBP/NOK":"Cặp đồng tiền GBP/NOK","XPT/GBP":"Cặp tiền tệ XPT/GBP","Week_of":"Tuần của","Entry_Spot":"Giá giao ngay Đi vào","Nov":"Tháng Mười một","Ref_":"Tham khảo.","spread_up":"chênh lệch lên","Orange":"Cam","BNP_Paribas":"Ngân hàng BNP Paribas","Dutch_Index":"Chỉ số Hà Lan","POSCO":"Tập đoàn POSCO","EUR/BRL":"Cặp đồng tiền EUR/BRL","Iberdrola_SA":"Tập đoàn Iberdrola SA","Metals":"Kim loại","EUR/INR":"Cặp đồng tiền EUR/INR","We":"Chúng tôi","EUR/HKD":"Cặp đồng tiền EUR/HKD","even":"đồng đều","Gaming_Account":"Tài khoản Cá cược","July":"Tháng Bảy","June":"Tháng Sáu","Purchase_Date":"Ngày Mua","Infosys_Ltd":"Tập đoàn Infosys Ltd (Ấn Độ)","Thursday":"Thứ Năm","EUR/AUD":"Cặp đồng tiền EUR/AUD","Limit":"Giới hạn","Smart_Indices":"Chỉ số Thông minh","EUR/DKK":"Cặp đồng tiền EUR/DKK","GDF_Suez":"Tập đoàn GDF Suez","USD_Index":"Chỉ số đô la Mỹ","ANZ_Banking_Group_Ltd":"Tập đoàn tài chính ANZ","USD/MXN":"Cặp đồng tiền USD/MXN","HDFC_Bank_Ltd":"Ngân hàng HDFC","GBP/DKK":"Cặp đồng tiền GBP/DKK","password":"mật khẩu","Stop-type":"Loại - Tới hạn","AUD/JPY":"Tỷ giá giữa đồng Đô la Úc và đồng Yên Nhật","GBP/IDR":"Cặp đồng tiền GBP/IDR","Random_Bull":"Bò Random","Your_withdrawal_limit_for_the_entire_duration_of_the_account_is_currently:_EUR":"Giới hạn rút tiền cho toàn bộ thời gian của tài khoản này hiện là: EUR","EUR/HUF":"Cặp đồng tiền EUR/HUF","ticks":"giây","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"Khi bạn nhấp vào \"OK\" bạn sẽ bị loại bỏ khỏi giao dịch trên trang web tới ngày được chọn.","IBM":"Tập đoàn IBM","Apr":"Tháng 4","Danone":"Công ty sữa Danone","months":"tháng","Potential_Profit":"Lợi nhuận tiềm ẩn","over":"Vượt quá","Reliance_Industries_Ltd":"Công ty Reliance Industries","Random":"Ngẫu nhiên","Sale_Date":"Ngày Bán hàng","Nocturnes":"Dạ khúc","Exercise_period":"Thời hạn thực tập","February":"Tháng Hai","AB_Inbev":"Tập đoàn AB Inbev","Your_current_balance_is":"Số dư hiện tại của bạn là","Singapore_Index":"Chỉ số Singapore","Duration":"Khoảng thời gian","This_contract_lost":"Hợp đồng này đã bị lỗ","AUD/CNY":"Cặp đồng tiền AUD/CNY","AUD/USD":"Cặp đồng tiền AUD/USD","EUR_Index":"Chỉ số EUR","Egypt_Index":"Chỉ số Ai Cập","Net_profit":"Lợi nhuận thuần","There_was_a_problem_accessing_the_server_during_purchase_":"Có lỗi trung cập vào máy chủ khi mua.","JP_Morgan_Chase_&_Co_":"Tập đoàn tài chính JP Morgan Chase & Co.","create_new_account":"tạo tài khoản mới","SK_Hynix_Inc_":"Tập đoàn SK Hynix.","Pernod_Ricard":"Tập đoàn Pernod Ricard","Dutch_Stocks":"Chứng khoán Hà Lan","Oct":"Tháng Mười","Barrier_offset":"Bù đắp Rào cản","EUR/JPY":"Cặp đồng tiền EUR/JPY","Gold/USD":"Vàng/ đô la Mỹ","Next_Day":"Ngày tiếp theo","EUR/SAR":"Cặp đồng tiền EUR/SAR","Inditex_SA":"SA Inditex","BHP_Billiton_Ltd":"Công ty BHP Billiton","Save_as_CSV":"Lưu dưới dạng CSV","GBP/PLN":"Cặp đồng tiền GBP/PLN","Quotidians":"Hàng ngày","Loss":"Thất thoát","Vodafone":"Tập đoàn viễn thông Vodafone","Dutch_Smart_Index":"Chỉ số thông minh Hà Lan","AUD/KRW":"Cặp đồng tiền AUD/KRW","Tick":"Giây","letters":"các ký tự","under":"ở dưới","Silver/USD":"Cặp Bạc/ đô la Mỹ","SoftBank_Co_":"Tập đoàn SoftBank Co.","Energy":"Năng lượng","From":"Từ","does_not_touch":"không chạm","hour":"giờ","Credit_Agricole":"Ngân hàng Credit Agricole","View":"Xem","Wells_Fargo_&_Company":"Tập đoàn Wells Fargo & Company","EUR/NOK":"Cặp đồng tiền EUR/NOK","Sorry,_an_error_occurred_while_processing_your_account_":"Xin lỗi, Lỗi xảy ra trong khi đang xử lý tài khoản của bạn.","Trading_Limits":"Giới hạn Giao dịch","Vanilla_Options":"Quyền chọn vanilla","German_Smart_Index":"Chỉ số thông minh Đức","minute":"phút","BBVA_(Banco_Bilbao)":"Tập đoàn BBVA (Banco Bilbao)","Maximum_account_cash_balance":"Số dư tài khoản tối đa","August":"Tháng 8","Renault":"Tập đoàn ô tô Renault","EUR/CNY":"Cặp đồng tiền EUR/CNY","Bombay_Index":"Chỉ số Bombay","Euro_50_Smart_Index":"Chỉ số thông minh 50 Euro","GBP/JPY":"Cặp đồng tiền GBP/JPY","US_Tech_Composite_Index":"Chỉ số US Tech Composite","Anglo_American_plc":"Công ty mỏ Anglo American plc","seconds":"giây","or_equivalent_in_other_currency":"hoặc tương đương loại tiền khác","Gold/GBP":"Vàng/GBP","Oil/USD":"Dầu/ đô la Mỹ","GBP/ZAR":"Cặp đồng tiền GBP/ZAR","Up/Down":"Lên/Xuống","Wal-Mart_Stores_Inc_":"Tập đoàn bán lẻ đa quốc gia Wal-Mart Stores Inc.","You_have_already_withdrawn_the_equivalent_of_EUR":"Bạn đã rút tương đương EUR","Telefonica_SA":"Tập đoàn Telefonica SA","Profit_Table":"Bảng lợi nhuận","Purchase":"Mua","Shenzhen_Index":"Chỉ số Shenzhen","Invalid_email_address":"Địa chỉ email không hợp lệ","Please_check_your_Email_for_the_next_step_":"Vui lòng kiểm tra Email của bạn cho bước tiếp theo.","Random_50_Index":"50 chỉ số ngẫu nhiên","Investment_Account":"Tài khoản Đầu tư","GBP/AED":"Cặp đồng tiền GBP/AED","USD/SGD":"Cặp đồng tiền USD/SGD","You_are_not_authorized_for_withdrawal_via_payment_agent_":"Bạn không đượcquyền rút tiền qua đại lý thanh toán.","USD/KRW":"Cặp đồng tiền USD/KRW","Wall_Street_Smart_Index":"Chỉ số Thông minh phố Wall","EUR/ZAR":"Cặp đồng tiên EUR/ZAR","Westpac_Banking_Co_":"Tập đoàn tài chính Westpac Banking Co.","Withdrawal_Limits":"Giới hạn Rút tiền","Print_chart":"In biểu đồ","Please_try_again_":"Vui lòng thử lại.","Your_transaction_reference_is":"Tham chiếu giao dịch của bạn là","Diageo_plc":"Tập đoàn Diageo","Glencore_Xstrat":"Tập đoàn Glencore Xstrat","National_Australia_Bank_Ltd":"Ngân hàng quốc gia Australia","Philip_Morris_International":"Tập đoàn quốc tế Philip Morris International","Save_as_SVG":"Lưu theo định dạng SVG","Profit/Loss":"Lợi nhuận/Thua lỗ","Commodities":"Hàng hóa","Seadrill":"Tập đoàn khai thác Seadrill","Verification_token_is_missing__Click_on_the_verification_link_sent_to_your_Email_and_make_sure_you_are_not_already_logged_in_":"Quá trình xác nhận chưa hoàn thành. Hãy nhấp vào đường link được gửi tới email của bạn và chắc chắn rằng bạn chưa được đăng nhập.","Lloyds_Banking_Group_plc":"Tập đoàn tài chính Lloyds Banking Group plc","Air_Liquide":"Công ty khí gas công nghiệp Air Liquide","goes_outside":"đi ra ngoài","High_Barrier":"Rào cản Cao","GBP/SAR":"Cặp đồng tiền GBP/SAR","space":"khoảng cách","Portuguese_Smart_Index":"Chỉ số thông minh Bồ Đào Nha","EUR/GBP":"Cặp đồng tiền EUR/GBP","Saturday":"Thứ Bảy","Never_Used":"Chưa bao giờ dùng","USD/HKD":"Cặp đồng tiền USD/HKD","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"Thể hiện số tiền lãi tối đa trên hợp đồng nổi bật ở trong hồ sơ của bạn. Nếu lượng tối đa đã đạt được, bạn có thể sẽ không cần mua thêm hợp đồng không phải đóng trước vị thế đang tồn tại.","EUR/CZK":"Cặp đồng tiền EUR/CZK","Description":"Mô tả","Sell":"Bán","Abu_Dhabi_Index":"Chỉ số Abu Dhabi","Euro_50_Index":"Chỉ số 50 châu Âu","October":"Tháng Mười","Procter_&_Gamble_Co_":"Tập đoàn Procter & Gamble Co.","period":"giai đoạn","Standard_Chartered_plc":"Ngân hàng Standard Chartered","Stays_In/Goes_Out":"Vẫn ở trong /Đi ra Ngoài","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"Hãy trình bày số hợp đồng xuất sắc tối đa có trong hồ sơ của bạn. Mỗi một dòng trong hồ sơ là một vị thế mở. Khi đã đạt đến mức tối đa, bạn sẽ không thể mở thêm vị thế mới mà không đóng các vị thế đang có trước.","Italian_30_Index":"Chỉ số 30 Italia","Asset":"Tài sản","Airbus_Group":"Tập đoàn Airbus","Unilever":"Tập đoàn Unilever","AUD/HKD":"Cặp đồng tiền AUD/HKD","EUR/USD":"Cặp đồng tiền EUR/USD","Hong_Kong_Index":"Chỉ số Hồng Kông","DNB":"Tập đoàn tài chính DNB","Barrier":"Rào cản","Low_Barrier":"Rào cản thấp","Previous_Day":"Ngày trước","Sale_Price":"Giá bán hàng","AUD/IDR":"Cặp đồng tiền AUD/IDR","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"Nhập giá giới hạn khác với giá giao ngay. Nếu bạn nhập +0.005, bạn sẽ có thể mua được một hợp đồng với giá giới hạn cao hơn 0.005 so với giá giao ngay  được nhập. GIá giao ngay được nhập sẽ là giá tiếp theo sau khi lệnh của bạn được nhận","GBP/CNY":"Cặp đồng tiền GBP/CNY","Short":"Vị thế Bán","Random_75_Index":"75 chỉ số ngẫu nhiên","Please_confirm_the_trade_on_your_statement_before_proceeding_":"Xin vui lòng xác nhận nội dung giao dịch của bạn trước khi xử lý.","Token":"Mã Token","Year":"Năm","Purchase_Time":"Thời Gian mua","Day":"Ngày","Your_request_to_withdraw_[_1]_[_2]_from_your_account_[_3]_to_Payment_Agent_[_4]_account_has_been_successfully_processed_":"Yêu cầu rút tiền   từ tài khoản của bạn  tới  tài khoản Đại lý Thanh toán đã được xử lý thành công.","AT&T":"Tập đoàn viễn thông AT&T","Trading_and_Withdrawal_Limits":"Giới hạn Giao dich và giới hạn Rút tiền","SABMiller_plc":"Tập đoàn đồ uống SABMiller plc","High_barrier_offset":"Hàng rào cao","ICICI_Bank_Ltd":"Ngân hàng ICICI","Aug":"Tháng 8","Telenor":"Hãng Telenor","KBC_Groep":"Tập đoàn KBC","EUR/KRW":"Cặp đồng tiền EUR/KRW","ends_outside":"kết thúc bên ngoài","Russian_Regular_Index":"Chỉ số Thông thường Nga","Hitachi_Ltd":"Tập đoàn Hitachi","Feb":"Tháng Hai","The_two_passwords_that_you_entered_do_not_match_":"Hai mật khẩu bạn vừa nhập không khớp với nhau.","Stop-loss":"Thua lỗ -Tới hạn","re-enter_password":"nhập lại mật khẩu","This_field_is_required_":"Lĩnh vực này được yêu cầu.","Return":"Lợi nhuận","Carrefour":"Tập đoàn Carrefour","Swiss_Index":"Chỉ số Thụy Sĩ","USD/SAR":"Cặp đồng tiền USD/SAR","AP_Ordinary":"AP thông thường","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"tối thiểu","day":"ngày","Chevron_Co_":"Tập đoàn năng lượng Chevron Co.","Save_as_JPEG":"Lưu dưới định dạng JPEG","AUD/CZK":"Cặp đồng tiền AUD/CZK","Platinum/USD":"Cặp Platinum/USD","hours":"giờ","Johnson_&_Johnson":"Johnson và Johnson","Euro_100_Index":"Chỉ số 100 Euro","second":"giây","GBP/INR":"Cặp đồng tiền GBP/INR","EUR/AED":"Cặp đồng tiền EUR/AED","Belgian_Stocks":"Chứng khoán Bỉ","Date":"Ngày","Asia/Oceania":"Châu Á/châu Đại Dương","Italian_Index":"Chỉ số Ý","Your_withdrawal_limit_is_EUR":"Giới hạn rút tiền của bạn là EUR","TOTAL":"Tập đoàn TOTAL","lower":"thấp hơn","April":"Tháng 4","Daimler_AG":"Tập đoàn ô tô Daimler AG","ICAG_(British_Airways)":"ICAG (Hãng hàng không Anh Quốc)","AUDZAR":"Cặp đồng tiền AUD/ZAR","GBP/SGD":"Cặp đồng tiền GBP/SGD","Last_Digit_Prediction":"Dự đoán chữ số cuối cùng","GBP/CHF":"Cặp đồng tiền GBP/CHF","USD/DKK":"Cặp đồng tiền USD/DKK","General_Electric_Company":"Tập đoàn General Electric Company","US_Tech_100_Index":"Chỉ số US Tech 100","AUD/AED":"Cặp đồng tiền AUD/AED","Sep":"Tháng Chín","Safran":"Tập đoàn Safran","USD/AED":"Cặp đồng tiền USD/AED","Jakarta_Index":"Chỉ số Jakarta","Purchase_Price":"Giá Mua","XPD/EUR":"Cặp tiền tệ XPD/EUR","UK_Smart_Index":"Chỉ số thông minh Anh","XPT/EUR":"Cặp tiền tệ XPT/EUR","days":"ngày","Name":"Tên","Save_as_PNG":"Lưu theo định dạng PNG","New_Zealand_Index":"Chỉ số New Zealand","Electricite_de_France":"Tập đoàn Electricite de France (Pháp)","Major_Pairs":"Cặp tiền tệ chính","GBP/CAD":"Cặp đồng tiền GBP/CAD","Jump_To":"Nhảy đến","loading___":"đang tải...","French_Index":"Chỉ số chứng khoán Pháp","Essilor_International":"Tập đoàn quốc tế Essilor","Heineken":"Nhãn hiệu Heineken","Email_address":"Địa chỉ hòm thư","EUR/SGD":"Cặp đồng tiền EUR/SGD","AUD/PLN":"Cặp đồng tiền AUD/PLN","Closes":"Đóng","To":"Để","AUD/NOK":"Cặp đồng tiền AUD/NOK","Tuesday":"Thứ Ba","High_barrier":"Rào cản cao","GBP/HKD":"Cặp đồng tiền GBP/HKD","You_must_accept_the_terms_and_conditions_to_open_an_account_":"Bạn phải chấp nhận các điều khoản và điều kiện để mở tài khoản.","USDZAR":"Cặp đồng tiền USD/ZAR","Mar":"Tháng Ba","Allianz_SE":"Nhà cung cấp dịch vụ tài chính Allianz SE","Dec":"Tháng 12","US_S&P_100":"Chỉ số chứng khoán Hoa Kỳ S&P 100","Portuguese_Index":"Chỉ số Bồ Đào Nha","higher":"cao hơn","Jan":"Tháng Một","in_aggregate_over_the_last":"trong tổng số vượt quá lần cuối","Monday":"Thứ Hai","Royal_Dutch_Shell":"Tập đoàn Shell Hoàng Gia Hà Lan","differs":"Khác","USD/CZK":"Cặp đồng tiền USD/CZK","Randoms":"Ngẫu nhiên","Societe_Generale":"Hãng Societe Generale","Oil/AUD":"Dầu/AUD","GBP/BRL":"Cặp đồng tiền GBP/BRL","Action":"Hành động","French_Smart_Index":"Chỉ số Thông minh Pháp","comma":"dấu phẩy","minutes":"phút","USD/CHF":"Cặp đồng tiền USD/CHF","Last_Used":"Lần sử dụng cuối cùng","details":"chi tiết","AUD/MXN":"Cặp đồng tiền AUD/MXN","Oil/GBP":"Dầu/GBP","Indian_50_Index":"Chỉ số Indian 50","Toyota_Motor":"Tập đoàn Toyota Motor","Wall_Street_Index":"Chỉ số phố Wall","Previous":"Trước","Kering":"Tập đoàn Kering","EUR/IDR":"Cặp đồng tiền EUR/IDR","Contract_period":"Thời hạn hợp đồng","Euro_150_Index":"Chỉ số 150 Euro","Failed_to_update_trade_description_":"Không thể cập nhật mô tả giao dịch.","Barclays_plc":"Ngân hàng Barclays plc","Stocks":"Cổ phiếu","The_Payment_Agent_facility_is_currently_not_available_in_your_country_":"Các cơ sở đại lý thanh toán hiện không có trong đất nước của bạn.","Buy":"Mua","Next":"Tiếp theo","Friday":"Thứ Sáu","Random_Yin":"Yin ngẫu nhiên","EUR/SEK":"Cặp đồng tiền EUR/SEK","Your_settings_have_been_updated_successfully_":"Thiết lập của bạn đã được cập nhật thành công.","Your_password_cannot_be_the_same_as_your_email":"Mật khẩu của bạn không thể giống như mật khẩu email","Schneider_Electric":"Tập đoàn năng lượng Schneider Electric","Shanghai_Index":"Chỉ số chứng khoán Thượng Hải","BG_Group_plc":"Tập đoàn BG","points":"điểm","Random_25_Index":"25 chỉ số ngẫu nhiên","December":"Tháng 12","XAG/GBP":"Cặp tiền tệ XAG/GBP","Saudi_Arabia_Index":"Chỉ số Ả Rập","Higher/Lower":"Cao hơn/Thấp hơn","Stake":"Đơn vị vốn, cổ phiếu","GlaxoSmithKline_plc":"Tập đoàn dược phẩm GlaxoSmithKline","GBP/MXN":"Cặp đồng tiền GBP/MXN","Amount_per_point":"Số tiền trên mỗi điểm","in_aggregate_over_the_lifetime_of_your_account_":"trong tổng số vượt quá vòng đời của tài khoản.","The_Coca-Cola_Company":"Tập đoàn Coca-Cola","USD/SEK":"Cặp đồng tiền USD/SEK","Total_Profit/Loss":"Tổng Lợi nhuận/Thua lỗ","L'Oreal":"Tập đoàn L'Oreal","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"Hãy trình bày số tiền tối đa mà bạn có thể giữ trong tài khoản. Nếu đã đạt mức tối đa, bạn sẽ được yêu cầu rút tiền.","Jun":"Tháng Sáu","Balance":"Số dư tài khoản","Statement":"Tuyên bố","ends_between":"kết thúc giữa","asian_down":"xuống kiểu châu Á","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"Chúng tôi không thể dò giá trực tiếp tại thời điểm này. Để thấy được dòng giá hãy thử làm mới lại trang web, nếu bạn gặp vấn đề này sau khi làm thì hãy thử một trình duyệt khác","Low_barrier":"Rào cản thấp","Forex":"Thị trường ngoại hối","Minor_Pairs":"Cặp tiền tệ thứ yếu","Spreads":"Giá chênh lệch","Virtual_Account":"Tài khoản Ảo","USD/NOK":"Cặp đồng tiền USD/NOK","French_Stocks":"Chứng khoán Pháp","years":"năm","Sunday":"Chủ nhật","USD/PLN":"Cặp đồng tiền USD/PLN","GBP/CZK":"Cặp đồng tiền GBP/CZK","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"Vì vậy khoản tiền rút tối đa hiện giờ của bạn (nói tới tài khoản đang có tiền được rút) là EUR","Please_wait_<br_/>Your_request_is_being_processed_":"Vui lòng chờ. <br />Yêu cầu của bạn đang được xử lý.","Irish_Index":"Chỉ số Ailen","AUD/NZD":"Cặp đồng tiền AUD/NZD","Belgian_Index":"Chỉ số Bỉ","Palladium/USD":"Cặp Palladium/USD","January":"Tháng Một","Hyundai_Motor_Co_":"Tập đoàn Hyundai Motor.","Groupe_Bruxelles_Lambert":"Tập đoàn Bruxelles Lambert","Maximum_number_of_open_positions":"Số tối đa của vị thế mở","Start_Time":"Thời gian bắt đầu","Shinhan_Financial":"Tập đoàn tài chính Thượng Hải","AUD/SEK":"Cặp đồng tiền AUD/SEK","Ends_In/Out":"Kết thúc Trong/Ngoài","XPD/AUD":"Cặp tiền tệ XPD/AUD","Indices":"Chỉ số","EUR/NZD":"Cặp đồng tiền EUR/NZD","Maximum_aggregate_payouts_on_open_positions":"Tập hợp tiền thưởng tối đa trên vị thế mở","Credit/Debit":"Tín dụng/Ghi nợ","End_Time":"Thời gian Kết thúc","There_was_a_problem_accessing_the_server_":"Có lỗi khi truy cập máy chủ.","year":"năm","German_Index":"Chỉ số chứng khoán Đức","EUR/CHF":"Cặp đồng tiền EUR/CHF","November":"Tháng Mười một","ExxonMobil":"Tập đoàn ExxonMobil","South_African_Index":"Chỉ số chứng khoán Nam Phi","Contract":"Hợp đồng","Please_enter_a_date_that_is_at_least_6_months_from_now_":"Vui lòng nhập ngày ít nhất là 6 tháng kể từ bây giờ.","Zoom":"Phóng","May":"Tháng Năm","Profit":"Lợi nhuận","Rise/Fall":"Tăng/Giảm","XPT/AUD":"Cặp tiền tệ XPT/AUD","Total_Cost":"Tổng Chi phí","Touch/No_Touch":"Chạm","Hang_Seng_China":"Hằng Sinh, Trung Quốc","Honda_Motor_Co__Ltd":"Tập đoàn Honda Motor Co. Ltd","Maximum_daily_turnover":"Thu nhập hàng ngày tối đa","Commbank_(Australia)":"Commbank (Úc)","Royal_Dutch_Shell_plc":"Tập đoàn Shell Hoàng Gia Hà Lan","Cie_de_Saint-Gobain":"Tập đoàn Cie de Saint-Gobain","Settles":"Quyết toán","Item":"Hạng mục","Month":"Tháng","SANOFI":"Tập đoàn chăm sóc sức khỏe SANOFI","Middle_East":"Trung Đông","Random_Yang":"Yang Ngẫu nhiên","Reckitt_Benckiser_Group_plc":"Tập đoàn Reckitt Benckiser Group plc","Low_barrier_offset":"Tấm chắn hàng rào thấp","ING":"Tập đoàn tài chính ING","USD/INR":"Cặp đồng tiền USD/INR","AUD/CAD":"Cặp đồng tiền AUD/CAD","GBP/USD":"Cặp đồng tiền GBP/USD"};
+texts_json['ZH_TW'] = {"This_contract_won":"此合約獲利","Oil/EUR":"原油/歐元","Spot":"現價","US_Index":"美國指數","ASML_Holding":"阿斯麥公司","Payout":"賠付","EUR/CAD":"歐元/加元","Unilever_plc":"聯合利華公司","stays_between":"位於區間之內","Random_Bear":"隨機熊市","NZD/JPY":"紐元/日圓","Deposit_of":"存款","odd":"奇數","Pfizer_Inc_":"輝瑞大藥廠","Wednesday":"星期三","Represents_the_maximum_volume_of_contracts_that_you_may_purchase_in_any_given_trading_day_":"表示任一指定交易日您可以買入的最大合約數量。","Your_provided_email_address_is_already_in_use_by_another_Login_ID":"您所提供的電郵地址已被另一登入ID 使用","Dubai_Index":"迪拜指數","month":"月份","XPD/GBP":"鈀金價盎司/英鎊","Banco_Santander_SA":"桑坦德銀行","In/Out":"「範圍之內/之外」","Tokyo_Electric_Power_Co__Inc":"東京電力公司","AXA":"法國安盛集團","Opens":"開盤","Potential_Payout":"可能的賠付額","GBP/NZD":"英鎊/紐西蘭元","Points":"點","Therefore_you_may_not_withdraw_any_additional_funds_":"所以您可能不能提取任何額外資金。","Belgacom":"比利時電信","ITC_Ltd":"國際貿易中心有限公司","USD/JPY":"美元/日圓","Gold/AUD":"黃金/澳元","Vinci":"法國萬喜集團","touches":"觸及","AUD/BRL":"英鎊/人民幣","day_withdrawal_limit_is_currently_EUR":"目前日取款限額是EUR","AUD/CHF":"澳元/瑞士法郎","No_Live_price_update":"無即時價格更新","Please_select_a_payment_agent":"請選擇支付代理","Real_Account":"真實帳戶","Europe/Africa":"歐洲/非洲","USD/CNY":"美元/人民幣","USD/IDR":"美元/印度尼西亞盧比","Your_account_is_fully_authenticated_and_your_withdrawal_limits_have_been_lifted_":"您的帳戶已經得到完全驗證，且您的取款限額已經取消。","Swedish_Index":"瑞典指數","GBP_Index":"英鎊指數","Samsung_Electronics":"三星電子","country_of_residence":"居住國","Jul":"七月","Upcoming_Events":"未來事件","minimum_available_duration":"最短可用期限","AUD/DKK":"澳元/丹麥克朗","Gold/EUR":"黃金/歐元","USD/CAD":"美元/加元","Now":"現在","EUR/MXN":"歐元/墨西哥披索","Norwegian_Index":"挪威指數","EUR/PLN":"歐元/波蘭茲羅提","asian_up":"亞洲上漲","GBP/AUD":"英鎊/澳元","Asians":"亞洲期權","Random_100_Index":"隨機 100 指數","September":"九月","Save_as_PDF":"以PDF格式儲存","Contract_Confirmation":"合約確認","numbers":"數字","Merck_&_Co__Inc_":"默克集團","XAG/AUD":"銀價盎司/澳元","Moet_Hennessy_Louis_Vuitton":"酩悅·軒尼詩-路易·威登集團","Delete":"刪除","spread_down":"價差下跌","GBP/KRW":"英鎊/韓元","AUD_Index":"澳元指數","AUD/SGD":"澳元/新加坡元","Digits":"數字期權","UCB":"比利時聯合化學集團","We_are_not_accepting_accounts_from_residents_of_this_country_at_the_present_time_":"目前不接受來自該國居民的帳戶。","Australian_Index":"澳大利亞指數","NZD/USD":"美元/丹麥克朗","Start_time":"開始時間","Rio_Tinto_plc":"力拓集團","Your":"您的","Americas":"美洲","Japanese_Index":"日本指數","Statoil":"挪威國家石油公司","matches":"符合","Long":"長倉","USD/BRL":"美元/巴西雷亞爾","is_required__Current_spread":"為必要。目前價差","AUD/SAR":"澳元/沙特阿拉伯里亞爾","Yara_International":"雅苒國際","XAG/EUR":"銀價盎司/歐元","Vivendi":"法國斐凡迪集團","March":"三月","GBP/SEK":"英鎊/瑞典克朗","(Bejing/CST_-8_hours)":"（北京/CST -8 小時）","Smart_FX":"智慧外匯","AUD/INR":"澳元/印度盧比","GBP/NOK":"英鎊/挪威克朗","XPT/GBP":"白金價盎司/英鎊","Week_of":"週","Entry_Spot":"入市現價","Nov":"十一月","Ref_":"參考","spread_up":"價差上漲","Orange":"法國電信集團","BNP_Paribas":"法國巴黎銀行","QUALCOMM":"美國高通公司","Dutch_Index":"荷蘭指數","EUR/BRL":"歐元/巴西雷亞爾","Iberdrola_SA":"西班牙電力公司","Metals":"金屬","EUR/INR":"歐元/印度盧比","We":"星期三","EUR/HKD":"歐元/港幣","even":"偶數","Gaming_Account":"博彩帳戶","July":"七月","June":"六月","Purchase_Date":"買入日期","Infosys_Ltd":"印孚瑟斯有限公司","Thursday":"星期四","EUR/AUD":"歐元/澳元","Limit":"限額","Smart_Indices":"智慧指數","EUR/DKK":"歐元/丹麥克朗","GDF_Suez":"法國天然氣蘇伊士集團","USD_Index":"美元指數","ANZ_Banking_Group_Ltd":"澳新銀行集團有限公司","USD/MXN":"美元/墨西哥披索","HDFC_Bank_Ltd":"印度HDFC銀行","GBP/DKK":"英鎊/丹麥克朗","password":"密碼","Stop-type":"停止類型","AUD/JPY":"澳元/日圓","GBP/IDR":"英鎊/印度尼西亞盧比","Random_Bull":"隨機牛市","Your_withdrawal_limit_for_the_entire_duration_of_the_account_is_currently:_EUR":"在整個帳戶持續期內您的取款限額目前為：EUR","EUR/HUF":"歐元/匈牙利福林","ticks":"跳動點","When_you_click_'Ok'_you_will_be_excluded_from_trading_on_the_site_until_the_selected_date_":"當您點選「Ok」後，您將被禁止在此網站交易，直到選定期限結束為止。","Apr":"四月","Danone":"達能集團","months":"月份","Potential_Profit":"潛在利潤","over":"高於","Microsoft":"微軟公司","Reliance_Industries_Ltd":"信實工業有限公司","Random":"隨機","Sale_Date":"賣出日期","Nocturnes":"Nocturne指數","Exercise_period":"練習期間","February":"二月","AB_Inbev":"安海斯-布希英博","Your_current_balance_is":"您目前餘額有","Singapore_Index":"新加坡指數","Duration":"期限","This_contract_lost":"此合約虧損","AUD/CNY":"澳元/人民幣","AUD/USD":"澳元/美元","EUR_Index":"歐元指數","Egypt_Index":"埃及指數","Net_profit":"淨收益","There_was_a_problem_accessing_the_server_during_purchase_":"買入時伺服器存取出了問題。","JP_Morgan_Chase_&_Co_":"摩根大通公司","create_new_account":"開立新帳戶","SK_Hynix_Inc_":"SK海力士半導體公司","Pernod_Ricard":"法國保樂力加集團","Dutch_Stocks":"荷蘭股票","Th":"星期四","Oct":"十月","Barrier_offset":"障礙位移","EUR/JPY":"歐元/日圓","Gold/USD":"黃金/美元","Next_Day":"第二天","EUR/SAR":"歐元/沙特阿拉伯里亞爾","Inditex_SA":"西班牙Inditex SA集團","BHP_Billiton_Ltd":"必和必拓公司","Save_as_CSV":"以CSV格式儲存","GBP/PLN":"英鎊/波蘭茲羅提","Quotidians":"Quotidian市場","Loss":"虧損","Mo":"星期一","Vodafone":"沃達豐集團","Dutch_Smart_Index":"荷蘭智慧指數","AUD/KRW":"澳元/韓元","Tick":"跳動點","letters":"信件","under":"低於","Silver/USD":"白銀/美元","SoftBank_Co_":"軟銀公司","Energy":"能源","From":"來自","does_not_touch":"未觸及","hour":"小時","Credit_Agricole":"法國農業信貸銀行","View":"檢視","Wells_Fargo_&_Company":"富國銀行","EUR/NOK":"歐元/挪威克朗","Sorry,_an_error_occurred_while_processing_your_account_":"對不起，在處理您的帳戶時出錯。","Trading_Limits":"交易限制","Vanilla_Options":"單純期權","German_Smart_Index":"德國智慧指數","minute":"分鐘","BBVA_(Banco_Bilbao)":"西班牙對外銀行","Maximum_account_cash_balance":"最大帳戶現金餘額","August":"八月","Renault":"雷諾汽車","EUR/CNY":"歐元/人民幣","Bombay_Index":"孟買指數","Euro_50_Smart_Index":"歐洲 50 智慧指數","GBP/JPY":"英鎊/日圓","US_Tech_Composite_Index":"美國科技綜合指數","Sa":"星期六","Anglo_American_plc":"英美資源集團","seconds":"秒","Assicurazioni_Generali_SpA":"義大利忠利保險公司","or_equivalent_in_other_currency":"或等值的其它貨幣","Gold/GBP":"黃金/英鎊","Oil/USD":"原油/美元","GBP/ZAR":"英鎊/南非蘭特","Up/Down":"漲/跌","Wal-Mart_Stores_Inc_":"沃爾瑪百貨有限公司","You_have_already_withdrawn_the_equivalent_of_EUR":"您已累計提取 EUR","Telefonica_SA":"西班牙電信","Profit_Table":"利潤表","Purchase":"買入","Shenzhen_Index":"深圳指數","Invalid_email_address":"無效的電子郵件地址","Please_check_your_Email_for_the_next_step_":"進入下一步驟前請檢查您的電郵地址。","Random_50_Index":"隨機 50 指數","Investment_Account":"投資帳戶","GBP/AED":"英鎊/阿聯酋迪拉姆","USD/SGD":"美元/新加坡元","You_are_not_authorized_for_withdrawal_via_payment_agent_":"您未經授權通過付款代理進行取款。","USD/KRW":"美元/韓元","Wall_Street_Smart_Index":"華爾街智慧指數","EUR/ZAR":"歐元/南非蘭特","Westpac_Banking_Co_":"西太平洋銀行公司","Withdrawal_Limits":"取款限額","Print_chart":"列印圖表","Please_try_again_":"請重試。","Your_transaction_reference_is":"您的交易參考號是","Diageo_plc":"英國帝亞吉歐公司","Apple_Inc_":"蘋果公司","Glencore_Xstrat":"嘉能可超達","National_Australia_Bank_Ltd":"澳大利亞國民銀行有限公司","Philip_Morris_International":"菲利普莫里斯股份有限公司","Save_as_SVG":"以SVG格式儲存","Profit/Loss":"利潤/虧損","Commodities":"商品","Seadrill":"挪威石油服務公司","Verification_token_is_missing__Click_on_the_verification_link_sent_to_your_Email_and_make_sure_you_are_not_already_logged_in_":"沒找到驗證權杖。請點選發送到您郵箱的驗證連結，並確保您還未登入。","Lloyds_Banking_Group_plc":"萊斯銀行集團","Fr":"星期五","Air_Liquide":"法國液空集團","goes_outside":"處於區間之外","High_Barrier":"高障礙","GBP/SAR":"英鎊/沙特阿拉伯里亞爾","space":"空間","Portuguese_Smart_Index":"葡萄牙智慧指數","EUR/GBP":"歐元/英鎊","Saturday":"星期六","Never_Used":"從未使用過","USD/HKD":"美元/港幣","Presents_the_maximum_aggregate_payouts_on_outstanding_contracts_in_your_portfolio__If_the_maximum_is_attained,_you_may_not_purchase_additional_contracts_without_first_closing_out_existing_positions_":"表示您證券組合中未平倉合約的最大總賠付額。如果達到該最大值，那麼您在購買更多合約之前需要先對現有頭寸進行平倉。","EUR/CZK":"歐元/捷克克朗","Description":"描述","Sell":"賣出","Abu_Dhabi_Index":"阿布達比指數","Euro_50_Index":"歐洲 50 指數","October":"十月","Procter_&_Gamble_Co_":"寶鹼公司","period":"週期","Standard_Chartered_plc":"渣打銀行","Stays_In/Goes_Out":"「保持在範圍之內/超出範圍之外」","Fiat":"飛雅特汽車公司","Represents_the_maximum_number_of_outstanding_contracts_in_your_portfolio__Each_line_in_your_portfolio_counts_for_one_open_position__Once_the_maximum_is_reached,_you_will_not_be_able_to_open_new_positions_without_closing_an_existing_position_first_":"表示您的投資組合中未平倉合約的最大數量。您投資組合中的每一行都算作是一個未平倉頭寸。一旦達到該最大值，在開設新頭寸之前您需要先了結一個現有頭寸。","Italian_30_Index":"意大利 30 指數","Asset":"資產","Airbus_Group":"空中巴士集團","Unilever":"聯合利華公司","AUD/HKD":"澳元/港幣","EUR/USD":"歐元/美元","Hong_Kong_Index":"香港指數","Barrier":"障礙","Low_Barrier":"低障礙","Previous_Day":"前一天","Tu":"星期二","Sale_Price":"賣出價格","AUD/IDR":"澳元/印度尼西亞盧比","Enter_the_barrier_in_terms_of_the_difference_from_the_spot_price__If_you_enter_+0_005,_then_you_will_be_purchasing_a_contract_with_a_barrier_0_005_higher_than_the_entry_spot__The_entry_spot_will_be_the_next_tick_after_your_order_has_been_received":"請按與現貨價格差額的形式輸入障礙水平。如果您輸入+0.005 ，那麼您將買入障礙水平比入市現價高0.005 的合約。入市現價為收到您訂單之後的下一個價格","GBP/CNY":"澳元/巴西雷亞爾","Short":"短倉","Random_75_Index":"隨機 75 指數","Please_confirm_the_trade_on_your_statement_before_proceeding_":"繼續執行之前，請在您的聲明上確認此項交易。","Token":"權杖","Year":"年","Purchase_Time":"買入時間","Day":"天","Your_request_to_withdraw_[_1]_[_2]_from_your_account_[_3]_to_Payment_Agent_[_4]_account_has_been_successfully_processed_":"您從 帳戶提取  到支付代理帳戶的要求已成功處理。","AT&T":"AT&T公司","Trading_and_Withdrawal_Limits":"交易和取款限額","SABMiller_plc":"米勒啤酒集團","High_barrier_offset":"高障礙位移","ICICI_Bank_Ltd":"印度工業信貸投資銀行","Aug":"八月","Telenor":"挪威電信公司","KBC_Groep":"KBC集團","EUR/KRW":"歐元/韓元","ends_outside":"區間之外結束","Russian_Regular_Index":"俄羅斯普通指數","Hitachi_Ltd":"日立公司","Feb":"二月","The_two_passwords_that_you_entered_do_not_match_":"兩次輸入的密碼不相符。","Stop-loss":"止損","re-enter_password":"重新輸入密碼","This_field_is_required_":"此為必填欄位。","Return":"回報","Carrefour":"家樂福超市","Swiss_Index":"瑞士指數","USD/SAR":"美元/沙特阿拉伯里亞爾","AP_Ordinary":"AP 普通股票指數","[ctx,minimum_duration,_for_example_minimum_15_seconds]min":"分鐘","Intesa_Sanpaolo":"義大利聯合聖保羅銀行","day":"天","Chevron_Co_":"雪佛龍公司","Save_as_JPEG":"以JPEG格式儲存","AUD/CZK":"澳元/捷克克朗","Platinum/USD":"白金/美元","hours":"小時","Johnson_&_Johnson":"壯生","Euro_100_Index":"歐洲100指數","second":"秒","GBP/INR":"英鎊/印度盧比","EUR/AED":"歐元/阿聯酋迪拉姆","Belgian_Stocks":"比利時股票","Date":"日期","Asia/Oceania":"亞洲/大洋洲","Italian_Index":"意大利指數","Your_withdrawal_limit_is_EUR":"您的取款限額是EUR","TOTAL":"道達爾公司","lower":"低於","April":"四月","Daimler_AG":"戴姆勒股份公司","ICAG_(British_Airways)":"英國航空公司","AUDZAR":"澳元兌南非蘭特","GBP/SGD":"英鎊/新加坡元","Last_Digit_Prediction":"最後數字的預測","GBP/CHF":"英鎊/瑞士法郎","USD/DKK":"紐西蘭元/美元","General_Electric_Company":"通用電氣公司","US_Tech_100_Index":"美國科技100指數","AUD/AED":"澳元/阿聯酋迪拉姆","Sep":"九月","Safran":"賽峰","USD/AED":"美元/阿聯酋迪拉姆","Jakarta_Index":"雅加達指數","Purchase_Price":"買入價格","XPD/EUR":"鈀金價盎司/歐元","UK_Smart_Index":"英國智慧指數","XPT/EUR":"白金價盎司/歐元","days":"天","Name":"姓名","Save_as_PNG":"以PNG格式儲存","New_Zealand_Index":"紐西蘭指數","Electricite_de_France":"法國電力公司","Major_Pairs":"主要貨幣對","Su":"星期日","GBP/CAD":"英鎊/加元","Jump_To":"跳至","loading___":"載入中……","French_Index":"法國指數","Essilor_International":"依視路","Heineken":"海尼根","Email_address":"電子郵件地址","EUR/SGD":"歐元/新加坡元","AUD/PLN":"澳元/波蘭兹羅提","Closes":"收盤","To":"到","AUD/NOK":"澳元/挪威克朗","Tuesday":"星期二","High_barrier":"高障礙","GBP/HKD":"英鎊/港幣","You_must_accept_the_terms_and_conditions_to_open_an_account_":"您必須接受條款和條件才能開戶。","ENEL":"義大利國家電力公司","USDZAR":"美元兌南非蘭特","Mar":"三月","Allianz_SE":"安聯 SE","Dec":"十二月","US_S&P_100":"美國標普 100 指數","Portuguese_Index":"葡萄牙指數","higher":"高於","Jan":"一月","in_aggregate_over_the_last":"上期內的總額","Monday":"星期一","Royal_Dutch_Shell":"荷蘭皇家殼牌公司","differs":"相差","USD/CZK":"美元/捷克克朗","Randoms":"隨機指數","Societe_Generale":"法國興業銀行","Oil/AUD":"原油/澳元","GBP/BRL":"英鎊/巴西雷亞爾","Action":"動作","French_Smart_Index":"法國智慧指數","comma":"逗號","minutes":"分鐘","USD/CHF":"美元/瑞士法郎","Last_Used":"上一次使用","details":"詳細資料","AUD/MXN":"澳元/墨西哥比索","Oil/GBP":"原油/英鎊","Indian_50_Index":"印度50 指數","Toyota_Motor":"豐田汽車","Wall_Street_Index":"華爾街指數","Previous":"之前","Kering":"開雲集團","EUR/IDR":"歐元/印度尼西亞盧比","Contract_period":"合約期間","Euro_150_Index":"歐洲150指數","Failed_to_update_trade_description_":"無法更新交易描述。","Barclays_plc":"巴克萊銀行","Stocks":"股票","The_Payment_Agent_facility_is_currently_not_available_in_your_country_":"您的國家無可用支付代理設施。","Buy":"買入","Next":"下一頁","Friday":"星期五","Random_Yin":"隨機陰市","EUR/SEK":"歐元/瑞典克朗","Your_settings_have_been_updated_successfully_":"您的設定已成功更新。","Your_password_cannot_be_the_same_as_your_email":"您的密碼不可與電子郵件相同","Schneider_Electric":"施耐德電氣公司","Shanghai_Index":"上海指數","BG_Group_plc":"英國石油天然氣集團公司","points":"點","Random_25_Index":"隨機 25 指數","December":"十二月","XAG/GBP":"銀價盎司/英鎊","Saudi_Arabia_Index":"沙地阿拉伯指數","Higher/Lower":"「高於/低於」","Stake":"投注資金","GlaxoSmithKline_plc":"荷商葛蘭素史克藥廠","GBP/MXN":"英鎊/墨西哥披索","Amount_per_point":"每點之金額","in_aggregate_over_the_lifetime_of_your_account_":"自您開戶以來的累計總額。","The_Coca-Cola_Company":"可口可樂","USD/SEK":"美元/瑞典克朗","Total_Profit/Loss":"利潤/虧損合計","L'Oreal":"歐萊雅集團","Represents_the_maximum_amount_of_cash_that_you_may_hold_in_your_account___If_the_maximum_is_reached,_you_will_be_asked_to_withdraw_funds_":"表示您的帳戶中可持有的最高現金額。如果達到該最高額，將會要求您提取資金。","Jun":"六月","Balance":"餘額","Statement":"帳單","ends_between":"區間之內結束","asian_down":"亞洲下跌","We_are_not_able_to_stream_live_prices_at_the_moment__To_enjoy_live_streaming_of_prices_try_refreshing_the_page,_if_you_get_this_issue_after_repeated_attempts_try_a_different_browser":"目前我們不能夠串流即時價格。要獲得價格的即時串流請試重新整理頁面，如果經過反复嘗試還是存在此問題，請換一個瀏覽器","Oracle":"甲骨文公司","Low_barrier":"低障礙","Forex":"外匯","Minor_Pairs":"次要貨幣對","Spreads":"價差","Virtual_Account":"虛擬帳戶","USD/NOK":"美元/挪威克朗","French_Stocks":"法國股票","years":"年","Sunday":"星期日","USD/PLN":"美元/波蘭茲羅提","GBP/CZK":"英鎊/捷克克朗","Therefore_your_current_immediate_maximum_withdrawal_(subject_to_your_account_having_sufficient_funds)_is_EUR":"因此您目前的即時最高取款額（要求您的帳戶具有充足的資金）為EUR","Please_wait_<br_/>Your_request_is_being_processed_":"請稍候。 <br />您的要求正在處理中。","Irish_Index":"愛爾蘭指數","AUD/NZD":"澳元/紐西蘭元","Belgian_Index":"比利時指數","Palladium/USD":"鈀金/美元","ENI_SpA":"義大利埃尼集團","January":"一月","Hyundai_Motor_Co_":"現代汽車公司","Groupe_Bruxelles_Lambert":"藍博特布魯塞爾集團","Maximum_number_of_open_positions":"最大未平倉頭寸數目","Start_Time":"開始時間","Shinhan_Financial":"新韓金融","AUD/SEK":"澳元/瑞典克朗","Ends_In/Out":"收盤價在「範圍之內/之外」","XPD/AUD":"鈀金價盎司/澳元","Indices":"指數","EUR/NZD":"歐元/紐西蘭元","Maximum_aggregate_payouts_on_open_positions":"未平倉頭寸的最大賠付總額","Credit/Debit":"借記/貸記","End_Time":"結束時間","There_was_a_problem_accessing_the_server_":"伺服器存取出了問題。","year":"年","German_Index":"德國指數","Google_Inc_":"谷歌","EUR/CHF":"歐元/瑞士法郎","November":"十一月","ExxonMobil":"埃克森美孚公司","South_African_Index":"南非指數","Contract":"合約","Please_enter_a_date_that_is_at_least_6_months_from_now_":"請輸入至少6個月後的日期。","Zoom":"縮放","May":"五月","Profit":"利潤","Rise/Fall":"「上漲/下跌」合約","XPT/AUD":"白金價盎司/澳元","Total_Cost":"成本總計","Touch/No_Touch":"觸及/未觸及","Hang_Seng_China":"恆生中國指數","Honda_Motor_Co__Ltd":"本田汽車有限公司","Intel":"英特爾公司","Maximum_daily_turnover":"最大日成交量","Commbank_(Australia)":"聯邦銀行（澳大利亞）","Royal_Dutch_Shell_plc":"荷蘭皇家殼牌公司","Cie_de_Saint-Gobain":"聖戈班公司","Settles":"結算","Item":"項目","Month":"月份","SANOFI":"賽諾菲","Middle_East":"中東","Random_Yang":"隨機陽市","Reckitt_Benckiser_Group_plc":"利潔時集團公司","Low_barrier_offset":"低障礙位移","USD/INR":"美元/印度盧比","AUD/CAD":"澳元/加元","GBP/USD":"英鎊/美元"};
 ;var markets_list = ["forex","indices","stocks","commodities","random"]; var markets_json = {"random":{"submarkets":[{"instruments":[{"value":"R_100","label":"Random 100 Index"},{"value":"R_25","label":"Random 25 Index"},{"value":"R_50","label":"Random 50 Index"},{"value":"R_75","label":"Random 75 Index"}],"name":"random_index","label":"Indices"},{"instruments":[{"value":"RDBEAR","label":"Random Bear"},{"value":"RDBULL","label":"Random Bull"},{"value":"RDMOON","label":"Random Moon"},{"value":"RDSUN","label":"Random Sun"}],"name":"random_daily","label":"Quotidians"},{"instruments":[{"value":"RDMARS","label":"Random Mars"},{"value":"RDVENUS","label":"Random Venus"},{"value":"RDYANG","label":"Random Yang"},{"value":"RDYIN","label":"Random Yin"}],"name":"random_nightly","label":"Nocturnes"}],"label":"Randoms"},"commodities":{"submarkets":[{"instruments":[{"value":"frxXAUUSD","label":"Gold/USD"},{"value":"frxXPDUSD","label":"Palladium/USD"},{"value":"frxXPTUSD","label":"Platinum/USD"},{"value":"frxXAGUSD","label":"Silver/USD"}],"name":"metals","label":"Metals"},{"instruments":[{"value":"frxBROUSD","label":"Oil/USD"}],"name":"energy","label":"Energy"}],"label":"Commodities"},"forex":{"submarkets":[{"instruments":[{"value":"frxAUDJPY","label":"AUD/JPY"},{"value":"frxAUDUSD","label":"AUD/USD"},{"value":"frxEURAUD","label":"EUR/AUD"},{"value":"frxEURCAD","label":"EUR/CAD"},{"value":"frxEURCHF","label":"EUR/CHF"},{"value":"frxEURGBP","label":"EUR/GBP"},{"value":"frxEURJPY","label":"EUR/JPY"},{"value":"frxEURUSD","label":"EUR/USD"},{"value":"frxGBPAUD","label":"GBP/AUD"},{"value":"frxGBPJPY","label":"GBP/JPY"},{"value":"frxGBPUSD","label":"GBP/USD"},{"value":"frxUSDCAD","label":"USD/CAD"},{"value":"frxUSDCHF","label":"USD/CHF"},{"value":"frxUSDJPY","label":"USD/JPY"}],"name":"major_pairs","label":"Major Pairs"},{"instruments":[{"value":"frxAUDCAD","label":"AUD/CAD"},{"value":"frxAUDCHF","label":"AUD/CHF"},{"value":"frxAUDNZD","label":"AUD/NZD"},{"value":"frxAUDPLN","label":"AUD/PLN"},{"value":"frxEURNZD","label":"EUR/NZD"},{"value":"frxGBPCAD","label":"GBP/CAD"},{"value":"frxGBPCHF","label":"GBP/CHF"},{"value":"frxGBPNOK","label":"GBP/NOK"},{"value":"frxGBPNZD","label":"GBP/NZD"},{"value":"frxGBPPLN","label":"GBP/PLN"},{"value":"frxNZDJPY","label":"NZD/JPY"},{"value":"frxNZDUSD","label":"NZD/USD"},{"value":"frxUSDMXN","label":"USD/MXN"},{"value":"frxUSDNOK","label":"USD/NOK"},{"value":"frxUSDPLN","label":"USD/PLN"},{"value":"frxUSDSEK","label":"USD/SEK"}],"name":"minor_pairs","label":"Minor Pairs"},{"instruments":[{"value":"WLDAUD","label":"AUD Index"},{"value":"WLDEUR","label":"EUR Index"},{"value":"WLDGBP","label":"GBP Index"},{"value":"WLDUSD","label":"USD Index"}],"name":"smart_fx","label":"Smart FX"}],"label":"Forex"},"stocks":{"submarkets":[{"instruments":[{"value":"FPCS","label":"AXA"},{"value":"FPAI","label":"Air Liquide"},{"value":"FPAIR","label":"Airbus Group"},{"value":"FPBNP","label":"BNP Paribas"},{"value":"FPCA","label":"Carrefour"},{"value":"FPSGO","label":"Cie de Saint-Gobain"},{"value":"FPACA","label":"Credit Agricole"},{"value":"FPBN","label":"Danone"},{"value":"FPEDF","label":"Electricite de France"},{"value":"FPEI","label":"Essilor International"},{"value":"FPGSZ","label":"GDF Suez"},{"value":"FPKER","label":"Kering"},{"value":"FPOR","label":"L'Oreal"},{"value":"FPMC","label":"Moet Hennessy Louis Vuitton"},{"value":"FPORA","label":"Orange"},{"value":"FPRI","label":"Pernod Ricard"},{"value":"FPRNO","label":"Renault"},{"value":"FPSAN","label":"SANOFI"},{"value":"FPSAF","label":"Safran"},{"value":"FPSU","label":"Schneider Electric"},{"value":"FPGLE","label":"Societe Generale"},{"value":"FPFP","label":"TOTAL"},{"value":"FPDG","label":"Vinci"},{"value":"FPVIV","label":"Vivendi"}],"name":"france","label":"French Stocks"},{"instruments":[{"value":"BBABI","label":"AB Inbev"},{"value":"BBBELG","label":"Belgacom"},{"value":"BBGBLB","label":"Groupe Bruxelles Lambert"},{"value":"BBKBC","label":"KBC Groep"},{"value":"BBUCB","label":"UCB"}],"name":"belgium","label":"Belgian Stocks"},{"instruments":[{"value":"NAASML","label":"ASML Holding"},{"value":"NAHEIA","label":"Heineken"},{"value":"NAINGA","label":"ING"},{"value":"NARDSA","label":"Royal Dutch Shell"},{"value":"NAUNA","label":"Unilever"}],"name":"amsterdam","label":"Dutch Stocks"}],"label":"Stocks"},"indices":{"submarkets":[{"instruments":[{"value":"AS51","label":"Australian Index"},{"value":"BSESENSEX30","label":"Bombay Index"},{"value":"HSI","label":"Hong Kong Index"},{"value":"JCI","label":"Jakarta Index"},{"value":"N225","label":"Japanese Index"},{"value":"SSECOMP","label":"Shanghai Index"},{"value":"SZSECOMP","label":"Shenzhen Index"},{"value":"STI","label":"Singapore Index"}],"name":"asia_oceania","label":"Asia/Oceania"},{"instruments":[{"value":"BFX","label":"Belgian Index"},{"value":"AEX","label":"Dutch Index"},{"value":"SX5E","label":"Euro 50 Index"},{"value":"FCHI","label":"French Index"},{"value":"GDAXI","label":"German Index"},{"value":"ISEQ","label":"Irish Index"},{"value":"OBX","label":"Norwegian Index"},{"value":"TOP40","label":"South African Index"},{"value":"SSMI","label":"Swiss Index"}],"name":"europe_africa","label":"Europe/Africa"},{"instruments":[{"value":"SPC","label":"US Index"},{"value":"DJI","label":"Wall Street Index"}],"name":"americas","label":"Americas"},{"instruments":[{"value":"SYNAEX","label":"Dutch Smart Index"},{"value":"SYNSX5E","label":"Euro 50 Smart Index"},{"value":"SYNFCHI","label":"French Smart Index"},{"value":"SYNGDAXI","label":"German Smart Index"},{"value":"SYNFTSE","label":"UK Smart Index"},{"value":"SYNDJI","label":"Wall Street Smart Index"}],"name":"smart_index","label":"Smart Indices"},{"instruments":[{"value":"DFMGI","label":"Dubai Index"},{"value":"SASEIDX","label":"Saudi Arabia Index"}],"name":"middle_east","label":"Middle East"}],"label":"Indices"}};;if (window.applicationCache) {
         window.applicationCache.addEventListener('updateready', function(){
             if (window.applicationCache.status === window.applicationCache.UPDATEREADY) {
@@ -49587,9 +48547,6 @@ texts_json['ZH_TW'] = {"Euro_50_Index":"歐洲 50 指數","Please_select":"請�
                         window.location.reload();
                         return false;
                     });
-                    setTimeout(function() {
-                      $('#appcache-refresh-link').trigger('click');
-                    }, 30000);
                 } catch (err) {}
             }
         }, false);
@@ -50266,30 +49223,6 @@ URL.prototype = {
 
         return url;
     },
-    url_for_static: function(path) {
-        if(!path) {
-            path = '';
-        }
-        else if (path.length > 0 && path[0] === '/') {
-            path = path.substr(1);
-        }
-
-        var staticHost = window.staticHost;
-        if(!staticHost || staticHost.length === 0) {
-            staticHost = $('script[src*="binary.min.js"]').attr('src');
-
-            if(staticHost && staticHost.length > 0) {
-                staticHost = staticHost.substr(0, staticHost.indexOf('/js/') + 1);
-            }
-            else {
-                staticHost = 'https://static.binary.com/';
-            }
-
-            window.staticHost = staticHost;
-        }
-
-        return staticHost + path;
-    },
     reset: function() {
         this.location = window.location;
         this._param_hash = undefined;
@@ -50393,7 +49326,7 @@ Menu.prototype = {
                 this.show_main_menu();
             }
         } else {
-            var is_mojo_page = /^\/$|\/login|\/home|\/smart-indices|\/ad|\/open-source-projects|\/white-labels|\/bulk-trader-facility|\/partners|\/payment-agent|\/about-us|\/group-information|\/group-history|\/careers|\/contact|\/terms-and-conditions|\/terms-and-conditions-jp|\/responsible-trading|\/us_patents|\/lost_password$/.test(window.location.pathname);
+            var is_mojo_page = /^\/$|\/login|\/home|\/smart-indices|\/ad|\/open-source-projects|\/white-labels|\/bulk-trader-facility|\/partners|\/payment-agent|\/about-us|\/group-information|\/group-history|\/careers|\/contact|\/terms-and-conditions|\/terms-and-conditions-jp|\/responsible-trading|\/us_patents|\/signup$/.test(window.location.pathname);
             if(!is_mojo_page) {
                 trading.addClass('active');
                 this.show_main_menu();
@@ -50435,8 +49368,8 @@ Menu.prototype = {
                 if(markets_array.indexOf(link_id) < 0) {
                     var link = $(this).find('a');
                     if(markets_array.indexOf(link.attr('id')) < 0) {
-                        var link_text = link.text();
-                        link.replaceWith($('<span/>', {class: 'link disabled-link', text: link_text}));
+                        link.addClass('disabled-link');
+                        link.removeAttr('href');
                     }
                 }
             });
@@ -50519,6 +49452,7 @@ Menu.prototype = {
             }
             start_trading.attr("href", trade_url);
 
+            $('#menu-top li:eq(3) a').attr('href', trade_url);
             $('#mobile-menu #topMenuStartBetting a.trading_link').attr('href', trade_url);
         }
 
@@ -50526,6 +49460,12 @@ Menu.prototype = {
             event.preventDefault();
             load_with_pjax(trade_url);
         }).addClass('unbind_later');
+
+        $('#menu-top li:eq(3) a').on('click', function(event) {
+            event.preventDefault();
+            load_with_pjax(trade_url);
+        }).addClass('unbind_later');
+
     }
 };
 
@@ -50541,7 +49481,6 @@ Header.prototype = {
         this.show_or_hide_login_form();
         this.register_dynamic_links();
         this.simulate_input_placeholder_for_ie();
-        this.logout_handler();
     },
     on_unload: function() {
         this.menu.reset();
@@ -50643,23 +49582,6 @@ Header.prototype = {
         clearInterval(clock_handle);
 
         clock_handle = setInterval(update_time, 1000);
-    },
-    logout_handler : function(){
-        $('a.logout').unbind('click').click(function(){
-            BinarySocket.send({"logout": "1"});
-        });
-    },
-    do_logout : function(response){
-        if("logout" in response && response.logout === 1){
-            sessionStorage.setItem('currencies', '');
-            var cookies = ['login', 'loginid', 'loginid_list', 'email', 'settings', 'reality_check'];
-            var current_domain = window.location.hostname.replace('www', '');
-            cookies.map(function(c){
-                $.removeCookie(c, {path: '/', domain: current_domain});
-            });
-
-            window.location.href = page.url.url_for(''); //redirect to homepage
-        }
     },
 };
 
@@ -50951,7 +49873,6 @@ Page.prototype = {
     on_change_loginid: function() {
         var that = this;
         $('#client_loginid').on('change', function() {
-            sessionStorage.setItem('currencies', '');
             $('#loginid-switch-form').submit();
         });
     },
@@ -51024,185 +49945,6 @@ Page.prototype = {
         });
     }
 };
-;/* ************************************************************
-Created: 20060120
-Author:  Steve Moitozo <god at zilla dot us> -- geekwisdom.com
-Description: This is a quick and dirty password quality meter
-     written in JavaScript so that the password does
-     not pass over the network.
-License: MIT License (see below)
-Modified: 20060620 - added MIT License
-Modified: 20061111 - corrected regex for letters and numbers
-                     Thanks to Zack Smith -- zacksmithdesign.com
----------------------------------------------------------------
-Copyright (c) 2006 Steve Moitozo <god at zilla dot us>
-Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation
-files (the "Software"), to deal in the Software without
-restriction, including without limitation the rights to use,
-copy, modify, merge, publish, distribute, sublicense, and/or
-sell copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following
-conditions:
-   The above copyright notice and this permission notice shall
-be included in all copies or substantial portions of the
-Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
-KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
-WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
-AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
-OR OTHER DEALINGS IN THE SOFTWARE.
----------------------------------------------------------------
-Password Strength Factors and Weightings
-password length:
-level 0 (3 point): less than 4 characters
-level 1 (6 points): between 5 and 7 characters
-level 2 (12 points): between 8 and 15 characters
-level 3 (18 points): 16 or more characters
-letters:
-level 0 (0 points): no letters
-level 1 (5 points): all letters are lower case
-level 2 (7 points): letters are mixed case
-numbers:
-level 0 (0 points): no numbers exist
-level 1 (5 points): one number exists
-level 1 (7 points): 3 or more numbers exists
-special characters:
-level 0 (0 points): no special characters
-level 1 (5 points): one special character exists
-level 2 (10 points): more than one special character exists
-combinatons:
-level 0 (1 points): letters and numbers exist
-level 1 (1 points): mixed case letters
-level 1 (2 points): letters, numbers and special characters
-          exist
-level 1 (2 points): mixed case letters, numbers and special
-          characters exist
-NOTE: Because I suck at regex the code might need work
-NOTE: Instead of putting out all the logging information,
-    the score, and the verdict it would be nicer to stretch
-    a graphic as a method of presenting a visual strength
-    guage.
-************************************************************ */
-function testPassword(passwd)
-{
-    var intScore   = 0;
-    var strVerdict = "weak";
-    var strLog     = "";
-
-    // PASSWORD LENGTH
-    if (passwd.length<5)                         // length 4 or less
-    {
-      intScore = (intScore+3);
-      strLog   = strLog + "3 points for length (" + passwd.length + ")\n";
-    }
-    else if (passwd.length>4 && passwd.length<8) // length between 5 and 7
-    {
-      intScore = (intScore+6);
-      strLog   = strLog + "6 points for length (" + passwd.length + ")\n";
-    }
-    else if (passwd.length>7 && passwd.length<16)// length between 8 and 15
-    {
-      intScore = (intScore+12);
-      strLog   = strLog + "12 points for length (" + passwd.length + ")\n";
-    }
-    else if (passwd.length>15)                    // length 16 or more
-    {
-      intScore = (intScore+18);
-      strLog   = strLog + "18 point for length (" + passwd.length + ")\n";
-    }
-
-
-    // LETTERS (Not exactly implemented as dictacted above because of my limited understanding of Regex)
-    if (passwd.match(/[a-z]/))                              // [verified] at least one lower case letter
-    {
-      intScore = (intScore+1);
-      strLog   = strLog + "1 point for at least one lower case char\n";
-    }
-
-    if (passwd.match(/[A-Z]/))                              // [verified] at least one upper case letter
-    {
-      intScore = (intScore+5);
-      strLog   = strLog + "5 points for at least one upper case char\n";
-    }
-
-    // NUMBERS
-    if (passwd.match(/\d+/))                                 // [verified] at least one number
-    {
-      intScore = (intScore+5);
-      strLog   = strLog + "5 points for at least one number\n";
-    }
-
-    if (passwd.match(/(.*[0-9].*[0-9].*[0-9])/))             // [verified] at least three numbers
-    {
-      intScore = (intScore+5);
-      strLog   = strLog + "5 points for at least three numbers\n";
-    }
-
-
-    // SPECIAL CHAR
-    if (passwd.match(/.[!,@,#,$,%,^,&,*,?,_,~]/))            // [verified] at least one special character
-    {
-      intScore = (intScore+5);
-      strLog   = strLog + "5 points for at least one special char\n";
-    }
-
-                   // [verified] at least two special characters
-    if (passwd.match(/(.*[!,@,#,$,%,^,&,*,?,_,~].*[!,@,#,$,%,^,&,*,?,_,~])/))
-    {
-      intScore = (intScore+5);
-      strLog   = strLog + "5 points for at least two special chars\n";
-    }
-
-
-    // COMBOS
-    if (passwd.match(/([a-z].*[A-Z])|([A-Z].*[a-z])/))        // [verified] both upper and lower case
-    {
-      intScore = (intScore+2);
-      strLog   = strLog + "2 combo points for upper and lower letters\n";
-    }
-
-    if (passwd.match(/([a-zA-Z])/) && passwd.match(/([0-9])/)) // [verified] both letters and numbers
-    {
-      intScore = (intScore+2);
-      strLog   = strLog + "2 combo points for letters and numbers\n";
-    }
-
-                  // [verified] letters, numbers, and special characters
-    if (passwd.match(/([a-zA-Z0-9].*[!,@,#,$,%,^,&,*,?,_,~])|([!,@,#,$,%,^,&,*,?,_,~].*[a-zA-Z0-9])/))
-    {
-      intScore = (intScore+2);
-      strLog   = strLog + "2 combo points for letters, numbers and special chars\n";
-    }
-
-
-    if(intScore < 16)
-    {
-       strVerdict = text.localize("Very weak");
-    }
-    else if (intScore > 15 && intScore < 25)
-    {
-       strVerdict = text.localize("Weak");
-    }
-    else if (intScore > 24 && intScore < 35)
-    {
-       strVerdict = text.localize("Mediocre");
-    }
-    else if (intScore > 34 && intScore < 45)
-    {
-       strVerdict = text.localize("Strong");
-    }
-    else
-    {
-       strVerdict = text.localize("Stronger");
-    }
-
-  var array = [intScore, strVerdict];
-  return array;
-}
 ;//For object shape coherence we create named objects to be inserted into the queue.
 var URLPjaxQueueElement = function(exec_function, url) {
     this.method = exec_function;
@@ -51726,7 +50468,6 @@ if (!/backoffice/.test(document.URL)) { // exclude BO
 
         LocalStore.set('active_loginid', match);
         var start_time;
-        var time_now;
         var tabChanged = function() {
             if(clock_started === true){
                 if (document.hidden || document.webkitHidden) {
@@ -52944,6 +51685,47 @@ $(function() { onLoad.fire(); });
 ;// json to hold all the events loaded on trading page
 var trade_event_bindings = {};
 
+var trading_times_init = function() {
+      var tabset_name = "#trading-tabs";
+
+     var trading_times = $(tabset_name);
+     trading_times.tabs();
+     var url = location.href;
+     $( "#tradingdate" ).datepicker({ minDate: 0, maxDate:'+1y', dateFormat: "yy-mm-dd", autoSize: true,
+     onSelect: function( dateText, picker ){
+         trading_times.tabs( "destroy" );
+         showLoadingImage(trading_times);
+         url = page.url.url_for('resources/trading_times', 'date=' + dateText, 'cached');
+         $.ajax({
+                  url: url,
+                  data:  { 'ajax_only': 1 },
+                  success: function(html){
+                            trading_times.replaceWith(html);
+                            trading_times = $("#trading-tabs");
+			                      
+                            if (page.language() === 'JA') {	
+                              trading_times.tabs("disable");
+			    } 
+			    else {
+			      trading_times.tabs();
+			    }
+                            
+                            page.url.update(url);
+                         },
+                  error: function(xhr, textStatus, errorThrown){
+                          trading_times.empty().append(textStatus);
+                       },
+                });
+         }
+     });
+};
+
+var asset_index_init = function() {
+    var tabset_name = "#asset-tabs";
+    // jQueryUI tabs
+    $(tabset_name).tabs();
+};
+
 function confirm_popup_action() {
 
     $('.bom_confirm_popup_link').on('click', function (e){
@@ -52981,6 +51763,8 @@ function get_login_page_url() {
     return 'https://' + page.settings.get('domains')['private'] + '/login' + params;
 }
 
+onLoad.queue_for_url(trading_times_init, 'trading_times');
+onLoad.queue_for_url(asset_index_init, 'asset_index');
 onLoad.queue_for_url(confirm_popup_action, 'my_account|confirm_popup');
 onLoad.queue_for_url(hide_payment_agents, 'cashier');
 
@@ -53113,8 +51897,8 @@ pjax_config_page('rise_fall_table', function() {
     };
 });
 
-pjax_config_page('openpositionsws|trade.cgi|statement|f_manager_statement|f_manager_history|' +
-    'f_profit_table|profit_table|trading', function() {
+pjax_config_page('portfoliows|portfolio|trade.cgi|statement|f_manager_statement|f_manager_history|' +
+    'f_profit_table|profit_table|trading|legacy-statement|legacy-profittable', function() {
     return {
         onLoad: function() {
             BetSell.register();
@@ -53630,11 +52414,11 @@ BetAnalysis.tab_last_digit = new BetAnalysis.DigitInfo();
         get_live_chart: function() {
             var that = this;
             $.ajax(ajax_loggedin({
-              url     : '/d/trade_livechart.cgi?l=' + page.language(),
-              dataType: 'html',
-              success : function (data) {
-                    that.set_live_chart(data);
-                  },
+                url     : '/d/trade_livechart.cgi?l=' + page.language(),
+                dataType: 'html',
+                success : function (data) {
+                            that.set_live_chart(data);
+                          },
             }));
         },
         set_live_chart: function (data) {
@@ -58404,7 +57188,7 @@ var select_user_country = function() {
     if ($('#residence').length > 0) {
         var selected_country = $('#residence').val();
         var c_config = page.settings.get('countries_list');
-        if (selected_country && selected_country.length > 0) {
+        if (selected_country.length > 0) {
             if (c_config[selected_country]['gaming_company'] == 'none' && c_config[selected_country]['financial_company'] == 'none') {
                 selected_country = '';
             }
@@ -58417,7 +57201,7 @@ var select_user_country = function() {
                 dataType: "json"
             }).done(function(response) {
                 selected_country = response.country;
-                if (selected_country && c_config[selected_country]['gaming_company'] == 'none' && c_config[selected_country]['financial_company'] == 'none') {
+                if (c_config[selected_country]['gaming_company'] == 'none' && c_config[selected_country]['financial_company'] == 'none') {
                     selected_country = '';
                 }
                 $('#residence').val(selected_country).change();
@@ -58676,11 +57460,7 @@ pjax_config_page('user/assessment', function() {
         $('.btnDelete').click(function(e) {
             e.preventDefault();
             e.stopPropagation();
-            if(window.confirm(
-                text.localize('Are you sure that you want to permanently delete token') + 
-                ': "' + $(this).parents('tr').find('td.name').text() + '"?')) {
-                    deleteToken($(this).attr('id'));
-            }
+            deleteToken($(this).attr('id'));
         });
     };
 
@@ -58745,7 +57525,7 @@ pjax_config_page('user/assessment', function() {
     };
 
     var isRequiredError = function(fieldID) {
-        if(!$(fieldID).val() || !(/.+/).test($(fieldID).val().trim())){
+        if(!(/.+/).test($(fieldID).val().trim())){
             showError(fieldID, Content.errorMessage('req'));
             return true;
         } else {
@@ -58854,130 +57634,144 @@ pjax_config_page("api_tokenws", function() {
 });
 ;var PasswordWS = (function(){
 
-  var $form, $result;
+	var $form, $result;
 
-  var init = function() {
-    $form   = $("#change-password > form");
-    $result = $("#change-password > div[data-id='success-result']");
-    $form.find("button").on("click", function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      PasswordWS.sendRequest();
-    });
-  };
+	var init = function() {
+		$form   = $("#change-password > form");
+		$result = $("#change-password > div[data-id='success-result']");
+		$form.find("button").on("click", function(e){
+			e.preventDefault();
+			e.stopPropagation();
+			PasswordWS.sendRequest();
+		});
+	};
+	
+	var validateForm = function() {
 
-  var validateForm = function() {
+		var isValid 	= true,
+			old_pass 	= $form.find("input[name='oldpassword']").val(),
+			new_pass 	= $form.find("input[name='new-password']").val(),
+			repeat_pass = $form.find("input[name='repeat-password']").val();
 
-    var isValid 	= true,
-      old_pass 	= $form.find("input[name='oldpassword']").val(),
-      new_pass 	= $form.find("input[name='new-password']").val(),
-      repeat_pass = $form.find("input[name='repeat-password']").val();
+		/**
+		 * Validation for new-password
+		**/
 
-    /**
-     * Validation for new-password
-    **/
+		// Old passwrod cannot be blank. We leave the actual matching to backend
+		if(0 === old_pass.length) {
+			$form.find("p[data-error='old-blank']").removeClass("hidden");
+			isValid = false;
+		} else {
+			$form.find("p[data-error='old-blank']").addClass("hidden");
+		}		
 
-    // Old passwrod cannot be blank. We leave the actual matching to backend
-    if(0 === old_pass.length) {
-      $form.find("p[data-error='old-blank']").removeClass("hidden");
-      isValid = false;
-    } else {
-      $form.find("p[data-error='old-blank']").addClass("hidden");
-    }
+		// New password cannot be the same as the old password
+		if(new_pass.length > 0 && new_pass === old_pass) {
+			$form.find("p[data-error='same-as-old']").removeClass("hidden");
+			isValid = false;
+		} else {
+			$form.find("p[data-error='same-as-old']").addClass("hidden");
+		}
 
-    // New password cannot be the same as the old password
-    if(new_pass.length > 0 && new_pass === old_pass) {
-      $form.find("p[data-error='same-as-old']").removeClass("hidden");
-      isValid = false;
-    } else {
-      $form.find("p[data-error='same-as-old']").addClass("hidden");
-    }
+		// Min length
+		if(new_pass.length < 6) {
+			$form.find("p[data-error='too-short']").removeClass("hidden");
+			isValid = false;
+		} else {
+			$form.find("p[data-error='too-short']").addClass("hidden");
+		}
 
-    if (!Validate.errorMessagePassword(document.getElementById('password').value, document.getElementById('repeat-password').value, document.getElementById('error-password'), document.getElementById('error-repeat-password'))){
-      isValid = false;
-    }
+		// Max length
+		if(new_pass.length > 25) {
+			$form.find("p[data-error='too-long']").removeClass("hidden");
+			isValid = false;
+		} else {
+			$form.find("p[data-error='too-long']").addClass("hidden");
+		}
 
-    // New and Repeat should be the same
-    if(new_pass !== repeat_pass) {
-      $form.find("p[data-error='not-the-same']").removeClass("hidden");
-      isValid = false;
-    } else {
-      $form.find("p[data-error='not-the-same']").addClass("hidden");
-    }
+		// Invalid characters
+		var regexp = new RegExp('^[ -~]+$');
+		if(new_pass.length && !regexp.test(new_pass)){
+			$form.find("p[data-error='bad-chars']").removeClass("hidden");
+			isValid = false;
+		} else {
+			$form.find("p[data-error='bad-chars']").addClass("hidden");
+		}
 
-    if(isValid) return {
-      old_pass: old_pass,
-      new_pass: new_pass
-    };
 
-    return false;
+		// New and Repeat should be the same
+		if(new_pass !== repeat_pass) {
+			$form.find("p[data-error='not-the-same']").removeClass("hidden");
+			isValid = false;
+		} else {
+			$form.find("p[data-error='not-the-same']").addClass("hidden");
+		}
 
-  };
+		if(isValid) return {
+			old_pass: old_pass,
+			new_pass: new_pass
+		};
 
-  var sendRequest = function() {
+		return false;
 
-    $form.find("p[data-error='server-sent-error']").addClass("hidden");
+	};
 
-    var passwords = validateForm();
-    if(false === passwords) return false;
+	var sendRequest = function() {
 
-    BinarySocket.send({
-        "change_password": "1",
-        "old_password": passwords.old_pass,
-        "new_password": passwords.new_pass
-    });
+		$form.find("p[data-error='server-sent-error']").addClass("hidden");
 
-  };
+		var passwords = validateForm();
+		if(false === passwords) return false;
 
-  var apiResponse = function(resp) {
+		BinarySocket.send({
+		    "change_password": "1",
+		    "old_password": passwords.old_pass,
+		    "new_password": passwords.new_pass
+		});
 
-    console.log("apiResponse:", resp);
+	};
 
-    /**
-     * Failed
-    **/
-    if("error" in resp) {
-      var errorMsg = text.localize("Old password is wrong.");
-      if("message" in resp.error) {
-        errorMsg = resp.error.message;
-      }
-      $form.find("p[data-error='server-sent-error']").text(errorMsg).removeClass("hidden");
-      return false;
-    }
+	var apiResponse = function(resp) {
 
-    /**
-     * Succeeded
-    **/
-    $form.addClass("hidden");
-    $result.removeClass("hidden");
-    return true;
+		console.log("apiResponse:", resp);
 
-  };
+		/** 
+		 * Failed
+		**/
+		if("error" in resp) {
+			var errorMsg = text.localize("Old password is wrong.");
+			if("message" in resp.error) {
+				errorMsg = resp.error.message;
+			}
+			$form.find("p[data-error='server-sent-error']").text(errorMsg).removeClass("hidden");
+			return false;
+		}
 
-  return {
-    init: init,
-    sendRequest: sendRequest,
-    apiResponse: apiResponse
-  };
+		/**
+		 * Succeeded
+		**/
+		$form.addClass("hidden");
+		$result.removeClass("hidden");
+		return true;
+
+	};
+
+	return {
+		init: init,
+		sendRequest: sendRequest,
+		apiResponse: apiResponse
+	};
 
 })();
 
 pjax_config_page("user/change_password", function() {
     return {
         onLoad: function() {
-          Content.populate();
-          if (isIE() === false) {
-            $('#password').on('input', function() {
-              $('#password-meter').attr('value', testPassword($('#password').val())[0]);
-            });
-          } else {
-            $('#password-meter').remove();
-          }
-          if (!getCookieItem('login')) {
+        	if (!getCookieItem('login')) {
                 window.location.href = page.url.url_for('login');
                 return;
             }
-          BinarySocket.init({
+        	BinarySocket.init({
                 onmessage: function(msg){
                     var response = JSON.parse(msg.data);
                     if (response) {
@@ -58987,7 +57781,7 @@ pjax_config_page("user/change_password", function() {
                         }
                     }
                 }
-            });
+            });		 
             PasswordWS.init();
         }
     };
@@ -59080,6 +57874,59 @@ ClientForm.prototype = {
 
         return true;
     },
+    self_exclusion: function() {
+        return {
+            has_something_to_save: function(init) {
+                var el, i;
+                var names = ['MAXCASHBAL', 'MAXOPENPOS',
+                             'DAILYTURNOVERLIMIT', 'DAILYLOSSLIMIT',
+                             '7DAYTURNOVERLIMIT', '7DAYLOSSLIMIT',
+                             '30DAYTURNOVERLIMIT', '30DAYLOSSLIMIT',
+                             'SESSIONDURATION', 'EXCLUDEUNTIL'];
+                for (i=0; i<names.length; i++) {
+                    el = document.getElementById(names[i]);
+                    if (el) {
+                        el.value = el.value.replace(/^\s*/, '').replace(/\s*$/, '');
+                        if (el.value == (init[names[i]]===undefined ? '' : init[names[i]])) continue;
+                        return true;
+                    }
+                }
+                return false;
+            },
+            validate_exclusion_date: function() {
+                var exclusion_date = $('#EXCLUDEUNTIL').val();
+                var date_regex = /^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
+                var error_element_errorEXCLUDEUNTIL = clearInputErrorField('errorEXCLUDEUNTIL');
+
+                if (exclusion_date) {
+
+                    if(date_regex.test($('#EXCLUDEUNTIL').val()) === false){
+                        error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please select a valid date");
+                        return false;
+                    }
+            
+                    exclusion_date = new Date(exclusion_date);
+                    // self exclusion date must >= 6 month from now
+                    var six_month_date = new Date();
+                    six_month_date.setMonth(six_month_date.getMonth() + 6);
+
+                    if (exclusion_date < six_month_date) {
+                        error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please enter a date that is at least 6 months from now.");
+                        return false ;
+                    }
+
+                    if (confirm(text.localize("When you click 'Ok' you will be excluded from trading on the site until the selected date.")) === true) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+
+                }
+
+                return true;
+            },
+        };
+    }(),
     set_idd_for_residence: function(residence) {
         var tel = $('#Tel');
         if (!tel.val() || tel.val().length < 6) {
@@ -59134,28 +57981,22 @@ ClientForm.prototype = {
 ;var SettingsDetailsWS = (function() {
     "use strict";
 
-    var formID,
-        frmBtn,
-        RealAccElements,
-        errorClass;
-    var fieldIDs;
+    var formID = '#frmPersonalDetails';
+    var frmBtn = formID + ' button',
+        RealAccElements = '.RealAcc',
+        errorClass = 'errorfield';
+    var fieldIDs = {
+        address1 : '#Address1',
+        address2 : '#Address2',
+        city     : '#City',
+        state    : '#State',
+        postcode : '#Postcode',
+        phone    : '#Phone'
+    };
     var isValid;
 
 
     var init = function() {
-        formID = '#frmPersonalDetails';
-        frmBtn = formID + ' button';
-        RealAccElements = '.RealAcc';
-        errorClass = 'errorfield';
-        fieldIDs = {
-            address1 : '#Address1',
-            address2 : '#Address2',
-            city     : '#City',
-            state    : '#State',
-            postcode : '#Postcode',
-            phone    : '#Phone'
-        };
-
         BinarySocket.send({"get_settings": "1"});
     };
 
@@ -59224,7 +58065,7 @@ ClientForm.prototype = {
         var address1 = $(fieldIDs.address1).val().trim(),
             address2 = $(fieldIDs.address2).val().trim(),
             city     = $(fieldIDs.city).val().trim(),
-            state    = $(fieldIDs.state).val(),
+            state    = $(fieldIDs.state).val().trim(),
             postcode = $(fieldIDs.postcode).val().trim(),
             phone    = $(fieldIDs.phone).val().trim();
         
@@ -59250,7 +58091,7 @@ ClientForm.prototype = {
         }
 
         // state
-        if(!isRequiredError(fieldIDs.state) && ($(fieldIDs.state).is('input') && !(/^[a-zA-Z\s\-']+$/).test(state))) {
+        if(!isRequiredError(fieldIDs.state) && !(/^[a-zA-Z\s\-']+$/).test(state)) {
             showError(fieldIDs.state, Content.errorMessage('reg', [letters, space, '- \'']));
         }
 
@@ -59280,7 +58121,7 @@ ClientForm.prototype = {
     };
 
     var isRequiredError = function(fieldID) {
-        if(!$(fieldID).val() || !(/.+/).test($(fieldID).val().trim())){
+        if(!(/.+/).test($(fieldID).val().trim())){
             showError(fieldID, Content.errorMessage('req'));
             return true;
         } else {
@@ -59386,41 +58227,6 @@ pjax_config_page("settings/detailsws", function() {
 
             Content.populate();
             SettingsDetailsWS.init();
-        }
-    };
-});
-;var SettingsWS = (function() {
-    "use strict";
-
-    var init = function() {
-        var classHidden = 'invisible',
-            classReal   = '.real';
-
-        if(page.client.is_real) {
-            $(classReal).removeClass(classHidden);
-        }
-        else {
-            $(classReal).addClass(classHidden);
-        }
-
-        $('#settingsContainer').removeClass(classHidden);
-    };
-
-    return {
-        init: init
-    };
-}());
-
-
-pjax_config_page("settingsws", function() {
-    return {
-        onLoad: function() {
-            if (!page.client.is_logged_in) {
-                window.location.href = page.url.url_for('login');
-                return;
-            }
-
-            SettingsWS.init();
         }
     };
 });
@@ -59713,8 +58519,8 @@ var on_click_signup = function() {
 
 function check_login_hide_signup() {
     if (page.client.is_logged_in) {
-        $('#verify-email-form').remove();
-        $('.break').attr('style', 'margin-bottom:1em');
+        $('#open-account').remove();
+        $('#stretch').removeClass('grd-grid-7 grd-grid-mobile-12 grd-grid-phablet-12');
     }
 }
 
@@ -59722,159 +58528,6 @@ function hide_if_logged_in() {
     if (page.client.is_logged_in) {
         $('.client_logged_out').remove();
     }
-}
-
-// use function to generate elements and append them
-// e.g. element is select and element to append is option
-function appendTextValueChild(element, text, value){
-    var option = document.createElement("option");
-
-    option.text = text;
-    option.value = value;
-    element.appendChild(option);
-}
-
-// populate drop down list of Titles, pass in select element
-function setTitles(select){
-    appendTextValueChild(select, Content.localize().textMr, 'Mr');
-    appendTextValueChild(select, Content.localize().textMrs, 'Mrs');
-    appendTextValueChild(select, Content.localize().textMs, 'Ms');
-    appendTextValueChild(select, Content.localize().textMiss, 'Miss');
-    appendTextValueChild(select, Content.localize().textDr, 'Dr');
-    appendTextValueChild(select, Content.localize().textProf, 'Prof');
-}
-
-// append numbers to a drop down menu, eg 1-30
-function dropDownNumbers(select, startNum, endNum) {
-    select.appendChild(document.createElement("option"));
-
-    for (i = startNum; i <= endNum; i++){
-        var option = document.createElement("option");
-        option.text = i;
-        option.value = i;
-        select.appendChild(option);
-    }
-
-}
-
-function dropDownMonths(select, startNum, endNum) {
-    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-    select.appendChild(document.createElement("option"));
-    for (i = startNum; i <= endNum; i++){
-        var option = document.createElement("option");
-        if (i <= '9') {
-            option.value = '0' + i;
-        } else {
-            option.value = i;
-        }
-
-        for (j = i; j <= i; j++) {
-            option.text = months[j-1];
-        }
-
-        select.appendChild(option);
-    }
-}
-
-function generateBirthDate(days, months, year){
-    //days
-    dropDownNumbers(days, 1, 31);
-    //months
-    dropDownMonths(months, 1, 12);
-
-    var currentYear = new Date().getFullYear();
-    var startYear = currentYear - 100;
-    var endYear = currentYear - 17;
-
-    //years
-    dropDownNumbers(year, startYear, endYear);
-}
-
-function isValidDate(day, month, year){
-    // Assume not leap year by default (note zero index for Jan)
-    var daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
-
-    // If evenly divisible by 4 and not evenly divisible by 100,
-    // or is evenly divisible by 400, then a leap year
-    if ( ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0) ) {
-        daysInMonth[1] = 29;
-    }
-    return day <= daysInMonth[--month];
-}
-
-function handle_residence_state_ws(){
-  BinarySocket.init({
-    onmessage: function(msg){
-      var select;
-      var response = JSON.parse(msg.data);
-      if (response) {
-        var type = response.msg_type;
-        if (type === 'states_list'){
-          select = document.getElementById('address-state');
-          var states_list = response.states_list;
-          if (states_list.length > 0){
-            for (i = 0; i < states_list.length; i++) {
-                appendTextValueChild(select, states_list[i].text, states_list[i].value);
-            }
-            select.parentNode.parentNode.setAttribute('style', 'display:block');
-          }
-        }
-        if (type === 'residence_list'){
-          select = document.getElementById('residence-disabled');
-          var phoneElement = document.getElementById('tel'),
-              residenceValue = $.cookie('residence'),
-              residence_list = response.residence_list;
-          if (residence_list.length > 0){
-            for (i = 0; i < residence_list.length; i++) {
-              appendTextValueChild(select, residence_list[i].text, residence_list[i].value);
-              if (phoneElement && residence_list[i].phone_idd && residenceValue === residence_list[i].value){
-                phoneElement.value = '+' + residence_list[i].phone_idd;
-              }
-            }
-            select.parentNode.parentNode.setAttribute('style', 'display:block');
-          }
-        }
-      }
-    }
-  });
-}
-
-function setResidenceWs(){
-  BinarySocket.send({ residence_list: 1 });
-}
-
-//pass select element to generate list of states
-function generateState(select) {
-    appendTextValueChild(select, Content.localize().textSelect, '');
-    BinarySocket.send({ states_list: $.cookie('residence') });
-}
-
-function getUrlVars() {
-    var vars = {};
-    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-        vars[key] = value;
-    });
-    return vars;
-}
-
-function replaceQueryParam(param, newval, search) {
-    var regex = new RegExp("([?;&])" + param + "[^&;]*[;&]?");
-    var query = search.replace(regex, "$1").replace(/&$/, '');
-
-    return (query.length > 2 ? query + "&" : "?") + (newval ? param + "=" + newval : '');
-}
-
-if (page.language() === 'JA' && !$.cookie('MyJACookie')) {
-  var str = window.location.search;
-  str = replaceQueryParam('l', 'EN', str);
-  window.location = window.location.pathname + str;
-}
-
-
-// returns true if internet explorer browser
-function isIE() {
-  return /(msie|trident|edge)/i.test(window.navigator.userAgent) && !window.opera;
 }
 
 pjax_config_page('/$|/home', function() {
@@ -59973,7 +58626,6 @@ pjax_config_page('/careers', function() {
         },
     };
 });
-
 pjax_config_page('/bulk-trader-facility', function() {
     return {
         onLoad: function() {
@@ -59985,175 +58637,6 @@ pjax_config_page('/bulk-trader-facility', function() {
         }
     };
 });
-
-pjax_config_page('/terms-and-condition', function() {
-    return {
-        onLoad: function() {
-            var year = document.getElementsByClassName('currentYear');
-            for (i = 0; i < year.length; i++){
-              year[i].innerHTML = new Date().getFullYear();
-            }
-        },
-    };
-});
-;/*
- *  This is developed to simplify the usage of enjoyhint (https://github.com/xbsoftware/enjoyhint) 
- *
- *  How to Implement in a page:
- *  1. Add the button element to the template: <div id="guideBtn"></div>
- *  2. Add the js initialization call, having the customized parameters: Guide.init({script : 'trading'});
- *  3. Add the script data to getScript() method
- */
-
-var Guide = (function() {
-	var opt,
-		cookieName,
-		btnNext,
-		btnFinish;
-
-	var init = function(options) {
-		opt = {
-			script	       : '',      // the script name in scripts
-			autoStart      : false,   // false: start by button click
-			guideBtnID     : '#guideBtn',
-			btnText        : text.localize('Walkthrough Guide'),  // guide start button's text
-			blink_class    : 'highlight',
-			blink_inDelay  : 1000,
-			blink_outDelay : 1000,
-			blink_interval : 3000,    // 0: continous blinking (blink_inDelay + blink_outDelay)
-			blink_count    : 0        // 0: infinite
-		};
-        $.extend(true, opt, options);
-
-        cookieName = 'hide_guide';
-		btnNext    = {className: "button", html: '<span>' + text.localize('Next') + '</span>'};
-		btnFinish  = {className: "button btnFinish", html: '<span>' + text.localize('Finish') + '</span>'};
-
-		if($(opt.guideBtnID).length === 0) {
-			console.warn('Could not find the button placeholder: <div id="' + opt.guideBtnID + '"></div>');
-			return;
-		}
-
-		if(opt.script.length === 0) {
-			console.warn('"script" name should be specified');
-			return;
-		}
-
-		if(isDisabled()) {
-			$(opt.guideBtnID).remove();
-			return;
-		}
-
-		makeButton();
-	};
-
-	/*
-	 *  do not show the guide button if its close (X) has been clicked before
-	 */
-	var isDisabled = function() {
-		var disabled = $.cookie(cookieName);
-		return !!disabled && $.inArray(opt.script, disabled.split(',')) >= 0;
-	};
-
-	/*
-	 *  handle the guide button appearance using a cookie for all scripts
-	 */
-	var setDisabled = function() {
-		if(!isDisabled()) {
-			var disabled = $.cookie(cookieName);
-			$.cookie(cookieName, (!disabled ? opt.script : disabled + ',' + opt.script));
-		}
-	};
-
-	/*
-	 *  generate the button's html
-	 */
-	var makeButton = function() {
-		if($(opt.guideBtnID).children().length > 0) {
-			return;
-		}
-
-		$(opt.guideBtnID)
-			.addClass('grd-hide-mobile pulser')
-			.append($('<span/>', {class: 'close', text: 'X'}))
-			.append($('<strong/>'));
-		$(opt.guideBtnID + ' strong').html('<span></span>' + opt.btnText);
-
-		setEvents();
-	};
-
-	/*
-	 *  both buttons' click event
-	 */
-	var setEvents = function() {
-		$(opt.guideBtnID + ' strong').click(function(e){
-			var enjoyhint_instance = null;
-			enjoyhint_instance = new EnjoyHint({});
-			enjoyhint_instance.setScript(getScript(opt.script));
-			enjoyhint_instance.runScript();
-		});
-		
-		if(opt.autoStart) {
-			$(opt.guideBtnID).click();
-		}
-
-		// Hide button
-		$(opt.guideBtnID + ' span.close').click(function(){
-			setDisabled();
-			$(opt.guideBtnID).remove();
-		});
-	};
-
-	/*
-	 *  each page's script
-	 */
-	var getScript = function(scriptName) {
-		if(scriptName === 'trading') {
-			return [
-				{
-					selector    : '#contract_markets',
-					description : '<h1>' + text.localize('Step') + ' 1</h1>' + 
-									text.localize('Select your market'),
-					event_type  : 'next',
-					nextButton  : btnNext
-				},
-				{
-					selector    : '#underlying',
-					description : '<h1>' + text.localize('Step') + ' 2</h1>' + 
-									text.localize('Select your underlying asset'),
-					event_type  : 'next',
-					nextButton  : btnNext
-				},
-				{
-					selector    : '#contract_form_name_nav',
-					description : '<h1>' + text.localize('Step') + ' 3</h1>' +
-									text.localize('Select your trade type'),
-					event_type  : 'next',
-					nextButton  : btnNext
-				},
-				{
-					selector    : '#websocket_form',
-					description : '<h1>' + text.localize('Step') + ' 4</h1>' + 
-									text.localize('Adjust trade parameters'),
-					event_type  : 'next',
-					nextButton  : btnNext
-				},
-				{
-					selector    : '#contracts_list',
-					description : '<h1>' + text.localize('Step') + ' 5</h1>' + 
-									text.localize('Predict the direction<br />and purchase'),
-					event_type  : 'next',
-					nextButton  : btnFinish
-				}
-			];
-		}
-	};
-
-
-	return {
-		init: init
-	};
-})();
 ;var minDT = new Date();
 minDT.setUTCFullYear(minDT.getUTCFullYear - 3);
 var liveChartsFromDT, liveChartsToDT, liveChartConfig;
@@ -60328,210 +58811,6 @@ $(function() {
     }
 
 });
-;var PortfolioWS =  (function() {
-
-    'use strict';
-
-    var pageLanguage = page.language();
-    if(!pageLanguage) pageLanguage = "EN";
-
-    var rowTemplate;
-    var retry;
-
-    var init = function() {
-        showLoadingImage($("#portfolio-loading"));
-        // get the row template and then discard the node as it has served its purpose
-        rowTemplate = $("#portfolio-dynamic tr:first")[0].outerHTML;
-        $("#portfolio-dynamic tr:first").remove();
-        BinarySocket.send({"balance":1});
-        BinarySocket.send({"portfolio":1});
-    };
-
-
-    /**
-     * Show balance
-    **/
-    var updateBalance = function(data) {
-        $("span[data-id='balance']").text(data.balance.currency + ' ' + addComma(parseFloat(data.balance.balance)));
-        if(parseFloat(data.balance.balance, 10) > 0) {
-            $("#if-balance-zero").remove();
-        }
-    };
-
-    /**
-     * Updates portfolio table
-    **/
-    var updatePortfolio = function(data) {
-
-        /**
-         * Check for error
-        **/
-        if("error" in data) {
-            throw new Error("Trying to get portfolio data, we got this error", data.error);
-        }
-
-        /**
-         * no open contracts
-        **/
-        if(0 === data.portfolio.contracts.length) {
-            $("#portfolio-table").addClass("dynamic");
-            $("#portfolio-content").removeClass("dynamic");
-            $("#portfolio-loading").hide();
-            return true;
-        }
-
-        /**
-         * User has at least one contract
-        **/
-
-        $("#portfolio-no-contract").remove();
-        var contracts = '';
-        var sumPurchase = 0.0;
-        var currency;
-        $.each(data.portfolio.contracts, function(ci, c) {
-            sumPurchase += parseFloat(c.buy_price, 10);
-            currency = c.currency;
-            contracts += rowTemplate
-            .split("!transaction_id!").join(c.transaction_id)
-            .split("!contract_id!").join(c.contract_id)
-            .split("!longcode!").join(c.longcode)
-            .split("!currency!").join(c.currency)
-            .split("!buy_price!").join(addComma(parseFloat(c.buy_price)));
-        });
-
-        // contracts is ready to be added to the dom
-        $("#portfolio-dynamic").replaceWith(trans(contracts));
-
-        // update footer area data
-        sumPurchase = sumPurchase.toFixed(2);
-        $("#cost-of-open-positions").text(currency + ' ' + addComma(parseFloat(sumPurchase)));
-
-        // request "proposal_open_contract"
-        BinarySocket.send({"proposal_open_contract":1, "subscribe":1});
-
-        // ready to show portfolio table
-        $("#portfolio-loading").remove();
-        $("#portfolio-content").removeClass("dynamic");
-
-    };
-
-    var updateIndicative = function(data) {
-
-        var $td = $("tr[data-contract_id='"+data.proposal_open_contract.contract_id+"'] td.indicative");
-        var old_indicative = $td.find('strong').text();
-        old_indicative = parseFloat(old_indicative, 2);
-        if(isNaN(old_indicative)) old_indicative = 0.0;
-
-        var new_indicative = parseFloat(data.proposal_open_contract.bid_price, 2);
-        if(isNaN(new_indicative)) new_indicative = 0.0;
-
-        if(data.proposal_open_contract.is_valid_to_sell != 1) {
-            $td.html(data.proposal_open_contract.currency+' <strong class="indicative_price">'+data.proposal_open_contract.bid_price+'</strong><span>'+text.localize('Resale not offered')+'</span>').addClass("no_resale");
-        } else {
-            $td.removeClass("no_resale");
-
-            if(old_indicative > new_indicative) {
-                $td.html(data.proposal_open_contract.currency+' <strong class="indicative_price price_moved_down">'+data.proposal_open_contract.bid_price+'</strong>');
-            } else if(old_indicative < new_indicative) {
-                $td.html(data.proposal_open_contract.currency+' <strong class="indicative_price price_moved_up">'+data.proposal_open_contract.bid_price+'</strong>');
-            }
-        }
-
-        var indicative_sum = 0, indicative_price = 0, up_down;
-        $("strong.indicative_price").each(function() {
-            indicative_price = $(this).text();
-            indicative_price = parseFloat(indicative_price, 2);
-            if(!isNaN(indicative_price)) {
-                indicative_sum += indicative_price;
-            }
-        });
-
-        indicative_sum = indicative_sum.toFixed(2);
-
-        $("#value-of-open-positions").text('USD ' + addComma(parseFloat(indicative_sum)));
-
-    };
-
-
-    /*** utility functions ***/
-
-    // Dynamic text
-    var dTexts = ["view", "indicative"];
-
-    /**
-     * In the dynamic parts we have strings to include
-     * For instance, in portfolio table, we have a 'View' button
-     * for each contract.
-    **/
-    var trans = function(str) {
-        var placeholder;
-        for(var i = 0, l = dTexts.length; i < l; i++) {
-            placeholder = ":"+dTexts[i]+":";
-            if(-1 === str.indexOf(placeholder)) continue;
-            str = str.split(placeholder).join(text.localize(dTexts[i]));
-        }
-        return str;
-    };
-
-    return {
-        init: init,
-        updateBalance: updateBalance,
-        updatePortfolio: updatePortfolio,
-        updateIndicative: updateIndicative
-    };
-
-})();
-
-pjax_config_page("user/openpositionsws", function() {
-    return {
-        onLoad: function() {
-            if (!getCookieItem('login')) {
-                window.location.href = page.url.url_for('login');
-                return;
-            }
-            BinarySocket.init({
-
-                onmessage: function(msg){
-
-                    try {
-                        response  = JSON.parse(msg.data);
-                        if("object" !== typeof response || !("msg_type" in response)) {
-                            throw new Error("Response from WS API is not well formatted.");
-                        }
-                    } catch(e) {
-                        throw new Error("Response from WS API is not well formatted.");
-                    }
-
-                    var msg_type = response.msg_type;
-
-                    switch(msg_type) {
-
-                        case "balance":
-                            PortfolioWS.updateBalance(response);
-                            break;
-
-                        case "portfolio":
-                            PortfolioWS.updatePortfolio(response);
-                            break;
-
-                        case "proposal_open_contract":
-                            PortfolioWS.updateIndicative(response);
-                            break;
-
-                        default:
-                            // msg_type is not what PortfolioWS handles, so ignore it.
-
-                    }
-
-                }
-            });
-            PortfolioWS.init();
-        },
-        onUnload: function(){
-            BinarySocket.send({"forget_all": "proposal_open_contract"});
-        }
-    };
-});
 ;$(function() {
     $( "#accordion" ).accordion({
       heightStyle: "content",
@@ -60692,6 +58971,342 @@ pjax_config_page('portfolio', function() {
         }
     };
 });
+;var PortfolioWS =  (function() {
+
+    'use strict';
+
+    var pageLanguage = page.language();
+    if(!pageLanguage) pageLanguage = "EN";
+
+    var rowTemplate;
+    var retry;
+
+    var init = function() {
+        showLoadingImage($("#portfolio-loading"));
+        // get the row template and then discard the node as it has served its purpose
+        rowTemplate = $("#portfolio-dynamic tr:first")[0].outerHTML;
+        $("#portfolio-dynamic tr:first").remove();
+        BinarySocket.send({"balance":1});
+    };
+
+
+    /**
+     * Show balance
+    **/
+    var updateBalance = function(data) {
+        $("span[data-id='balance']").text(data.balance.currency + ' ' + addComma(parseFloat(data.balance.balance)));
+        if(parseFloat(data.balance.balance, 10) > 0) {
+            $("#if-balance-zero").remove();
+        }
+        BinarySocket.send({"portfolio":1});
+    };
+    
+    /**
+     * Updates portfolio table
+    **/
+    var updatePortfolio = function(data) {
+
+        /**
+         * Check for error
+        **/
+        if("error" in data) {
+            throw new Error("Trying to get portfolio data, we got this error", data.error);
+        }
+
+        /**
+         * no open contracts
+        **/
+        if(0 === data.portfolio.contracts.length) {
+            $("#portfolio-table").addClass("dynamic");
+            $("#portfolio-content").removeClass("dynamic");
+            $("#portfolio-loading").hide();
+            return true;
+        }
+
+        /**
+         * User has at least one contract
+        **/
+
+        $("#portfolio-no-contract").remove();
+        var contracts = '';
+        var sumPurchase = 0.0;
+        var currency;
+        $.each(data.portfolio.contracts, function(ci, c) {
+            sumPurchase += parseFloat(c.buy_price, 10);
+            currency = c.currency;
+            contracts += rowTemplate
+            .split("!transaction_id!").join(c.transaction_id)
+            .split("!contract_id!").join(c.contract_id)
+            .split("!longcode!").join(c.longcode)
+            .split("!currency!").join(c.currency)
+            .split("!buy_price!").join(addComma(parseFloat(c.buy_price)));
+        });
+
+        // contracts is ready to be added to the dom
+        $("#portfolio-dynamic").replaceWith(trans(contracts));
+
+        // update footer area data
+        sumPurchase = sumPurchase.toFixed(2);
+        $("#cost-of-open-positions").text(currency + ' ' + addComma(parseFloat(sumPurchase)));
+
+        // request "proposal_open_contract"
+        BinarySocket.send({"proposal_open_contract":1});
+
+        // ready to show portfolio table
+        $("#portfolio-loading").remove();
+        $("#portfolio-content").removeClass("dynamic");
+
+    };
+
+    var updateIndicative = function(data) {
+
+        var $td = $("tr[data-contract_id='"+data.proposal_open_contract.contract_id+"'] td.indicative");
+        var old_indicative = $td.find('strong').text();
+        old_indicative = parseFloat(old_indicative, 2);
+        if(isNaN(old_indicative)) old_indicative = 0.0;
+
+        var new_indicative = parseFloat(data.proposal_open_contract.bid_price, 2);
+        if(isNaN(new_indicative)) new_indicative = 0.0;
+
+        if(data.proposal_open_contract.is_valid_to_sell != 1) {
+            $td.html(data.proposal_open_contract.currency+' <strong class="indicative_price">'+data.proposal_open_contract.bid_price+'</strong><span>'+text.localize('Resale not offered')+'</span>').addClass("no_resale");
+        } else {
+            $td.removeClass("no_resale");
+
+            if(old_indicative > new_indicative) {
+                $td.html(data.proposal_open_contract.currency+' <strong class="indicative_price price_moved_down">'+data.proposal_open_contract.bid_price+'</strong>');
+            } else if(old_indicative < new_indicative) {
+                $td.html(data.proposal_open_contract.currency+' <strong class="indicative_price price_moved_up">'+data.proposal_open_contract.bid_price+'</strong>');
+            }            
+        }
+
+        var indicative_sum = 0, indicative_price = 0, up_down;
+        $("strong.indicative_price").each(function() {
+            indicative_price = $(this).text();
+            indicative_price = parseFloat(indicative_price, 2);
+            if(!isNaN(indicative_price)) {
+                indicative_sum += indicative_price;
+            }
+        });
+
+        indicative_sum = indicative_sum.toFixed(2);
+
+        $("#value-of-open-positions").text('USD ' + addComma(parseFloat(indicative_sum)));
+
+    };
+
+
+    /*** utility functions ***/
+
+    // Dynamic text
+    var dTexts = ["view", "indicative"];
+
+    /**
+     * In the dynamic parts we have strings to include
+     * For instance, in portfolio table, we have a 'View' button
+     * for each contract.
+    **/
+    var trans = function(str) {
+        var placeholder;
+        for(var i = 0, l = dTexts.length; i < l; i++) {
+            placeholder = ":"+dTexts[i]+":";
+            if(-1 === str.indexOf(placeholder)) continue;
+            str = str.split(placeholder).join(text.localize(dTexts[i]));
+        }
+        return str;
+    };
+ 
+    return {
+        init: init,
+        updateBalance: updateBalance,
+        updatePortfolio: updatePortfolio,
+        updateIndicative: updateIndicative
+    };
+
+})();
+
+pjax_config_page("user/portfoliows", function() {
+    return {
+        onLoad: function() {
+            if (!getCookieItem('login')) {
+                window.location.href = page.url.url_for('login');
+                return;
+            }
+            BinarySocket.init({
+
+                onmessage: function(msg){
+
+                    try {
+                        response  = JSON.parse(msg.data);
+                        if("object" !== typeof response || !("msg_type" in response)) {
+                            throw new Error("Response from WS API is not well formatted.");
+                        }
+                    } catch(e) {
+                        throw new Error("Response from WS API is not well formatted.");
+                    }
+
+                    var msg_type = response.msg_type;
+            
+                    switch(msg_type) {
+
+                        case "balance":
+                            PortfolioWS.updateBalance(response);
+                            break;
+
+                        case "portfolio":
+                            PortfolioWS.updatePortfolio(response);
+                            break;
+
+                        case "proposal_open_contract":
+                            PortfolioWS.updateIndicative(response);
+                            break;
+
+                        default:
+                            // msg_type is not what PortfolioWS handles, so ignore it.
+
+                    }
+
+                }
+            });      
+            PortfolioWS.init();
+        }
+    };
+});
+;var calculate_button_event = function() {
+    $('#pricingtable_calculate').on('click', function(e) {
+        e.preventDefault();
+        var form = $('form[name=pricing_table_input]').get(0);
+        var url = page.url.url_for('resources/pricing_table', getFormParams(form));
+        $('#pricingtable_calculate').hide();
+        $('#pricingtable_calculating').show();
+        $('#pricing_table_prices_div').html('');
+        $.ajax({
+            url: url,
+            data: {
+                ajax_only: 1,
+                prices_only: 1,
+            },
+        }).done(function(response) {
+            $('#pricing_table_prices_div').html(response);
+            page.url.update(url);
+            $('#pricingtable_calculating').hide();
+            $('#pricingtable_calculate').show();
+            attach_tabs('#pricing_table_tabs');
+        });
+    });
+};
+
+var bet_type_select = function() {
+    $('#pricing_table_input').find('select[name="bet_type"]').on('change', function() {
+        var bet_type = $(this).val();
+        var double_barriers = ["RANGE", "UPORDOWN", "EXPIRYRANGE", "EXPIRYMISS"];
+        var is_double_barrier = 0;
+
+        for (var i = 0; i < double_barriers.length; i++) {
+            if (bet_type == double_barriers[i]) {
+                is_double_barrier = 1;
+                break;
+            }
+        }
+        if (is_double_barrier == 1) {
+            $("#lower_strike").show();
+            $("#high_strike_label").show();
+            $("#strike_label").hide();
+        } else {
+            $("#lower_strike").hide();
+            $("#high_strike_label").hide();
+            $("#strike_label").show();
+        }
+
+        var prev_underlying = $("#pricingtable_underlying").val();
+
+        // change underlying option list
+        var ajax_url = page.url.url_for('resources/pricing_table');
+        $.post(
+            ajax_url,
+            {
+                action: "get_underlyings",
+                ajax_only: 1,
+                bet_type: bet_type,
+                underlying: prev_underlying,
+            },
+            function(data) {
+                $("#pricingtable_underlying_div").html(data);
+                var underlying = $('#pricingtable_underlying');
+                if (underlying.val() != prev_underlying) {
+                    underlying.find("option").get(0).selected = true;
+                    underlying.find("option").get(0).val();
+                    underlying.trigger("change");
+                }
+            },
+            "html"
+        );
+    });
+};
+
+var select_underlying_change = function() {
+    $("#pricingtable_underlying").on("change", function() {
+        var underlying = $(this).val();
+        // change lower strike
+        var ajax_url = page.url.url_for('resources/pricing_table');
+        $.post(
+            ajax_url,
+            {
+                action: "get_low_strike",
+                ajax_only: 1,
+                underlying: underlying
+            },
+            function(data) {
+                $("#low_strike").attr("value", data);
+            },
+            "html"
+        );
+    });
+};
+
+var select_strike_type = function() {
+    $("#strike_type").on('change', function() {
+        var strike_type = $(this).val();
+        if (strike_type == 'Moneyness terms') {
+            $("#from_strike_percent").show();
+            $("#from_strike_label").hide();
+        } else {
+            $("#from_strike_percent").hide();
+            $("#from_strike_label").show();
+        }
+    }).change();
+};
+
+var expiry_date_picker = function() {
+    var today = new Date();
+    var three_month = new Date();
+    three_month.setDate(today.getDate() + 60);
+
+    var id = $('#from_expiry');
+    id.datepicker({
+        dateFormat: 'yy-mm-dd',
+        monthNames: [text.localize('January'), text.localize('February'), text.localize('March'), text.localize('April'), text.localize('May'), text.localize('June'),
+            text.localize('July'), text.localize('August'), text.localize('September'), text.localize('October'), text.localize('November'), text.localize('December')],
+        dayNamesShort: [text.localize('Su'), text.localize('Mo'), text.localize('Tu'), text.localize('We'),
+            text.localize('Th'), text.localize('Fr'), text.localize('Sa')],
+        minDate: today,
+        maxDate: three_month,
+        onSelect: function(dateText, inst) {
+            id.attr("value", dateText);
+        },
+    }).datepicker('setDate', "0");
+};
+
+function initialize_pricing_table() {
+    calculate_button_event();
+    bet_type_select();
+    select_underlying_change();
+    select_strike_type();
+    expiry_date_picker();
+    $("#from_expiry").keydown(false);
+}
+
+onLoad.queue_for_url(initialize_pricing_table, 'pricing_table');
 ;var AssetIndexWS = (function() {
     "use strict";
 
@@ -60708,8 +59323,6 @@ pjax_config_page('portfolio', function() {
         $container = $('#asset-index');
         showLoadingImage($container);
         marketColumns = {};
-        activeSymbols = null;
-        assetIndex = null;
         // index of items in asset_index response
         idx = {
             symbol: 0,
@@ -60759,9 +59372,6 @@ pjax_config_page('portfolio', function() {
         for(var i = 0; i < assetIndex.length; i++) {
             var assetItem = assetIndex[i];
             var symbolInfo = getSymbolInfo(assetItem[idx.symbol])[0];
-            if(!symbolInfo) {
-                continue;
-            }
             var market = symbolInfo.market;
 
             assetItem.push(symbolInfo);
@@ -60803,9 +59413,6 @@ pjax_config_page('portfolio', function() {
         for(var i = 0; i < assetIndex.length; i++) {
             var assetItem  = assetIndex[i];
             var symbolInfo = assetItem[idx.symInfo];
-            if(!symbolInfo) {
-                continue;
-            }
 
             // just show "Major Pairs" when the language is JA
             if(isJapan && symbolInfo.submarket !== 'major_pairs') {
@@ -60855,7 +59462,7 @@ pjax_config_page('portfolio', function() {
         for(var i = 1; i < marketCols.columns.length; i++) {
             var prop = marketCols.columns[i];
             if(prop.length > 0) {
-                cells.push(prop in assetCells ? assetCells[prop] : '--');
+                cells.push(prop in assetCells ? assetCells[prop] : '');
                 columns.push(prop);
             }
         }
@@ -60912,7 +59519,7 @@ pjax_config_page("asset_indexws", function() {
         }
     };
 });
-;var MarketTimesWS = (function() {
+;var TradingTimesWS = (function() {
     "use strict";
 
     var $date,
@@ -60927,8 +59534,6 @@ pjax_config_page("asset_indexws", function() {
         $date      = $('#trading-date');
         $container = $('#trading-times');
         columns    = ['Asset', 'Opens', 'Closes', 'Settles', 'UpcomingEvents'];
-        activeSymbols = null;
-        tradingTimes = null;
         showLoadingImage($container);
         BinarySocket.send({"active_symbols": "brief"});
         sendRequest('today');
@@ -61062,7 +59667,7 @@ pjax_config_page("asset_indexws", function() {
         for(var i = 0; i < events.length; i++) {
             result += (i > 0 ? '<br />' : '') + events[i].descrip + ': ' + events[i].dates;
         }
-        return result.length > 0 ? result : '--';
+        return result;
     };
 
     var createEmptyTable = function(tableID) {
@@ -61092,7 +59697,7 @@ pjax_config_page("asset_indexws", function() {
 
 
 
-pjax_config_page("market_timesws", function() {
+pjax_config_page("trading_timesws", function() {
     return {
         onLoad: function() {
             BinarySocket.init({
@@ -61100,20 +59705,59 @@ pjax_config_page("market_timesws", function() {
                     var response = JSON.parse(msg.data);
                     if (response) {
                         if (response.msg_type === "trading_times") {
-                            MarketTimesWS.getTradingTimes(response);
+                            TradingTimesWS.getTradingTimes(response);
                         }
                         else if (response.msg_type === "active_symbols") {
-                            MarketTimesWS.getActiveSymbols(response);
+                            TradingTimesWS.getActiveSymbols(response);
                         }
                     }
                 }
             });
 
             Content.populate();
-            MarketTimesWS.init();
+            TradingTimesWS.init();
         }
     };
 });
+;var Exclusion = (function(){
+    var self_exclusion_date_picker = function () {
+        // 6 months from now
+        var start_date = new Date();
+        start_date.setMonth(start_date.getMonth() + 6);
+
+        // 5 years from now
+        var end_date = new Date();
+        end_date.setFullYear(end_date.getFullYear() + 5);
+
+        var id = $('#EXCLUDEUNTIL');
+
+        id.datepicker({
+            dateFormat: 'yy-mm-dd',
+            minDate: start_date,
+            maxDate: end_date,
+            onSelect: function(dateText, inst) {
+                id.attr("value", dateText);
+            },
+        });
+    };
+
+    var self_exclusion_validate_date = function () {
+        $('#selfExclusion').on('click', '#self_exclusion_submit', function () {
+            return client_form.self_exclusion.validate_exclusion_date();
+        });
+    };
+
+    return{
+        self_exclusion_validate_date : self_exclusion_validate_date,
+        self_exclusion_date_picker :self_exclusion_date_picker
+    };
+
+})();
+onLoad.queue_for_url(function () {
+// date picker for self exclusion
+    Exclusion.self_exclusion_date_picker();
+    Exclusion.self_exclusion_validate_date();
+}, 'self_exclusion');
 ;var SelfExlusionWS = (function(){
     
     "use strict";
@@ -61123,31 +59767,15 @@ pjax_config_page("market_timesws", function() {
 
     var init = function(){
         $form   = $("#selfExclusion");
-        clearErrors();
         $form.find("button").on("click", function(e){
             e.preventDefault();
             e.stopPropagation();
-            clearErrors();
             if(validateForm($form) === false){
                 return false;
             }
-            sendRequest();
-
+            BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "set_self_exclusion"}});
         });
-
-        BinarySocket.send({"get_self_exclusion": 1});
-
-        self_exclusion_date_picker();
-    };
-
-    var clearErrors = function(){
-        $form.find("#exclusionMsg").hide();
-        $form.find("#exclusionMsg").text("");
-        $("#errorMsg").hide();
-        $form.show();
-        $("#exclusionText").show();
-        $("#exclusionTitle").show();
-        $("#errorMsg").text("");
+        BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "get_self_exclusion"}});
     };
 
     var isNormalInteger= function(str) {
@@ -61203,7 +59831,7 @@ pjax_config_page("market_timesws", function() {
             }
         });
 
-        if(validate_exclusion_date() ===false){
+        if(validateDate() ===false){
             isValid = false;
         }
 
@@ -61213,37 +59841,23 @@ pjax_config_page("market_timesws", function() {
         }
     };
 
-    var validate_exclusion_date = function() {
-        var exclusion_date = $('#EXCLUDEUNTIL').val();
-        var date_regex = /^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
-        var error_element_errorEXCLUDEUNTIL = clearInputErrorField('errorEXCLUDEUNTIL');
+    var isAuthorized =  function(response){
+        if(response.echo_req.passthrough){
+            var option= response.echo_req.passthrough.value ;
 
-        if (exclusion_date) {
-
-            if(date_regex.test($('#EXCLUDEUNTIL').val()) === false){
-                error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please select a valid date");
-                return false;
+            switch(option){
+                case   "get_self_exclusion" :
+                        BinarySocket.send({"get_self_exclusion": 1});
+                        break;
+                case   "set_self_exclusion" :
+                        sendRequest();
+                        break;                   
             }
-    
-            exclusion_date = new Date(exclusion_date);
-            // self exclusion date must >= 6 month from now
-            var six_month_date = new Date();
-            six_month_date.setMonth(six_month_date.getMonth() + 6);
-
-            if (exclusion_date < six_month_date) {
-                error_element_errorEXCLUDEUNTIL.innerHTML = text.localize("Please enter a date that is at least 6 months from now.");
-                return false ;
-            }
-
-            if (confirm(text.localize("When you click 'Ok' you will be excluded from trading on the site until the selected date.")) === true) {
-                return true;
-            } else {
-                return false;
-            }
-
         }
+    };
 
-        return true;
+    var validateDate = function(){
+        return client_form.self_exclusion.validate_exclusion_date();
     };
 
     var populateForm = function(response){
@@ -61252,11 +59866,6 @@ pjax_config_page("market_timesws", function() {
         if("error" in response) {
             if("message" in response.error) {
                 console.log(response.error.message);
-                $("#errorMsg").show();
-                $("#errorMsg").text(text.localize(response.error.message));
-                $form.hide();
-                $("#exclusionText").hide();
-                $("#exclusionTitle").hide();
             }
             return false;
         }else{
@@ -61401,32 +60010,8 @@ pjax_config_page("market_timesws", function() {
             }
             return false;
         }else{
-            $form.find("#exclusionMsg").show();
-            $form.find("#exclusionMsg").text(text.localize('Your changes have been updated.'));
-            BinarySocket.send({"get_self_exclusion": 1});
-
+            window.location.href = window.location.href;
         }
-    };
-
-    var self_exclusion_date_picker = function () {
-        // 6 months from now
-        var start_date = new Date();
-        start_date.setMonth(start_date.getMonth() + 6);
-
-        // 5 years from now
-        var end_date = new Date();
-        end_date.setFullYear(end_date.getFullYear() + 5);
-
-        var id = $('#EXCLUDEUNTIL');
-
-        id.datepicker({
-            dateFormat: 'yy-mm-dd',
-            minDate: start_date,
-            maxDate: end_date,
-            onSelect: function(dateText, inst) {
-                id.attr("value", dateText);
-            },
-        });
     };
 
     var apiResponse = function(response){
@@ -61437,6 +60022,9 @@ pjax_config_page("market_timesws", function() {
         }else if(type === "set_self_exclusion" || (type === "error" && "set_self_exclusion" in response.echo_req))
         {
             responseMessage(response);
+        }else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
+        {
+            isAuthorized(response);
         }
     };
 
@@ -61466,10 +60054,16 @@ pjax_config_page("user/self_exclusionws", function() {
                     }
                 }
             });	
+            Exclusion.self_exclusion_date_picker();
             SelfExlusionWS.init();
         }
     };
-});;/*
+});;onLoad.queue_for_url(function() {
+    $('#statement-date').on('change', function() {
+        $('#submit-date').removeClass('invisible');
+    });
+}, 'legacy-statement');
+;/*
  * This file contains the code related to loading of trading page bottom analysis
  * content. It will contain jquery so as to compatible with old code and less rewrite
  *
@@ -61483,7 +60077,7 @@ pjax_config_page("user/self_exclusionws", function() {
 
 var TradingAnalysis = (function(){
     var trading_digit_info;
-
+    
     var requestTradeAnalysis = function() {
         'use strict';
         $.ajax({
@@ -61665,6 +60259,7 @@ var TradingAnalysis = (function(){
     };
 
 })();
+
 ;/*
  * Handles barrier processing and display
  *
@@ -61859,7 +60454,7 @@ var Barriers = (function () {
                          a2.classList.add('a-active');
                          flag = 1;
                      }
-
+                     
                      a2.classList.add('tm-a-2');
                      a2.appendChild(content2);
                      a2.setAttribute('menuitem',el2.toLowerCase());
@@ -61933,7 +60528,7 @@ var Barriers = (function () {
 
      var keys1 = Object.keys(elements).sort(marketSort);
      for (var i=0; i<keys1.length; i++) {
-         var key = keys1[i];
+         var key = keys1[i]; 
          var option = document.createElement('option'), content = document.createTextNode(elements[key].name);
          option.setAttribute('value', key);
          if (selected && selected === key) {
@@ -61948,7 +60543,7 @@ var Barriers = (function () {
          if(elements[key].submarkets && Object.keys(elements[key].submarkets).length){
             var keys2 = Object.keys(elements[key].submarkets).sort(marketSort);
             for (var j=0; j<keys2.length; j++) {
-                var key2 = keys2[j];
+                var key2 = keys2[j]; 
                 option = document.createElement('option');
                 option.setAttribute('value', key2);
                 if (selected && selected === key2) {
@@ -62155,7 +60750,7 @@ function hidePriceOverlay() {
     if (elm) {
         elm.style.display = 'none';
     }
-
+    
 }
 
 function hideFormOverlay(){
@@ -62248,7 +60843,7 @@ function getContractCategoryTree(elements){
             }
             return e;
         });
-        tree = tree.filter(function(v){ return v.length; });
+        tree = tree.filter(function(v){ return v.length; });   
     }
     return tree;
 }
@@ -62407,27 +61002,12 @@ function debounce(func, wait, immediate) {
  */
 function getDefaultMarket() {
     'use strict';
-    var mkt = sessionStorage.getItem('market');
-    var markets = Symbols.markets(1);
-    if (!mkt || !markets[mkt]) {
-        var sorted_markets = Object.keys(Symbols.markets()).sort(function(a, b) {
-            return getMarketsOrder(a) - getMarketsOrder(b);
-        });
-        mkt = sorted_markets[0];
-    }
-    return mkt;
-}
-
-// Order
-function getMarketsOrder(market) {
-    var order = {
-        'forex': 1,
-        'random': 2,
-        'indices': 3,
-        'stocks': 4,
-        'commodities': 5
-    };
-    return order[market] ? order[market] : 100;
+   var mkt = sessionStorage.getItem('market');
+   var markets = Symbols.markets(1);
+   if(!mkt ||  !markets[mkt]){
+        mkt = Object.keys(markets)[0];
+   }
+   return mkt;
 }
 
 /*
@@ -62574,7 +61154,7 @@ function countDecimalPlaces(num) {
 
 function selectOption(option, select){
     var options = select.getElementsByTagName('option');
-    var contains = 0;
+    var contains = 0; 
     for(var i = 0; i < options.length; i++){
         if(options[i].value==option && !options[i].hasAttribute('disabled')){
             contains = 1;
@@ -62602,13 +61182,13 @@ function updatePurchaseStatus(final_price, pnl, contract_status){
         $profit.html(Content.localize().textLoss + '<p>'+pnl+'</p>');
     }
     else{
-        $profit.html(Content.localize().textProfit + '<p>'+(Math.round((final_price-pnl)*100)/100)+'</p>');
+        $profit.html(Content.localize().textProfit + '<p>'+(Math.round((final_price-pnl)*100)/100)+'</p>');        
     }
 }
 
 function updateWarmChart(){
     var $chart = $('#trading_worm_chart');
-    var spots =  Object.keys(Tick.spots()).sort(function(a,b){return a-b;}).map(function(v){return Tick.spots()[v];});
+    var spots = Tick.spots();
     var chart_config = {
         type: 'line',
         lineColor: '#606060',
@@ -62622,13 +61202,13 @@ function updateWarmChart(){
     };
     if($chart){
         $chart.sparkline(spots, chart_config);
-        if(spots.length){
+        if(spots.length){     
             $chart.show();
         }
         else{
             $chart.hide();
-        }
-    }
+        }  
+    }  
 }
 
 function reloadPage(){
@@ -62657,54 +61237,6 @@ function addComma(num){
         num = num.toFixed(2);
     }
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
-function showHighchart(){
-  Content.populate();
-  var div = document.createElement('div');
-  div.className = 'grd-grid-12 chart_div';
-
-  div.innerHTML = '<table width="600px" align="center"><tr id="highchart_duration"><td width="25%">' +
-                  Content.localize().textDuration + ':</td><td width="25%"><select id="time_period"><option value="1t">1 ' +
-                  Content.localize().textTickResultLabel.toLowerCase() + '</option><option value="1m">1 ' + text.localize("minute").toLowerCase() +
-                  '</option><option value="2m">2 ' + Content.localize().textDurationMinutes.toLowerCase() + '</option><option value="3m">3 ' +
-                  Content.localize().textDurationMinutes.toLowerCase() +'</option><option value="5m">5 ' + Content.localize().textDurationMinutes.toLowerCase() +
-                  '</option><option value="10m">10 ' + Content.localize().textDurationMinutes.toLowerCase() + '</option><option value="15m">15 ' +
-                  Content.localize().textDurationMinutes.toLowerCase() +'</option><option value="30m">30 ' + Content.localize().textDurationMinutes.toLowerCase() +
-                  '</option><option value="1h">1 ' + text.localize('hour').toLowerCase() + '</option><option value="2h">2 ' +
-                  Content.localize().textDurationHours.toLowerCase() +'</option><option value="4h">4 ' + Content.localize().textDurationHours.toLowerCase() +
-                  '</option><option value="8h">8 ' + Content.localize().textDurationHours.toLowerCase() + '</option><option value="1d">1 ' +
-                  text.localize('day').toLowerCase() +'</option></select></td></td></tr><tr align="center"><td colspan="4">' +
-                  '<iframe src="" width="100%" height="520" id="chart_frame" style="overflow-y : hidden;" scrolling="no"></iframe></td></tr></table>';
-
-   document.getElementById('trade_live_chart').appendChild(div);
-}
-
-function setUnderlyingTime() {
-   var instrumentCode = document.getElementById('underlying'),
-       contractMarkets = document.getElementById('bet_underlying'),
-       highchart_time =  document.getElementById('time_period');
-   highchart_time.addEventListener("change", function(){
-     setUnderlyingTime();
-   });
-   if (instrumentCode) {
-     instrumentCode.addEventListener("change", function(){
-       setUnderlyingTime();
-     });
-     chartFrameSource(instrumentCode.value, highchart_time);
-   } else if (contractMarkets) {
-     contractMarkets.addEventListener("change", function(){
-       setUnderlyingTime();
-     });
-     document.getElementById('submarket').addEventListener("change", function(){
-       setUnderlyingTime();
-     });
-     chartFrameSource(contractMarkets.value, highchart_time);
-   }
-}
-
-function chartFrameSource(underlying, highchart_time){
-  document.getElementById('chart_frame').src = 'https://highcharts.binary.com?affiliates=true&instrument=' + underlying + '&timePeriod=' + highchart_time.value + '&gtm=false';
 }
 ;var Content = (function () {
     'use strict';
@@ -62793,15 +61325,17 @@ function chartFrameSource(underlying, highchart_time){
             textMaxAggregateTooltip: text.localize('Presents the maximum aggregate payouts on outstanding contracts in your portfolio. If the maximum is attained, you may not purchase additional contracts without first closing out existing positions.'),
             textTradingLimits: text.localize('Trading Limits'),
             textWithdrawalTitle: text.localize('Withdrawal Limits'),
-            textWithdrawalLimits: text.localize('Your withdrawal limit is EUR %1 (or equivalent in other currency).'),
-            textWithrawalAmount: text.localize('You have already withdrawn the equivalent of EUR %1'),
-            textDayWithdrawalLimit: text.localize('Your %1 day withdrawal limit is currently EUR %2 (or equivalent in other currency).'),
+            textWithdrawalLimits: text.localize('Your withdrawal limit is EUR'),
+            textCurrencyEquivalent: text.localize('or equivalent in other currency'),
+            textWithrawalAmount: text.localize('You have already withdrawn the equivalent of EUR'),
+            textYour: text.localize('Your'),
+            textDayWithdrawalLimit: text.localize('day withdrawal limit is currently EUR'),
             textAuthenticatedWithdrawal: text.localize('Your account is fully authenticated and your withdrawal limits have been lifted.'),
             textAggregateOverLast: text.localize('in aggregate over the last'),
-            textWithdrawalForEntireDuration: text.localize('Your withdrawal limit for the entire duration of the account is currently: EUR %1 (or equivalent in other currency).'),
+            textWithdrawalForEntireDuration: text.localize('Your withdrawal limit for the entire duration of the account is currently: EUR'),
             textInAggregateOverLifetime: text.localize('in aggregate over the lifetime of your account.'),
             textNotAllowedToWithdraw: text.localize('Therefore you may not withdraw any additional funds.'),
-            textCurrentMaxWithdrawal: text.localize('Therefore your current immediate maximum withdrawal (subject to your account having sufficient funds) is EUR %1 (or equivalent in other currency).'),
+            textCurrentMaxWithdrawal: text.localize('Therefore your current immediate maximum withdrawal (subject to your account having sufficient funds) is EUR'),
             textBuyPrice: text.localize('Buy price'),
             textFinalPrice: text.localize('Final price'),
             textLoss: text.localize('Loss'),
@@ -62812,34 +61346,27 @@ function chartFrameSource(underlying, highchart_time){
             textMessageRequired: text.localize('This field is required.'),
             textMessageCountLimit: text.localize('You should enter between %1 characters.'), // %LIMIT% should be replaced by a range. sample: (6-20)
             textMessageJustAllowed: text.localize('Only %1 are allowed.'), // %ALLOWED% should be replaced by values including: letters, numbers, space, period, ...
-            textMessageValid: text.localize('Please submit a valid %1.'), // %FIELD% should be replaced by values such as email address
+            textMessageValid: text.localize('Please submit a valid %1.'), // %FIELD% should be replaced by values such as Email address
             textLetters: text.localize('letters'),
             textNumbers: text.localize('numbers'),
             textSpace: text.localize('space'),
             textPeriod: text.localize('period'),
             textComma: text.localize('comma'),
-            textHyphen: text.localize('hyphen'),
-            textApost: text.localize('apostrophe'),
             textPassword: text.localize('password'),
             textPasswordsNotMatching: text.localize('The two passwords that you entered do not match.'),
-            textTokenMissing: text.localize('Verification token is missing. Click on the verification link sent to your email and make sure you are not already logged in.'),
+            textEmailAddress: text.localize('Email address'),
+            textRepeatPassword: text.localize('re-enter password'),
+            textResidence: text.localize('country of residence'),
+            textTokenMissing: text.localize('Verification token is missing. Click on the verification link sent to your Email and make sure you are not already logged in.'),
+            textDetails: text.localize('details'),
+            textCreateNewAccount: text.localize('create new account'),
             textDuplicatedEmail: text.localize('Your provided email address is already in use by another Login ID'),
             textAsset: text.localize('Asset'),
             textOpens: text.localize('Opens'),
             textCloses: text.localize('Closes'),
             textSettles: text.localize('Settles'),
             textUpcomingEvents: text.localize('Upcoming Events'),
-            textEmailSent: text.localize('Please check your email for the next step.'),
-            textMr: text.localize('Mr'),
-            textMrs: text.localize('Mrs'),
-            textMs: text.localize('Ms'),
-            textMiss: text.localize('Miss'),
-            textDr: text.localize('Dr'),
-            textProf: text.localize('Prof'),
-            textErrorBirthdate: text.localize('Please input a valid date'),
-            textSelect: text.localize('Please select'),
-            textUnavailableReal: text.localize('Sorry, account opening is unavailable.'),
-            textMessageMinRequired: text.localize('Minimum of %1 characters required.'),
+            textEmailSent: text.localize('Please check your Email for the next step.'),
             textFeatureUnavailable: text.localize('Sorry, this feature is not available.')
         };
 
@@ -62980,7 +61507,7 @@ function chartFrameSource(underlying, highchart_time){
         var titleElement = document.getElementById("statement-title").firstElementChild;
         titleElement.textContent = localize.textStatement;
     };
-
+    
     var profitTableTranslation = function(){
         var titleElement = document.getElementById("profit-table-title").firstElementChild;
         titleElement.textContent = localize.textProfitTable;
@@ -62989,13 +61516,13 @@ function chartFrameSource(underlying, highchart_time){
     var limitsTranslation = function(){
         var titleElement = document.getElementById("limits-title").firstElementChild;
         titleElement.textContent = localize.textLimits;
-
+        
         if(TUser.get().loginid){
             var loginId = TUser.get().loginid;
 
             var tradingLimits = document.getElementById("trading-limits");
             tradingLimits.textContent = loginId + " - " + localize.textTradingLimits;
-
+            
             var withdrawalTitle = document.getElementById("withdrawal-title");
             withdrawalTitle.textContent = loginId + " - " + localize.textWithdrawalTitle;
         }
@@ -63019,10 +61546,6 @@ function chartFrameSource(underlying, highchart_time){
             case 'valid':
                 if(param)
                     msg = localize.textMessageValid.replace('%1', param);
-                break;
-            case 'min':
-                if(param)
-                    msg = localize.textMessageMinRequired.replace('%1', param);
                 break;
             default:
                 break;
@@ -63236,15 +61759,7 @@ function displayCurrencies(selected) {
         target.removeChild(target.firstChild);
     }
 
-    var client_currencies;
-    if(page.client.is_logged_in) {
-        client_currencies = Settings.get('client.currencies');
-    }
-
     currencies.forEach(function (currency) {
-        if(client_currencies && client_currencies.length > 0 && client_currencies.indexOf(currency) < 0) {
-            return;
-        }
         var option = document.createElement('option'),
             content = document.createTextNode(currency);
 
@@ -63641,12 +62156,10 @@ var TradingEvents = (function () {
         if (value === 'now') {
             sessionStorage.removeItem('date_start');
         } else {
-            if ($('expiry_type').val() === 'endtime'){
-                make_price_request = -1;
-                var end_time = moment(value*1000).utc().add(15,'minutes');
-                Durations.setTime(end_time.format("hh:mm"));
-                Durations.selectEndDate(end_time.format("YYYY-MM-DD"));
-            }
+            make_price_request = -1;
+            var end_time = moment(value*1000).utc().add(15,'minutes');
+            Durations.setTime(end_time.format("hh:mm"));
+            Durations.selectEndDate(end_time.format("YYYY-MM-DD"));
             sessionStorage.setItem('date_start', value);
         }
 
@@ -63778,11 +62291,8 @@ var TradingEvents = (function () {
                     // forget the old tick id i.e. close the old tick stream
                     processForgetTicks();
                     // get ticks for current underlying
-                    Tick.request(underlying);
+                    BinarySocket.send({ ticks : underlying });
                 }
-            });
-            underlyingElement.addEventListener('mousedown', function(e) {
-                Symbols.getSymbols(0);
             });
         }
 
@@ -63792,7 +62302,7 @@ var TradingEvents = (function () {
         var durationAmountElement = document.getElementById('duration_amount');
         if (durationAmountElement) {
             // jquery needed for datepicker
-            $('#duration_amount').on('input', debounce(function (e) {
+            $('#duration_amount').on('change', debounce(function (e) {
                 if (e.target.value % 1 !== 0 ) {
                     e.target.value = Math.floor(e.target.value);
                 }
@@ -64207,8 +62717,6 @@ var Message = (function () {
                 Purchase.display(response);
             } else if (type === 'tick') {
                 processTick(response);
-            } else if (type === 'history') {
-                Tick.processHistory(response);
             } else if (type === 'trading_times'){
                 processTradingTimes(response);
             } else if (type === 'statement'){
@@ -64241,18 +62749,14 @@ var Message = (function () {
  * `socket.send(Price.createProposal())` to send price proposal to sever
  * `Price.display()` to display the price details returned from server
  */
-var Price = (function() {
+var Price = (function () {
     'use strict';
 
     var typeDisplayIdMapping = {},
         form_id = 0;
 
-    var createProposal = function(typeOfContract) {
-        var proposal = {
-                proposal: 1,
-                subscribe: 1
-            },
-            underlying = document.getElementById('underlying'),
+    var createProposal = function (typeOfContract) {
+        var proposal = {proposal: 1}, underlying = document.getElementById('underlying'),
             submarket = document.getElementById('submarket'),
             contractType = typeOfContract,
             amountType = document.getElementById('amount_type'),
@@ -64303,9 +62807,9 @@ var Price = (function() {
         } else if (expiryType && isVisible(expiryType) && expiryType.value === 'endtime') {
             var endDate2 = endDate.value;
             var endTime2 = Durations.getTime();
-            if (!endTime2) {
+            if(!endTime2){
                 var trading_times = Durations.trading_times();
-                if (trading_times.hasOwnProperty(endDate2) && typeof trading_times[endDate2][underlying.value] === 'object' && trading_times[endDate2][underlying.value].length && trading_times[endDate2][underlying.value][0] !== '--') {
+                if(trading_times.hasOwnProperty(endDate2) && typeof trading_times[endDate2][underlying.value] === 'object' && trading_times[endDate2][underlying.value].length  && trading_times[endDate2][underlying.value][0]!=='--'){
                     endTime2 = trading_times[endDate2][underlying.value];
                 }
             }
@@ -64325,7 +62829,7 @@ var Price = (function() {
             proposal['barrier2'] = lowBarrier.value;
         }
 
-        if (prediction && isVisible(prediction)) {
+        if(prediction && isVisible(prediction)){
             proposal['barrier'] = parseInt(prediction.value);
         }
 
@@ -64349,40 +62853,30 @@ var Price = (function() {
             proposal['contract_type'] = typeOfContract;
         }
 
-        proposal['passthrough'] = {
-            form_id: form_id
-        };
+        proposal['passthrough'] = {form_id:form_id};
 
         return proposal;
     };
 
-    var display = function(details, contractType) {
+    var display = function (details, contractType) {
         var proposal = details['proposal'];
-        var id = proposal ? proposal['id'] : '';
-        var params = details['echo_req'];
+        var params = details['echo_req'],
+            id = proposal['id'],
+            type = params['contract_type'] || typeDisplayIdMapping[id],
+            is_spread = proposal['spread'] ? true : false;
 
-        var type = params['contract_type'];
-        if (id && !type) {
-            type = typeDisplayIdMapping[id];
-        }
-
-        var is_spread = false;
-        if (proposal && proposal['spread']) {
-            is_spread = true;
-        }
-
-        if (params && id && Object.getOwnPropertyNames(params).length > 0) {
+        if (params && Object.getOwnPropertyNames(params).length > 0) {
             typeDisplayIdMapping[id] = type;
         }
 
         var position = contractTypeDisplayMapping(type);
 
-        if (!position) {
+        if(!position){
             return;
         }
-
-        var container = document.getElementById('price_container_' + position);
-        if (!$(container).is(":visible")) {
+        
+        var container = document.getElementById('price_container_'+position);
+        if(!$(container).is(":visible")){
             $(container).fadeIn(200);
         }
 
@@ -64410,7 +62904,7 @@ var Price = (function() {
             }
         }
 
-        if (proposal && proposal['display_value']) {
+        if (proposal['display_value']) {
             if (is_spread) {
                 amount.textContent = proposal['display_value'];
             } else {
@@ -64418,22 +62912,20 @@ var Price = (function() {
             }
         }
 
-        if (proposal && proposal['longcode']) {
-            proposal['longcode'] = proposal['longcode'].replace(/[\d\,]+\.\d\d/, function(x) {
-                return '<b>' + x + '</b>';
-            });
-            description.innerHTML = '<div>' + proposal['longcode'] + '</div>';
+        if (proposal['longcode']) {
+            proposal['longcode'] = proposal['longcode'].replace(/[\d\,]+\.\d\d/,function(x){return '<b>'+x+'</b>';});
+            description.innerHTML = '<div>'+proposal['longcode']+'</div>';
         }
 
-        if (details['error']) {
+        if (details['error']){
             purchase.hide();
             comment.hide();
             amount_wrapper.hide();
-            description.innerHTML = "";
             price_wrapper.classList.add('small');
             error.show();
             error.textContent = details['error'].message;
-        } else {
+        }
+        else{
             purchase.show();
             comment.show();
             amount_wrapper.show();
@@ -64452,19 +62944,19 @@ var Price = (function() {
             purchase.setAttribute('data-ask-price', proposal['ask_price']);
             purchase.setAttribute('data-display_value', proposal['display_value']);
             purchase.setAttribute('data-symbol', id);
-            for (var key in params) {
-                if (key && key !== 'proposal') {
-                    purchase.setAttribute('data-' + key, params[key]);
+            for(var key in params){
+                if(key && key !== 'proposal'){
+                    purchase.setAttribute('data-'+key, params[key]);
                 }
             }
         }
     };
 
-    var clearMapping = function() {
+    var clearMapping = function () {
         typeDisplayIdMapping = {};
     };
 
-    var clearFormId = function() {
+    var clearFormId = function () {
         form_id = 0;
     };
 
@@ -64472,15 +62964,9 @@ var Price = (function() {
         proposal: createProposal,
         display: display,
         clearMapping: clearMapping,
-        idDisplayMapping: function() {
-            return typeDisplayIdMapping;
-        },
-        getFormId: function() {
-            return form_id;
-        },
-        incrFormId: function() {
-            form_id++;
-        },
+        idDisplayMapping: function () { return typeDisplayIdMapping; },
+        getFormId: function(){ return form_id; },
+        incrFormId: function(){ form_id++; },
         clearFormId: clearFormId
     };
 
@@ -64502,11 +62988,11 @@ function processActiveSymbols(data) {
 
     displayMarkets('contract_markets', Symbols.markets(), market);
     processMarket();
-    // setTimeout(function(){
-        // if(document.getElementById('underlying')){
-        //     Symbols.getSymbols(0);
-        // }
-    // }, 60*1000);
+    setTimeout(function(){
+        if(document.getElementById('underlying')){
+            Symbols.getSymbols(0);
+        }
+    }, 60*1000);
 }
 
 
@@ -64550,7 +63036,7 @@ function processMarketUnderlying() {
     // forget the old tick id i.e. close the old tick stream
     processForgetTicks();
     // get ticks for current underlying
-    Tick.request(underlying);
+    BinarySocket.send({ ticks : underlying });
 
     Tick.clean();
     
@@ -64757,7 +63243,7 @@ function processForgetTicks() {
 function processTick(tick) {
     'use strict';
     var symbol = sessionStorage.getItem('underlying');
-    if(tick.echo_req.ticks === symbol || (tick.tick && tick.tick.symbol === symbol)){
+    if(tick.echo_req.ticks === symbol){
         Tick.details(tick);
         Tick.display();
         var digit_info = TradingAnalysis.digit_info();
@@ -64833,15 +63319,14 @@ var Purchase = (function () {
         var error = details['error'];
         var show_chart = !error && passthrough['duration']<=10 && passthrough['duration_unit']==='t' && (sessionStorage.formname === 'risefall' || sessionStorage.formname === 'higherlower' || sessionStorage.formname === 'asian');
 
+        container.style.display = 'block';
         contracts_list.style.display = 'none';
 
         if (error) {
-            container.style.display = 'block';
             message_container.hide();
             confirmation_error.show();
             confirmation_error.textContent = error['message'];
         } else {
-            container.style.display = 'table-row';
             message_container.show();
             confirmation_error.hide();
 
@@ -64923,91 +63408,62 @@ var Purchase = (function () {
                 show_contract_result:1,
                 width: $('#confirmation_message').width(),
             });
-            WSTickDisplay.spots_list = {};
         }
     };
 
     var update_spot_list = function(data){
-       
-        if($('#contract_purchase_spots:hidden').length){
-            return;
-        }
-
-        var duration = purchase_data.echo_req.passthrough['duration'];
-
-        if(!duration){
-            return;
-        }
-
         var spots = document.getElementById('contract_purchase_spots');
-        var spots2 = Tick.spots();
-        var epoches = Object.keys(spots2).sort(function(a,b){return a-b;});
-        spots.textContent = '';
+        if(isVisible(spots) && purchase_data.echo_req.passthrough['duration'] && data.tick.epoch && data.tick.epoch > purchase_data.buy.start_time){
+            var fragment = document.createElement('div');
+            fragment.classList.add('row');
 
-        var replace = function(d){d1 = d; return '<b>'+d+'</b>';};
-        for(var s=0; s<epoches.length; s++){
-            var tick_d = {
-                epoch: epoches[s],
-                quote: spots2[epoches[s]]
-            };
+            var el1 = document.createElement('div');
+            el1.classList.add('col');
+            el1.textContent = Content.localize().textTickResultLabel + " " + (spots.getElementsByClassName('row').length+1);
+            fragment.appendChild(el1);
 
-            if(isVisible(spots) && tick_d.epoch && tick_d.epoch > purchase_data.buy.start_time){
-                var fragment = document.createElement('div');
-                fragment.classList.add('row');
+            var el2 = document.createElement('div');
+            el2.classList.add('col');
+            var date = new Date(data.tick.epoch*1000);
+            var hours = date.getUTCHours() < 10 ? '0'+date.getUTCHours() : date.getUTCHours();
+            var minutes = date.getUTCMinutes() < 10 ? '0'+date.getUTCMinutes() : date.getUTCMinutes();
+            var seconds = date.getUTCSeconds() < 10 ? '0'+date.getUTCSeconds() : date.getUTCSeconds();
+            el2.textContent = hours+':'+minutes+':'+seconds;
+            fragment.appendChild(el2);
 
-                var el1 = document.createElement('div');
-                el1.classList.add('col');
-                el1.textContent = Content.localize().textTickResultLabel + " " + (spots.getElementsByClassName('row').length+1);
-                fragment.appendChild(el1);
+            var d1;
+            var tick = data.tick.quote.replace(/\d$/,function(d){d1 = d; return '<b>'+d+'</b>';});
+            var el3 = document.createElement('div');
+            el3.classList.add('col');
+            el3.innerHTML = tick;
+            fragment.appendChild(el3);
 
-                var el2 = document.createElement('div');
-                el2.classList.add('col');
-                var date = new Date(tick_d.epoch*1000);
-                var hours = date.getUTCHours() < 10 ? '0'+date.getUTCHours() : date.getUTCHours();
-                var minutes = date.getUTCMinutes() < 10 ? '0'+date.getUTCMinutes() : date.getUTCMinutes();
-                var seconds = date.getUTCSeconds() < 10 ? '0'+date.getUTCSeconds() : date.getUTCSeconds();
-                el2.textContent = hours+':'+minutes+':'+seconds;
-                fragment.appendChild(el2);
+            spots.appendChild(fragment);
+            spots.scrollTop = spots.scrollHeight;
 
-                var d1;
-                var tick = tick_d.quote.replace(/\d$/,replace);
-                var el3 = document.createElement('div');
-                el3.classList.add('col');
-                el3.innerHTML = tick;
-                fragment.appendChild(el3);
+            if(d1 && purchase_data.echo_req.passthrough['duration']===1){
+                var contract_status,
+                    final_price, 
+                    pnl;
 
-                spots.appendChild(fragment);
-                spots.scrollTop = spots.scrollHeight;
-
-                if(d1 && duration===1){
-                    var contract_status,
-                        final_price,
-                        pnl;
-
-                    if  (  purchase_data.echo_req.passthrough.contract_type==="DIGITMATCH" && d1==purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITDIFF" && d1!=purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITEVEN" && d1%2===0 || purchase_data.echo_req.passthrough.contract_type==="DIGITODD" && d1%2 || purchase_data.echo_req.passthrough.contract_type==="DIGITOVER" && d1>purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITUNDER" && d1<purchase_data.echo_req.passthrough.barrier){
-                        spots.className = 'won';
-                        final_price = $('#contract_purchase_payout p').text();
-                        pnl = $('#contract_purchase_cost p').text();
-                        contract_status = Content.localize().textContractStatusWon;
-                    }
-                    else{
-                        spots.className = 'lost';
-                        final_price = 0;
-                        pnl = -$('#contract_purchase_cost p').text();
-                        contract_status = Content.localize().textContractStatusLost;
-                    }
-
-                    updatePurchaseStatus(final_price, pnl, contract_status);
+                if  (  purchase_data.echo_req.passthrough.contract_type==="DIGITMATCH" && d1==purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITDIFF" && d1!=purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITEVEN" && d1%2===0 || purchase_data.echo_req.passthrough.contract_type==="DIGITODD" && d1%2 || purchase_data.echo_req.passthrough.contract_type==="DIGITOVER" && d1>purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITUNDER" && d1<purchase_data.echo_req.passthrough.barrier){
+                    spots.className = 'won';
+                    final_price = $('#contract_purchase_payout p').text();
+                    pnl = $('#contract_purchase_cost p').text();
+                    contract_status = Content.localize().textContractStatusWon;
+                }
+                else{
+                    spots.className = 'lost';
+                    final_price = 0;
+                    pnl = -$('#contract_purchase_cost p').text();
+                    contract_status = Content.localize().textContractStatusLost;
                 }
 
-                duration--;
-                if(!duration){
-                    purchase_data.echo_req.passthrough['duration'] = 0;
-                }
+                updatePurchaseStatus(final_price, pnl, contract_status);
             }
 
+            purchase_data.echo_req.passthrough['duration']--;
         }
-        
     };
 
     return {
@@ -65072,7 +63528,6 @@ var StartDates = (function(){
 
             startDates.list.sort(compareStartDate);
 
-            var first;
             startDates.list.forEach(function (start_date) {
                 var a = moment.unix(start_date.open).utc();
                 var b = moment.unix(start_date.close).utc();
@@ -65090,9 +63545,6 @@ var StartDates = (function(){
                     if(a.unix()-start.unix()>5*60){
                         option = document.createElement('option');
                         option.setAttribute('value', a.utc().unix());
-                        if(typeof first === 'undefined' && !hasNow){
-                            first = a.utc().unix();
-                        }
                         content = document.createTextNode(a.format('HH:mm ddd'));
                         option.appendChild(content);
                         fragment.appendChild(option);
@@ -65102,9 +63554,6 @@ var StartDates = (function(){
             });
             target.appendChild(fragment);
             displayed = 1;
-            if(first){
-                TradingEvents.onStartDateChange(first);            
-            }
         } else {
             displayed = 0;
             document.getElementById('date_start_row').style.display = 'none';
@@ -65235,17 +63684,17 @@ var Symbols = (function () {
  * `Tick.epoch()` to get the tick epoch time
  * 'Tick.display()` to display current spot
  */
-var Tick = (function() {
+var Tick = (function () {
     'use strict';
 
     var quote = '',
         id = '',
         epoch = '',
         errorMessage = '',
-        spots = {},
+        spots = [],
         keep_number = 20;
 
-    var details = function(data) {
+    var details = function (data) {
         errorMessage = '';
 
         if (data) {
@@ -65257,18 +63706,15 @@ var Tick = (function() {
                 id = tick['id'];
                 epoch = tick['epoch'];
 
-                spots[epoch] = quote;
-                var epoches = Object.keys(spots).sort(function(a, b) {
-                    return a - b;
-                });
-                if (epoches.length > keep_number) {
-                    delete spots[epoches[0]];
+                if(spots.length === keep_number){
+                    spots.shift();
                 }
+                spots.push(quote);
             }
         }
     };
 
-    var display = function() {
+    var display = function () {
         $('#spot').fadeIn(200);
         var spotElement = document.getElementById('spot');
         var message = '';
@@ -65278,9 +63724,9 @@ var Tick = (function() {
             message = quote;
         }
 
-        if (parseFloat(message) != message) {
+        if(parseFloat(message) != message){
             spotElement.className = 'error';
-        } else {
+        } else{
             spotElement.classList.remove('error');
             displayPriceMovement(spotElement, spotElement.textContent, message);
             displayIndicativeBarrier();
@@ -65289,61 +63735,24 @@ var Tick = (function() {
         spotElement.textContent = message;
     };
 
-    var request = function(symbol) {
-        BinarySocket.send({
-            "ticks_history": symbol,
-            "style": "ticks",
-            "end": "latest",
-            "count": keep_number,
-            "subscribe": 1
-        });
-    };
-
-    var processHistory = function(res) {
-        if (res.history && res.history.times && res.history.prices) {
-            for (var i = 0; i < res.history.times.length; i++) {
-                details({
-                    tick: {
-                        epoch: res.history.times[i],
-                        quote: res.history.prices[i]
-                    }
-                });
-            }
-        }
-    };
-
     return {
         details: details,
         display: display,
-        quote: function() {
-            return quote;
-        },
-        id: function() {
-            return id;
-        },
-        epoch: function() {
-            return epoch;
-        },
-        errorMessage: function() {
-            return errorMessage;
-        },
-        clean: function() {
-            spots = {};
+        quote: function () { return quote; },
+        id: function () { return id; },
+        epoch: function () { return epoch; },
+        errorMessage: function () { return errorMessage; },
+        clean: function(){ 
+            spots = []; 
             quote = '';
             $('#spot').fadeOut(200);
         },
-        spots: function() {
-            return spots;
-        },
-        setQuote: function(q) {
-            quote = q;
-        },
-        request: request,
-        processHistory: processHistory
+        spots: function(){ return spots;},
+        setQuote: function(q){ quote = q; }
     };
 })();
 ;var WSTickDisplay = Object.create(TickDisplay);
-WSTickDisplay.plot = function(plot_from, plot_to) {
+WSTickDisplay.plot = function(plot_from, plot_to){
     var $self = this;
     $self.contract_start_moment = moment($self.contract_start_ms).utc();
     $self.counter = 0;
@@ -65351,55 +63760,45 @@ WSTickDisplay.plot = function(plot_from, plot_to) {
 };
 WSTickDisplay.update_ui = function(final_price, pnl, contract_status) {
     var $self = this;
-    updatePurchaseStatus(final_price, final_price - pnl, contract_status);
+    updatePurchaseStatus(final_price, pnl, contract_status);
 };
 
-WSTickDisplay.updateChart = function(data) {
+WSTickDisplay.updateChart = function(data){
 
     var $self = this;
 
     var chart = document.getElementById('tick_chart');
-    if (!chart || !isVisible(chart) || !data || !data.tick) {
+    if(!chart || !isVisible(chart) || !data || !data.tick){
         return;
     }
 
-    var spots2 = Tick.spots();
-    var epoches = Object.keys(spots2).sort(function(a, b) {
-        return a - b;
-    });
-    if ($self.applicable_ticks.length >= $self.ticks_needed) {
-        $self.evaluate_contract_outcome();
-        return;
-    } else {
-        for (var d = 0; d < epoches.length; d++) {
-            var tick = {
-                epoch: parseInt(epoches[d]),
-                quote: parseFloat(spots2[epoches[d]])
-            };
-            if (tick.epoch > $self.contract_start_moment.unix() && !$self.spots_list[tick.epoch]) {
-                if (!$self.chart) return;
-                if (!$self.chart.series) return;
-                $self.chart.series[0].addPoint([$self.counter, tick.quote], true, false);
-                $self.applicable_ticks.push(tick);
-                $self.spots_list[tick.epoch] = tick.quote;
-                var indicator_key = '_' + $self.counter;
-                if (typeof $self.x_indicators[indicator_key] !== 'undefined') {
-                    $self.x_indicators[indicator_key]['index'] = $self.counter;
-                    $self.add($self.x_indicators[indicator_key]);
-                }
+    var tick = {
+        epoch: parseInt(data.tick.epoch),
+        quote: parseFloat(data.tick.quote)
+    };
 
-                $self.add_barrier();
-                $self.apply_chart_background_color(tick);
-                $self.counter++;
-
+    if (tick.epoch > $self.contract_start_moment.unix()) {
+        if ($self.applicable_ticks.length >= $self.ticks_needed) {
+            $self.evaluate_contract_outcome();
+            return;
+        } else {
+            if (!$self.chart) return;
+            if (!$self.chart.series) return;
+            $self.chart.series[0].addPoint([$self.counter, tick.quote], true, false);
+            $self.applicable_ticks.push(tick);
+            var indicator_key = '_' + $self.counter;
+            if (typeof $self.x_indicators[indicator_key] !== 'undefined') {
+                $self.x_indicators[indicator_key]['index'] = $self.counter;
+                $self.add($self.x_indicators[indicator_key]);
             }
+
+            $self.add_barrier();
+            $self.apply_chart_background_color(tick);
+            $self.counter++;
         }
-    }
-
-
-
-
+    }           
 };
+
 ;var TradePage = (function(){
 	
 	var trading_page = 0;
@@ -65432,11 +63831,6 @@ WSTickDisplay.updateChart = function(data) {
 		if (document.getElementById('websocket_form')) {
 		    addEventListenerForm();
 		}
-
-		// Walktrough Guide
-		Guide.init({
-			script : 'trading'
-		});
 	};
 
 	var onUnload = function(){
@@ -65461,6 +63855,7 @@ WSTickDisplay.updateChart = function(data) {
 
     var reality_check_url = page.url.url_for('user/reality_check');
     var reality_freq_url  = page.url.url_for('user/reality_check_frequency');
+    var logout_url        = page.url.url_for('logout');
 
     RealityCheck.prototype.setInterval = function (intv) {
         this.interval = intv * 60 * 1000; // convert minutes to millisec
@@ -65622,8 +64017,8 @@ WSTickDisplay.updateChart = function(data) {
             $('#reality-check').remove();
         });
 
-        $('#reality-check #btn_logout').unbind('click').click(function(){
-            BinarySocket.send({"logout": "1"});
+        $('#reality-check .blogout').on('click', function () {
+            window.location.href = logout_url;
         });
         
         var obj = document.getElementById('realityDuration');
@@ -65781,8 +64176,8 @@ var BinarySocket = (function () {
         if (isClose()) {
             bufferedSends.push(data);
             init(1);
-        } else if (isReady()) {
-            if(!data.hasOwnProperty('passthrough') && !data.hasOwnProperty('verify_email')){
+        } else if (isReady() && (authorized || TradePage.is_trading_page() || data.hasOwnProperty('time') )) {
+            if(!data.hasOwnProperty('passthrough')){
                 data.passthrough = {};
             }
             // temporary check
@@ -65821,13 +64216,8 @@ var BinarySocket = (function () {
         }
 
         binarySocket.onopen = function (){
-            try{
-                var loginToken = getCookieItem('login');
-            }
-            catch(err){
-                init(1);
-            }
-            if(loginToken && !authorized) {
+            var loginToken = getCookieItem('login');
+            if(loginToken) {
                 binarySocket.send(JSON.stringify({authorize: loginToken}));
             }
             else {
@@ -65863,18 +64253,8 @@ var BinarySocket = (function () {
                     sendBufferedSends();
                 } else if (type === 'balance') {
                     ViewBalanceUI.updateBalances(response.balance);
-                } else if (type === 'time') {
+                } else if(type ==='time'){
                     page.header.time_counter(response);
-                } else if (type === 'logout') {
-                    page.header.do_logout(response);
-                } else if (type === 'error') {
-                    if(response.error.code === 'RateLimit') {
-                        $('#ratelimit-error-message')
-                            .css('display', 'block')
-                            .on('click', '#ratelimit-refresh-link', function () {
-                                window.location.reload();
-                            });
-                    }
                 }
 
                 if(typeof events.onmessage === 'function'){
@@ -65925,666 +64305,6 @@ var BinarySocket = (function () {
     };
 
 })();
-;var account_transferws = (function(){
-    "use strict";
-    var $form ;
-    var account_from , account_to ;
-    var currType,account_bal;
-    var availableCurr= [] ;
-    var payoutCurr = [];
-    
-    var init = function(){
-        $form = $('#account_transfer');
-        $("#success_form").hide();
-        $("#client_message").hide();
-        account_bal = 0;
-
-        BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 1 });
-
-        $form.find("button").on("click", function(e){
-            e.preventDefault();
-            e.stopPropagation();
-
-            if(validateForm() === false){
-                return false;
-            }
-            
-            BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 2 });
-        });
-
-        $form.find("#transfer_account_transfer").on("change",function(){
-
-           $form.find("#invalid_amount").text("");
-           set_account_from_to();
-
-           BinarySocket.send({"authorize": $.cookie('login'), "req_id" : 3});
-
-        });
-    };
-    var set_account_from_to = function(){
-
-        var accounts = $("#transfer_account_transfer option:selected").text();
-        var matches = accounts
-                        .split('(')
-                        .filter(function(v){ 
-                            return v.indexOf(')') > -1;})
-                        .map( function(value) { 
-                            return value.split(')')[0];
-                    }); 
-
-        account_from = matches[0];
-        account_to = matches[1];
-        
-        $.each(availableCurr,function(index,value){
-            if(value.account == account_from){
-                currType = value.currency;
-                account_bal = value.balance;
-            }
-        });
-
-        $form.find("#currencyType").html(currType);
-    };
-    var validateForm =function(){
-
-        var amt = $form.find("#acc_transfer_amount").val();
-        var isValid = true;
-       
-        if(amt.length <=0 ){
-            $form.find("#invalid_amount").text(text.localize("Invalid amount. Minimum transfer amount is 0.10, and up to 2 decimal places."));
-            isValid = false;
-        }
-
-        if($.inArray(currType, payoutCurr) == -1)
-        {
-            $form.find("#invalid_amount").text(text.localize("Invalid currency."));
-            isValid = false;
-        }
-
-        return isValid;
-    };
-
-    var apiResponse = function(response){
-        var type = response.msg_type;
-        if (type === "transfer_between_accounts" || (type === "error" && "transfer_between_accounts" in response.echo_req)){
-           responseMessage(response);
-
-        }
-        else if(type === "payout_currencies" || (type === "error" && "payout_currencies" in response.echo_req))
-        {
-            responseMessage(response);
-        }
-        else if(type === "authorize" || (type === "error" && "authorize" in response.echo_req))
-        {
-            isAuthorized(response);
-        }
-    };
-
-    var isAuthorized =  function(response){
-        if(response.req_id){
-            var option= response.req_id ;
-            var amt = $form.find("#acc_transfer_amount").val();
-
-            switch(option){
-                case    1:
-                        BinarySocket.send({ 
-                            "transfer_between_accounts": "1",
-                            "req_id" : 4
-                        });
-                        break;
-                case    2 :
-                        BinarySocket.send({ 
-                            "transfer_between_accounts": "1",
-                            "account_from": account_from,
-                            "account_to": account_to,
-                            "currency": currType,
-                            "amount": amt
-                        });
-                        break;  
-                case    3:
-                        BinarySocket.send({"payout_currencies": "1"});
-                        break;
-                                   
-            }
-
-        }
-    };
-
-    var responseMessage = function(response) {
-        var resvalue ;
-        if("error" in response) {
-                if("message" in response.error) {
-
-                    if($('#transfer_account_transfer option').length > 0 ){
-                        $form.find("#invalid_amount").text(text.localize(response.error.message));
-                    }
-                    else{
-                        $("#client_message").show();
-                        $("#client_message p").html(text.localize(response.error.message));
-                        $("#success_form").hide();
-                        $form.hide();
-
-                    }
-                    return false;
-                }
-
-                return false;
-        }
-        else if("payout_currencies" in response){
-
-            payoutCurr = response.payout_currencies;
-        }
-        else if ("transfer_between_accounts" in response){
-
-            if(response.req_id === 5){
-        
-                $.each(response.accounts,function(key,value){
-                    $form.hide();
-                    $("#success_form").show();
-                    $("#client_message").hide();
-
-                    if(value.loginid == account_from){
-                        $("#loginid_1").html(value.loginid);
-                        $("#balance_1").html(value.balance);
-                    }
-                    else if(value.loginid == account_to){
-                        $("#loginid_2").html(value.loginid);
-                        $("#balance_2").html(value.balance);
-
-                    }
-                });
-            }
-            else if(response.req_id === 4){
-
-                var secondacct, firstacct,str,optionValue;
-
-                $.each(response.accounts, function(index,value){
-                    var currObj = {};
-
-                    if($.isEmptyObject(firstacct))
-                    {
-                        firstacct = value.loginid;
-                        currObj.account = value.loginid;
-                        currObj.currency = value.currency;
-                        currObj.balance = value.balance;
-
-                        availableCurr.push(currObj);
-                    }
-                    else
-                    {
-                        secondacct = value.loginid;
-                        str = text.localize("from account (" + firstacct + ") to account (" + secondacct + ")");
-                        optionValue = firstacct + "_to_" + secondacct;
-                        $form.find("#transfer_account_transfer")
-                             .append($("<option></option>")
-                             .attr("value",optionValue)
-                             .text(str));
-                        str = text.localize("from account (" + secondacct + ") to account (" + firstacct + ")");
-                        optionValue = secondacct + "_to_" + firstacct;
-                        $form.find("#transfer_account_transfer")
-                             .append($("<option></option>")
-                             .attr("value",optionValue)
-                             .text(str));     
-
-                        currObj.account = value.loginid;
-                        currObj.currency = value.currency;
-                        currObj.balance = value.balance;
-
-                        availableCurr.push(currObj);     
-
-                        firstacct = "";    
-                    }
-                    
-                    if(($.isEmptyObject(firstacct) === false) && ($.isEmptyObject(secondacct) === false))
-                    {
-                        str = text.localize("from account (" + secondacct + ") to account (" + firstacct + ")");
-                        optionValue = secondacct + "_to_" + firstacct;
-                        $form.find("#transfer_account_transfer")
-                                 .append($("<option></option>")
-                                 .attr("value",optionValue)
-                                 .text(str));     
-                    }
-
-                    if(value.balance <= 0){
-                        $form.find("#transfer_account_transfer option:last").remove();
-                    }
-                
-
-
-                });
-
-                $form.find("#transfer_account_transfer option").eq(0).attr('selected', 'selected');
-
-                set_account_from_to();
-
-                if((account_bal <=0) && (response.accounts.length > 1) ){
-                    $("#client_message").show();
-                    $("#success_form").hide();
-                    $form.hide();
-                    return false;
-                }
-                else if(account_to === undefined || account_from === undefined || $.isEmptyObject(account_to))
-                {
-                    $("#client_message").show();
-                    $("#client_message p").html(text.localize("The account transfer is unavailable for your account."));
-                    $("#success_form").hide();
-                    $form.hide();
-                    return false;
-                }
-
-                BinarySocket.send({"payout_currencies": "1"});
-            }
-            else{
-                BinarySocket.send({ 
-                    "transfer_between_accounts": "1",
-                    "req_id" : 5
-                });
-
-            }
-        }
-
-    };
-
-    return {
-        init : init,
-        apiResponse : apiResponse
-    };
-
-})();
-
-pjax_config_page("cashier/account_transferws", function() {
-    return {
-        onLoad: function() {
-        	if (!getCookieItem('login')) {
-                window.location.href = page.url.url_for('login');
-                return;
-            }
-            if((/VRT/.test($.cookie('loginid')))){
-                window.location.href = ("/");
-            }
-
-        	BinarySocket.init({
-                onmessage: function(msg){
-                    var response = JSON.parse(msg.data);
-                    if (response) {
-                        account_transferws.apiResponse(response);
-                    }
-                }
-            });	
-
-            account_transferws.init();
-        }
-    };
-});;var my_account = (function(){
-
-    "use strict";
-
-    var init = function(){
-    	$("#VRT_topup_link").hide();
-
-        var currType = TUser.get().currency;
-        var bal =  TUser.get().balance;
-
-        if(bal < 1000 && (/^VRT/.test(TUser.get().loginid) === true ) ){
-            var str = "Deposit "+ currType + " 10000 virtual money into your account ";
-            $("#VRT_topup_link").show();
-            $("#VRT_topup_link a").text(text.localize(str));
-        }
-    };
-
-    return {
-    	init : init
-
-    };
-
-})();
-/*
-pjax_config_page("user/my_account", function() {
-    return {
-        onLoad: function() {
-        	if (!$.cookie('login')) {
-                window.location.href = page.url.url_for('login');
-                return;
-            }
-
-            BinarySocket.init({
-                onauth : function(){
-                    my_account.init();
-                }
-
-            });
-        }
-    };
-});*/;var my_accountws = (function(){
-
-    "use strict";
-    var currType;
-
-    var init = function(){
-        $("#welcome").hide();
-    	$("#VRT_topup_link").hide();
-    	$("#authenticate_button").hide();
-    	$("#welcome_text").hide();
-    	BinarySocket.send({"balance": 1, "req_id": 1 });
-    };
-
-    var getBalance = function(response){
-    	var str , bal ;
-    	if(response.echo_req.req_id){
-	    	if("error" in response) {
-	            if("message" in response.error) {
-	                console.log(response.error.message);
-	            }
-	            return false;
-	        }
-	    	else{
-	    		currType = response.balance.currency;
-	    		bal =  response.balance.balance;
-	    		var isReal = !(/VRT/.test($.cookie('loginid')));
-	    		if(parseInt(response.req_id,10) === 1){
-	    			if(!isReal){
-	    			    str = "You're currently logged in to your virtual money account ";
-	    			    $("#welcome").show();
-	    			    $("#welcome").text(text.localize("Welcome!"));
-	    			    $("#welcome_text").show();
-	    			    $("#welcome_text .clientid").text("("+ $.cookie('loginid') +").");
-	    			    $("#welcome_text").html(text.localize(str)+$("#welcome_text").html());
-	    			    $("#cashier-portfolio").removeClass('invisible');
-    	                $("#profit-statement").removeClass('invisible');
-    	                if(bal<1000){
-	    		    	    str = "Deposit %1 virtual money into your account ";
-    	    		    	$("#VRT_topup_link").show();
-    	    		    	$("#VRT_topup_link a").text(text.localize(str).replace("%1",currType + " 10000 "));
-	    			    }
-	    			}
-	    			else{
-	    			   BinarySocket.send({"get_settings": 1, "req_id":3});
-	    			}
-	    			BinarySocket.send({"get_account_status": 1, "req_id":2});
-	    		}
-	    		
-	    		
-	    	}
-    	}
-
-    };
-    
-    var showAuthenticate = function(response){
-        var status;
-        if("error" in response){
-            if("message" in response.error) {
-	            console.log(response.error.message);
-	        }
-            return false;
-        }
-        else{
-            status = response.get_account_status[0];
-            if(status === "unwelcome"){
-                $("#authenticate_button").show();
-                $("#authenticate_button").removeClass("invisible");
-                $("#authenticate_button span").text(text.localize("Authenticate your account"));
-            }
-        }
-    };
-    
-    var getLandingCompany = function(response){
-        var country_code;
-        if("error" in response){
-            if("message" in response.error) {
-	            console.log(response.error.message);
-	        }
-            return false;
-        }
-        else{
-            country_code = response.get_settings.country_code;
-            BinarySocket.send({"landing_company": country_code, "req_id":4});
-        }
-    };
-    
-    var showWelcomeText = function(response){
-        var landing_company, str;
-        if("error" in response){
-            if("message" in response.error) {
-	            console.log(response.error.message);
-	        }
-            return false;
-        }
-        else{
-            if(/MLT/.test($.cookie('loginid'))){
-                landing_company = response.landing_company.gaming_company.name;
-            }
-            else{
-                landing_company = response.landing_company.financial_company.name;
-            }
-            str = "You're currently logged in to your real money account with %1 ";
-            $("#welcome").show();
-	    	$("#welcome").text(text.localize("Welcome!"));
-	    	$("#welcome_text").show();
-	    	$("#welcome_text .clientid").text(" ("+ $.cookie('loginid') +").");
-	    	$("#welcome_text").html(text.localize(str).replace("%1", landing_company) + $("#welcome_text").html());
-	    	$("#cashier-portfolio").removeClass('invisible');
-    	    $("#profit-statement").removeClass('invisible');
-    	    showNoticeMsg();
-        }
-    };
-    
-    var showNoticeMsg = function(){
-        var loginid_list = $.cookie('loginid_list');
-        var res = loginid_list.split("+");
-        if(res.length == "2" &&(/MLT/.test(res[0]) || /MLT/.test(res[1]))){
-            $("#investment_message").removeClass("invisible");
-        }
-    };
-
-    var apiResponse = function(response){
-    	var type = response.msg_type;
-    	if(type === "balance" || (type === "error" && "balance" in response.echo_req))
-        {
-            getBalance(response);
-        }
-        if(type === "get_account_status" || (type === "error" && "get_account_status" in response.echo_req)){
-            showAuthenticate(response);
-        }
-        if(type === "get_settings" || (type === "error" && "get_settings" in response.echo_req)){
-            getLandingCompany(response);
-        }
-        if(type === "landing_company" || (type === "error" && "landing_company" in response.echo_req)){
-            showWelcomeText(response);
-        }
-    };
-
-    return {
-    	init : init,
-    	apiResponse : apiResponse
-
-    };
-
-})();
-
-
-
-pjax_config_page("user/my_accountws", function() {
-    return {
-        onLoad: function() {
-        	if (!getCookieItem('login')) {
-                window.location.href = page.url.url_for('login');
-                return;
-            }
-        	BinarySocket.init({
-                onmessage: function(msg){
-                    var response = JSON.parse(msg.data);
-                    if (response) {
-                        my_accountws.apiResponse(response);
-                          
-                    }
-                }
-            });
-            Content.populate();
-            my_accountws.init();
-        }
-    };
-});
-;var PaymentAgentListWS = (function() {
-    "use strict";
-
-    var hiddenClass,
-        ddlCountriesID,
-        $paListContainer;
-
-    var residence,
-        agentTemplate;
-
-
-    var init = function() {
-        hiddenClass = 'hidden';
-        ddlCountriesID = '#target_country';
-        $paListContainer = $('#pa_list');
-        agentTemplate = $paListContainer.find('#accordion').html();
-
-        residence = $.cookie('residence');
-        if(!residence || residence.length === 0) {
-            residence = '00'; // just to get a list of payment agent Countries
-        }
-
-        sendRequest(residence, true);
-    };
-
-    var sendRequest = function(country, isList) {
-        BinarySocket.send({
-            "paymentagent_list": country ? country : $(ddlCountriesID).val(), 
-            "passthrough": isList ? {"countries_list": "1"} : {}
-        });
-    };
-
-    var responseHandler = function(response) {
-        if(response.echo_req.passthrough && response.echo_req.passthrough.countries_list === '1') {
-            populateCountriesList(response);
-        }
-        else {
-            populateAgentsList(response.paymentagent_list.list);
-        }
-    };
-
-    // --------------------------
-    // ----- Countries List -----
-    // --------------------------
-    var populateCountriesList = function(response) {
-        var $ddlCountries = $(ddlCountriesID);
-        $ddlCountries.empty();
-
-        var cList = response.paymentagent_list.available_countries;
-        if(cList.length === 0) {
-            $ddlCountries.parent().addClass(hiddenClass);
-            showEmptyListMsg();
-            return;
-        }
-
-        var requestedCountry = response.echo_req.paymentagent_list;
-        var found = false;
-        cList.map(function(country) {
-            if(country === requestedCountry) {
-                found = true;
-            }
-            insertListOption($ddlCountries, country[1], country[0]);
-        });
-
-        if(found) {
-            $ddlCountries.val(requestedCountry);
-            populateAgentsList(response.paymentagent_list.list);
-        }
-        else {
-            sendRequest();
-        }
-
-        $ddlCountries.change(function() {
-            sendRequest();
-        });
-    };
-
-    var insertListOption = function($ddlObject, itemText, itemValue) {
-        $ddlObject.append($('<option/>', {value: itemValue, text: itemText}));
-    };
-
-    // -----------------------
-    // ----- Agents List -----
-    // -----------------------
-    var populateAgentsList = function(list) {
-        if(!list || list.length === 0) {
-            showEmptyListMsg();
-            return;
-        }
-
-        showLoadingImage($paListContainer);
-
-        var $accordion = $('<div/>', {id: 'accordion'});
-
-        list.map(function(agent){
-            var supported_banks = '';
-            if(agent.supported_banks && agent.supported_banks.length > 0) {
-                var banks = agent.supported_banks.split(',');
-                banks.map(function(bank){
-                    supported_banks += bank.length === 0 ? 
-                        '' :
-                        '<img src="' + page.url.url_for_static('images/pages/payment_agent/banks/' + bank.toLowerCase() + '.png') + '" alt="' + bank + '" title="' + bank + '" />';
-                });
-            }
-        
-            $accordion.append(
-                agentTemplate
-                    .replace(/%name/g                   , agent.name)
-                    .replace(/%summary/g                , agent.summary)
-                    .replace(/%deposit_commission/g     , agent.deposit_commission)
-                    .replace(/%withdrawal_commission/g  , agent.withdrawal_commission)
-                    .replace(/%url/g                    , agent.url)
-                    .replace(/%email/g                  , agent.email)
-                    .replace(/%telephone/g              , agent.telephone)
-                    .replace(/%further_information/g    , agent.further_information)
-                    .replace(/%supported_banks/g        , supported_banks)
-            );
-        });
-
-        $paListContainer.empty().append($accordion);
-
-        $('#accordion').accordion({
-            heightStyle : 'content',
-            collapsible : true,
-            active      : false
-        });
-    };
-
-    var showEmptyListMsg = function() {
-        $('#no_paymentagent').removeClass(hiddenClass);
-    };
-
-    return {
-        init: init,
-        responseHandler: responseHandler
-    };
-}());
-
-
-
-pjax_config_page("payment_agent_listws", function() {
-    return {
-        onLoad: function() {
-            BinarySocket.init({
-                onmessage: function(msg) {
-                    var response = JSON.parse(msg.data);
-                    if (response) {
-                        if (response.msg_type === "paymentagent_list") {
-                            PaymentAgentListWS.responseHandler(response);
-                        }
-                    }
-                    else {
-                        console.log('some error occured');
-                    }
-                }
-            });
-
-            Content.populate();
-            PaymentAgentListWS.init();
-        }
-    };
-});
 ;var PaymentAgentWithdrawWS = (function() {
     "use strict";
 
@@ -66674,7 +64394,7 @@ pjax_config_page("payment_agent_listws", function() {
         clearError();
         isValid = true;
 
-        var agent  = $(fieldIDs.ddlAgents).val(),
+        var agent  = $(fieldIDs.ddlAgents).val().trim(),
             amount = $(fieldIDs.txtAmount).val().trim(),
             desc   = $(fieldIDs.txtDesc).val().trim();
         
@@ -66720,7 +64440,7 @@ pjax_config_page("payment_agent_listws", function() {
     };
 
     var isRequiredError = function(fieldID) {
-        if(!$(fieldID).val() || !(/.+/).test($(fieldID).val().trim())){
+        if(!(/.+/).test($(fieldID).val().trim())){
             showError(fieldID, Content.errorMessage('req'));
             return true;
         } else {
@@ -66875,6 +64595,8 @@ pjax_config_page("paymentagent/withdrawws", function() {
 
     var clearErrors = function(){
         $("#SecuritySuccessMsg").text('');
+        $("#errorcashierlockpassword1").text('');
+        $("#errorcashierlockpassword2").text('');
         $("#client_message_content").text('');
         $("#client_message_content").hide();
 
@@ -66903,25 +64625,50 @@ pjax_config_page("paymentagent/withdrawws", function() {
         });
         BinarySocket.send({"authorize": $.cookie('login'), "passthrough": {"value": "is_locked"}});
     };
-
+    
     var validateForm = function(){
         var isValid = true;
         var regexp = new RegExp('^[ -~]+$');
 
         clearErrors();
 
-        var pwd1 = document.getElementById("cashierlockpassword1").value,
-            pwd2 = document.getElementById("cashierlockpassword2").value,
-            errorPassword = document.getElementById('errorcashierlockpassword1'),
-            errorRPassword = document.getElementById('errorcashierlockpassword2'),
-            isVisible = $("#repasswordrow").is(':visible');
+        var pwd1 = $("#cashierlockpassword1").val();
+        var pwd2 = $("#cashierlockpassword2").val();
+        var isVisible = $("#repasswordrow").is(':visible');
 
-        if(isVisible === true){
-          if (!Validate.errorMessagePassword(pwd1, pwd2, errorPassword, errorRPassword)){
+        if(pwd1.length <= 0 ){
+            $("#errorcashierlockpassword1").text(text.localize("Please enter a password."));
             isValid = false;
-          }
         }
-
+        else if(pwd1.length > 25){
+            $("#errorcashierlockpassword1").text(text.localize("password can't be longer than 25."));
+            isValid = false;
+        }else if(pwd1.length < 6 ){
+            $("#errorcashierlockpassword1").text(text.localize("Your password should be at least 6 characters."));
+            isValid = false;
+        }else if(!regexp.test(pwd1)){
+            $("#errorcashierlockpassword1").text(text.localize("Your password contains invalid characters."));
+            isValid = false;
+        }
+        
+        if(isVisible === true){
+            
+            if(pwd2.length <= 0 ){
+                $("#errorcashierlockpassword2").text(text.localize("Please enter a password."));
+                isValid = false;
+            }
+            else if(pwd2.length > 25){
+                $("#errorcashierlockpassword2").text(text.localize("password can't be longer than 25."));
+                isValid = false;
+            }else if(pwd2.length < 6 ){
+                $("#errorcashierlockpassword2").text(text.localize("Your password should be at least 6 characters."));
+                isValid = false;
+            }else if(pwd1 !== pwd2 ){
+                $("#errorcashierlockpassword2").text(text.localize("The two passwords that you entered do not match."));
+                isValid = false;
+            }
+        }
+                
         return isValid;
     };
     var isAuthorized =  function(response){
@@ -66931,30 +64678,30 @@ pjax_config_page("paymentagent/withdrawws", function() {
 
             switch(option){
                 case   "lock_password" :
-                        BinarySocket.send({
+                        BinarySocket.send({ 
                             "cashier_password": "1",
                             "lock_password": pwd
                         });
                         break;
                 case   "unlock_password" :
-                        BinarySocket.send({
+                        BinarySocket.send({ 
                             "cashier_password": "1",
                             "unlock_password": pwd
                         });
-                        break;
+                        break; 
                 case   "is_locked" :
-                        BinarySocket.send({
+                        BinarySocket.send({ 
                             "cashier_password": "1",
                             "passthrough" : {"value" : "lock_status"}
                         });
-                        break ;
+                        break ;                          
             }
         }
     };
     var responseMessage = function(response){
 
        var resvalue;
-
+       
        if(response.echo_req.passthrough && (response.echo_req.passthrough.value === "lock_status") ){
             var passthrough = response.echo_req.passthrough.value;
             resvalue = response.cashier_password;
@@ -66972,14 +64719,6 @@ pjax_config_page("paymentagent/withdrawws", function() {
                 $("#lockInfo").text(text.localize("An additional password can be used to restrict access to the cashier."));
                 $form.find("button").attr("value","Update");
                 $form.find("button").html(text.localize("Update"));
-                $('#password-meter-div').attr('style', 'display:block');
-                if (isIE() === false) {
-                  $('#cashierlockpassword1').on('input', function() {
-                    $('#password-meter').attr('value', testPassword($('#cashierlockpassword1').val())[0]);
-                  });
-                } else {
-                  $('#password-meter').remove();
-                }
             }
 
         }
@@ -67002,7 +64741,7 @@ pjax_config_page("paymentagent/withdrawws", function() {
                 else{
                     $("#client_message_content").show();
                     $("#client_message_content").text(text.localize('Sorry, an error occurred while processing your account.'));
-
+                    
                     return false;
                 }
             }
@@ -67029,115 +64768,28 @@ pjax_config_page("paymentagent/withdrawws", function() {
 pjax_config_page("user/settings/securityws", function() {
     return {
         onLoad: function() {
-          if (!getCookieItem('login')) {
-              window.location.href = page.url.url_for('login');
-              return;
-          }
-          if((/VRT/.test($.cookie('loginid')))){
-              window.location.href = ("/");
-          }
-
-          Content.populate();
-
-          BinarySocket.init({
-                onmessage: function(msg){
-                    var response = JSON.parse(msg.data);
-                    if (response) {
-                        securityws.SecurityApiResponse(response);
-
-                    }
-                }
-            });
-
-            securityws.init();
-        }
-    };
-});
-;var topup_virtualws = (function(){
-
-	"use strict";
-    var account;
-
-    var init = function(){
-    	$("#VRT_topup_message").hide();
-    	$("#VRT_title").hide();
-    	$("#VRT_topup_errorMessage").hide();
-
-        account = TUser.get().loginid;
-        BinarySocket.send({"topup_virtual": 1 });
-
-    };
-
-    var responseMessage = function(response){
-    	var str, amt , currType;
-	 	if("error" in response) {
-            if("message" in response.error) {
-                $("#VRT_topup_errorMessage").show();
-                $("#VRT_topup_errorMessage").text(text.localize(response.error.message));
-                $("#VRT_topup_message").hide();
-                $("#VRT_title").hide();
-
-            }
-            alert("it reaches end");
-            return false;
-        }
-        else{
-        	currType = response.topup_virtual.currency;
-        	amt = response.topup_virtual.amount;
-        	str = currType + " " + amt + " has been credited to your Virtual money account " + account ;
-        	$("#VRT_topup_message p:first-child").html(text.localize(str));
-            $("#VRT_topup_message").show();
-            $("#VRT_title").show();
-            $("#VRT_topup_errorMessage").hide();
-
-            alert("Its done now");
-
-            return false;
-        }
-
-    };
-
-    var apiResponse = function(response){
-    	var type = response.msg_type;
-    	if (type === "topup_virtual" || (type === "error" && "topup_virtual" in response.echo_req)){
-           responseMessage(response);
-        }
-    };
-
-    return {
-    	init : init,
-    	apiResponse : apiResponse
-    };
-})();
-
-
-pjax_config_page("cashier/top_up_virtualws", function() {
-    return {
-        onLoad: function() {
-        	if (!$.cookie('login')) {
-                alert("You are not log in buddy");
-                return false;
-               // window.location.href = page.url.url_for('login');
+        	if (!getCookieItem('login')) {
+                window.location.href = page.url.url_for('login');
                 return;
             }
+            if((/VRT/.test($.cookie('loginid')))){
+                window.location.href = ("/");
+            }
+
         	BinarySocket.init({
                 onmessage: function(msg){
                     var response = JSON.parse(msg.data);
                     if (response) {
-                        topup_virtualws.apiResponse(response);
+                        securityws.SecurityApiResponse(response);
                           
                     }
                 }
             });	
-            topup_virtualws.init();
-        },
-        onUnload: function(){
-            alert("its unloading");
-            return false;
+
+            securityws.init();
         }
     };
-});
-;var Button = (function(){
+});;var Button = (function(){
     "use strict";
     function createBinaryStyledButton(){
         var span = $("<span></span>", {class: "button"});
@@ -67344,155 +64996,99 @@ var Table = (function(){
     };
 }());
 ;var Validate = (function(){
-  var errorCounter = 0;
 
-  //give DOM element of error to display
-  function displayErrorMessage(error){
-    error.setAttribute('style', 'display:block');
-  }
-
-  //give DOM element or error to hide
-  function hideErrorMessage(error){
-    error.setAttribute('style', 'display:none');
-    var errorMessage = $('.error-message-password');
-    if (errorMessage){
-      errorMessage.remove();
-    }
-  }
-
-  function handleError(error, text){
-    var par = document.createElement('p'),
-        re = new RegExp(text),
-        allText = '';
-    par.className = 'error-message-password';
-    var parClass = $('.' + par.className);
-    if (parClass.length > 1) {
-      for (i = 0; i < parClass.length; i++){
-        allText = allText + parClass[i].textContent;
-      }
-      if (!re.test(allText)){
-        par.innerHTML = par.innerHTML + ' ' + text;
-      }
-    } else {
-      par.innerHTML = text;
-    }
-    error.appendChild(par);
-    displayErrorMessage(error);
-  }
-
-  //check validity of email
-  function validateEmail(mail) {
-    if (/^\w+([\+\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)){
-      return true;
-    }
-    return false;
-  }
-
-  //give error message for invalid email, needs DOM element of error and value of email
-  function errorMessageEmail(email, error) {
-    if (email === "") {
-      error.textContent = Content.errorMessage('req');
-      displayErrorMessage(error);
-      return true;
-    } else if (!validateEmail(email)) {
-      error.textContent = Content.errorMessage('valid', text.localize('email address'));
-      displayErrorMessage(error);
-      return true;
-    }
-    hideErrorMessage(error);
-    return false;
-  }
-
-  function passwordNotEmpty(password, error){
-    if (!/^.+$/.test(password)) {
-      handleError(error, Content.errorMessage('req'));
-      return errorCounter++;
-    }
-    return true;
-  }
-
-  function passwordRNotEmpty(rPassword, rError){
-    if (!/^.+$/.test(rPassword)) {
-      rError.textContent = Content.errorMessage('req');
-      displayErrorMessage(rError);
-      return errorCounter++;
-    }
-    return true;
-  }
-
-  function passwordMatching(password, rPassword, rError){
-    if (password !== rPassword) {
-      rError.textContent = Content.localize().textPasswordsNotMatching;
-      displayErrorMessage(rError);
-      return errorCounter++;
-    }
-    return true;
-  }
-
-  function passwordLength(password, error){
-    if (password.length < 6 || password.length > 25) {
-      handleError(error, Content.errorMessage('range', '6-25'));
-      return errorCounter++;
-    }
-    return true;
-  }
-
-  function passwordValid(password, error){
-    if (!/^[ -~]+$/.test(password)) {
-      handleError(error, Content.errorMessage('valid', Content.localize().textPassword));
-      return errorCounter++;
-    }
-    return true;
-  }
-
-  function passwordStrong(password, error){
-    if (testPassword(password)[0] < 33) {
-      var tooltipPassword = document.getElementById('tooltip-password');
-      tooltipPassword.innerHTML = testPassword(password)[1];
-      tooltipPassword.setAttribute('title', text.localize('Try adding 3 or more numbers and 2 or more special characters. Password score is: ' + testPassword(password)[0] + '. Passing score is: 33.'));
-      displayErrorMessage(error);
-      return errorCounter++;
-    }
-    return true;
-  }
-
-  //give error message for invalid password, needs value of password, repeat of password, and DOM element of error
-  function errorMessagePassword(password, rPassword, error, rError) {
-    hideErrorMessage(error);
-    hideErrorMessage(rError);
-    errorCounter = 0;
-
-    if (passwordNotEmpty(password, error) === true){
-      passwordLength(password, error);
-      passwordValid(password, error);
-      passwordStrong(password, error);
-      if (passwordRNotEmpty(rPassword, rError) === true){
-        passwordMatching(password, rPassword, rError);
-      }
-    } else {
-      passwordRNotEmpty(rPassword, rError);
+	//give DOM element of error to display
+	function displayErrorMessage(error){
+        error.setAttribute('style', 'display:block');
     }
 
-    if (errorCounter === 0){
-      return true;
+    //give DOM element or error to hide
+    function hideErrorMessage(error){
+    	error.setAttribute('style', 'display:none');
     }
-    return false;
-  }
 
-  return {
-    displayErrorMessage: displayErrorMessage,
-    hideErrorMessage: hideErrorMessage,
-    errorMessageEmail: errorMessageEmail,
-    errorMessagePassword: errorMessagePassword
-  };
+    //check validity of email
+    function validateEmail(mail) {
+
+        if (/^\w+([\+\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)){  
+        
+            return true;
+        }  
+        
+        return false;
+    }
+
+    //give error message for invalid email, needs DOM element of error and value of email
+    function errorMessageEmail(email, error) {
+        if (email === "") {
+            error.textContent = Content.errorMessage('req');
+            displayErrorMessage(error);
+            return true;
+
+        } else if (!validateEmail(email)) {
+            error.textContent = Content.errorMessage('valid', Content.localize().textEmailAddress);
+            displayErrorMessage(error);
+            return true;
+
+        }
+        hideErrorMessage(error);
+        return false;
+    }
+
+    //give error message for invalid password, needs value of password, repeat of password, and DOM element of error
+    function errorMessagePassword(password, rPassword, error, rError) {
+        if (!/^.+$/.test(password)) {
+            hideErrorMessage(rError);
+            error.textContent = Content.errorMessage('req');
+            displayErrorMessage(error);
+
+        	if (!/^.+$/.test(rPassword)) {
+	            rError.textContent = Content.errorMessage('req');
+	            displayErrorMessage(rError);
+
+	            return false;
+
+	        }
+            return false;
+
+        } else if (password !== rPassword) {
+            hideErrorMessage(error);
+            rError.textContent = Content.localize().textPasswordsNotMatching;
+            displayErrorMessage(rError);
+
+            return false;
+
+        } else if (!/^[ -~]+$/.test(password)) {
+            hideErrorMessage(rError);
+            error.textContent = Content.errorMessage('valid', Content.localize().textPassword);
+            displayErrorMessage(error);
+
+            return false;
+
+        } else if (password.length < 6 || password.length > 25) {
+            hideErrorMessage(rError);
+            error.textContent = Content.errorMessage('range', '6-25 ' + Content.localize().textPassword);
+            displayErrorMessage(error);
+
+            return false;
+
+        }
+		hideErrorMessage(error);
+        hideErrorMessage(rError);
+        return true;
+
+    }
+
+	return {
+		displayErrorMessage: displayErrorMessage,
+        hideErrorMessage: hideErrorMessage,
+        errorMessageEmail: errorMessageEmail,
+        errorMessagePassword: errorMessagePassword
+    };
 }());
-;pjax_config_page("limitsws", function(){
+;pjax_config_page("limitws", function(){
     return {
         onLoad: function() {
-            if (!$.cookie('login')) {
-                window.location.href = page.url.url_for('login');
-                return;
-            }
             Content.populate();
             document.getElementById('client_message').setAttribute('style', 'display:none');
 
@@ -67510,7 +65106,7 @@ var Table = (function(){
                             LimitsWS.limitsHandler(response);
                         } else if (error) {
                             LimitsWS.limitsError();
-                        }
+                        } 
                     }
                 }
             });
@@ -67530,6 +65126,8 @@ var Table = (function(){
         Content.limitsTranslation();
         LimitsUI.fillLimitsTable(limits);
 
+        var equivalent = " (" + Content.localize().textCurrencyEquivalent + ").";
+
         var withdrawal_limit = document.getElementById("withdrawal-limit");
         var already_withdraw = document.getElementById("already-withdraw");
         var withdrawal_limit_aggregate = document.getElementById("withdrawal-limit-aggregate");
@@ -67537,19 +65135,19 @@ var Table = (function(){
         if(limits['lifetime_limit'] === 99999999) {
             withdrawal_limit.textContent = Content.localize().textAuthenticatedWithdrawal;
         } else if(limits['num_of_days_limit'] === limits['lifetime_limit']) {
-            withdrawal_limit.textContent = Content.localize().textWithdrawalLimits.replace('%1', addComma(limits['num_of_days_limit']));
-            already_withdraw.textContent = Content.localize().textWithrawalAmount.replace('%1', addComma(limits["withdrawal_since_inception_monetary"])) + '.';
+            withdrawal_limit.textContent = Content.localize().textWithdrawalLimits + " " + addComma(limits['num_of_days_limit']) + equivalent;
+            already_withdraw.textContent = Content.localize().textWithrawalAmount + " " + addComma(limits["withdrawal_since_inception_monetary"]) + ".";
         } else {
-            withdrawal_limit.textContent = Content.localize().textDayWithdrawalLimit.replace('%1', limits['num_of_days']).replace('%2', addComma(limits['num_of_days_limit']));
-            already_withdraw.textContent = Content.localize().textWithrawalAmount.replace('%1', limits['withdrawal_for_x_days_monetary']) + " " + Content.localize().textAggregateOverLast + " " + limits['num_of_days'] + " " + Content.localize().textDurationDays;
+            withdrawal_limit.textContent = Content.localize().textYour + " " + limits['num_of_days'] + " " + Content.localize().textDayWithdrawalLimit + " " + addComma(limits['num_of_days_limit']) + equivalent;
+            already_withdraw.textContent = Content.localize().textWithrawalAmount + " " + limits['withdrawal_for_x_days_monetary'] + " " + Content.localize().textAggregateOverLast + " " + limits['num_of_days'] + " " + Content.localize().textDurationDays;
             if(limits["lifetime_limit"] < 99999999) {
-                withdrawal_limit_aggregate.textContent = Content.localize().textWithdrawalForEntireDuration.replace('%1', addComma(limits["lifetime_limit"]));
-                document.getElementById("already-withdraw-aggregate").textContent = Content.localize().textWithrawalAmount.replace('%1', addComma(limits["withdrawal_since_inception_monetary"])) + " " + Content.localize().textInAggregateOverLifetime;
+                withdrawal_limit_aggregate.textContent = Content.localize().textWithdrawalForEntireDuration + " " + addComma(limits["lifetime_limit"]) + equivalent;
+                document.getElementById("already-withdraw-aggregate").textContent = Content.localize().textWithrawalAmount + " " + addComma(limits["withdrawal_since_inception_monetary"]) + " " + Content.localize().textInAggregateOverLifetime;
             }
             if(limits['remainder'] === 0) {
                 withdrawal_limit_aggregate.textContent = Content.localize().textNotAllowedToWithdraw;
             } else if (limits['remainder'] !== 0) {
-                withdrawal_limit_aggregate.textContent = Content.localize().textCurrentMaxWithdrawal.replace('%1', addComma(limits['remainder']));
+                withdrawal_limit_aggregate.textContent = Content.localize().textCurrentMaxWithdrawal + " " + addComma(limits['remainder']) + equivalent;
             }
 
         }
@@ -67714,7 +65312,7 @@ var ProfitTableWS = (function () {
             if((transactionsReceived === 0) && (currentBatch.length === 0)) {
                 $('#profit-table tbody')
                     .append($('<tr/>', {class: "flex-tr"})
-                        .append($('<td/>', {colspan: 7})
+                        .append($('<td/>', {colspan: 7}) 
                             .append($('<p/>', {class: "notice-msg center", text: text.localize("Your account has no trading activity.")})
                             )
                         )
@@ -67794,9 +65392,6 @@ var ProfitTableUI = (function(){
             Content.localize().textSalePrice,
             Content.localize().textProfitLoss
         ];
-
-        header[6] = header[6] + (TUser.get().currency ? "(" + TUser.get().currency + ")" : "");
-
         var footer = [Content.localize().textTotalProfitLoss, "", "", "", "", "", ""];
 
         var data = [];
@@ -67897,307 +65492,7 @@ var ProfitTableUI = (function(){
         initDatepicker: initDatepicker,
         cleanTableContent: clearTableContent
     };
-}());
-;pjax_config_page("new_account/realws", function(){
-
-  return {
-    onLoad: function() {
-      if (!$.cookie('login')) {
-          window.location.href = page.url.url_for('login');
-          return;
-      }
-      Content.populate();
-      var residenceValue = $.cookie('residence');
-      var title     = document.getElementById('title'),
-          dobdd     = document.getElementById('dobdd'),
-          dobmm     = document.getElementById('dobmm'),
-          dobyy     = document.getElementById('dobyy'),
-          residence = document.getElementById('residence-disabled'),
-          state     = document.getElementById('address-state'),
-          tel       = document.getElementById('tel'),
-          question  = document.getElementById('secret-question');
-      RealAccOpeningUI.setValues(dobdd, dobmm, dobyy, state, question, tel, residenceValue);
-      setTitles(title);
-
-      $(window).load(function() {
-        residence.value = residenceValue;
-
-        $('#real-form').submit(function(evt) {
-          evt.preventDefault();
-          if (residenceValue) {
-            if (RealAccOpeningUI.checkValidity()){
-              BinarySocket.init({
-                onmessage: function(msg){
-                  var response = JSON.parse(msg.data);
-                  if (response) {
-                    var type = response.msg_type;
-                    var error = response.error;
-
-                    if (type === 'new_account_real' && !error){
-                      var loginid = response.new_account_real.client_id;
-                      var oldCookieValue = $.cookie('loginid_list');
-                      $.cookie('loginid_list', loginid + ':R:E+' + oldCookieValue, {domain: document.domain.substring(3), path:'/'});
-                      $.cookie('loginid', loginid, {domain: document.domain.substring(3), path:'/'});
-                      page.header.show_or_hide_login_form();
-                      window.location.href = page.url.url_for('user/my_account') + '&newaccounttype=real&login=true&newrealaccount';
-                    } else if (error) {
-                      if (/multiple real money accounts/.test(error.message)){
-                        var duplicate = 'duplicate';
-                        RealAccOpeningUI.showError(duplicate);
-                      } else {
-                        RealAccOpeningUI.showError();
-                      }
-                    }
-                  }
-                }
-              });
-            }
-          } else {
-            RealAccOpeningUI.showError();
-          }
-        });
-      });
-    }
-  };
-});
-;var RealAccOpeningData = (function(){
-    function getRealAcc(arr){
-        var req = {
-            new_account_real: 1,
-            salutation: arr[0],
-            first_name: arr[1],
-            last_name: arr[2],
-            date_of_birth: arr[3],
-            residence: arr[4],
-            address_line_1: arr[5],
-            address_line_2: arr[6],
-            address_city: arr[7],
-            address_state: arr[8],
-            address_postcode: arr[9],
-            phone: arr[10],
-            secret_question: arr[11],
-            secret_answer: arr[12]
-        };
-
-        BinarySocket.send(req);
-    }
-
-    return {
-        getRealAcc: getRealAcc
-    };
-}());
-;var RealAccOpeningUI = (function(){
-  "use strict";
-
-  function setValues(dobdd, dobmm, dobyy, state, question, tel, residenceValue){
-    handle_residence_state_ws();
-    generateBirthDate(dobdd, dobmm, dobyy);
-    setResidenceWs(tel, residenceValue);
-    generateState(state);
-
-    var secretQuestions = [
-        "Mother's maiden name",
-        "Name of your pet",
-        "Name of first love",
-        "Memorable town/city",
-        "Memorable date",
-        "Favourite dish",
-        "Brand of first car",
-        "Favourite artist"
-    ];
-
-    for (i = 0; i < secretQuestions.length; i++) {
-        appendTextValueChild(question, secretQuestions[i], secretQuestions[i]);
-    }
-
-  }
-
-  function showError(opt){
-    $('#real-form').remove();
-    var error = document.getElementsByClassName('notice-msg')[0];
-    if (opt === 'duplicate') {
-      error.innerHTML = text.localize("Sorry, you seem to already have a real money account with us. Perhaps you have used a different email address when you registered it. For legal reasons we are not allowed to open multiple real money accounts per person. If you do not remember your account with us, please") + " " + "<a href='" + page.url.url_for('contact') + "'>" + text.localize("contact us") + "</a>";
-    } else {
-      error.innerHTML = Content.localize().textUnavailableReal;
-    }
-    error.parentNode.parentNode.parentNode.setAttribute('style', 'display:block');
-  }
-
-  function hideAllErrors(allErrors) {
-    for (i = 0; i < allErrors.length; i++) {
-      Validate.hideErrorMessage(allErrors[i]);
-    }
-  }
-
-  function checkValidity(){
-    var errorCounter = 0;
-
-    var letters = Content.localize().textLetters,
-        numbers = Content.localize().textNumbers,
-        space   = Content.localize().textSpace,
-        hyphen  = Content.localize().textHyphen,
-        period  = Content.localize().textPeriod,
-        apost   = Content.localize().textApost;
-
-    var title     = document.getElementById('title'),
-        fname     = document.getElementById('fname'),
-        lname     = document.getElementById('lname'),
-        dobdd     = document.getElementById('dobdd'),
-        dobmm     = document.getElementById('dobmm'),
-        dobyy     = document.getElementById('dobyy'),
-        residence = document.getElementById('residence-disabled'),
-        address1  = document.getElementById('address1'),
-        address2  = document.getElementById('address2'),
-        town      = document.getElementById('address-town'),
-        state     = document.getElementById('address-state'),
-        postcode  = document.getElementById('address-postcode'),
-        tel       = document.getElementById('tel'),
-        question  = document.getElementById('secret-question'),
-        answer    = document.getElementById('secret-answer'),
-        tnc       = document.getElementById('tnc');
-
-    var arr = [
-                title.value,
-                fname.value,
-                lname.value,
-                dobyy.value + '-' + dobmm.value + '-' + dobdd.value,
-                $.cookie('residence'),
-                address1.value,
-                address2.value,
-                town.value,
-                state.value,
-                postcode.value,
-                tel.value,
-                question.value,
-                answer.value
-            ];
-
-    var errorTitle     = document.getElementById('error-title'),
-        errorFname     = document.getElementById('error-fname'),
-        errorLname     = document.getElementById('error-lname'),
-        errorBirthdate = document.getElementById('error-birthdate'),
-        errorResidence = document.getElementById('error-residence'),
-        errorAddress1  = document.getElementById('error-address1'),
-        errorAddress2  = document.getElementById('error-address2'),
-        errorTown      = document.getElementById('error-town'),
-        errorState     = document.getElementById('error-state'),
-        errorPostcode  = document.getElementById('error-postcode'),
-        errorTel       = document.getElementById('error-tel'),
-        errorQuestion  = document.getElementById('error-question'),
-        errorAnswer    = document.getElementById('error-answer'),
-        errorTnc       = document.getElementById('error-tnc');
-
-    var allErrors = [
-                        errorTitle,
-                        errorFname,
-                        errorLname,
-                        errorBirthdate,
-                        errorResidence,
-                        errorAddress1,
-                        errorAddress2,
-                        errorTown,
-                        errorState,
-                        errorPostcode,
-                        errorTel,
-                        errorQuestion,
-                        errorAnswer,
-                        errorTnc
-                    ];
-
-    hideAllErrors(allErrors);
-
-    if (!/^[a-zA-Z]+([\s\-|\.|\'|a-zA-Z]*)*$/.test(fname.value)){
-      errorFname.innerHTML = Content.errorMessage('reg', [letters, space, hyphen, period, apost, ' ']);
-      Validate.displayErrorMessage(errorFname);
-      errorCounter++;
-    }
-
-    if (!/^[a-zA-Z]+([\s\-|\.|\'|a-zA-Z]*)*$/.test(lname.value)){
-      errorLname.innerHTML = Content.errorMessage('reg', [letters, space, hyphen, period, apost, ' ']);
-      Validate.displayErrorMessage(errorLname);
-      errorCounter++;
-    }
-
-    if (!isValidDate(dobdd.value, dobmm.value, dobyy.value)) {
-      errorBirthdate.innerHTML = Content.localize().textErrorBirthdate;
-      Validate.displayErrorMessage(errorBirthdate);
-      errorCounter++;
-    }
-
-    if (!/^[a-zA-Z|\d]+(\s|-|.|'[a-zA-Z]*)*$/.test(address1.value)){
-      errorAddress1.innerHTML = Content.errorMessage('reg', [letters, numbers, space, hyphen, period, apost, ' ']);
-      Validate.displayErrorMessage(errorAddress1);
-      errorCounter++;
-    }
-
-    if (!/^[a-zA-Z]+(\s|-|.[a-zA-Z]*)*$/.test(town.value)){
-      errorTown.innerHTML = Content.errorMessage('reg', [letters, space, hyphen, period, ' ']);
-      Validate.displayErrorMessage(errorTown);
-      errorCounter++;
-    }
-
-    if(state.offsetParent !== null && state.value === '') {
-      errorState.innerHTML = Content.errorMessage('req');
-      Validate.displayErrorMessage(errorState);
-      errorCounter++;
-    }
-
-    if (!/^\d+(-|\d]*)*$/.test(postcode.value)){
-      errorPostcode.innerHTML = Content.errorMessage('reg', [numbers, hyphen, ' ']);
-      Validate.displayErrorMessage(errorPostcode);
-      errorCounter++;
-    }
-
-    if (tel.value.length < 6) {
-      errorTel.innerHTML = Content.errorMessage('min', 6);
-      Validate.displayErrorMessage(errorTel);
-      errorCounter++;
-    } else if (!/^\+?\d{6,35}$/.test(tel.value)){
-      errorTel.innerHTML = Content.errorMessage('reg', [numbers, hyphen, ' ']);
-      Validate.displayErrorMessage(errorTel);
-      errorCounter++;
-    }
-
-    if (answer.value.length < 4) {
-      errorAnswer.innerHTML = Content.errorMessage('min', 4);
-      Validate.displayErrorMessage(errorAnswer);
-      errorCounter++;
-    } else if (!/^[a-zA-Z0-9]*(\s|-|.[a-zA-Z0-9]*){4,60}$/.test(answer.value)){
-      errorAnswer.innerHTML = Content.errorMessage('reg', [numbers, hyphen, ' ']);
-      Validate.displayErrorMessage(errorAnswer);
-      errorCounter++;
-    }
-
-    if (!tnc.checked){
-      errorTnc.innerHTML = Content.errorMessage('req');
-      Validate.displayErrorMessage(errorTnc);
-      errorCounter++;
-    }
-
-    for (i = 0; i < arr.length; i++){
-      if (/^$/.test(arr[i]) && i !== 6 && i !== 8){
-        allErrors[i].innerHTML = Content.errorMessage('req');
-        Validate.displayErrorMessage(allErrors[i]);
-        errorCounter++;
-      }
-    }
-
-    if (errorCounter === 0) {
-      RealAccOpeningData.getRealAcc(arr);
-      hideAllErrors(allErrors);
-      return 1;
-    }
-
-    return 0;
-  }
-
-  return {
-    setValues: setValues,
-    showError: showError,
-    checkValidity: checkValidity
-  };
-})();
-;pjax_config_page("user/statement", function(){
+}());;pjax_config_page("user/statement", function(){
     return {
         onLoad: function() {
             if (!getCookieItem('login')) {
@@ -68478,7 +65773,7 @@ var ProfitTableUI = (function(){
     "use strict";
 
     function getEmail(email){
-        var req = {verify_email: email, type: 'account_opening'};
+        var req = {verify_email: email};
 
         BinarySocket.send(req);
     }
@@ -68533,76 +65828,67 @@ var ViewBalanceUI = (function(){
     };
 }());
 ;pjax_config_page("virtualws", function(){
-  return {
-    onLoad: function() {
-      if (getCookieItem('login')) {
-          window.location.href = page.url.url_for('user/my_account');
-          return;
-      }
-      get_residence_list();
-      Content.populate();
-      var form = document.getElementById('virtual-form');
-      var errorEmail = document.getElementById('error-email'),
-          errorPassword = document.getElementById('error-password'),
-          errorRPassword = document.getElementById('error-r-password');
+	
+	return {
+		onLoad: function() {
+        	get_residence_list();
+        	Content.populate();
 
-      if (isIE() === false) {
-        $('#password').on('input', function() {
-          $('#password-meter').attr('value', testPassword($('#password').val())[0]);
-        });
-      } else {
-        $('#password-meter').remove();
-      }
+			var form = document.getElementById('virtual-form');
+			var errorEmail = document.getElementById('error-email');
 
-      if (form) {
-        $('#virtual-form').submit( function(evt) {
-          evt.preventDefault();
+		    VirtualAccOpeningUI.setLabel();
 
-          var email = document.getElementById('email').value,
-              residence = document.getElementById('residence').value,
-              password = document.getElementById('password').value,
-              rPassword = document.getElementById('r-password').value;
+			if (form) {
 
-          Validate.errorMessageEmail(email, errorEmail);
+				$('#virtual-form').submit( function(evt) {
+					evt.preventDefault();
+					Validate.hideErrorMessage(errorEmail);
 
-          if (Validate.errorMessagePassword(password, rPassword, errorPassword, errorRPassword) && !Validate.errorMessageEmail(email, errorEmail)){
-            BinarySocket.init({
-              onmessage: function(msg){
-                var response = JSON.parse(msg.data);
-                if (response) {
-                  var type = response.msg_type;
-                  var error = response.error;
+					var email = document.getElementById('email').value,
+				    	residence = document.getElementById('residence').value,
+				    	password = document.getElementById('password').value,
+						rPassword = document.getElementById('r-password').value;
 
-                  if (type === 'new_account_virtual' && !error){
-                    form.setAttribute('action', '/login');
-                    form.setAttribute('method', 'POST');
-                    $('#virtual-form').unbind('submit');
-                    form.submit();
-                  } else if (type === 'error' || error){
-                    if (/email address is already in use/.test(error.message)) {
-                      errorEmail.textContent = Content.localize().textDuplicatedEmail;
-                    } else if (/email address is unverified/.test(error.message)) {
-                      errorEmail.textContent = text.localize('Email address is unverified.');
-                    } else if (/not strong enough/.test(error.message)) {
-                      errorEmail.textContent = text.localize('Password is not strong enough.');
-                    } else if (error.details && error.details.verification_code) {
-                      if (/required/.test(error.details.verification_code)){
-                        errorEmail.textContent = Content.localize().textTokenMissing;
-                      }
-                    } else {
-                      errorEmail.textContent = Content.errorMessage('valid', Content.localize().textEmailAddress);
-                    }
-                    Validate.displayErrorMessage(errorEmail);
-                  }
-                }
-              }
-            });
-            VirtualAccOpeningData.getDetails(email, password, residence);
-          }
-        });
-      }
-    }
-  };
+					if (VirtualAccOpeningUI.checkPassword(password, rPassword)) {
+						
+						BinarySocket.init({
+					        onmessage: function(msg){
+					            var response = JSON.parse(msg.data);
+
+					            if (response) {
+					                var type = response.msg_type;
+					                var error = response.error;
+
+					                if (type === 'new_account_virtual' && !error){
+
+					                    form.setAttribute('action', '/login');
+										form.setAttribute('method', 'POST');
+
+										$('#virtual-form').unbind('submit');
+										form.submit();
+
+					                } else if (type === 'error' || error){
+					                	if (/email address is already in use/.test(error.message)) {
+				                			errorEmail.textContent = Content.localize().textDuplicatedEmail;
+				                		} else if (/required/.test(error.message)) {
+				                			errorEmail.textContent = Content.localize().textTokenMissing;
+				                		} else { 
+				                			errorEmail.textContent = Content.errorMessage('valid', Content.localize().textEmailAddress);
+				                		}
+				                		Validate.displayErrorMessage(errorEmail);
+					                }
+					            }
+					        }
+					    });
+
+					    VirtualAccOpeningData.getDetails(email, password, residence);
+					}
+					
+				});
+			}
+		}
+	};
 });
 ;var VirtualAccOpeningData = (function(){
     "use strict";
@@ -68621,6 +65907,47 @@ var ViewBalanceUI = (function(){
 
     return {
         getDetails: getDetails
+    };
+}());
+;var VirtualAccOpeningUI = (function(){
+    "use strict";
+
+    function setLabel(){
+
+        var labels = document.getElementsByTagName('LABEL');
+        for (var i = 0; i < labels.length; i++) {
+            if (labels[i].htmlFor !== '') {
+                var elem = document.getElementById(labels[i].htmlFor);
+                if (elem)
+                    elem.label = labels[i];         
+            }
+        }
+
+        var details = document.getElementById('details'),
+            email = document.getElementById('email'),
+            btn_submit = document.getElementById('btn_submit'),
+            residence = document.getElementById('residence'),
+            password = document.getElementById('password'),
+            rPassword = document.getElementById('r-password');
+
+        details.textContent = StringUtil.toTitleCase(Content.localize().textDetails);
+        email.label.innerHTML = StringUtil.toTitleCase(Content.localize().textEmailAddress);
+        password.label.innerHTML = StringUtil.toTitleCase(Content.localize().textPassword);
+        rPassword.label.innerHTML = StringUtil.toTitleCase(Content.localize().textRepeatPassword);
+        residence.label.innerHTML = StringUtil.toTitleCase(Content.localize().textResidence);
+        btn_submit.textContent = StringUtil.toTitleCase(Content.localize().textCreateNewAccount);
+    }
+
+    function checkPassword(password, rPassword){
+        var errorPassword = document.getElementById('error-password'),
+            errorRPassword = document.getElementById('error-r-password');
+
+        return Validate.errorMessagePassword(password, rPassword, errorPassword, errorRPassword);
+    }
+
+    return {
+        setLabel: setLabel,
+        checkPassword: checkPassword
     };
 }());
 ;//////////////////////////////////////////////////////////////////

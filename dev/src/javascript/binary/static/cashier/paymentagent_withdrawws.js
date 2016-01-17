@@ -87,7 +87,7 @@ var PaymentAgentWithdrawWS = (function() {
         clearError();
         isValid = true;
 
-        var agent  = $(fieldIDs.ddlAgents).val(),
+        var agent  = $(fieldIDs.ddlAgents).val().trim(),
             amount = $(fieldIDs.txtAmount).val().trim(),
             desc   = $(fieldIDs.txtDesc).val().trim();
         
@@ -133,7 +133,7 @@ var PaymentAgentWithdrawWS = (function() {
     };
 
     var isRequiredError = function(fieldID) {
-        if(!$(fieldID).val() || !(/.+/).test($(fieldID).val().trim())){
+        if(!(/.+/).test($(fieldID).val().trim())){
             showError(fieldID, Content.errorMessage('req'));
             return true;
         } else {

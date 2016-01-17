@@ -36,7 +36,11 @@
           %h1.ja-hide= l('Trading')
           %ul.ja-hide
             %li.ja-hide
-              %a.pjaxload{:href=>url_for("/resources/asset_indexws")}= l('Asset Index')
+              %a.pjaxload{:href=>url_for("/resources/pricing_table")}= l('Pricing Table')
+            %li
+              %a.ja-hide.pjaxload{:href=>url_for("/resources/rise_fall_table")}= l('Rise/Fall Table')
+            %li.ja-hide
+              %a.pjaxload{:href=>url_for("/resources/asset_index")}= l('Asset Index')
           .grd-row-padding.ja-no-padding
             %h1= l('Banking')
             %ul
@@ -65,10 +69,10 @@
         .grd-grid-4
           %h1= l('Market Data')
           %ul
+            %li
+              %a.pjaxload{:href=>url_for("/charting/livechart")}= l('Live Charts')
             %li.ja-hide
               %a.pjaxload{:href => '//highcharts.binary.com'}= l('HighCharts')
-            %li
-              %a.pjaxload{:href=> '//tradingview.binary.com'}= l('TradingView')
         .grd-grid-4
           %h1.ja-hide= l('Partner With Us')
             %ul.ja-hide.partner
@@ -78,7 +82,7 @@
   #footer-regulatory.ja-top-padding
     .grd-container.grd-default-container
       .grd-parent.grd-grid-12.regulatory-logo
-        .grd-grid-2
+        .grd-grid-2.center
           %a{:href => "http://www.gov.im/gambling/", :target => "_blank"}
             %img.responsive#iom_icon_footer{:src => url_for('images/pages/footer/isle-of-man.png')}
         .grd-grid-2.center
@@ -96,10 +100,7 @@
           = include('layouts/default/social')
     #appcache-reload-message
       .message
-        != l("A new version of the interface is available. This page will <a href='#' id='appcache-refresh-link'>refresh</a> in 30 seconds.")
-    #ratelimit-error-message
-      .message
-        != l("You have reached the rate limit of requests per second. To continue, please <a href='javascript:;' id='ratelimit-refresh-link'>refresh</a> the page.")
+        != l("A new version of the interface is available. Please <a href='#' id='appcache-refresh-link'>refresh</a> this page to try again.")
   #footer-last
     .grd-container.grd-default-container
       .grd-grid-12

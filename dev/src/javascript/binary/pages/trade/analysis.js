@@ -12,7 +12,7 @@
 
 var TradingAnalysis = (function(){
     var trading_digit_info;
-
+    
     var requestTradeAnalysis = function() {
         'use strict';
         $.ajax({
@@ -194,3 +194,4 @@ var TradingAnalysis = (function(){
     };
 
 })();
+

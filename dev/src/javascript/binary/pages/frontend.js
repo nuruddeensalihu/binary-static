@@ -287,8 +287,8 @@ var on_click_signup = function() {
 
 function check_login_hide_signup() {
     if (page.client.is_logged_in) {
-        $('#verify-email-form').remove();
-        $('.break').attr('style', 'margin-bottom:1em');
+        $('#open-account').remove();
+        $('#stretch').removeClass('grd-grid-7 grd-grid-mobile-12 grd-grid-phablet-12');
     }
 }
 
@@ -296,159 +296,6 @@ function hide_if_logged_in() {
     if (page.client.is_logged_in) {
         $('.client_logged_out').remove();
     }
-}
-
-// use function to generate elements and append them
-// e.g. element is select and element to append is option
-function appendTextValueChild(element, text, value){
-    var option = document.createElement("option");
-
-    option.text = text;
-    option.value = value;
-    element.appendChild(option);
-}
-
-// populate drop down list of Titles, pass in select element
-function setTitles(select){
-    appendTextValueChild(select, Content.localize().textMr, 'Mr');
-    appendTextValueChild(select, Content.localize().textMrs, 'Mrs');
-    appendTextValueChild(select, Content.localize().textMs, 'Ms');
-    appendTextValueChild(select, Content.localize().textMiss, 'Miss');
-    appendTextValueChild(select, Content.localize().textDr, 'Dr');
-    appendTextValueChild(select, Content.localize().textProf, 'Prof');
-}
-
-// append numbers to a drop down menu, eg 1-30
-function dropDownNumbers(select, startNum, endNum) {
-    select.appendChild(document.createElement("option"));
-
-    for (i = startNum; i <= endNum; i++){
-        var option = document.createElement("option");
-        option.text = i;
-        option.value = i;
-        select.appendChild(option);
-    }
-
-}
-
-function dropDownMonths(select, startNum, endNum) {
-    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-    select.appendChild(document.createElement("option"));
-    for (i = startNum; i <= endNum; i++){
-        var option = document.createElement("option");
-        if (i <= '9') {
-            option.value = '0' + i;
-        } else {
-            option.value = i;
-        }
-
-        for (j = i; j <= i; j++) {
-            option.text = months[j-1];
-        }
-
-        select.appendChild(option);
-    }
-}
-
-function generateBirthDate(days, months, year){
-    //days
-    dropDownNumbers(days, 1, 31);
-    //months
-    dropDownMonths(months, 1, 12);
-
-    var currentYear = new Date().getFullYear();
-    var startYear = currentYear - 100;
-    var endYear = currentYear - 17;
-
-    //years
-    dropDownNumbers(year, startYear, endYear);
-}
-
-function isValidDate(day, month, year){
-    // Assume not leap year by default (note zero index for Jan)
-    var daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
-
-    // If evenly divisible by 4 and not evenly divisible by 100,
-    // or is evenly divisible by 400, then a leap year
-    if ( ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0) ) {
-        daysInMonth[1] = 29;
-    }
-    return day <= daysInMonth[--month];
-}
-
-function handle_residence_state_ws(){
-  BinarySocket.init({
-    onmessage: function(msg){
-      var select;
-      var response = JSON.parse(msg.data);
-      if (response) {
-        var type = response.msg_type;
-        if (type === 'states_list'){
-          select = document.getElementById('address-state');
-          var states_list = response.states_list;
-          if (states_list.length > 0){
-            for (i = 0; i < states_list.length; i++) {
-                appendTextValueChild(select, states_list[i].text, states_list[i].value);
-            }
-            select.parentNode.parentNode.setAttribute('style', 'display:block');
-          }
-        }
-        if (type === 'residence_list'){
-          select = document.getElementById('residence-disabled');
-          var phoneElement = document.getElementById('tel'),
-              residenceValue = $.cookie('residence'),
-              residence_list = response.residence_list;
-          if (residence_list.length > 0){
-            for (i = 0; i < residence_list.length; i++) {
-              appendTextValueChild(select, residence_list[i].text, residence_list[i].value);
-              if (phoneElement && residence_list[i].phone_idd && residenceValue === residence_list[i].value){
-                phoneElement.value = '+' + residence_list[i].phone_idd;
-              }
-            }
-            select.parentNode.parentNode.setAttribute('style', 'display:block');
-          }
-        }
-      }
-    }
-  });
-}
-
-function setResidenceWs(){
-  BinarySocket.send({ residence_list: 1 });
-}
-
-//pass select element to generate list of states
-function generateState(select) {
-    appendTextValueChild(select, Content.localize().textSelect, '');
-    BinarySocket.send({ states_list: $.cookie('residence') });
-}
-
-function getUrlVars() {
-    var vars = {};
-    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-        vars[key] = value;
-    });
-    return vars;
-}
-
-function replaceQueryParam(param, newval, search) {
-    var regex = new RegExp("([?;&])" + param + "[^&;]*[;&]?");
-    var query = search.replace(regex, "$1").replace(/&$/, '');
-
-    return (query.length > 2 ? query + "&" : "?") + (newval ? param + "=" + newval : '');
-}
-
-if (page.language() === 'JA' && !$.cookie('MyJACookie')) {
-  var str = window.location.search;
-  str = replaceQueryParam('l', 'EN', str);
-  window.location = window.location.pathname + str;
-}
-
-
-// returns true if internet explorer browser
-function isIE() {
-  return /(msie|trident|edge)/i.test(window.navigator.userAgent) && !window.opera;
 }
 
 pjax_config_page('/$|/home', function() {
@@ -547,7 +394,6 @@ pjax_config_page('/careers', function() {
         },
     };
 });
-
 pjax_config_page('/bulk-trader-facility', function() {
     return {
         onLoad: function() {
@@ -557,16 +403,5 @@ pjax_config_page('/bulk-trader-facility', function() {
         onUnload: function() {
             $(window).off('scroll');
         }
-    };
-});
-
-pjax_config_page('/terms-and-condition', function() {
-    return {
-        onLoad: function() {
-            var year = document.getElementsByClassName('currentYear');
-            for (i = 0; i < year.length; i++){
-              year[i].innerHTML = new Date().getFullYear();
-            }
-        },
     };
 });

@@ -62,8 +62,8 @@ var BinarySocket = (function () {
         if (isClose()) {
             bufferedSends.push(data);
             init(1);
-        } else if (isReady()) {
-            if(!data.hasOwnProperty('passthrough') && !data.hasOwnProperty('verify_email')){
+        } else if (isReady() && (authorized || TradePage.is_trading_page() || data.hasOwnProperty('time') )) {
+            if(!data.hasOwnProperty('passthrough')){
                 data.passthrough = {};
             }
             // temporary check
@@ -102,13 +102,8 @@ var BinarySocket = (function () {
         }
 
         binarySocket.onopen = function (){
-            try{
-                var loginToken = getCookieItem('login');
-            }
-            catch(err){
-                init(1);
-            }
-            if(loginToken && !authorized) {
+            var loginToken = getCookieItem('login');
+            if(loginToken) {
                 binarySocket.send(JSON.stringify({authorize: loginToken}));
             }
             else {
@@ -144,18 +139,8 @@ var BinarySocket = (function () {
                     sendBufferedSends();
                 } else if (type === 'balance') {
                     ViewBalanceUI.updateBalances(response.balance);
-                } else if (type === 'time') {
+                } else if(type ==='time'){
                     page.header.time_counter(response);
-                } else if (type === 'logout') {
-                    page.header.do_logout(response);
-                } else if (type === 'error') {
-                    if(response.error.code === 'RateLimit') {
-                        $('#ratelimit-error-message')
-                            .css('display', 'block')
-                            .on('click', '#ratelimit-refresh-link', function () {
-                                window.location.reload();
-                            });
-                    }
                 }
 
                 if(typeof events.onmessage === 'function'){

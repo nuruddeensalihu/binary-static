@@ -15,11 +15,11 @@ function processActiveSymbols(data) {
 
     displayMarkets('contract_markets', Symbols.markets(), market);
     processMarket();
-    // setTimeout(function(){
-        // if(document.getElementById('underlying')){
-        //     Symbols.getSymbols(0);
-        // }
-    // }, 60*1000);
+    setTimeout(function(){
+        if(document.getElementById('underlying')){
+            Symbols.getSymbols(0);
+        }
+    }, 60*1000);
 }
 
 
@@ -63,7 +63,7 @@ function processMarketUnderlying() {
     // forget the old tick id i.e. close the old tick stream
     processForgetTicks();
     // get ticks for current underlying
-    Tick.request(underlying);
+    BinarySocket.send({ ticks : underlying });
 
     Tick.clean();
     
@@ -270,7 +270,7 @@ function processForgetTicks() {
 function processTick(tick) {
     'use strict';
     var symbol = sessionStorage.getItem('underlying');
-    if(tick.echo_req.ticks === symbol || (tick.tick && tick.tick.symbol === symbol)){
+    if(tick.echo_req.ticks === symbol){
         Tick.details(tick);
         Tick.display();
         var digit_info = TradingAnalysis.digit_info();
