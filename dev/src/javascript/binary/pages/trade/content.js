@@ -85,17 +85,15 @@ var Content = (function () {
             textMaxAggregateTooltip: text.localize('Presents the maximum aggregate payouts on outstanding contracts in your portfolio. If the maximum is attained, you may not purchase additional contracts without first closing out existing positions.'),
             textTradingLimits: text.localize('Trading Limits'),
             textWithdrawalTitle: text.localize('Withdrawal Limits'),
-            textWithdrawalLimits: text.localize('Your withdrawal limit is EUR'),
-            textCurrencyEquivalent: text.localize('or equivalent in other currency'),
-            textWithrawalAmount: text.localize('You have already withdrawn the equivalent of EUR'),
-            textYour: text.localize('Your'),
-            textDayWithdrawalLimit: text.localize('day withdrawal limit is currently EUR'),
+            textWithdrawalLimits: text.localize('Your withdrawal limit is EUR %1 (or equivalent in other currency).'),
+            textWithrawalAmount: text.localize('You have already withdrawn the equivalent of EUR %1'),
+            textDayWithdrawalLimit: text.localize('Your %1 day withdrawal limit is currently EUR %2 (or equivalent in other currency).'),
             textAuthenticatedWithdrawal: text.localize('Your account is fully authenticated and your withdrawal limits have been lifted.'),
             textAggregateOverLast: text.localize('in aggregate over the last'),
-            textWithdrawalForEntireDuration: text.localize('Your withdrawal limit for the entire duration of the account is currently: EUR'),
+            textWithdrawalForEntireDuration: text.localize('Your withdrawal limit for the entire duration of the account is currently: EUR %1 (or equivalent in other currency).'),
             textInAggregateOverLifetime: text.localize('in aggregate over the lifetime of your account.'),
             textNotAllowedToWithdraw: text.localize('Therefore you may not withdraw any additional funds.'),
-            textCurrentMaxWithdrawal: text.localize('Therefore your current immediate maximum withdrawal (subject to your account having sufficient funds) is EUR'),
+            textCurrentMaxWithdrawal: text.localize('Therefore your current immediate maximum withdrawal (subject to your account having sufficient funds) is EUR %1 (or equivalent in other currency).'),
             textBuyPrice: text.localize('Buy price'),
             textFinalPrice: text.localize('Final price'),
             textLoss: text.localize('Loss'),
@@ -112,13 +110,15 @@ var Content = (function () {
             textSpace: text.localize('space'),
             textPeriod: text.localize('period'),
             textComma: text.localize('comma'),
+            textHyphen: text.localize('hyphen'),
+            textApost: text.localize('apostrophe'),
             textPassword: text.localize('password'),
             textPasswordsNotMatching: text.localize('The two passwords that you entered do not match.'),
             textEmailAddress: text.localize('Email address'),
             textRepeatPassword: text.localize('re-enter password'),
-            textResidence: text.localize('country of residence'),
+            textResidence: text.localize('Country of residence'),
             textTokenMissing: text.localize('Verification token is missing. Click on the verification link sent to your Email and make sure you are not already logged in.'),
-            textDetails: text.localize('details'),
+            textDetails: text.localize('Details'),
             textCreateNewAccount: text.localize('create new account'),
             textDuplicatedEmail: text.localize('Your provided email address is already in use by another Login ID'),
             textAsset: text.localize('Asset'),
@@ -126,7 +126,17 @@ var Content = (function () {
             textCloses: text.localize('Closes'),
             textSettles: text.localize('Settles'),
             textUpcomingEvents: text.localize('Upcoming Events'),
-            textEmailSent: text.localize('Please check your Email for the next step.'),
+            textEmailSent: text.localize('Please check your email for the next step.'),
+            textMr: text.localize('Mr'),
+            textMrs: text.localize('Mrs'),
+            textMs: text.localize('Ms'),
+            textMiss: text.localize('Miss'),
+            textDr: text.localize('Dr'),
+            textProf: text.localize('Prof'),
+            textErrorBirthdate: text.localize('Please input a valid date'),
+            textSelect: text.localize('Please select'),
+            textUnavailableReal: text.localize('Sorry, account opening is unavailable.'),
+            textMessageMinRequired: text.localize('Minimum of %1 characters required.'),
             textFeatureUnavailable: text.localize('Sorry, this feature is not available.')
         };
 
@@ -267,7 +277,7 @@ var Content = (function () {
         var titleElement = document.getElementById("statement-title").firstElementChild;
         titleElement.textContent = localize.textStatement;
     };
-    
+
     var profitTableTranslation = function(){
         var titleElement = document.getElementById("profit-table-title").firstElementChild;
         titleElement.textContent = localize.textProfitTable;
@@ -276,13 +286,13 @@ var Content = (function () {
     var limitsTranslation = function(){
         var titleElement = document.getElementById("limits-title").firstElementChild;
         titleElement.textContent = localize.textLimits;
-        
+
         if(TUser.get().loginid){
             var loginId = TUser.get().loginid;
 
             var tradingLimits = document.getElementById("trading-limits");
             tradingLimits.textContent = loginId + " - " + localize.textTradingLimits;
-            
+
             var withdrawalTitle = document.getElementById("withdrawal-title");
             withdrawalTitle.textContent = loginId + " - " + localize.textWithdrawalTitle;
         }
@@ -306,6 +316,10 @@ var Content = (function () {
             case 'valid':
                 if(param)
                     msg = localize.textMessageValid.replace('%1', param);
+                break;
+            case 'min':
+                if(param)
+                    msg = localize.textMessageMinRequired.replace('%1', param);
                 break;
             default:
                 break;

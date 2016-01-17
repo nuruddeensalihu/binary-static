@@ -7,6 +7,7 @@ var Validate = (function(){
 
     //give DOM element or error to hide
     function hideErrorMessage(error){
+        error.innerHTML = '';
     	error.setAttribute('style', 'display:none');
     }
 

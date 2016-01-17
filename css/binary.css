@@ -1048,8 +1048,15 @@ ul.checked li {
   margin: 0 2em 0 0;
   display: inline-block;
 }
-.tab-menu-wrap ul li#topMenuBetaInterface, #content .tab-menu-wrap ul li#topMenuBetaInterface {
+.tab-menu-wrap ul li#topMenuStartBetting, #content .tab-menu-wrap ul li#topMenuStartBetting {
   float: right;
+  margin: 0 0 0 2em;
+}
+.tab-menu-wrap ul li#topMenuStartBetting ul, #content .tab-menu-wrap ul li#topMenuStartBetting ul {
+  text-align: right;
+}
+.tab-menu-wrap ul li#topMenuStartBetting ul li, #content .tab-menu-wrap ul li#topMenuStartBetting ul li {
+  margin: 0 0 0 2em;
 }
 .tab-menu-wrap ul li a, #content .tab-menu-wrap ul li a {
   font-weight: normal;
@@ -1070,7 +1077,6 @@ ul.checked li {
 }
 .tab-menu-wrap ul li ul.sub_items li.sub_item, #content .tab-menu-wrap ul li ul.sub_items li.sub_item {
   font-size: 100%;
-  margin-right: 20px;
 }
 .tab-menu-wrap ul li ul.tm-ul-2, #content .tab-menu-wrap ul li ul.tm-ul-2 {
   margin-top: 1px;
@@ -1084,13 +1090,10 @@ ul.checked li {
   display: block;
   position: absolute;
   left: 1px;
-  width: 99%;
+  width: 100%;
   z-index: 10;
   margin-top: 3px solid transparent;
   background: #fff;
-}
-.tab-menu-wrap ul li.hover ul li, .tab-menu-wrap ul li.active ul li, #content .tab-menu-wrap ul li.active ul li, #content .tab-menu-wrap ul li.hover ul li, #content .tab-menu-wrap ul li.active ul li {
-  margin-right: 2em;
 }
 .tab-menu-wrap ul li.hover ul li a, .tab-menu-wrap ul li.active ul li a, #content .tab-menu-wrap ul li.active ul li a, .tab-menu-wrap ul li.hover ul li span, .tab-menu-wrap ul li.active ul li span, #content .tab-menu-wrap ul li.active ul li span, #content .tab-menu-wrap ul li.hover ul li a, #content .tab-menu-wrap ul li.active ul li a, #content .tab-menu-wrap ul li.hover ul li span, #content .tab-menu-wrap ul li.active ul li span {
   top: auto;
@@ -2622,7 +2625,6 @@ abbr {
   font-size: 0.8em;
   display: inline-block;
   background: white;
-  /* Pricing Table */
 }
 #betpage #content-holder #content #bet_container #bet_cost_container .rbox-wrap {
   border-bottom: 1px solid #C2C2C2;
@@ -2633,27 +2635,6 @@ abbr {
 }
 #betpage #content-holder #content #bet_container #bet_cost_container .pricing-details {
   top: 1px;
-}
-#betpage #content-holder #content #bet_container #bet_cost_container .draggable form {
-  width: auto;
-}
-#betpage #content-holder #content #bet_container #bet_cost_container .draggable .odd {
-  background: #F2F2F2;
-}
-#betpage #content-holder #content #bet_container #bet_cost_container .draggable .rbox {
-  border: 1px solid #C2C2C2;
-  position: relative;
-  margin-bottom: 3em;
-}
-#betpage #content-holder #content #bet_container #bet_cost_container .draggable .rbox-table-full {
-  border: 1px solid #F2F2F2;
-  font-size: 93%;
-  text-align: left;
-}
-#betpage #content-holder #content #bet_container #bet_cost_container .draggable .rbox-table-full td {
-  text-align: left;
-  border: 1px solid #F2F2F2;
-  border-width: 0 1px;
 }
 #betpage #content-holder #content #bet_container #loading-price {
   text-align: center;
@@ -3632,10 +3613,6 @@ form#forward_start label {
   width: auto;
 }
 
-form#pricing_table_input select {
-  width: 90%;
-}
-
 #profit-table-form #fromdate {
   width: 105px;
 }
@@ -4204,14 +4181,6 @@ div#price_table_notes {
 
 .tab-menu-wrap ul#trading-times {
   margin-bottom: 1em;
-}
-
-form#rise_fall_form fieldset {
-  padding-top: 1em;
-  margin-bottom: 1em;
-}
-form#rise_fall_form label {
-  width: auto;
 }
 
 /* Terms and conditions */
@@ -4787,9 +4756,14 @@ table .loss, table .lower {
 #accordion .ui-widget-content {
   border: 1px solid #E5E5E5 !important;
 }
-#accordion #supported_banks {
+#accordion #supported_banks, #accordion .supported_banks {
   text-align: center;
   padding-top: 30px;
+}
+#accordion .supported_banks img {
+  width: 72px;
+  height: 57px;
+  margin: 3px;
 }
 
 .timeline {
@@ -5023,7 +4997,7 @@ a.dynamic, span.dynamic, div.dynamic, p.dynamic, button.dynamic, table.dynamic {
 }
 
 #portfolio td {
-  padding: 10px 30px;
+  padding: 10px 10px;
 }
 #portfolio td.indicative, #portfolio td.purchase {
   white-space: nowrap;
@@ -5037,13 +5011,27 @@ a.dynamic, span.dynamic, div.dynamic, p.dynamic, button.dynamic, table.dynamic {
   margin-top: -11px;
 }
 #portfolio th {
-  padding: 10px 30px;
+  padding: 10px 10px;
   text-align: left;
 }
 #portfolio th.details {
   width: 45%;
 }
+#portfolio table .ref {
+  text-align: left !important;
+}
+@media screen and (max-width: 480px) {
+  #portfolio .details {
+    display: none;
+  }
+}
 
+#trading-times table, #asset-index table {
+  margin-top: -2px;
+}
+#trading-times tr:nth-child(1) th, #asset-index tr:nth-child(1) th {
+  background-color: #C2C2C2;
+}
 #trading-times th.flex-tr-child, #asset-index th.flex-tr-child {
   line-height: 30px;
 }
@@ -5064,14 +5052,315 @@ a.dynamic, span.dynamic, div.dynamic, p.dynamic, button.dynamic, table.dynamic {
   font-weight: 700;
 }
 
-#asset-index th, #asset-index .asset {
+#asset-index th {
   width: 12%;
+}
+#asset-index .asset {
+  width: 18%;
 }
 #asset-index th.flex-tr-child:nth-child(2):nth-last-child(1) {
   width: 24%;
 }
 #asset-index th.flex-tr-child:nth-child(2):nth-last-child(2), #asset-index th.flex-tr-child:nth-child(3):nth-last-child(1) {
   width: 18%;
+}
+
+@font-face {
+  font-family: 'casino_handregular';
+  src: url("../download/fonts/guide/casino_hand-webfont.eot");
+  src: url("../download/fonts/guide/casino_hand-webfont.eot?#iefix") format("embedded-opentype"), url("../download/fonts/guide/casino_hand-webfont.woff") format("woff"), url("../download/fonts/guide/casino_hand-webfont.ttf") format("truetype"), url("../download/fonts/guide/casino_hand-webfont.svg#casino_handregular") format("svg");
+  font-weight: 400;
+  font-style: normal;
+}
+.enjoyhint {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1010;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.enjoyhint_hide {
+  display: none;
+}
+
+.enjoyhint_disable_events {
+  position: absolute;
+  width: 2000px;
+  height: 1500px;
+  z-index: 1011;
+  pointer-events: all;
+}
+
+.enjoyhint_next_btn {
+  position: absolute;
+  z-index: 1012;
+  pointer-events: all;
+  box-sizing: content-box;
+  /*width: 100px;
+  height: 40px;*/
+  cursor: pointer;
+  margin: 0 auto;
+  /*border: 2px solid #1ecd97;
+  -webkit-border-radius: 40px;
+  border-radius: 40px;
+  font: normal normal normal 17px/40px "Advent Pro", Helvetica, sans-serif;
+  color: #1ecd97;*/
+  text-align: center;
+  text-overflow: clip;
+  letter-spacing: 1px;
+  background: 0 0;
+  transition: background-color 0.3s cubic-bezier(0, 0, 0, 0), color 0.3s cubic-bezier(0, 0, 0, 0), width 0.3s cubic-bezier(0, 0, 0, 0), border-width 0.3s cubic-bezier(0, 0, 0, 0), border-color 0.3s cubic-bezier(0, 0, 0, 0);
+}
+
+.enjoyhint_next_btn:hover {
+  /*color: rgba(255, 255, 255, 1);
+  background: #1ecd97;*/
+}
+
+.enjoyhint_next_btn:active {
+  /*border: 2px solid rgba(33, 224, 163, 1);
+  background: rgba(33, 224, 163, 1);*/
+  transition: none;
+}
+
+.enjoyhint_skip_btn {
+  position: absolute;
+  z-index: 1012;
+  pointer-events: all;
+  box-sizing: content-box;
+  /*width: 100px;
+  height: 40px;*/
+  cursor: pointer;
+  margin: 0 auto;
+  /*border: 2px solid #1ecd97;
+  -webkit-border-radius: 40px;
+  border-radius: 40px;
+  font: normal normal normal 17px/40px "Advent Pro", Helvetica, sans-serif;
+  color: #1ecd97;*/
+  text-align: center;
+  text-overflow: clip;
+  letter-spacing: 1px;
+  background: 0 0;
+  transition: background-color 0.3s cubic-bezier(0, 0, 0, 0), color 0.3s cubic-bezier(0, 0, 0, 0), width 0.3s cubic-bezier(0, 0, 0, 0), border-width 0.3s cubic-bezier(0, 0, 0, 0), border-color 0.3s cubic-bezier(0, 0, 0, 0);
+}
+
+.enjoyhint_skip_btn:hover {
+  /*color: rgba(255, 255, 255, 1);
+  background: #1ecd97;*/
+}
+
+.enjoyhint_skip_btn:active {
+  /*border: 2px solid rgba(33, 224, 163, 1);
+  background: rgba(33, 224, 163, 1);*/
+  transition: none;
+}
+
+.enjoyhint_close_btn {
+  display: inline-block;
+  position: absolute;
+  z-index: 1012;
+  pointer-events: all;
+  box-sizing: content-box;
+  width: .24em;
+  height: .24em;
+  border: none;
+  border-radius: 1em;
+  font: 400 8em/normal Arial, Helvetica, sans-serif;
+  color: black;
+  text-overflow: clip;
+  background: 0 0;
+  border: 2px solid #fff;
+}
+
+.enjoyhint_close_btn::before {
+  display: inline-block;
+  box-sizing: content-box;
+  width: 29px;
+  height: 2px;
+  position: absolute;
+  content: "";
+  top: 16px;
+  left: 3px;
+  border: none;
+  font: normal 100%/normal Arial, Helvetica, sans-serif;
+  color: black;
+  text-overflow: clip;
+  background: #e98024;
+  text-shadow: none;
+  -webkit-transform: rotateZ(45deg);
+  transform: rotateZ(45deg);
+}
+
+.enjoyhint_close_btn::after {
+  display: inline-block;
+  box-sizing: content-box;
+  width: 29px;
+  height: 2px;
+  position: absolute;
+  content: "";
+  top: 16px;
+  left: 3px;
+  border: none;
+  font: normal 100%/normal Arial, Helvetica, sans-serif;
+  color: black;
+  text-overflow: clip;
+  background: #e98024;
+  text-shadow: none;
+  -webkit-transform: rotateZ(-45deg);
+  transform: rotateZ(-45deg);
+}
+
+.enjoyhint_close_btn:hover {
+  color: white;
+  background: #fff;
+  cursor: pointer;
+}
+
+.enjoyhint_close_btn:active {
+  border: 2px solid #fff;
+  background: #fff;
+  transition: none;
+}
+
+.enjoyhint_btn {
+  box-sizing: content-box;
+  width: 150px;
+  height: 40px;
+  cursor: pointer;
+  margin: 0 auto;
+  border: 2px solid #1ecd97;
+  border-radius: 40px;
+  font: normal normal normal 17px/40px "Advent Pro", Helvetica, sans-serif;
+  color: #1ecd97;
+  text-align: center;
+  text-overflow: clip;
+  letter-spacing: 1px;
+  background: 0 0;
+  transition: background-color 0.3s cubic-bezier(0, 0, 0, 0), color 0.3s cubic-bezier(0, 0, 0, 0), width 0.3s cubic-bezier(0, 0, 0, 0), border-width 0.3s cubic-bezier(0, 0, 0, 0), border-color 0.3s cubic-bezier(0, 0, 0, 0);
+}
+
+.enjoyhint_btn:hover {
+  color: white;
+  background: #1ecd97;
+}
+
+.enjoyhint_btn:active {
+  border: 2px solid #21e0a3;
+  background: #21e0a3;
+  transition: none;
+}
+
+.enjoyhint div.canvas-container {
+  position: absolute;
+}
+
+.enjoyhint_canvas {
+  position: absolute;
+  z-index: 100;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#kinetic_container {
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.enjoyhint_svg_wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+.enjoyhint_svg_wrapper svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.enjoyhint_svg_transparent .enjoy_hint_label, .enjoyhint_svg_transparent .enjoyhint_svg_wrapper {
+  opacity: 0;
+}
+
+.enjoy_hint_label {
+  position: absolute;
+  color: #fff;
+  z-index: 107;
+  font-size: 1.7em;
+  font-family: casino_handregular, Arial;
+  transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+.enjoy_hint_label h1 {
+  margin-bottom: 0.4em;
+}
+
+div.kineticjs-content {
+  position: absolute !important;
+}
+
+#guideBtn {
+  display: inline-block;
+  background-color: #F2F2F2;
+  padding: 5px 20px;
+  position: relative;
+}
+#guideBtn span.close {
+  display: none;
+  color: red;
+  font-size: 0.8em;
+  cursor: pointer;
+  position: absolute;
+  top: 2px;
+  right: 4px;
+}
+#guideBtn:hover span.close {
+  display: block;
+}
+#guideBtn strong {
+  color: #2a3052;
+  cursor: pointer;
+  display: inline-block;
+  white-space: nowrap;
+  line-height: 22px;
+}
+#guideBtn strong span {
+  display: inline-block;
+  vertical-align: middle;
+  width: 22px;
+  height: 22px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-image: url("../images/pages/guide/guide-icon.svg");
+  margin-right: 7px;
+}
+#guideBtn strong:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  #guideBtn {
+    display: none;
+  }
+}
+/* trading page */
+#trading_socket_container #guideBtn {
+  float: right;
 }
 
 /* static pages */
@@ -5108,9 +5397,9 @@ a.dynamic, span.dynamic, div.dynamic, p.dynamic, button.dynamic, table.dynamic {
 
 #trading_init_progress {
   cursor: pointer;
-  background-image: url("../images/pages/binary-symbol-logo.png");
-  background-image: url("../images/pages/binary-symbol-logo.svg"), none;
-  background-size: contain;
+  /*background-image: url('../images/pages/binary-symbol-logo.png');
+  background-image: url('../images/pages/binary-symbol-logo.svg'), none;
+  background-size: contain;*/
   width: 10rem;
   height: 10rem;
   position: absolute;
@@ -5230,13 +5519,13 @@ a.dynamic, span.dynamic, div.dynamic, p.dynamic, button.dynamic, table.dynamic {
           flex-wrap: wrap;
 }
 #trading_socket_container #contract_form_content_wrapper {
-  padding-top: 1em;
+  padding-top: .5em;
 }
 #trading_socket_container #contract_symbol_container {
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
   display: inline-flex;
-  padding-bottom: 0px;
+  padding: 0px;
 }
 #trading_socket_container #contract_symbol_container #contract_markets_container {
   text-align: right;
@@ -5892,6 +6181,9 @@ a.dynamic, span.dynamic, div.dynamic, p.dynamic, button.dynamic, table.dynamic {
 #profit-table-ws-container th {
   padding-right: 8px;
 }
+#profit-table-ws-container th.buy-date {
+  white-space: pre;
+}
 #profit-table-ws-container td {
   padding-right: 8px;
 }
@@ -5974,7 +6266,7 @@ body.JA #asset-forex div.table-header:nth-of-type(n + 3), body.JA #asset-forex d
 body.JA #tradingtimes-forex div.table-header:nth-of-type(n + 3), body.JA #tradingtimes-forex div.table-body:nth-of-type(n + 15) {
   display: none !important;
 }
-body.JA #topMenuHighCharts, body.JA #risefall_table_lnk, body.JA #pricing_table_lnk, body.JA #topMenuBetaInterface {
+body.JA #topMenuHighCharts, body.JA #topMenuBetaInterface {
   display: none !important;
 }
 body.JA #footer-regulatory .grd-grid-9, body.JA #footer-regulatory .grd-grid-phablet-7 {

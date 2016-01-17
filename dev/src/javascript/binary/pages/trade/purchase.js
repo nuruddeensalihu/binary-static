@@ -31,14 +31,15 @@ var Purchase = (function () {
         var error = details['error'];
         var show_chart = !error && passthrough['duration']<=10 && passthrough['duration_unit']==='t' && (sessionStorage.formname === 'risefall' || sessionStorage.formname === 'higherlower' || sessionStorage.formname === 'asian');
 
-        container.style.display = 'block';
         contracts_list.style.display = 'none';
 
         if (error) {
+            container.style.display = 'block';
             message_container.hide();
             confirmation_error.show();
             confirmation_error.textContent = error['message'];
         } else {
+            container.style.display = 'table-row';
             message_container.show();
             confirmation_error.hide();
 
@@ -155,7 +156,7 @@ var Purchase = (function () {
 
             if(d1 && purchase_data.echo_req.passthrough['duration']===1){
                 var contract_status,
-                    final_price, 
+                    final_price,
                     pnl;
 
                 if  (  purchase_data.echo_req.passthrough.contract_type==="DIGITMATCH" && d1==purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITDIFF" && d1!=purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITEVEN" && d1%2===0 || purchase_data.echo_req.passthrough.contract_type==="DIGITODD" && d1%2 || purchase_data.echo_req.passthrough.contract_type==="DIGITOVER" && d1>purchase_data.echo_req.passthrough.barrier || purchase_data.echo_req.passthrough.contract_type==="DIGITUNDER" && d1<purchase_data.echo_req.passthrough.barrier){

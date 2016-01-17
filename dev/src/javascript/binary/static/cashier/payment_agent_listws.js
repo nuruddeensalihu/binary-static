@@ -1,8 +1,7 @@
 var PaymentAgentListWS = (function() {
     "use strict";
 
-    var hiddenClass,
-        ddlCountriesID,
+    var ddlCountriesID,
         $paListContainer;
 
     var residence,
@@ -10,7 +9,6 @@ var PaymentAgentListWS = (function() {
 
 
     var init = function() {
-        hiddenClass = 'hidden';
         ddlCountriesID = '#target_country';
         $paListContainer = $('#pa_list');
         agentTemplate = $paListContainer.find('#accordion').html();
@@ -47,32 +45,28 @@ var PaymentAgentListWS = (function() {
         $ddlCountries.empty();
 
         var cList = response.paymentagent_list.available_countries;
-        if(cList.length === 0) {
-            $ddlCountries.parent().addClass(hiddenClass);
-            showEmptyListMsg();
-            return;
-        }
-
-        var requestedCountry = response.echo_req.paymentagent_list;
-        var found = false;
-        cList.map(function(country) {
-            if(country === requestedCountry) {
-                found = true;
+        if(cList.length > 0) {
+            var requestedCountry = response.echo_req.paymentagent_list;
+            var found = false;
+            for(var i = 0; i < cList.length; i++) {
+                if(cList[i][0] === requestedCountry) {
+                    found = true;
+                }
+                insertListOption($ddlCountries, cList[i][1], cList[i][0]);
             }
-            insertListOption($ddlCountries, country[1], country[0]);
-        });
 
-        if(found) {
-            $ddlCountries.val(requestedCountry);
-            populateAgentsList(response.paymentagent_list.list);
-        }
-        else {
-            sendRequest();
-        }
+            if(found) {
+                $ddlCountries.val(requestedCountry);
+                populateAgentsList(response.paymentagent_list.list);
+            }
+            else {
+                sendRequest($ddlCountries.val());
+            }
 
-        $ddlCountries.change(function() {
-            sendRequest();
-        });
+            $ddlCountries.change(function() {
+                sendRequest();
+            });
+        }
     };
 
     var insertListOption = function($ddlObject, itemText, itemValue) {
@@ -84,7 +78,7 @@ var PaymentAgentListWS = (function() {
     // -----------------------
     var populateAgentsList = function(list) {
         if(!list || list.length === 0) {
-            showEmptyListMsg();
+            $paListContainer.append($('<p/>', {id: 'no_paymentagent', text: text.localize('There are no available Payment Agents.')}));
             return;
         }
 
@@ -126,9 +120,6 @@ var PaymentAgentListWS = (function() {
         });
     };
 
-    var showEmptyListMsg = function() {
-        $('#no_paymentagent').removeClass(hiddenClass);
-    };
 
     return {
         init: init,

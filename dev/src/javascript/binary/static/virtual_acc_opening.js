@@ -1,63 +1,63 @@
 pjax_config_page("virtualws", function(){
-	
-	return {
-		onLoad: function() {
-        	get_residence_list();
-        	Content.populate();
 
-			var form = document.getElementById('virtual-form');
-			var errorEmail = document.getElementById('error-email');
+  return {
+    onLoad: function() {
+          get_residence_list();
+          Content.populate();
 
-		    VirtualAccOpeningUI.setLabel();
+      var form = document.getElementById('virtual-form');
+      var errorEmail = document.getElementById('error-email');
 
-			if (form) {
+        VirtualAccOpeningUI.setLabel();
 
-				$('#virtual-form').submit( function(evt) {
-					evt.preventDefault();
-					Validate.hideErrorMessage(errorEmail);
+      if (form) {
 
-					var email = document.getElementById('email').value,
-				    	residence = document.getElementById('residence').value,
-				    	password = document.getElementById('password').value,
-						rPassword = document.getElementById('r-password').value;
+        $('#virtual-form').submit( function(evt) {
+          evt.preventDefault();
+          Validate.hideErrorMessage(errorEmail);
 
-					if (VirtualAccOpeningUI.checkPassword(password, rPassword)) {
-						
-						BinarySocket.init({
-					        onmessage: function(msg){
-					            var response = JSON.parse(msg.data);
+          var email = document.getElementById('email').value,
+              residence = document.getElementById('residence').value,
+              password = document.getElementById('password').value,
+            rPassword = document.getElementById('r-password').value;
 
-					            if (response) {
-					                var type = response.msg_type;
-					                var error = response.error;
+          if (VirtualAccOpeningUI.checkPassword(password, rPassword)) {
 
-					                if (type === 'new_account_virtual' && !error){
+            BinarySocket.init({
+                  onmessage: function(msg){
+                      var response = JSON.parse(msg.data);
 
-					                    form.setAttribute('action', '/login');
-										form.setAttribute('method', 'POST');
+                      if (response) {
+                          var type = response.msg_type;
+                          var error = response.error;
 
-										$('#virtual-form').unbind('submit');
-										form.submit();
+                          if (type === 'new_account_virtual' && !error){
 
-					                } else if (type === 'error' || error){
-					                	if (/email address is already in use/.test(error.message)) {
-				                			errorEmail.textContent = Content.localize().textDuplicatedEmail;
-				                		} else if (/required/.test(error.message)) {
-				                			errorEmail.textContent = Content.localize().textTokenMissing;
-				                		} else { 
-				                			errorEmail.textContent = Content.errorMessage('valid', Content.localize().textEmailAddress);
-				                		}
-				                		Validate.displayErrorMessage(errorEmail);
-					                }
-					            }
-					        }
-					    });
+                              form.setAttribute('action', '/login');
+                    form.setAttribute('method', 'POST');
 
-					    VirtualAccOpeningData.getDetails(email, password, residence);
-					}
-					
-				});
-			}
-		}
-	};
+                    $('#virtual-form').unbind('submit');
+                    form.submit();
+
+                          } else if (type === 'error' || error){
+                            if (/email address is already in use/.test(error.message)) {
+                              errorEmail.textContent = Content.localize().textDuplicatedEmail;
+                            } else if (/required/.test(error.message)) {
+                              errorEmail.textContent = Content.localize().textTokenMissing;
+                            } else {
+                              errorEmail.textContent = Content.errorMessage('valid', Content.localize().textEmailAddress);
+                            }
+                            Validate.displayErrorMessage(errorEmail);
+                          }
+                      }
+                  }
+              });
+
+              VirtualAccOpeningData.getDetails(email, password, residence);
+          }
+
+        });
+      }
+    }
+  };
 });

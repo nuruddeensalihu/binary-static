@@ -106,7 +106,11 @@ var APITokenWS = (function() {
         $('.btnDelete').click(function(e) {
             e.preventDefault();
             e.stopPropagation();
-            deleteToken($(this).attr('id'));
+            if(window.confirm(
+                text.localize('Are you sure that you want to permanently delete token') + 
+                ': "' + $(this).parents('tr').find('td.name').text() + '"?')) {
+                    deleteToken($(this).attr('id'));
+            }
         });
     };
 
@@ -171,7 +175,7 @@ var APITokenWS = (function() {
     };
 
     var isRequiredError = function(fieldID) {
-        if(!(/.+/).test($(fieldID).val().trim())){
+        if(!$(fieldID).val() || !(/.+/).test($(fieldID).val().trim())){
             showError(fieldID, Content.errorMessage('req'));
             return true;
         } else {

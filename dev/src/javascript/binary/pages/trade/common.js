@@ -60,7 +60,7 @@
                          a2.classList.add('a-active');
                          flag = 1;
                      }
-                     
+
                      a2.classList.add('tm-a-2');
                      a2.appendChild(content2);
                      a2.setAttribute('menuitem',el2.toLowerCase());
@@ -134,7 +134,7 @@
 
      var keys1 = Object.keys(elements).sort(marketSort);
      for (var i=0; i<keys1.length; i++) {
-         var key = keys1[i]; 
+         var key = keys1[i];
          var option = document.createElement('option'), content = document.createTextNode(elements[key].name);
          option.setAttribute('value', key);
          if (selected && selected === key) {
@@ -149,7 +149,7 @@
          if(elements[key].submarkets && Object.keys(elements[key].submarkets).length){
             var keys2 = Object.keys(elements[key].submarkets).sort(marketSort);
             for (var j=0; j<keys2.length; j++) {
-                var key2 = keys2[j]; 
+                var key2 = keys2[j];
                 option = document.createElement('option');
                 option.setAttribute('value', key2);
                 if (selected && selected === key2) {
@@ -356,7 +356,7 @@ function hidePriceOverlay() {
     if (elm) {
         elm.style.display = 'none';
     }
-    
+
 }
 
 function hideFormOverlay(){
@@ -449,7 +449,7 @@ function getContractCategoryTree(elements){
             }
             return e;
         });
-        tree = tree.filter(function(v){ return v.length; });   
+        tree = tree.filter(function(v){ return v.length; });
     }
     return tree;
 }
@@ -608,12 +608,27 @@ function debounce(func, wait, immediate) {
  */
 function getDefaultMarket() {
     'use strict';
-   var mkt = sessionStorage.getItem('market');
-   var markets = Symbols.markets(1);
-   if(!mkt ||  !markets[mkt]){
-        mkt = Object.keys(markets)[0];
-   }
-   return mkt;
+    var mkt = sessionStorage.getItem('market');
+    var markets = Symbols.markets(1);
+    if (!mkt || !markets[mkt]) {
+        var sorted_markets = Object.keys(Symbols.markets()).sort(function(a, b) {
+            return getMarketsOrder(a) - getMarketsOrder(b);
+        });
+        mkt = sorted_markets[0];
+    }
+    return mkt;
+}
+
+// Order
+function getMarketsOrder(market) {
+    var order = {
+        'forex': 1,
+        'random': 2,
+        'indices': 3,
+        'stocks': 4,
+        'commodities': 5
+    };
+    return order[market] ? order[market] : 100;
 }
 
 /*
@@ -760,7 +775,7 @@ function countDecimalPlaces(num) {
 
 function selectOption(option, select){
     var options = select.getElementsByTagName('option');
-    var contains = 0; 
+    var contains = 0;
     for(var i = 0; i < options.length; i++){
         if(options[i].value==option && !options[i].hasAttribute('disabled')){
             contains = 1;
@@ -788,7 +803,7 @@ function updatePurchaseStatus(final_price, pnl, contract_status){
         $profit.html(Content.localize().textLoss + '<p>'+pnl+'</p>');
     }
     else{
-        $profit.html(Content.localize().textProfit + '<p>'+(Math.round((final_price-pnl)*100)/100)+'</p>');        
+        $profit.html(Content.localize().textProfit + '<p>'+(Math.round((final_price-pnl)*100)/100)+'</p>');
     }
 }
 
@@ -808,13 +823,13 @@ function updateWarmChart(){
     };
     if($chart){
         $chart.sparkline(spots, chart_config);
-        if(spots.length){     
+        if(spots.length){
             $chart.show();
         }
         else{
             $chart.hide();
-        }  
-    }  
+        }
+    }
 }
 
 function reloadPage(){
@@ -843,4 +858,52 @@ function addComma(num){
         num = num.toFixed(2);
     }
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function showHighchart(){
+  Content.populate();
+  var div = document.createElement('div');
+  div.className = 'grd-grid-12 chart_div';
+
+  div.innerHTML = '<table width="600px" align="center"><tr id="highchart_duration"><td align="right" width="25%">' +
+                  Content.localize().textDuration + ':</td><td align="left" width="25%"><select id="time_period"><option value="1t">1 ' +
+                  Content.localize().textTickResultLabel.toLowerCase() + '</option><option value="1m">1 ' + text.localize("minute").toLowerCase() +
+                  '</option><option value="2m">2 ' + Content.localize().textDurationMinutes.toLowerCase() + '</option><option value="3m">3 ' +
+                  Content.localize().textDurationMinutes.toLowerCase() +'</option><option value="5m">5 ' + Content.localize().textDurationMinutes.toLowerCase() +
+                  '</option><option value="10m">10 ' + Content.localize().textDurationMinutes.toLowerCase() + '</option><option value="15m">15 ' +
+                  Content.localize().textDurationMinutes.toLowerCase() +'</option><option value="30m">30 ' + Content.localize().textDurationMinutes.toLowerCase() +
+                  '</option><option value="1h">1 ' + text.localize('hour').toLowerCase() + '</option><option value="2h">2 ' +
+                  Content.localize().textDurationHours.toLowerCase() +'</option><option value="4h">4 ' + Content.localize().textDurationHours.toLowerCase() +
+                  '</option><option value="8h">8 ' + Content.localize().textDurationHours.toLowerCase() + '</option><option value="1d">1 ' +
+                  text.localize('day').toLowerCase() +'</option></select></td></td></tr><tr align="center"><td colspan="4">' +
+                  '<iframe src="" width="100%" height="520" id="chart_frame" style="overflow-y : hidden;" scrolling="no"></iframe></td></tr></table>';
+
+   document.getElementById('trade_live_chart').appendChild(div);
+}
+
+function setUnderlyingTime() {
+   var instrumentCode = document.getElementById('underlying'),
+       contractMarkets = document.getElementById('bet_underlying'),
+       highchart_time =  document.getElementById('time_period');
+   highchart_time.addEventListener("change", function(){
+     setUnderlyingTime();
+   });
+   if (instrumentCode) {
+     instrumentCode.addEventListener("change", function(){
+       setUnderlyingTime();
+     });
+     chartFrameSource(instrumentCode.value, highchart_time);
+   } else if (contractMarkets) {
+     contractMarkets.addEventListener("change", function(){
+       setUnderlyingTime();
+     });
+     document.getElementById('submarket').addEventListener("change", function(){
+       setUnderlyingTime();
+     });
+     chartFrameSource(contractMarkets.value, highchart_time);
+   }
+}
+
+function chartFrameSource(underlying, highchart_time){
+  document.getElementById('chart_frame').src = 'https://highcharts.binary.com?affiliates=true&instrument=' + underlying + '&timePeriod=' + highchart_time.value + '&gtm=false';
 }

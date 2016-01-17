@@ -14,6 +14,8 @@ var AssetIndexWS = (function() {
         $container = $('#asset-index');
         showLoadingImage($container);
         marketColumns = {};
+        activeSymbols = null;
+        assetIndex = null;
         // index of items in asset_index response
         idx = {
             symbol: 0,
@@ -63,6 +65,9 @@ var AssetIndexWS = (function() {
         for(var i = 0; i < assetIndex.length; i++) {
             var assetItem = assetIndex[i];
             var symbolInfo = getSymbolInfo(assetItem[idx.symbol])[0];
+            if(!symbolInfo) {
+                continue;
+            }
             var market = symbolInfo.market;
 
             assetItem.push(symbolInfo);
@@ -104,6 +109,9 @@ var AssetIndexWS = (function() {
         for(var i = 0; i < assetIndex.length; i++) {
             var assetItem  = assetIndex[i];
             var symbolInfo = assetItem[idx.symInfo];
+            if(!symbolInfo) {
+                continue;
+            }
 
             // just show "Major Pairs" when the language is JA
             if(isJapan && symbolInfo.submarket !== 'major_pairs') {
@@ -153,7 +161,7 @@ var AssetIndexWS = (function() {
         for(var i = 1; i < marketCols.columns.length; i++) {
             var prop = marketCols.columns[i];
             if(prop.length > 0) {
-                cells.push(prop in assetCells ? assetCells[prop] : '');
+                cells.push(prop in assetCells ? assetCells[prop] : '--');
                 columns.push(prop);
             }
         }

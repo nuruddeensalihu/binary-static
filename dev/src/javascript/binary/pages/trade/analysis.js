@@ -12,7 +12,7 @@
 
 var TradingAnalysis = (function(){
     var trading_digit_info;
-    
+
     var requestTradeAnalysis = function() {
         'use strict';
         $.ajax({
@@ -75,8 +75,13 @@ var TradingAnalysis = (function(){
         toggleActiveAnalysisTabs();
 
         if (currentTab === 'tab_graph') {
+          if (document.getElementById('underlying')){
+            showHighchart();
+            setUnderlyingTime();
+          } else {
             BetAnalysis.tab_live_chart.reset();
             BetAnalysis.tab_live_chart.render(true);
+          }
         } else {
             var url = currentLink.getAttribute('href');
             $.ajax({
@@ -194,4 +199,3 @@ var TradingAnalysis = (function(){
     };
 
 })();
-

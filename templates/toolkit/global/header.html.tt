@@ -54,7 +54,7 @@
                                 <a class="smaller-font pjaxload" href="[% request.url_for('tour') %]"[% target %]>[% l("Tour") %]</a>
                             </li>
                             <li>
-                                <a class="smaller-font pjaxload" href="[% request.url_for('trade.cgi') %]"[% target %]>[% l("Trade") %]</a>
+                                <a class="smaller-font pjaxload" href="[% request.url_for('trading') %]"[% target %]>[% l("Trade") %]</a>
                             </li>
                         </ul>
                     </div>
@@ -67,7 +67,7 @@
                             </select>
                         </div>
                         <div id="balance"></div>
-                        <a id="btn_logout" class="logout" href="[% request.url_for('logout') %]"[% target %]>[% l('LOG OUT') %]</a>
+                        <a id="btn_logout" class="logout" href="javascript:;">[% l('LOG OUT') %]</a>
                     </form>
                   </div>
                 </div>
