@@ -57,7 +57,7 @@ pjax_config_page("cashier/top_up_virtualws", function() {
     return {
         onLoad: function() {
         	if (!getCookieItem('login')) {
-                console.log("You are not log in buddy");
+                alert("You are not log in buddy");
                 return false;
                // window.location.href = page.url.url_for('login');
                 return;
@@ -74,7 +74,7 @@ pjax_config_page("cashier/top_up_virtualws", function() {
             topup_virtualws.init();
         },
         onUnload: function(){
-            console.log("its unloading");
+            alert("its unloading");
             return false;
         }
     };
