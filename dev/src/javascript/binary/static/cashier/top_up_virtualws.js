@@ -59,7 +59,7 @@ var topup_virtualws = (function(){
 pjax_config_page("cashier/top_up_virtualws", function() {
     return {
         onLoad: function() {
-        	if (!getCookieItem('login')) {
+        	if (!$.cookie('login')) {
                 alert("You are not log in buddy");
                 return false;
                // window.location.href = page.url.url_for('login');
