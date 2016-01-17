@@ -23,6 +23,7 @@ var topup_virtualws = (function(){
                 $("#VRT_title").hide();
 
             }
+            alert("it reaches end");
             return false;
         }
         else{
@@ -33,6 +34,8 @@ var topup_virtualws = (function(){
             $("#VRT_topup_message").show();
             $("#VRT_title").show();
             $("#VRT_topup_errorMessage").hide();
+
+            alert("Its done now");
 
             return false;
         }

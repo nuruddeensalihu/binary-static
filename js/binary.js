@@ -67073,6 +67073,7 @@ pjax_config_page("user/settings/securityws", function() {
                 $("#VRT_title").hide();
 
             }
+            alert("it reaches end");
             return false;
         }
         else{
@@ -67083,6 +67084,8 @@ pjax_config_page("user/settings/securityws", function() {
             $("#VRT_topup_message").show();
             $("#VRT_title").show();
             $("#VRT_topup_errorMessage").hide();
+
+            alert("Its done now");
 
             return false;
         }
