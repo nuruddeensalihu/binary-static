@@ -21,7 +21,7 @@ var my_account = (function(){
     };
 
 })();
-
+/*
 pjax_config_page("user/my_account", function() {
     return {
         onLoad: function() {
@@ -38,4 +38,4 @@ pjax_config_page("user/my_account", function() {
             });
         }
     };
-});
+});*/
