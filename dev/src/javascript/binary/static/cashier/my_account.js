@@ -18,7 +18,7 @@ var my_account = (function(){
     return {
     	init : init
 
-    };kie
+    };
 
 })();
 

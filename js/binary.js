@@ -66229,7 +66229,7 @@ pjax_config_page("cashier/account_transferws", function() {
     return {
     	init : init
 
-    };kie
+    };
 
 })();
 
