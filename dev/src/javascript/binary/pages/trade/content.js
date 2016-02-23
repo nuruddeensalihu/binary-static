@@ -114,7 +114,8 @@ var Content = (function () {
             textApost: text.localize('apostrophe'),
             textPassword: text.localize('password'),
             textPasswordsNotMatching: text.localize('The two passwords that you entered do not match.'),
-            textTokenMissing: text.localize('Verification token is missing. Click on the verification link sent to your email and make sure you are not already logged in.'),
+            textTokenMissing: text.localize('Verification token is missing.'),
+            textClickHereToRestart: text.localize('Please click on the verification link sent to your email, or click <a class="pjaxload" href="%1">here</a> to restart the verification process.'),
             textDuplicatedEmail: text.localize('Your provided email address is already in use by another Login ID'),
             textAsset: text.localize('Asset'),
             textOpens: text.localize('Opens'),
@@ -132,7 +133,8 @@ var Content = (function () {
             textSelect: text.localize('Please select'),
             textUnavailableReal: text.localize('Sorry, account opening is unavailable.'),
             textMessageMinRequired: text.localize('Minimum of %1 characters required.'),
-            textFeatureUnavailable: text.localize('Sorry, this feature is not available.')
+            textFeatureUnavailable: text.localize('Sorry, this feature is not available.'),
+            textMessagePasswordScore: text.localize( 'Password score is: %1. Passing score is: 20.')
         };
 
         var starTime = document.getElementById('start_time_label');
@@ -315,6 +317,10 @@ var Content = (function () {
             case 'min':
                 if(param)
                     msg = localize.textMessageMinRequired.replace('%1', param);
+                break;
+            case 'pass':
+                if(param)
+                    msg = localize.textMessagePasswordScore.replace('%1', param);
                 break;
             default:
                 break;

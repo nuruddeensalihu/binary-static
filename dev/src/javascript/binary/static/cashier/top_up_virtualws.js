@@ -1,76 +1,92 @@
-var top_up_virtualws = (function(){
-
+var TopUpVirtualWS = (function() {
 	"use strict";
-    var account;
 
-    var init = function(){
-    	$("#VRT_topup_message").hide();
-    	$("#VRT_title").hide();
-    	$("#VRT_topup_errorMessage").hide();
+    var containerID,
+        viewIDs,
+        hiddenClass,
+        $views,
+        loginID;
 
-        account = TUser.get().loginid;
-        BinarySocket.send({"topup_virtual": 1 });
+    var init = function() {
+        containerID = '#topup_virtual';
+        hiddenClass = 'hidden';
+        $views      = $(containerID + ' .viewItem');
+        viewIDs = {
+            error   : '#viewError',
+            success : '#viewSuccess'
+        };
+        loginID = getCookieItem('loginid');
 
+        $views.addClass('hidden');
+
+        if(!(/VRT/).test(loginID)) {
+            showMessage(text.localize('Sorry, this feature is available to virtual accounts only.'), false);
+        }
+        else {
+            BinarySocket.send({"topup_virtual": "1"});
+        }
     };
 
-    var responseMessage = function(response){
+    var responseHandler = function(response) {
     	var str, amt , currType;
-	 	if("error" in response) {
-            if("message" in response.error) {
-                $("#VRT_topup_errorMessage").show();
-                $("#VRT_topup_errorMessage").text(text.localize(response.error.message));
-                $("#VRT_topup_message").hide();
-                $("#VRT_title").hide();
-
+	 	if('error' in response) {
+            if('message' in response.error) {
+                showMessage(text.localize(response.error.message), false);
             }
-            return false;
         }
         else{
-        	currType = response.topup_virtual.currency;
-        	amt = response.topup_virtual.amount;
-        	str = currType + " " + amt + " has been credited to your Virtual money account " + account ;
-        	$("#VRT_topup_message p:first-child").html(text.localize(str));
-            $("#VRT_topup_message").show();
-            $("#VRT_title").show();
-            $("#VRT_topup_errorMessage").hide();
-        }
-
-    };
-
-    var apiResponse = function(response){
-    	var type = response.msg_type;
-    	if (type === "topup_virtual" || (type === "error" && "topup_virtual" in response.echo_req)){
-           responseMessage(response);
-
+            showMessage(
+                text.localize('%1 %2 has been credited to your Virtual money account %3')
+                    .replace('%1', response.topup_virtual.currency)
+                    .replace('%2', response.topup_virtual.amount)
+                    .replace('%3', loginID),
+                true);
         }
     };
+
+    var showMessage = function(message, isSuccess) {
+        var viewID = isSuccess ? viewIDs.success : viewIDs.error;
+        setActiveView(viewID);
+        $(viewID + ' > p').html(message);
+    };
+
+    var setActiveView = function(viewID) {
+        $views.addClass(hiddenClass);
+        $(viewID).removeClass(hiddenClass);
+    };
+
 
     return {
-    	init : init,
-    	apiResponse : apiResponse
+    	init: init,
+    	responseHandler: responseHandler
     };
-})();
+}());
 
 
-pjax_config_page("cashier/top_up_virtualws", function() {
+pjax_config_page("top_up_virtualws", function() {
     return {
         onLoad: function() {
         	if (!getCookieItem('login')) {
                 window.location.href = page.url.url_for('login');
                 return;
             }
+
         	BinarySocket.init({
                 onmessage: function(msg){
                     var response = JSON.parse(msg.data);
                     if (response) {
-                        top_up_virtualws.apiResponse(response);
-                          
+                        if (response.msg_type === "topup_virtual") {
+                            TopUpVirtualWS.responseHandler(response);
+                        }
                     }
-                },
-                onauth : function(){
-                    top_up_virtualws.init();
+                    else {
+                        console.log('some error occured');
+                    }
                 }
-            });	
+            });
+
+            Content.populate();
+            TopUpVirtualWS.init();
         }
     };
 });

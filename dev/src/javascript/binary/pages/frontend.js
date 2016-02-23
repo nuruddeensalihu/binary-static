@@ -100,22 +100,6 @@ var get_started_behaviour = function() {
         to_show = fragment ? $('a[name=' + fragment + '-section]').parent('.subsection') : $('.subsection.first');
         update_active_subsection(to_show);
     }
-
-    var random_market = $('.random-markets');
-    if (random_market.length > 0) {
-        sidebar_scroll(random_market);
-    }
-};
-
-
-var get_ticker = function() {
-    var ticker = $('#hometicker');
-    if (ticker.size()) {
-        $.ajax({ crossDomain: true, url: page.url.url_for('ticker'), async: true, dataType: "html" }).done(function(ticks) {
-            ticker.html(ticks);
-            ticker.find('ul').simplyScroll();
-        });
-    }
 };
 
 var Charts = function(charts) {
@@ -229,62 +213,6 @@ var display_career_email = function() {
     $("#hr_contact_eaddress").html(email_rot13("<n uers=\"znvygb:ue@ovanel.pbz\" ery=\"absbyybj\">ue@ovanel.pbz</n>"));
 };
 
-var get_residence_list = function() {
-    var url = page.url.url_for('residence_list');
-    $.getJSON(url, function(data) {
-        var countries = [];
-        $.each(data.residence, function(i, country) {
-            var disabled = '';
-            var selected = '';
-            if (country.disabled) {
-                disabled = ' disabled ';
-            } else if (country.selected) {
-                selected = ' selected="selected" ';
-            }
-            countries.push('<option value="' + country.value + '"' + disabled + selected + '>' + country.text + '</option>');
-            $("#residence").html(countries.join(''));
-
-            $('form#virtual-acc-form #btn_registration').removeAttr('disabled');
-        });
-    });
-};
-
-var on_input_password = function() {
-    $('#chooseapassword').on('input', function() {
-        $("#chooseapassword_2").css("visibility", "visible");
-    });
-};
-
-var on_click_signup = function() {
-    $('form#virtual-acc-form #btn_registration').on('click', function() {
-        var pwd = $('#chooseapassword').val();
-        var pwd_2 = $('#chooseapassword_2').val();
-        var email = $('#Email').val();
-        var residence = $('#residence').val();
-
-        var error_msg = '';
-        if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(email)) {
-            error_msg = text.localize('Invalid email address');
-        } else if (pwd.length < 6 || pwd.length > 25 || pwd_2.length < 6 || pwd_2.length > 25) {
-            error_msg = text.localize('Password length should be between 6 and 25 characters');
-        } else if (pwd.length === 0 || pwd_2.length === 0 || !client_form.compare_new_password(pwd, pwd_2)) {
-            error_msg = text.localize('The two passwords that you entered do not match.');
-        } else if (email == pwd) {
-            error_msg = text.localize('Your password cannot be the same as your email');
-        } else if (residence.length === 0) {
-            error_msg = text.localize('Please specify your country.');
-        }
-
-        if (error_msg.length > 0) {
-            $('#signup_error').text(error_msg);
-            $('#signup_error').removeClass('invisible');
-            $('#signup_error').show();
-            return false;
-        }
-        $('#virtual-acc-form').submit();
-    });
-};
-
 function check_login_hide_signup() {
     if (page.client.is_logged_in) {
         $('#verify-email-form').remove();
@@ -300,22 +228,15 @@ function hide_if_logged_in() {
 
 // use function to generate elements and append them
 // e.g. element is select and element to append is option
-function appendTextValueChild(element, text, value){
+function appendTextValueChild(element, text, value, disabled){
     var option = document.createElement("option");
-
     option.text = text;
     option.value = value;
+    if (disabled === 'disabled') {
+      option.setAttribute('disabled', disabled);
+    }
     element.appendChild(option);
-}
-
-// populate drop down list of Titles, pass in select element
-function setTitles(select){
-    appendTextValueChild(select, Content.localize().textMr, 'Mr');
-    appendTextValueChild(select, Content.localize().textMrs, 'Mrs');
-    appendTextValueChild(select, Content.localize().textMs, 'Ms');
-    appendTextValueChild(select, Content.localize().textMiss, 'Miss');
-    appendTextValueChild(select, Content.localize().textDr, 'Dr');
-    appendTextValueChild(select, Content.localize().textProf, 'Prof');
+    return;
 }
 
 // append numbers to a drop down menu, eg 1-30
@@ -328,12 +249,12 @@ function dropDownNumbers(select, startNum, endNum) {
         option.value = i;
         select.appendChild(option);
     }
+    return;
 
 }
 
 function dropDownMonths(select, startNum, endNum) {
     var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
     select.appendChild(document.createElement("option"));
     for (i = startNum; i <= endNum; i++){
         var option = document.createElement("option");
@@ -342,16 +263,18 @@ function dropDownMonths(select, startNum, endNum) {
         } else {
             option.value = i;
         }
-
         for (j = i; j <= i; j++) {
             option.text = months[j-1];
         }
-
         select.appendChild(option);
     }
+    return;
 }
 
-function generateBirthDate(days, months, year){
+function generateBirthDate(){
+    var days    = document.getElementById('dobdd'),
+        months    = document.getElementById('dobmm'),
+        year    = document.getElementById('dobyy');
     //days
     dropDownNumbers(days, 1, 31);
     //months
@@ -363,6 +286,7 @@ function generateBirthDate(days, months, year){
 
     //years
     dropDownNumbers(year, startYear, endYear);
+    return;
 }
 
 function isValidDate(day, month, year){
@@ -384,7 +308,51 @@ function handle_residence_state_ws(){
       var response = JSON.parse(msg.data);
       if (response) {
         var type = response.msg_type;
-        if (type === 'states_list'){
+        var residenceDisabled = $('#residence-disabled');
+        if (response.msg_type === 'get_settings') {
+          var country = response.get_settings.country_code;
+          if (country && country !== null) {
+            page.client.residence = country;
+            generateBirthDate();
+            generateState();
+            return;
+          } else {
+            var residenceForm = $('#residence-form');
+            $('#real-form').hide();
+            residenceDisabled.insertAfter('#move-residence-here');
+            $('#error-residence').insertAfter('#residence-disabled');
+            residenceDisabled.removeAttr('disabled');
+            residenceForm.show();
+            residenceForm.submit(function(evt) {
+              evt.preventDefault();
+              if (Validate.fieldNotEmpty(residenceDisabled.val(), document.getElementById('error-residence'))) {
+                page.client.residence = residenceDisabled.val();
+                BinarySocket.send({set_settings:1, residence:page.client.residence});
+              }
+              return;
+            });
+            return;
+          }
+        } else if (type === 'set_settings') {
+          var errorElement = document.getElementById('error-residence');
+          if (response.hasOwnProperty('error')) {
+            if (response.error.message) {
+              errorElement.innerHTML = response.error.message;
+              errorElement.setAttribute('style', 'display:block');
+            }
+            return;
+          } else {
+            errorElement.setAttribute('style', 'display:none');
+            $('#residence-form').hide();
+            residenceDisabled.insertAfter('#move-residence-back');
+            $('#error-residence').insertAfter('#residence-disabled');
+            residenceDisabled.attr('disabled', 'disabled');
+            $('#real-form').show();
+            generateBirthDate();
+            generateState();
+            return;
+          }
+        } else if (type === 'states_list'){
           select = document.getElementById('address-state');
           var states_list = response.states_list;
           if (states_list.length > 0){
@@ -393,35 +361,52 @@ function handle_residence_state_ws(){
             }
             select.parentNode.parentNode.setAttribute('style', 'display:block');
           }
-        }
-        if (type === 'residence_list'){
-          select = document.getElementById('residence-disabled');
-          var phoneElement = document.getElementById('tel'),
-              residenceValue = $.cookie('residence'),
+          return;
+        } else if (type === 'residence_list'){
+          select = document.getElementById('residence-disabled') || document.getElementById('residence');
+          var phoneElement   = document.getElementById('tel'),
+              residenceValue = page.client.residence,
               residence_list = response.residence_list;
           if (residence_list.length > 0){
             for (i = 0; i < residence_list.length; i++) {
-              appendTextValueChild(select, residence_list[i].text, residence_list[i].value);
+              if (residence_list[i].disabled) {
+                appendTextValueChild(select, residence_list[i].text, residence_list[i].value, 'disabled');
+              } else {
+                appendTextValueChild(select, residence_list[i].text, residence_list[i].value);
+              }
               if (phoneElement && residence_list[i].phone_idd && residenceValue === residence_list[i].value){
                 phoneElement.value = '+' + residence_list[i].phone_idd;
               }
             }
-            select.parentNode.parentNode.setAttribute('style', 'display:block');
+            if (residenceValue){
+                select.value = residenceValue;
+            }
           }
+          return;
         }
       }
     }
   });
 }
 
+function getSettings() {
+  BinarySocket.send({get_settings:1});
+  return;
+}
+
 function setResidenceWs(){
-  BinarySocket.send({ residence_list: 1 });
+  BinarySocket.send({residence_list:1});
+  return;
 }
 
 //pass select element to generate list of states
-function generateState(select) {
-    appendTextValueChild(select, Content.localize().textSelect, '');
-    BinarySocket.send({ states_list: $.cookie('residence') });
+function generateState() {
+    var state = document.getElementById('address-state');
+    appendTextValueChild(state, Content.localize().textSelect, '');
+    if (page.client.residence !== "") {
+      BinarySocket.send({ states_list: page.client.residence });
+    }
+    return;
 }
 
 function getUrlVars() {
@@ -445,19 +430,26 @@ if (page.language() === 'JA' && !$.cookie('MyJACookie')) {
   window.location = window.location.pathname + str;
 }
 
-
 // returns true if internet explorer browser
 function isIE() {
   return /(msie|trident|edge)/i.test(window.navigator.userAgent) && !window.opera;
 }
 
+// trim leading and trailing white space
+function Trim(str){
+  while(str.charAt(0) == (" ") ){str = str.substring(1);}
+  while(str.charAt(str.length-1) ==" " ){str = str.substring(0,str.length-1);}
+  return str;
+}
+
+//remove wrong json affiliate_tracking
+if ($.cookie('affiliate_tracking')) {
+  $.removeCookie('affiliate_tracking');
+}
+
 pjax_config_page('/$|/home', function() {
     return {
         onLoad: function() {
-            on_input_password();
-            on_click_signup();
-            get_residence_list();
-            get_ticker();
             check_login_hide_signup();
         }
     };
@@ -480,6 +472,23 @@ pjax_config_page('/smart-indices', function() {
     return {
         onLoad: function() {
             sidebar_scroll($('.smart-indices'));
+            if (page.url.location.hash !== "") {
+              $('a[href="' + page.url.location.hash + '"]').click();
+            }
+        },
+        onUnload: function() {
+            $(window).off('scroll');
+        }
+    };
+});
+
+pjax_config_page('/random-markets', function() {
+    return {
+        onLoad: function() {
+            sidebar_scroll($('.random-markets'));
+            if (page.url.location.hash !== "") {
+              $('a[href="' + page.url.location.hash + '"]').click();
+            }
         },
         onUnload: function() {
             $(window).off('scroll');
@@ -566,6 +575,27 @@ pjax_config_page('/terms-and-condition', function() {
             var year = document.getElementsByClassName('currentYear');
             for (i = 0; i < year.length; i++){
               year[i].innerHTML = new Date().getFullYear();
+            }
+        },
+    };
+});
+
+pjax_config_page('/user/myaccount', function() {
+    return {
+        onLoad: function() {
+            var divOne = text.localize('<div class="notice-msg" style="margin-top: 10px;">Your %1 account is unavailable. For any questions please contact <a href="%2">Customer Support</a>.</div>').replace('%2', page.url.url_for('contact')),
+                divTwo = text.localize('<div class="notice-msg" style="margin-top: 10px;">Your %1 accounts are unavailable. For any questions please contact <a href="%2">Customer Support</a>.</div>').replace('%2', page.url.url_for('contact'));
+            var loginidArry = page.user.loginid_array,
+                disabledAccount = [];
+            for (i = 0; i < loginidArry.length; i++) {
+              if (loginidArry[i].disabled === true && loginidArry[i].real === true) {
+                disabledAccount.push(loginidArry[i].id);
+              }
+            }
+            if (disabledAccount.length === 1) {
+                $(divOne.replace('%1', disabledAccount.toString())).insertAfter('.clientid');
+            } else if (disabledAccount.length > 1) {
+                $(divTwo.replace('%1', disabledAccount.join(', '))).insertAfter('.clientid');
             }
         },
     };

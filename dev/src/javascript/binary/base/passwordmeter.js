@@ -153,19 +153,15 @@ function testPassword(passwd)
     }
 
 
-    if(intScore < 16)
-    {
-       strVerdict = text.localize("Password is very weak");
-    }
-    else if (intScore > 15 && intScore < 25)
+    if(intScore < 10)
     {
        strVerdict = text.localize("Password is weak");
     }
-    else if (intScore > 24 && intScore < 35)
+    else if (intScore > 9 && intScore < 20)
     {
        strVerdict = text.localize("Password is moderate");
     }
-    else if (intScore > 34 && intScore < 45)
+    else if (intScore > 20)
     {
        strVerdict = text.localize("Password is strong");
     }

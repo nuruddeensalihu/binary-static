@@ -137,11 +137,11 @@
          var key = keys1[i];
          var option = document.createElement('option'), content = document.createTextNode(elements[key].name);
          option.setAttribute('value', key);
-         if (selected && selected === key) {
-             option.setAttribute('selected', 'selected');
-         }
          if(!elements[key].is_active){
             option.setAttribute('disabled', '');
+         }
+         else if (selected && selected === key) {
+             option.setAttribute('selected', 'selected');
          }
          option.appendChild(content);
          fragment.appendChild(option);
@@ -152,11 +152,11 @@
                 var key2 = keys2[j];
                 option = document.createElement('option');
                 option.setAttribute('value', key2);
-                if (selected && selected === key2) {
-                    option.setAttribute('selected', 'selected');
-                }
                 if(!elements[key].submarkets[key2].is_active){
                    option.setAttribute('disabled', '');
+                }
+                else if (selected && selected === key2) {
+                    option.setAttribute('selected', 'selected');
                 }
                 option.textContent = '\xA0\xA0\xA0\xA0'+elements[key].submarkets[key2].name;
                 fragment.appendChild(option);
@@ -165,6 +165,19 @@
      }
      if (target) {
          target.appendChild(fragment);
+
+         if(target.selectedIndex < 0) {
+            target.selectedIndex = 0;
+         }
+         var current = target.options[target.selectedIndex];
+         if(selected !== current.value) {
+            sessionStorage.setItem('market', current.value);
+         }
+
+         if(current.disabled) { // there is no open market
+            document.getElementById('markets_closed_msg').classList.remove('hidden');
+            document.getElementById('trading_init_progress').style.display = 'none';
+         }
      }
  }
 /*
@@ -425,7 +438,7 @@ function getContractCategoryTree(elements){
             ['endsinout',
             'staysinout']
         ],
-        // 'asian',
+        'asian',
         ['digits',
             ['matchdiff',
             'evenodd',
@@ -610,8 +623,8 @@ function getDefaultMarket() {
     'use strict';
     var mkt = sessionStorage.getItem('market');
     var markets = Symbols.markets(1);
-    if (!mkt || !markets[mkt]) {
-        var sorted_markets = Object.keys(Symbols.markets()).sort(function(a, b) {
+    if (!mkt || !markets[mkt] || !markets[mkt].is_active) {
+        var sorted_markets = Object.keys(Symbols.markets()).filter(function(v){return markets[v].is_active;}).sort(function(a, b) {
             return getMarketsOrder(a) - getMarketsOrder(b);
         });
         mkt = sorted_markets[0];
@@ -672,7 +685,8 @@ function displayIndicativeBarrier() {
     if (unit && unit.value !== 'd' && currentTick && !isNaN(currentTick)) {
         var decimalPlaces = countDecimalPlaces(currentTick);
         if (indicativeBarrierTooltip && isVisible(indicativeBarrierTooltip)) {
-            indicativeBarrierTooltip.textContent = (parseFloat(currentTick) + parseFloat(barrierElement.value)).toFixed(decimalPlaces);
+            var barrierValue = isNaN(parseFloat(barrierElement.value))?0:parseFloat(barrierElement.value);
+            indicativeBarrierTooltip.textContent = (parseFloat(currentTick) + barrierValue).toFixed(decimalPlaces);
         }
 
         if (indicativeHighBarrierTooltip && isVisible(indicativeHighBarrierTooltip)) {
@@ -744,17 +758,35 @@ function marketSort(a,b){
 
 function displayTooltip(market, symbol){
     'use strict';
-    var tip = document.getElementById('symbol_tip');
-    if(market.match(/^random/)){
+    var tip = document.getElementById('symbol_tip'),
+        guide = document.getElementById('guideBtn'),
+        app = document.getElementById('androidApp');
+    if (market.match(/^random/)){
         tip.show();
         tip.setAttribute('target','/get-started/random-markets');
+        if (guide) {
+          guide.hide();
+        }
+        app.show();
+    } else {
+      if (guide) {
+        guide.show();
+      }
+      app.hide();
+      tip.hide();
     }
-    else if(symbol.match(/^SYN/)){
+    if (market.match(/^random_index/)){
+        tip.setAttribute('target','/get-started/random-markets#random-indices');
+    }
+    if (market.match(/^random_daily/)){
+        tip.setAttribute('target','/get-started/random-markets#random-quotidians');
+    }
+    if (market.match(/^random_nightly/)){
+        tip.setAttribute('target','/get-started/random-markets#random-nocturnes');
+    }
+    if (market.match(/^smart_fx/)){
         tip.show();
-        tip.setAttribute('target','/smart-indices');
-    }
-    else{
-        tip.hide();
+        tip.setAttribute('target','/smart-indices#world-fx-indices');
     }
 }
 
@@ -873,7 +905,7 @@ function showHighchart(){
 
   div.innerHTML = '<table width="600px" align="center"><tr id="highchart_duration"><td width="25%">' +
                   Content.localize().textDuration + ':</td><td width="25%"><select id="time_period"><option value="1t">1 ' +
-                  Content.localize().textTickResultLabel.toLowerCase() + '</option><option value="1m">1 ' + text.localize("minute").toLowerCase() +
+                  Content.localize().textTickResultLabel.toLowerCase() + '</option><option value="1m" selected="selected">1 ' + text.localize("minute").toLowerCase() +
                   '</option><option value="2m">2 ' + Content.localize().textDurationMinutes.toLowerCase() + '</option><option value="3m">3 ' +
                   Content.localize().textDurationMinutes.toLowerCase() +'</option><option value="5m">5 ' + Content.localize().textDurationMinutes.toLowerCase() +
                   '</option><option value="10m">10 ' + Content.localize().textDurationMinutes.toLowerCase() + '</option><option value="15m">15 ' +
@@ -911,5 +943,5 @@ function setUnderlyingTime() {
 }
 
 function chartFrameSource(underlying, highchart_time){
-  document.getElementById('chart_frame').src = 'https://highcharts.binary.com?affiliates=true&instrument=' + underlying + '&timePeriod=' + highchart_time.value + '&gtm=false';
+  document.getElementById('chart_frame').src = 'https://webtrader.binary.com?affiliates=true&instrument=' + underlying + '&timePeriod=' + highchart_time.value + '&gtm=false';
 }

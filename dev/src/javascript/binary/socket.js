@@ -115,6 +115,7 @@ function BinarySocketClass() {
             }
 
             if(isReady()=== true){
+                page.header.validate_cookies();
                 if (clock_started === false) {
                     page.header.start_clock_ws();
                 }
@@ -130,21 +131,27 @@ function BinarySocketClass() {
                 }
                 var type = response.msg_type;
                 if (type === 'authorize') {
-                    authorized = true;
-                    TUser.set(response.authorize);
-                    if(typeof events.onauth === 'function'){
-                        events.onauth();
+                    if(response.hasOwnProperty('error')) {
+                       send({'logout': '1', passthrough: {'redirect': 'login'}});
                     }
-                    send({balance:1, subscribe: 1});
-                    sendBufferedSends();
+                   else {
+                       authorized = true;
+                       TUser.set(response.authorize);
+                       if(typeof events.onauth === 'function'){
+                           events.onauth();
+                       }
+                       send({balance:1, subscribe: 1});
+                       sendBufferedSends();
+                   }
                 } else if (type === 'balance') {
-                    ViewBalanceUI.updateBalances(response.balance);
+                   ViewBalanceUI.updateBalances(response);
                 } else if (type === 'time') {
-                    page.header.time_counter(response);
+                   page.header.time_counter(response);
                 } else if (type === 'logout') {
-                    page.header.do_logout(response);
-                } else if (type === 'error') {
-                    if(response.error.code === 'RateLimit') {
+                   page.header.do_logout(response);
+                }
+                if (response.hasOwnProperty('error')) {
+                    if(response.error && response.error.code && response.error.code === 'RateLimit') {
                         $('#ratelimit-error-message')
                             .css('display', 'block')
                             .on('click', '#ratelimit-refresh-link', function () {
@@ -152,7 +159,6 @@ function BinarySocketClass() {
                             });
                     }
                 }
-
                 if(typeof events.onmessage === 'function'){
                     events.onmessage(msg);
                 }

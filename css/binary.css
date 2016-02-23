@@ -552,7 +552,7 @@ ul.bullet li {
 ul.checked li {
   background: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNC4wLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDQzMzYzKSAgLS0+DQo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCINCgkgd2lkdGg9IjI0cHgiIGhlaWdodD0iMjBweCIgdmlld0JveD0iMCAwIDI0IDIwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAyNCAyMCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8Zz4NCgkJPGc+DQoJCQk8cG9seWdvbiBmaWxsPSIjRTk4MDI1IiBwb2ludHM9IjguNjIzLDE5LjU1NyAwLDEwLjkzNiAzLjczNiw3LjE5OCA4LjYyMywxMi4wODIgMjAuMjYyLDAuNDQzIDI0LDQuMTggOC42MjMsMTkuNTU3IAkJCSIvPg0KCQk8L2c+DQoJPC9nPg0KPC9nPg0KPC9zdmc+DQo=") no-repeat;
   background-position: left;
-  padding-left: 28px;
+  padding-left: 35px;
   min-height: 24px;
 }
 
@@ -605,6 +605,10 @@ ul.checked li {
 
 .empty-space {
   margin-top: 137px;
+}
+
+#main-menu .items li a {
+  white-space: nowrap;
 }
 
 *,
@@ -1536,6 +1540,7 @@ abbr {
   color: #fff;
   font-size: 85%;
   margin-bottom: 1em;
+  margin-top: 1em;
 }
 .home-content #verify-email-form .error-message {
   font-style: italic;
@@ -1595,32 +1600,28 @@ abbr {
 .home-content .xhead {
   padding-bottom: 15px;
   border-bottom: 1px solid #DEDEDE;
+  margin-bottom: 15px;
 }
 .home-content .inlined {
   display: inline-block;
 }
 .home-content .xlist1 {
   background: url(../images/pages/home/xicon-1.png) no-repeat;
-  padding-left: 40px;
-  min-height: 24px;
-  background-size: 30px;
 }
 .home-content .xlist2 {
   background: url(../images/pages/home/xicon-2.png) no-repeat;
-  padding-left: 40px;
-  min-height: 24px;
-  background-size: 30px;
 }
 .home-content .xlist3 {
   background: url(../images/pages/home/xicon-3.png) no-repeat;
+}
+.home-content .xlist1, .home-content .xlist2, .home-content .xlist3 {
   padding-left: 40px;
   min-height: 24px;
   background-size: 30px;
-}
-.home-content .xlist1, .home-content .xlist2, .home-content .xlist3 {
   margin-left: 50px !important;
   padding-bottom: 1em;
   text-align: left;
+  background-position: left top;
 }
 .home-content .small-image {
   width: 10%;
@@ -2062,15 +2063,6 @@ abbr {
 }
 #betpage #content-holder #content > .content-tab-container .tab-content-wrapper #tab_graph-content {
   width: 100%;
-}
-#betpage #content-holder #content > .content-tab-container .tab-content-wrapper #tab_ohlc-content #prices_statistics_table .daily_price_stats_head .table_heading {
-  text-align: center;
-  background-color: #F2F2F2;
-  font-weight: bold;
-  font-size: 1.1em;
-}
-#betpage #content-holder #content > .content-tab-container .tab-content-wrapper #tab_ohlc-content #prices_statistics_table .daily_price_stats_head hr {
-  display: block;
 }
 #betpage #content-holder #content > .content-tab-container .tab-content-wrapper form.smallfont {
   height: 40px;
@@ -3262,6 +3254,12 @@ input#duration_amount {
   background-image: url("../images/pages/logintrouble/ielogo-icon_1.png");
 }
 
+#microsoft_edge {
+  background-image: url("../images/pages/logintrouble/edgelogo.png");
+  background-size: 50%;
+  margin-top: -1em;
+}
+
 #firefox {
   background-image: url("../images/pages/logintrouble/firefoxlogo-icon_1.png");
 }
@@ -3869,6 +3867,12 @@ div#price_table_notes {
   margin: 1em 0;
 }
 
+@media screen and (max-width: 768px) {
+  #microsoft_edge {
+    background-size: 65%;
+    margin-top: -1em;
+  }
+}
 table {
   border-collapse: collapse;
   font-size: 0.9em;
@@ -4525,26 +4529,26 @@ table .loss, table .lower {
     font-size: 80% !important;
   }
 }
-.career .xquote {
+.career .xquote, .user_testing .xquote {
   background-color: #F2F2F2;
   padding: 20px 20px;
   margin: 30px 0;
 }
-.career .xquote div {
+.career .xquote div, .user_testing .xquote div {
   overflow: hidden;
+  display: table;
 }
-.career .xquote div .picture {
+.career .xquote div .picture, .user_testing .xquote div .picture {
   float: left;
   padding-right: 20px;
-  width: 15%;
 }
-.career .xquote div .text {
-  margin-top: 5%;
+.career .xquote div .text, .user_testing .xquote div .text {
+  display: table-cell;
+  vertical-align: middle;
 }
-@media screen and (max-width: 767px) {
-  .career .xquote .text {
-    margin-top: 2% !important;
-  }
+.career .xquote div .text span, .user_testing .xquote div .text span {
+  color: #58595B;
+  font-size: 12px;
 }
 
 .empty-space {
@@ -4978,6 +4982,112 @@ div.kineticjs-content {
   float: right;
 }
 
+#androidApp {
+  width: 100px;
+  height: 30px;
+  display: inline-block;
+  background: url("../images/pages/trade/google-play-badge.png") no-repeat;
+  background-size: 100px 30px;
+  position: relative;
+}
+
+/* trading page */
+#trading_socket_container #androidApp {
+  float: right;
+}
+@media (max-width: 768px) {
+  #trading_socket_container #androidApp {
+    margin: 0 auto;
+    padding-bottom: 10px;
+    display: block;
+    float: none;
+  }
+}
+
+.open-positions .grd-grid-4:not(:first-child) {
+  border: 1px dashed #d9d9d9;
+  border-width: 0 0 0 1px;
+}
+.open-positions .grd-grid-4:nth-child(3n+1) {
+  border-width: 0;
+}
+.open-positions .grd-grid-3 {
+  text-align: center;
+}
+.open-positions .grd-grid-9, .open-positions .grd-grid-3, .open-positions .grd-row-padding {
+  padding-left: 0;
+  padding-right: 0;
+}
+.open-positions img.responsive {
+  margin-top: 1.1em;
+  width: 50%;
+}
+.open-positions h2 {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.open-positions .title-section {
+  height: 2.5em;
+}
+.open-positions .paragraph-section {
+  height: 10em;
+  overflow: visible;
+}
+.open-positions .top-margin {
+  margin-top: 40px;
+}
+
+.job-details .grd-grid-3 .grd-grid-12 {
+  padding-left: 0;
+}
+.job-details .grd-grid-3 .grd-grid-12:first-child {
+  margin-bottom: .3em;
+}
+.job-details .sidebar {
+  position: relative;
+}
+.job-details .dept-image {
+  width: 80%;
+}
+
+@media screen and (max-width: 768px) {
+  .open-positions .grd-grid-phablet-6 {
+    border-width: 0 !important;
+  }
+  .open-positions .grd-grid-phablet-6:nth-child(even) {
+    border-width: 0 0 0 1px !important;
+  }
+  .open-positions .grd-grid-phablet-6.first, .open-positions .top-margin {
+    margin-top: 20px;
+  }
+  .open-positions .grd-grid-phablet-6.first .title-section {
+    height: 1.4em;
+  }
+  .open-positions .paragraph-section {
+    height: 9em;
+  }
+}
+@media screen and (max-width: 480px) {
+  .open-positions .grd-grid-mobile-12:not(:first-child) {
+    padding-top: 20px;
+    margin-top: auto !important;
+  }
+  .open-positions h1 {
+    text-align: center;
+  }
+  .open-positions img.responsive {
+    width: 40%;
+  }
+  .open-positions .title-section {
+    height: 1em;
+  }
+  .open-positions .paragraph-section {
+    height: auto;
+  }
+  .open-positions .top-margin {
+    margin-top: auto;
+  }
+}
 /* static pages */
 @keyframes spinning {
   from {
@@ -5028,6 +5138,9 @@ div.kineticjs-content {
   font-size: 1rem;
   position: relative;
   opacity: 0;
+}
+#trading_socket_container #markets_closed_msg {
+  margin-top: 0px;
 }
 #trading_socket_container abbr {
   text-decoration: none;
@@ -5898,16 +6011,6 @@ tr#highchart_duration td:nth-child(2) {
 }
 #virtual-form div.hint, #change-password div.hint, .usersettingssecurityws-content div.hint {
   margin-top: 10px;
-  font-size: 15px;
-}
-#virtual-form div.hint ul.disc, #change-password div.hint ul.disc, .usersettingssecurityws-content div.hint ul.disc {
-  margin-top: 10px;
-  margin-bottom: 0;
-  list-style-type: disc;
-}
-#virtual-form div.hint ul.disc li, #change-password div.hint ul.disc li, .usersettingssecurityws-content div.hint ul.disc li {
-  font-size: 14px;
-  margin: .5em 0 0 1em;
 }
 #virtual-form p.error-message-password, #change-password p.error-message-password, .usersettingssecurityws-content p.error-message-password {
   margin: 0.5em 0;
@@ -5950,7 +6053,7 @@ body.JA #asset-forex div.table-header:nth-of-type(n + 3), body.JA #asset-forex d
 body.JA #tradingtimes-forex div.table-header:nth-of-type(n + 3), body.JA #tradingtimes-forex div.table-body:nth-of-type(n + 15) {
   display: none !important;
 }
-body.JA #topMenuHighCharts, body.JA #topMenuBetaInterface {
+body.JA #topMenuWebtrader, body.JA #topMenuBetaInterface {
   display: none !important;
 }
 body.JA #footer-regulatory .grd-grid-9, body.JA #footer-regulatory .grd-grid-phablet-7 {
@@ -6127,7 +6230,7 @@ body.PT h1, body.PT h2, body.PT h3, body.PT h4, body.PT h5, body.PT h6 {
     position: relative !important;
     left: 0px !important;
     width: 100% !important;
-    z-index: 0 !important;
+    z-index: 1 !important;
     margin-top: 0px !important;
     background: #fff;
   }

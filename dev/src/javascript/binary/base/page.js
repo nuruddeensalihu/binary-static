@@ -267,7 +267,7 @@ Menu.prototype = {
                 this.show_main_menu();
             }
         } else {
-            var is_mojo_page = /^\/$|\/login|\/home|\/smart-indices|\/ad|\/open-source-projects|\/white-labels|\/bulk-trader-facility|\/partners|\/payment-agent|\/about-us|\/group-information|\/group-history|\/careers|\/contact|\/terms-and-conditions|\/terms-and-conditions-jp|\/responsible-trading|\/us_patents|\/lost_password$/.test(window.location.pathname);
+            var is_mojo_page = /^\/$|\/login|\/home|\/smart-indices|\/ad|\/open-source-projects|\/white-labels|\/bulk-trader-facility|\/partners|\/payment-agent|\/about-us|\/group-information|\/group-history|\/careers|\/contact|\/terms-and-conditions|\/terms-and-conditions-jp|\/responsible-trading|\/us_patents|\/lost_password|\/realws|\/virtualws|\/open-positions|\/job-details|\/user-testing$/.test(window.location.pathname);
             if(!is_mojo_page) {
                 trading.addClass('active');
                 this.show_main_menu();
@@ -299,22 +299,29 @@ Menu.prototype = {
 
         this.on_mouse_hover(active.item);
 
+        this.disable_not_allowed_markets();
+    },
+    disable_not_allowed_markets: function() {
         // enable only allowed markets
         var allowed_markets = $.cookie('allowed_markets');
-        if(allowed_markets) {
-            var markets_array = allowed_markets.split(',');
-            var sub_items = $('li#topMenuStartBetting ul.sub_items');
-            sub_items.find('li').each(function () {
-                var link_id = $(this).attr('id').split('_')[1];
-                if(markets_array.indexOf(link_id) < 0) {
-                    var link = $(this).find('a');
-                    if(markets_array.indexOf(link.attr('id')) < 0) {
-                        var link_text = link.text();
-                        link.replaceWith($('<span/>', {class: 'link disabled-link', text: link_text}));
-                    }
-                }
-            });
-        }
+        var markets_array = allowed_markets ? allowed_markets.split(',') : [];
+        var sub_items = $('li#topMenuStartBetting ul.sub_items');
+        var isReal = $.cookie('loginid') && !(/VRT/.test($.cookie('loginid')));
+        sub_items.find('li').each(function () {
+            var link_id = $(this).attr('id').split('_')[1];
+            if(markets_array.indexOf(link_id) < 0 && isReal) {
+                var link = $(this).find('a');
+                var link_text = link.text();
+                var link_href = link.attr('href');
+                link.replaceWith($('<span/>', {class: 'link disabled-link', text: link_text, link_url: link_href}));
+            }
+            else {
+                var span = $(this).find('span');
+                var span_text = span.text();
+                var span_href = span.attr('link_url');
+                span.replaceWith($('<a/>', {class: 'link pjaxload', text: span_text, href: span_href}));
+            }
+        });
     },
     reset: function() {
         $("#main-menu .item").unbind();
@@ -474,7 +481,7 @@ Header.prototype = {
     register_dynamic_links: function() {
         var logged_in_url = page.url.url_for('');
         if(this.client.is_logged_in) {
-            logged_in_url = page.url.url_for('user/my_account');
+            logged_in_url = page.url.url_for('user/my_accountws');
         }
 
         $('#logo').attr('href', logged_in_url).on('click', function(event) {
@@ -523,16 +530,40 @@ Header.prototype = {
             BinarySocket.send({"logout": "1"});
         });
     },
+
+    validate_cookies: function(){
+        if (getCookieItem('login') && getCookieItem('loginid_list')){
+            var accIds = $.cookie("loginid_list").split("+");
+            var loginid = $.cookie("loginid");
+
+            if(!client_form.is_loginid_valid(loginid)){
+                BinarySocket.send({"logout": "1"});
+            }
+
+            for(var i=0;i<accIds.length;i++){
+                if(!client_form.is_loginid_valid(accIds[i].split(":")[0])){
+                    BinarySocket.send({"logout": "1"});
+                }
+            }
+        }
+    },
     do_logout : function(response){
         if("logout" in response && response.logout === 1){
             sessionStorage.setItem('currencies', '');
-            var cookies = ['login', 'loginid', 'loginid_list', 'email', 'settings', 'reality_check'];
-            var current_domain = window.location.hostname.replace('www', '');
+            var cookies = ['login', 'loginid', 'loginid_list', 'email', 'settings', 'reality_check', 'affiliate_token', 'affiliate_tracking'];
+            var current_domain = '.' + document.domain.split('.').slice(-2).join('.');
             cookies.map(function(c){
                 $.removeCookie(c, {path: '/', domain: current_domain});
             });
 
-            window.location.href = page.url.url_for(''); //redirect to homepage
+            var redirectPage;
+            if(response.echo_req.hasOwnProperty('passthrough') && response.echo_req.passthrough.hasOwnProperty('redirect')) {
+                redirectPage = response.echo_req.passthrough.redirect;
+            }
+            else {
+                redirectPage = ''; //redirect to homepage
+            }
+            window.location.href = page.url.url_for(redirectPage);
         }
     },
 };
@@ -865,12 +896,11 @@ Page.prototype = {
     },
     record_affiliate_exposure: function() {
         var token = this.url.param('t');
-        var token_valid = /\w{32}/.test(token);
-        var is_subsidiary = /\w{1}/.test(this.url.param('s'));
-
-        if (!token_valid) {
+        if (!token || token.length !== 32) {
             return false;
         }
+        var token_length = token.length;
+        var is_subsidiary = /\w{1}/.test(this.url.param('s'));
 
         var cookie_value = $.cookie('affiliate_tracking');
         if(cookie_value) {
@@ -884,7 +914,7 @@ Page.prototype = {
 
         //Record the affiliate exposure. Overwrite existing cookie, if any.
         var cookie_hash = {};
-        if (token_valid) {
+        if (token_length === 32) {
             cookie_hash["t"] = token.toString();
         }
         if (is_subsidiary) {

@@ -51,11 +51,15 @@ function processMarket(flag) {
 function processMarketUnderlying() {
     'use strict';
 
-    if (!document.getElementById('underlying')) {
+    var underlyingElement = document.getElementById('underlying');
+    if (!underlyingElement) {
         return;
     }
 
-    var underlying = document.getElementById('underlying').value;
+    if(underlyingElement.selectedIndex < 0) {
+        underlyingElement.selectedIndex = 0;
+    }
+    var underlying = underlyingElement.value;
     sessionStorage.setItem('underlying', underlying);
 
     showFormOverlay();

@@ -14,24 +14,49 @@ var TradingAnalysis = (function() {
     var trading_digit_info, tab_japan_info;
 
     var requestTradeAnalysis = function() {
-        'use strict';
-        $.ajax({
-                method: 'POST',
-                url: page.url.url_for('trade/trading_analysis'),
-                data: {
-                    underlying: sessionStorage.getItem('underlying'),
-                    formname: sessionStorage.getItem('formname'),
-                    contract_category: Contract.form(),
-                    barrier: Contract.barrier()
-                }
-            })
-            .done(function(data) {
-                var contentId = document.getElementById('trading_bottom_content');
-                contentId.innerHTML = data;
-                sessionStorage.setItem('currentAnalysisTab', getActiveTab());
-                bindAnalysisTabEvent();
-                loadAnalysisTab();
-            });
+        var contentId = document.getElementById('trading_bottom_content');
+        var formName = $('#contract_form_name_nav').find('.a-active').attr('id');
+        if (formName === 'matchdiff') {
+          formName = 'digits';
+        }
+        contentId.innerHTML =
+          '<div class="content-tab-container page-section">' +
+            '<div class="tab-menu">' +
+              '<div class="tab-menu-wrap grd-container">' +
+                '<ul id="betsBottomPage" class="tm-ul">' +
+                  '<li id="tab_graph" class="tm-li first">' +
+                    '<a href="#tab_graph" class="tm-a first">' + text.localize('Chart') + '</a>' +
+                  '</li>' +
+                  '<li id="tab_explanation" class="tm-li active">' +
+                    '<a href="' + page.url.url_for('trade/bet_explanation') + '&underlying_symbol=' + $('#underlying').val() +
+                    '&form_name=' + formName +
+                    '" class="tm-a">' + text.localize('Explanation') + '</a>' +
+                  '</li>' +
+                  '<li id="tab_last_digit" class="invisible tm-li">' +
+                    '<a href="' + page.url.url_for('trade/last_digit_info?underlying=' + $('#underlying').val() +
+                    '&ajax_only=1') + '" class="tm-a">' +
+                    text.localize('Last Digit Stats') + '</a>' +
+                  '</li>' +
+                  '<li id="tab_japan_info" class="invisible tm-li last">' +
+                    '<a href="#" class="tm-a">' + text.localize('Prices') + '</a>' +
+                  '</li>' +
+                '</ul>' +
+              '</div>' +
+            '</div>' +
+            '<div class="tab-content grd-container">' +
+              '<div class="tab-content-wrapper" id="bet_bottom_content">' +
+                '<div id="tab_graph-content" class="toggle-content invisible">' +
+                  '<div id="trade_live_chart"></div>' +
+                '</div>' +
+                '<div id="tab_explanation-content" class="toggle-content selectedTab"></div>' +
+                '<div id="tab_last_digit-content" class="toggle-content invisible "></div>' +
+                '<div id="tab_japan_info-content" class="toggle-content invisible "></div>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        sessionStorage.setItem('currentAnalysisTab', getActiveTab());
+        bindAnalysisTabEvent();
+        loadAnalysisTab();
     };
 
     /*
@@ -96,11 +121,7 @@ var TradingAnalysis = (function() {
                     })
                     .done(function(data) {
                         contentId.innerHTML = data;
-                        if (currentTab === 'tab_intradayprices') {
-                            bindSubmitForIntradayPrices();
-                        } else if (currentTab === 'tab_ohlc') {
-                            bindSubmitForDailyPrices();
-                        } else if (currentTab == 'tab_last_digit') {
+                        if (currentTab == 'tab_last_digit') {
                             trading_digit_info = new BetAnalysis.DigitInfo();
                             trading_digit_info.on_latest();
                             trading_digit_info.show_chart(sessionStorage.getItem('underlying'));
@@ -149,56 +170,6 @@ var TradingAnalysis = (function() {
         }
 
         return selectedTab;
-    };
-
-    /*
-     * function to bind submit event for intraday prices
-     */
-    var bindSubmitForIntradayPrices = function() {
-        var elm = document.getElementById('intraday_prices_submit');
-        if (elm) {
-            elm.addEventListener('click', function(e) {
-                e.preventDefault();
-                var formElement = document.getElementById('analysis_intraday_prices_form'),
-                    contentTab = document.querySelector('#tab_intradayprices-content'),
-                    underlyingSelected = contentTab.querySelector('select[name="underlying"]'),
-                    dateSelected = contentTab.querySelector('select[name="date"]');
-
-                $.ajax({
-                        method: 'GET',
-                        url: formElement.getAttribute('action') + '&underlying=' + underlyingSelected.value + '&date=' + dateSelected.value,
-                    })
-                    .done(function(data) {
-                        contentTab.innerHTML = data;
-                        bindSubmitForIntradayPrices();
-                    });
-            });
-        }
-    };
-
-    /*
-     * function to bind submit event for intraday prices
-     */
-    var bindSubmitForDailyPrices = function() {
-        var elm = document.getElementById('daily_prices_submit');
-        if (elm) {
-            elm.addEventListener('click', function(e) {
-                e.preventDefault();
-                var formElement = document.getElementById('analysis_daily_prices_form'),
-                    contentTab = document.querySelector('#tab_ohlc-content'),
-                    underlyingSelected = sessionStorage.getItem('underlying'),
-                    daysSelected = contentTab.querySelector('input[name="days_to_display"]');
-
-                $.ajax({
-                        method: 'GET',
-                        url: formElement.getAttribute('action') + '&underlying_symbol=' + underlyingSelected + '&days_to_display=' + daysSelected.value,
-                    })
-                    .done(function(data) {
-                        contentTab.innerHTML = data;
-                        bindSubmitForDailyPrices();
-                    });
-            });
-        }
     };
 
     return {
